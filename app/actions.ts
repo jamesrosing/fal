@@ -11,8 +11,20 @@ if (!process.env.BLOB_READ_WRITE_TOKEN) {
   throw new Error("BLOB_READ_WRITE_TOKEN environment variable is not set")
 }
 
+type OutputFormat = "png" | "jpg" | "jpeg"
+
 export async function processImage(formData: FormData) {
   const file = formData.get("image") as File
+  const backgroundColor = formData.get("backgroundColor") as string || "#ffffff"
+  const outputFormat = (formData.get("outputFormat") as OutputFormat) || "png"
+
+  // Log the received data
+  console.log("Received form data:", {
+    fileName: file?.name,
+    backgroundColor,
+    outputFormat
+  })
+
   if (!file) {
     throw new Error("No file uploaded")
   }
@@ -27,16 +39,14 @@ export async function processImage(formData: FormData) {
 
     console.log("Uploaded image URL:", imageUrl)
     
+    // Prepare the request body according to the API schema
     const requestBody = {
-      image_url: imageUrl,
-      model: "General Use (Light)",
-      output_format: "png",
-      refine_foreground: true
+      image_url: imageUrl
     }
     
     console.log("Sending request to Fal AI:", requestBody)
 
-    // Use Fal AI to remove the background
+    // Remove the background with Fal AI
     const response = await fetch("https://fal.run/fal-ai/birefnet/v2", {
       method: "POST",
       headers: {
@@ -52,7 +62,8 @@ export async function processImage(formData: FormData) {
         status: response.status,
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
-        error: errorData
+        error: errorData,
+        requestBody
       })
       throw new Error(
         `Fal AI API error (${response.status}): ${
@@ -71,7 +82,11 @@ export async function processImage(formData: FormData) {
     }
 
     revalidatePath("/")
-    return { success: true, url: processedImageUrl }
+    return { 
+      success: true, 
+      url: processedImageUrl,
+      format: outputFormat
+    }
   } catch (error) {
     console.error("Error processing image:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to process image")

@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button"
 
 interface ImageDisplayProps {
   imageUrl: string | null;
+  format?: string;
 }
 
-export default function ImageDisplay({ imageUrl }: ImageDisplayProps) {
+export default function ImageDisplay({ imageUrl, format = "png" }: ImageDisplayProps) {
   const [isFullScreen, setIsFullScreen] = useState(false)
 
   const handleDownload = async () => {
@@ -21,7 +22,9 @@ export default function ImageDisplay({ imageUrl }: ImageDisplayProps) {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'processed-image.png'
+      // Use the correct extension based on the format
+      const extension = format === "jpeg" ? "jpg" : format
+      a.download = `processed-image.${extension}`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
