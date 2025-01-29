@@ -209,7 +209,7 @@ export function NavBar() {
           </Link>
           <nav className="hidden md:flex items-center">
             <div className="h-16 border-l border-gray-200 dark:border-gray-800"></div>
-            {navItems.slice(0, -1).map((item, index) => (
+            {navItems.slice(0, -1).map((item) => (
               <React.Fragment key={item.title}>
                 <div className="relative group border-r border-gray-200 dark:border-gray-800">
                   <button

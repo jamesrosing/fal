@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef } from "react"
 
 interface VideoLoaderProps {
   src: string
@@ -8,23 +8,25 @@ interface VideoLoaderProps {
 }
 
 export function VideoLoader({ src, onLoad }: VideoLoaderProps) {
-  const [isLoading, setIsLoading] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const video = document.createElement("video")
-
-    video.addEventListener("loadedmetadata", () => {
-      setIsLoading(false)
-      onLoad()
-    })
-
-    video.src = src
-
-    return () => {
-      video.remove()
+    const video = videoRef.current
+    if (video) {
+      video.addEventListener("loadeddata", onLoad)
+      return () => {
+        video.removeEventListener("loadeddata", onLoad)
+      }
     }
-  }, [src, onLoad])
+  }, [onLoad])
 
-  return null
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      className="hidden"
+      preload="auto"
+    />
+  )
 }
 

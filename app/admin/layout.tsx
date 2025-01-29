@@ -1,11 +1,14 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { AdminNavBar } from "@/components/admin-nav-bar"
+import type { ReactNode } from "react"
+import type { SVGProps } from "react"
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+interface AdminLayoutProps {
+  children: ReactNode;
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="border-b">
@@ -23,6 +26,7 @@ export default function AdminLayout({
           </nav>
         </div>
       </header>
+      <AdminNavBar />
       {children}
       <footer className="border-t mt-auto">
         <div className="container mx-auto px-4 py-4 text-center text-sm text-gray-500">
@@ -33,7 +37,7 @@ export default function AdminLayout({
   )
 }
 
-function MountainIcon(props: any) {
+function MountainIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

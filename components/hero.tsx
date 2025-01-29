@@ -10,22 +10,23 @@ function BackgroundVideo() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.addEventListener("loadeddata", () => {
+    const video = videoRef.current
+    if (video) {
+      video.addEventListener("loadeddata", () => {
         console.log("Video loaded successfully")
         setIsVideoLoaded(true)
       })
       
-      videoRef.current.addEventListener("error", (e) => {
+      video.addEventListener("error", (e) => {
         console.error("Video error:", e)
         setError("Failed to load video")
       })
     }
 
     return () => {
-      if (videoRef.current) {
-        videoRef.current.removeEventListener("loadeddata", () => setIsVideoLoaded(true))
-        videoRef.current.removeEventListener("error", () => setError(null))
+      if (video) {
+        video.removeEventListener("loadeddata", () => setIsVideoLoaded(true))
+        video.removeEventListener("error", () => setError(null))
       }
     }
   }, [])

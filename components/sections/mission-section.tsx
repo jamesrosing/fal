@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 
 export function MissionSection() {
@@ -33,10 +34,13 @@ export function MissionSection() {
       </div>
       <div className="relative mt-16 h-[800px] w-full overflow-hidden">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Allure%20MD%20Plastic%20Surgery%20+%20Dermatology.jpg-F9audkfbyoMRm8Bj6ss2sCa26IEGeK.jpeg"
             alt="Doctor consulting with patient"
-            className="h-full w-full object-cover object-center grayscale"
+            fill
+            className="object-cover object-center grayscale"
+            sizes="100vw"
+            priority
           />
           <div className="absolute inset-0 bg-black/60"></div>
         </div>

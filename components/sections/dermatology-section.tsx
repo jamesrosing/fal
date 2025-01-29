@@ -1,16 +1,20 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 
 export function DermatologySection() {
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20skin%20examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.webp"
           alt="Dermatology examination"
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
         />
         <div className="absolute inset-0 bg-black/50" />
       </div>

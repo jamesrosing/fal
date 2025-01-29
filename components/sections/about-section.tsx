@@ -1,16 +1,20 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 
 export function AboutSection() {
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/allure%20md%20team-Mm8n4OeNEk3cLrCdTqWLilNVaMKAIB.webp"
           alt="Allure MD Team"
-          className="h-full w-full object-cover object-center"
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/80" />
       </div>

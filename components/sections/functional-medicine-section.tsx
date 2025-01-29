@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 
 export function FunctionalMedicineSection() {
@@ -8,10 +9,13 @@ export function FunctionalMedicineSection() {
     <section className="relative min-h-screen bg-black text-white">
       <div className="relative min-h-screen bg-black text-white flex flex-col lg:flex-row">
         <div className="w-full h-[50vh] lg:h-screen relative overflow-hidden">
-          <img
+          <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dr.%20pooja%20gidwani%20functional%20medicine-Bu2sPZSjIHB98KY4WsMna2D9ii12tL.webp"
             alt="Dr. Gidwani consulting with patient"
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            fill
+            className="object-cover object-center"
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            priority
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>

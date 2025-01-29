@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useState } from "react"
 
@@ -10,10 +11,13 @@ export function MedicalSpaSection() {
   return (
     <section className="relative min-h-screen">
       <div className="absolute inset-0">
-        <img
+        <Image
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp"
           alt="Medical spa treatment"
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
       </div>

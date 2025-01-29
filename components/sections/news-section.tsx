@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 
 const news = [
@@ -45,10 +46,12 @@ export function NewsSection() {
                 viewport={{ once: true }}
               >
                 <div className="relative mb-4 h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={item.image || "/placeholder.svg"}
                     alt={item.title}
-                    className={`h-full w-full object-cover ${index === 1 ? "object-[center_15%]" : "object-center"}`}
+                    fill
+                    className={`object-cover ${index === 1 ? "object-[center_15%]" : "object-center"}`}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
                 <time className="text-sm text-gray-500">{item.date}</time>
