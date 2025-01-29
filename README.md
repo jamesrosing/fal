@@ -1,40 +1,75 @@
-# Image Background Remover
-
-A web application that removes backgrounds from images using Fal AI's background removal API.
+# Allure MD - Advanced Aesthetic Medicine Website
 
 ## Features
 
-- Upload and process images
-- Remove backgrounds automatically
-- Download processed images
-- Full-screen image preview
-- Responsive design
+- Responsive design for desktop and mobile devices
+- Dynamic navigation menu with dropdown functionality
+- Hero section with background video
+- Dark mode support (default)
+- Smooth scrolling and animations
+- Accessible design with proper ARIA attributes
+- Adobe Typekit font integration (Miller Text, Lorimer No 2, Figgins Sans)
 
 ## Tech Stack
 
-- Next.js 14
+- Next.js 13+ (App Router)
+- React 18+
 - TypeScript
-- Tailwind CSS
-- Fal AI API
-- Vercel Blob Storage
+- Tailwind CSS for styling
+- Framer Motion for animations
+- Radix UI for accessible component primitives
+- Lucide React for icons
+- next-themes for dark mode support
+- Adobe Typekit fonts
 
-## Getting Started
+## Setup Instructions
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env.local` file with the following variables:
-   ```
-   FAL_KEY=your_fal_ai_key
-   BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
-   ```
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+1. Clone the repository:
+
+
+## Font Usage
+
+The application uses Adobe Typekit fonts:
+- Miller Text (serif)
+- Lorimer No 2 (sans-serif)
+- Figgins Sans (sans-serif)
+
+These fonts are loaded through Adobe Typekit's CDN and are configured in the Tailwind CSS configuration. You can use them with the following utility classes:
+- `font-miller` - Miller Text
+- `font-lorimer` - Lorimer No 2
+- `font-figgins` - Figgins Sans
+
+The default sans-serif font is set to Figgins Sans, and the default serif font is set to Miller Text.
+
+## Adding Video Content
+
+To display the background video in the hero section:
+
+1. Prepare your video in WebM and MP4 formats.
+2. Name them `background-video.webm` and `background-video.mp4`.
+3. Place these files in the `public` directory.
+4. Add a poster image named `video-poster.jpg` in the `public` directory.
+
+## Customizing Content
+
+- Update navigation menu items in `components/nav-bar.tsx`
+- Modify hero section content in `components/hero.tsx`
+- Add new pages in the `app` directory
 
 ## Deployment
 
-The application is configured for deployment on Vercel. Make sure to add the environment variables in your Vercel project settings.
+1. Push your code to a GitHub repository.
+2. Import the project in your Vercel dashboard.
+3. Vercel will automatically set up the build configuration.
+4. Deploy!
+
+## Contributing
+
+Contributions are welcome! Please submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
+
+Note: The application uses dark mode by default. To change this, modify the `defaultTheme` prop in `app/layout.tsx`.
+

@@ -1,33 +1,25 @@
-"use client"
-
-import { useState } from "react"
-import ImageUploader from "./components/image-uploader"
-import ImageDisplay from "./components/image-display"
-
-interface ProcessedImage {
-  url: string;
-  format: string;
-}
+import { NavBar } from "@/components/nav-bar"
+import { Hero } from "@/components/hero"
+import { MissionSection } from "@/components/sections/mission-section"
+import { DermatologySection } from "@/components/sections/dermatology-section"
+import { MedicalSpaSection } from "@/components/sections/medical-spa-section"
+import { FunctionalMedicineSection } from "@/components/sections/functional-medicine-section"
+import { TeamSection } from "@/components/sections/team-section"
+import { AboutSection } from "@/components/sections/about-section"
+import { NewsSection } from "@/components/sections/news-section"
 
 export default function Home() {
-  const [processedImage, setProcessedImage] = useState<ProcessedImage | null>(null)
-
-  const handleImageProcessed = (url: string, format: string) => {
-    setProcessedImage({ url, format })
-  }
-
   return (
-    <div className="flex gap-8">
-      <div className="w-1/2">
-        <ImageUploader onImageProcessed={handleImageProcessed} />
-      </div>
-      <div className="w-1/2">
-        <ImageDisplay 
-          imageUrl={processedImage?.url ?? null} 
-          format={processedImage?.format}
-        />
-      </div>
-    </div>
+    <main className="min-h-screen bg-black">
+      <NavBar />
+      <Hero />
+      <MissionSection />
+      <DermatologySection />
+      <MedicalSpaSection />
+      <FunctionalMedicineSection />
+      <TeamSection />
+      <AboutSection />
+      <NewsSection />
+    </main>
   )
 }
-

@@ -1,12 +1,19 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { ThemeProvider } from "next-themes"
 import "./globals.css"
-
-const inter = Inter({ subsets: ["latin"] })
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Image Processor",
-  description: "Upload and process images",
+  title: "Allure MD | Advanced Aesthetic Medicine in Newport Beach",
+  description:
+    "Experience the perfect blend of science and beauty at Allure MD. Offering dermatology, medical spa treatments, and plastic surgery in Newport Beach.",
+  icons: [
+    {
+      url: "/favicon.ico",
+      rel: "icon",
+      type: "image/png",
+      sizes: "180x180",
+    },
+  ],
 }
 
 export default function RootLayout({
@@ -15,17 +22,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <div className="flex flex-col min-h-screen">
-          <header className="bg-primary text-primary-foreground p-4">
-            <h1 className="text-2xl font-bold">Image Processor</h1>
-          </header>
-          <main className="flex-grow container mx-auto py-8">{children}</main>
-          <footer className="bg-secondary text-secondary-foreground p-4 text-center">
-            <p>&copy; 2025 Image Processor. All rights reserved.</p>
-          </footer>
-        </div>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/1bp8vud.css" />
+      </head>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
