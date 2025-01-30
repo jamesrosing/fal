@@ -35,7 +35,10 @@ export function NewsSection() {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h2 className="mb-12 text-4xl font-bold">Latest News</h2>
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Latest Articles</h2>
+          <h3 className="mb-8 text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight font-serif">
+            Stay informed with Allure MD
+          </h3>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {news.map((item, index) => (
               <motion.article
@@ -54,16 +57,20 @@ export function NewsSection() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
-                <time className="text-sm text-gray-500">{item.date}</time>
-                <h3 className="mb-4 text-xl font-bold">{item.title}</h3>
-                <LearnMoreButton href="/news" underline={false}>
-                  Read More
-                </LearnMoreButton>
+                <time className="text-sm font-cerebri font-light text-gray-500">{item.date}</time>
+                <h4 className="mb-4 text-2xl font-serif">{item.title}</h4>
+                <div className="space-y-4">
+                  <LearnMoreButton href="/articles" underline={false} className="font-cerebri font-light">
+                    Read More
+                  </LearnMoreButton>
+                </div>
               </motion.article>
             ))}
           </div>
           <div className="mt-12 text-right">
-            <LearnMoreButton href="/blog">More Articles</LearnMoreButton>
+            <LearnMoreButton href="/articles" className="font-cerebri font-light">
+              View All Articles
+            </LearnMoreButton>
           </div>
         </motion.div>
       </div>

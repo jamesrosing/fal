@@ -14,16 +14,28 @@ export function TeamSection() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="relative z-10 flex flex-col justify-center px-4 py-24 text-white lg:w-1/2 lg:px-8"
+          className="relative z-10 flex flex-col justify-center px-4 py-24 text-white lg:w-1/2"
         >
-          <h2 className="mb-4 text-xl">Our Team</h2>
-          <h3 className="mb-8 text-4xl font-bold md:text-5xl">Expert care from trusted professionals</h3>
-          <p className="mb-8 text-lg leading-relaxed">
-            Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
-            decades of combined experience in aesthetic medicine. We&apos;re committed to delivering exceptional results
-            while ensuring your comfort and safety.
-          </p>
-          <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+          <motion.div className="max-w-3xl">
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Team</h2>
+            <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+              Expert care from trusted professionals
+            </h3>
+            <div className="space-y-6 text-lg font-cerebri font-light">
+              <p>
+                Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
+                decades of combined experience in aesthetic medicine. We are committed to delivering exceptional results
+                while ensuring your comfort and safety.
+              </p>
+              <div className="space-y-4">
+                <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Right side - Team photos grid */}
@@ -32,7 +44,7 @@ export function TeamSection() {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="relative grid grid-cols-2 gap-1 lg:w-1/2"
+          className="relative grid grid-cols-2 gap-1 lg:w-1/2 lg:-mr-[8.33%]"
         >
           {/* Top row */}
           <div className="relative h-full">

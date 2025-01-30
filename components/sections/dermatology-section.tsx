@@ -26,17 +26,23 @@ export function DermatologySection() {
           viewport={{ once: true }}
           className="max-w-3xl"
         >
-          <h2 className="mb-4 text-2xl">Dermatology</h2>
-          <h3 className="mb-8 text-5xl font-bold md:text-6xl">Advanced Skin Health Solutions</h3>
-          <p className="mb-12 text-lg leading-relaxed">
-            Our comprehensive dermatology services combine medical expertise with aesthetic precision. From skin cancer
-            screenings to advanced treatments for acne, eczema, and other conditions, we provide personalized care for
-            all your skin health needs.
-          </p>
-          <div className="space-y-4">
-            <LearnMoreButton href="/dermatology">Explore Dermatology Services</LearnMoreButton>
-            <br />
-            <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Dermatology</h2>
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+            Advanced skincare solutions for lasting results
+          </h3>
+          <div className="space-y-6 text-lg font-cerebri font-light">
+            <p>
+              Our comprehensive dermatology services combine medical expertise with aesthetic precision. From skin cancer
+              screenings to advanced treatments for acne, eczema, and other conditions, we provide personalized care for
+              all your skin health needs.
+            </p>
+            <div className="space-y-4">
+              <LearnMoreButton href="/team">Meet Dr. Susan Pearose</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/dermatology">Explore Dermatology Services</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
           </div>
         </motion.div>
       </div>

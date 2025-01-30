@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 interface LearnMoreButtonProps {
   href: string
@@ -15,14 +16,16 @@ export function LearnMoreButton({ href, children, className = "", underline = tr
   return (
     <Link href={href}>
       <motion.div
-        className={`group inline-flex items-center space-x-2 ${className} ${
-          underline ? "border-b border-current pb-1" : ""
-        }`}
+        className={cn(
+          "group inline-flex items-center space-x-2",
+          underline ? "border-b border-current pb-1" : "",
+          className
+        )}
         whileHover={{ x: 10 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
-        <span className="text-lg">{children}</span>
-        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        <span>{children}</span>
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
       </motion.div>
     </Link>
   )

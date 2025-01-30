@@ -15,11 +15,11 @@ export function MissionSection() {
           viewport={{ once: true }}
           className="max-w-4xl"
         >
-          <h2 className="mb-2 text-xl font-medium">Our Mission</h2>
-          <h3 className="mb-8 text-4xl font-bold md:text-6xl">
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Mission</h2>
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Transforming lives through advanced aesthetic medicine
           </h3>
-          <div className="space-y-6 text-lg">
+          <div className="space-y-6 text-lg font-cerebri font-light">
             <p>Beauty and wellness have evolved. How we approach aesthetic enhancement needs to evolve too.</p>
             <p>
               At Allure MD, we combine cutting-edge technology with artistic vision to deliver natural-looking results
@@ -46,13 +46,24 @@ export function MissionSection() {
         </div>
         <div className="container relative mx-auto px-4 py-24 text-white lg:px-8">
           <div className="max-w-2xl">
-            <h3 className="mb-6 text-4xl font-bold">Expert Care</h3>
-            <p className="mb-8 text-lg">
-              Our team of board-certified physicians and licensed medical professionals brings decades of combined
-              experience in aesthetic medicine. We stay at the forefront of medical advances to provide you with the
-              safest, most effective treatments available.
-            </p>
-            <LearnMoreButton href="/team">Meet Our Experts</LearnMoreButton>
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Plastic Surgery</h2>
+            <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+              Trusted expertise in aesthetic medicine
+            </h3>
+            <div className="space-y-6 text-lg font-cerebri font-light">
+              <p>
+                Our team of board-certified physicians and licensed medical professionals brings decades of combined
+                experience in aesthetic medicine. We stay at the forefront of medical advances to provide you with the
+                safest, most effective treatments available.
+              </p>
+              <div className="space-y-4">
+                <LearnMoreButton href="/team">Meet Dr. James Rosing</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+              </div>
+            </div>
           </div>
         </div>
       </div>

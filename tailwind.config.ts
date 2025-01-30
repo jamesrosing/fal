@@ -15,11 +15,9 @@ const config = {
     },
     extend: {
       fontFamily: {
-        miller: ["miller-text", "serif"],
-        lorimer: ["lorimer-no-2", "sans-serif"],
-        figgins: ["figgins-sans", "sans-serif"],
-        sans: ["figgins-sans", ...defaultTheme.fontFamily.sans],
-        serif: ["miller-text", ...defaultTheme.fontFamily.serif],
+        cerebri: ["Cerebri Sans", "sans-serif"],
+        sans: ["Cerebri Sans", ...defaultTheme.fontFamily.sans],
+        serif: ["garamond-premier-pro-subhead", ...defaultTheme.fontFamily.serif],
       },
       screens: {
         xs: "390px",

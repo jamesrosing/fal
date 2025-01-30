@@ -16,15 +16,23 @@ export const metadata: Metadata = {
   ],
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: 'dark',
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
-        <link rel="stylesheet" href="https://use.typekit.net/1bp8vud.css" />
+        <link rel="stylesheet" href="https://use.typekit.net/lbp8vud.css" />
+        {/* Remove or comment out eruda.js if not needed */}
+        {/* <script src="/__replco/static/devtools/eruda/3.2.3/eruda.js"></script> */}
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

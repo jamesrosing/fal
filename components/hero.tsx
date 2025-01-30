@@ -61,8 +61,24 @@ function BackgroundVideo() {
 }
 
 export function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.error("Video autoplay failed:", error)
+      })
+    }
+  }, [])
+
   return (
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero Section">
+      {isLoading && (
+        <div className="absolute inset-0 bg-black/90 flex items-center justify-center">
+          {/* Optional: Add a loading spinner here */}
+        </div>
+      )}
       <BackgroundVideo />
 
       <div className="relative h-full flex items-center text-white">
@@ -73,8 +89,8 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="max-w-3xl"
           >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">Advanced Aesthetic Medicine</h1>
-            <p className="text-xl sm:text-2xl mb-8 text-gray-200">Where artistry meets science</p>
+            <h1 className="hero-text mb-6">Advanced Aesthetic Medicine</h1>
+            <p className="hero-tagline text-xl sm:text-2xl mb-8 text-gray-200">Where artistry meets science</p>
             <Button
               variant="outline"
               size="lg"
