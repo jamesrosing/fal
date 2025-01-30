@@ -1,6 +1,7 @@
 import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
+import { Footer } from "@/components/footer"
 
 export const metadata: Metadata = {
   title: "Allure MD | Advanced Aesthetic Medicine in Newport Beach",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

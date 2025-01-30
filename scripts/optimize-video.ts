@@ -1,10 +1,52 @@
 import sharp from "sharp"
-import { exec } from "child_process"
-import { promisify } from "util"
-import fs from "fs/promises"
-import path from "path"
+import { exec } from "node:child_process"
+import { promisify } from "node:util"
+import { promises as fs } from "node:fs"
+import { join, normalize } from "node:path"
+import { fileURLToPath } from "node:url"
+import { dirname } from "node:path"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const execAsync = promisify(exec)
+
+// Helper function to normalize paths for ffmpeg
+function normalizePath(path: string): string {
+  // Normalize path and replace backslashes with forward slashes
+  return normalize(path).replace(/\\/g, '/')
+}
+
+interface VideoConfig {
+  name: string;
+  width: number;
+  height: number;
+  crf: {
+    webm: number;
+    mp4: number;
+  };
+}
+
+const VIDEO_CONFIGS: VideoConfig[] = [
+  {
+    name: "720p",
+    width: 1280,
+    height: 720,
+    crf: {
+      webm: 30,
+      mp4: 23,
+    },
+  },
+  {
+    name: "480p",
+    width: 854,
+    height: 480,
+    crf: {
+      webm: 33,
+      mp4: 26,
+    },
+  },
+]
 
 async function checkFfmpeg() {
   try {
@@ -48,23 +90,25 @@ async function checkVideoExists(videoPath: string) {
   }
 }
 
-async function generateVideoPoster() {
-  const videoDir = path.join(process.cwd(), "public", "video")
-  const videoPath = path.join(videoDir, "background.mp4")
+async function generateImages() {
+  const rootDir = join(__dirname, "..")
+  const videoDir = join(rootDir, "public", "video")
+  const imagesDir = join(rootDir, "public", "images")
+  const videoPath = join(videoDir, "background.mp4")
   
-  await ensureDirectoryExists(videoDir)
+  await ensureDirectoryExists(imagesDir)
 
   if (!(await checkVideoExists(videoPath))) {
     return false
   }
 
   try {
-    console.log("📸 Generating video poster...")
-    // Use ffmpeg to extract the first frame
-    await execAsync(`ffmpeg -i "${videoPath}" -vframes 1 -f image2 "${path.join(videoDir, "temp-poster.jpg")}"`)
+    console.log("📸 Generating images...")
+    // Extract first frame for poster
+    await execAsync(`ffmpeg -i "${normalizePath(videoPath)}" -vframes 1 -f image2 "${normalizePath(join(imagesDir, "temp-poster.jpg"))}"`)
     
-    // Optimize the poster image
-    await sharp(path.join(videoDir, "temp-poster.jpg"))
+    // Create poster image
+    await sharp(join(imagesDir, "temp-poster.jpg"))
       .resize(1920, 1080, {
         fit: "cover",
         position: "center"
@@ -73,35 +117,67 @@ async function generateVideoPoster() {
         quality: 80,
         progressive: true
       })
-      .toFile(path.join(videoDir, "video-poster.jpg"))
+      .toFile(join(imagesDir, "hero-poster.jpg"))
 
-    // Clean up temporary file
-    await fs.unlink(path.join(videoDir, "temp-poster.jpg"))
+    // Create fallback image (slightly different crop/processing)
+    await sharp(join(imagesDir, "temp-poster.jpg"))
+      .resize(1920, 1080, {
+        fit: "cover",
+        position: "center"
+      })
+      .jpeg({ 
+        quality: 85,
+        progressive: true
+      })
+      .toFile(join(imagesDir, "hero-fallback.jpg"))
+
+    // Clean up
+    await fs.unlink(join(imagesDir, "temp-poster.jpg"))
     
-    console.log("✅ Video poster generated successfully")
+    console.log("✅ Images generated successfully")
     return true
   } catch (error) {
-    console.error("Error generating video poster:", error)
+    console.error("Error generating images:", error)
     return false
   }
 }
 
 async function optimizeVideo() {
-  const videoDir = path.join(process.cwd(), "public", "video")
-  const videoPath = path.join(videoDir, "background.mp4")
+  const rootDir = join(__dirname, "..")
+  const sourceDir = join(rootDir, "public", "video")
+  const targetDir = join(rootDir, "public", "videos")
+  const videoPath = join(sourceDir, "background.mp4")
   
-  await ensureDirectoryExists(videoDir)
+  await ensureDirectoryExists(targetDir)
 
   if (!(await checkVideoExists(videoPath))) {
     return false
   }
 
   try {
-    console.log("🎬 Converting video to WebM format...")
-    // Convert to WebM with VP9 codec
-    await execAsync(`ffmpeg -i "${videoPath}" -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus "${path.join(videoDir, "background.webm")}"`)
+    console.log("🎬 Optimizing video for multiple formats...")
     
-    console.log("✅ Video optimization completed")
+    for (const config of VIDEO_CONFIGS) {
+      console.log(`\nProcessing ${config.name} version...`)
+      
+      // Convert to WebM with VP9 codec
+      console.log(`- Creating WebM version...`)
+      await execAsync(
+        `ffmpeg -i "${normalizePath(videoPath)}" -c:v libvpx-vp9 -crf ${config.crf.webm} -b:v 0 ` +
+        `-vf scale=${config.width}:${config.height} -c:a libopus ` +
+        `"${normalizePath(join(targetDir, `hero-${config.name}.webm`))}"`,
+      )
+      
+      // Convert to MP4 with H.264 codec
+      console.log(`- Creating MP4 version...`)
+      await execAsync(
+        `ffmpeg -i "${normalizePath(videoPath)}" -c:v libx264 -crf ${config.crf.mp4} ` +
+        `-vf scale=${config.width}:${config.height} -movflags +faststart ` +
+        `"${normalizePath(join(targetDir, `hero-${config.name}.mp4`))}"`,
+      )
+    }
+    
+    console.log("\n✅ Video optimization completed")
     return true
   } catch (error) {
     console.error("Error optimizing video:", error)
@@ -109,23 +185,25 @@ async function optimizeVideo() {
   }
 }
 
-// Run the optimization process
 async function main() {
   console.log("🎥 Starting video optimization process...")
   
-  // Check for ffmpeg installation
   if (!(await checkFfmpeg())) {
     return
   }
 
-  const posterSuccess = await generateVideoPoster()
+  const imagesSuccess = await generateImages()
   const optimizeSuccess = await optimizeVideo()
 
-  if (posterSuccess && optimizeSuccess) {
-    console.log("\n✨ All done! Your video has been optimized and the poster has been generated.")
+  if (imagesSuccess && optimizeSuccess) {
+    console.log("\n✨ All done! Your video has been optimized and images have been generated.")
     console.log("\nFiles created:")
-    console.log("- public/video/video-poster.jpg")
-    console.log("- public/video/background.webm")
+    console.log("- public/images/hero-poster.jpg")
+    console.log("- public/images/hero-fallback.jpg")
+    console.log("- public/videos/hero-720p.webm")
+    console.log("- public/videos/hero-720p.mp4")
+    console.log("- public/videos/hero-480p.webm")
+    console.log("- public/videos/hero-480p.mp4")
   } else {
     console.log("\n⚠️ Some operations failed. Please check the errors above.")
   }

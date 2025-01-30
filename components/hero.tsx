@@ -2,84 +2,39 @@
 
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { useEffect, useRef, useState } from "react"
+import { BackgroundVideo } from "@/components/ui/background-video"
 
-function BackgroundVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (video) {
-      video.addEventListener("loadeddata", () => {
-        console.log("Video loaded successfully")
-        setIsVideoLoaded(true)
-      })
-      
-      video.addEventListener("error", (e) => {
-        console.error("Video error:", e)
-        setError("Failed to load video")
-      })
-    }
-
-    return () => {
-      if (video) {
-        video.removeEventListener("loadeddata", () => setIsVideoLoaded(true))
-        video.removeEventListener("error", () => setError(null))
-      }
-    }
-  }, [])
-
-  return (
-    <div className="absolute inset-0 w-full h-full">
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
-          <p className="text-white">{error}</p>
-        </div>
-      )}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className={`object-cover w-full h-full transition-opacity duration-1000 ${
-          isVideoLoaded ? "opacity-100" : "opacity-0"
-        }`}
-        poster="/video/video-poster.jpg"
-        aria-hidden="true"
-      >
-        <source src="/video/background.webm" type="video/webm" />
-        <source src="/video/background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div className="absolute inset-0 bg-black/30" />
-    </div>
-  )
-}
+const videoSources = [
+  {
+    src: "/videos/hero-720p.webm",
+    type: "video/webm",
+    media: "(min-width: 720px)",
+  },
+  {
+    src: "/videos/hero-720p.mp4",
+    type: "video/mp4",
+    media: "(min-width: 720px)",
+  },
+  {
+    src: "/videos/hero-480p.webm",
+    type: "video/webm",
+    media: "(max-width: 719px)",
+  },
+  {
+    src: "/videos/hero-480p.mp4",
+    type: "video/mp4",
+    media: "(max-width: 719px)",
+  },
+]
 
 export function Hero() {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch((error) => {
-        console.error("Video autoplay failed:", error)
-      })
-    }
-  }, [])
-
   return (
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero Section">
-      {isLoading && (
-        <div className="absolute inset-0 bg-black/90 flex items-center justify-center">
-          {/* Optional: Add a loading spinner here */}
-        </div>
-      )}
-      <BackgroundVideo />
+      <BackgroundVideo
+        poster="/images/hero-poster.jpg"
+        fallbackImage="/images/hero-fallback.jpg"
+        sources={videoSources}
+      />
 
       <div className="relative h-full flex items-center text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

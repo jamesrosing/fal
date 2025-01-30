@@ -34,4 +34,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Video files
+public/video/*.mp4
+public/video/*.webm
+public/videos/*.mp4
+public/videos/*.webm
+
+# Keep poster images
+!public/images/hero-poster.jpg
+!public/images/hero-fallback.jpg
+
 .vercel
