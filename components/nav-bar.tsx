@@ -210,7 +210,10 @@ export function NavBar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className={cn("text-xl font-bold", isScrolled ? "text-gray-900 dark:text-white" : "text-white")}>
+            <span className={cn(
+              "text-xl font-['lorimer-no-2-condensed'] font-semibold",
+              isScrolled ? "text-gray-900 dark:text-white" : "text-white"
+            )}>
               ALLURE MD
             </span>
           </Link>
@@ -271,6 +274,7 @@ export function NavBar() {
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-full p-0 sm:max-w-sm bg-black">
+                <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
                 <div className="px-6 py-8">
                   {navItems.map((item) => (
                     <MobileNavItem key={item.title} item={item} />
