@@ -19,7 +19,7 @@ export function MedicalSpaSection() {
           sizes="100vw"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
       </div>
       <div className="relative container mx-auto px-4 min-h-screen flex flex-col justify-center lg:px-8">
         <motion.div
@@ -27,7 +27,7 @@ export function MedicalSpaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="max-w-3xl"
+          className="w-full lg:max-w-[50%]"
         >
           <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Medical Spa</h2>
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">

@@ -61,7 +61,14 @@ export function TeamSection() {
         <div className="relative h-screen">
           <div className="grid grid-cols-2 gap-1 h-full mx-1">
             {teamImages.map((image, index) => (
-              <div key={index} className="relative group">
+              <motion.div
+                key={index}
+                className="relative"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 1, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              >
                 <Image
                   src={image.src}
                   alt={image.alt}
@@ -70,8 +77,14 @@ export function TeamSection() {
                   sizes="50vw"
                   priority={index === 0}
                 />
-                <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:opacity-0" />
-              </div>
+                <motion.div
+                  className="absolute inset-0 bg-black/40"
+                  initial={{ opacity: 0.4 }}
+                  whileInView={{ opacity: 0 }}
+                  transition={{ duration: 1, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -118,7 +131,14 @@ export function TeamSection() {
           className="relative grid grid-cols-2 gap-1 lg:w-1/2 lg:-mr-[8.33%]"
         >
           {teamImages.map((image, index) => (
-            <div key={index} className="relative h-full">
+            <motion.div
+              key={index}
+              className="relative h-full"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1, delay: index * 0.2 }}
+              viewport={{ once: true }}
+            >
               <Image
                 src={image.src}
                 alt={image.alt}
@@ -127,8 +147,14 @@ export function TeamSection() {
                 sizes="25vw"
                 priority={index === 0}
               />
-              <div className="absolute inset-0 bg-black/40" />
-            </div>
+              <motion.div
+                className="absolute inset-0 bg-black/40"
+                initial={{ opacity: 0.4 }}
+                whileInView={{ opacity: 0 }}
+                transition={{ duration: 1, delay: index * 0.2 }}
+                viewport={{ once: true }}
+              />
+            </motion.div>
           ))}
         </motion.div>
       </div>

@@ -19,7 +19,7 @@ export function AboutSection() {
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:opacity-0" />
+          <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:opacity-0" />
         </div>
 
         {/* Desktop Text Content */}
@@ -29,7 +29,7 @@ export function AboutSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="max-w-3xl text-white py-24"
+            className="max-w-[50%] text-white py-24"
           >
             <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">About Us</h2>
             <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
@@ -40,16 +40,6 @@ export function AboutSection() {
                 At Allure MD, we bring together the expertise of board-certified physicians, skilled medical professionals,
                 and experienced aestheticians.
               </p>
-              <div className="grid grid-cols-2 gap-6 mb-12">
-                <div>
-                  <h4 className="mb-2 text-2xl font-normal">15+</h4>
-                  <p className="text-gray-300">Years of Combined Experience</p>
-                </div>
-                <div>
-                  <h4 className="mb-2 text-2xl font-normal">5,000+</h4>
-                  <p className="text-gray-300">Satisfied Patients</p>
-                </div>
-              </div>
               <div className="space-y-4">
                 <LearnMoreButton href="/about">Learn More About Us</LearnMoreButton>
                 <br />
@@ -71,7 +61,7 @@ export function AboutSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="max-w-3xl text-white"
+            className="w-full lg:max-w-[50%] text-white"
           >
             <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">About Us</h2>
             <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
@@ -82,16 +72,6 @@ export function AboutSection() {
                 At Allure MD, we bring together the expertise of board-certified physicians, skilled medical professionals,
                 and experienced aestheticians.
               </p>
-              <div className="grid grid-cols-2 gap-6 mb-12">
-                <div>
-                  <h4 className="mb-2 text-2xl font-normal">15+</h4>
-                  <p className="text-gray-300">Years of Combined Experience</p>
-                </div>
-                <div>
-                  <h4 className="mb-2 text-2xl font-normal">5,000+</h4>
-                  <p className="text-gray-300">Satisfied Patients</p>
-                </div>
-              </div>
               <div className="space-y-4">
                 <LearnMoreButton href="/about">Learn More About Us</LearnMoreButton>
                 <br />
@@ -113,7 +93,7 @@ export function AboutSection() {
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:opacity-0" />
+          <div className="absolute inset-0 bg-black/30 transition-opacity duration-300 group-hover:opacity-0" />
         </div>
       </div>
     </section>

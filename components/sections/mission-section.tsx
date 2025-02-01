@@ -13,7 +13,7 @@ export function MissionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="max-w-4xl"
+          className="w-full lg:max-w-[50%]"
         >
           <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Mission</h2>
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
@@ -42,10 +42,10 @@ export function MissionSection() {
             sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="absolute inset-0 bg-black/30"></div>
         </div>
         <div className="container relative mx-auto px-4 py-24 text-white lg:px-8">
-          <div className="max-w-2xl">
+          <div className="w-full lg:max-w-[50%] flex flex-col min-h-[800px] justify-end">
             <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Plastic Surgery</h2>
             <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
               Trusted expertise in aesthetic medicine

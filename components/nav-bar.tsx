@@ -211,7 +211,8 @@ export function NavBar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <span className={cn(
-              "text-xl font-['lorimer-no-2-condensed'] font-semibold",
+              "text-2xl font-semibold",
+              "font-['lorimer-no-2-condensed']",
               isScrolled ? "text-gray-900 dark:text-white" : "text-white"
             )}>
               ALLURE MD
