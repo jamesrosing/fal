@@ -1,3 +1,4 @@
+
 import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
@@ -32,7 +33,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="https://use.typekit.net/lbp8vud.css" />
+        <Script
+          id="typekit"
+          strategy="beforeInteractive"
+          src="https://use.typekit.net/lbp8vud.css"
+        />
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
@@ -43,4 +48,3 @@ export default function RootLayout({
     </html>
   )
 }
-
