@@ -136,23 +136,29 @@ export function NavBar() {
   }
 
   const MobileNavItem = ({ item }: { item: (typeof navItems)[0] }) => (
-    <div className="border-b border-gray-200 dark:border-gray-800">
+    <div className="border-b border-gray-800">
       <button
-        className="flex w-full items-center justify-between py-4 text-xl font-medium"
+        className="flex w-full items-center justify-between py-6 text-2xl font-serif"
         onClick={() => toggleExpanded(item.title)}
       >
         {item.title}
         {item.items.length > 0 &&
-          (expandedItems.includes(item.title) ? <Minus className="h-6 w-6" /> : <Plus className="h-6 w-6" />)}
+          (expandedItems.includes(item.title) ? (
+            <Minus className="h-5 w-5" />
+          ) : (
+            <Plus className="h-5 w-5" />
+          ))}
       </button>
       {expandedItems.includes(item.title) && item.items.length > 0 && (
-        <div className="pb-4">
+        <div className="pb-6">
           {item.items.map((subItem, index) => (
-            <div key={index} className="py-2">
+            <div key={index} className="py-3">
               {subItem.subItems ? (
                 <div>
                   <button
-                    className="flex w-full items-center justify-between text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                    className={cn(
+                      "flex w-full items-center justify-between text-xl font-cerebri font-normal text-gray-300 hover:text-white"
+                    )}
                     onClick={() => toggleExpanded(`${item.title}-${subItem.name}`)}
                   >
                     {subItem.name}
@@ -163,14 +169,14 @@ export function NavBar() {
                     )}
                   </button>
                   {expandedItems.includes(`${item.title}-${subItem.name}`) && (
-                    <div className="ml-4 mt-2 space-y-2">
+                    <div className="ml-4 mt-3 space-y-3">
                       {subItem.subItems.map((nestedItem, nestedIndex) => (
                         <Link
                           key={nestedIndex}
                           href="#"
-                          className="block text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                          className="block text-lg font-cerebri font-light text-gray-400 hover:text-white"
                         >
-                          {nestedItem}
+                          {nestedItem.toUpperCase()}
                         </Link>
                       ))}
                     </div>
@@ -179,9 +185,9 @@ export function NavBar() {
               ) : (
                 <Link
                   href="#"
-                  className="block text-base text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  className="block text-xl font-cerebri font-light text-gray-300 hover:text-white"
                 >
-                  {subItem.name}
+                  {subItem.name.toUpperCase()}
                 </Link>
               )}
             </div>
@@ -194,10 +200,11 @@ export function NavBar() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
-        isScrolled || activeItem ? "bg-black/80 backdrop-blur-md" : "bg-transparent",
-        isHidden ? "-translate-y-full" : "translate-y-0",
-        "border-b border-gray-200 dark:border-gray-800",
+        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 border-b",
+        isScrolled || activeItem 
+          ? "bg-black/80 backdrop-blur-md [&_*]:border-gray-200 dark:[&_*]:border-gray-800 border-gray-200 dark:border-gray-800" 
+          : "bg-transparent [&_*]:border-white border-white",
+        isHidden ? "-translate-y-full" : "translate-y-0"
       )}
     >
       <div className="container mx-auto px-4">
@@ -208,13 +215,13 @@ export function NavBar() {
             </span>
           </Link>
           <nav className="hidden md:flex items-center">
-            <div className="h-16 border-l border-gray-200 dark:border-gray-800"></div>
+            <div className="h-16 border-l flex items-center"></div>
             {navItems.slice(0, -1).map((item) => (
               <React.Fragment key={item.title}>
-                <div className="relative group border-r border-gray-200 dark:border-gray-800">
+                <div className="relative group border-r flex items-center">
                   <button
                     className={cn(
-                      "h-16 px-4 text-sm font-medium focus:outline-none",
+                      "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
                       isScrolled
                         ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
                         : "text-white hover:text-gray-200",
@@ -232,10 +239,10 @@ export function NavBar() {
             ))}
           </nav>
           <div className="flex items-center space-x-4">
-            <div className="relative group border-l border-gray-200 dark:border-gray-800 hidden md:block">
+            <div className="relative group border-l flex items-center h-16 hidden md:flex">
               <button
                 className={cn(
-                  "h-16 px-4 text-sm font-medium focus:outline-none",
+                  "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
                   isScrolled
                     ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
                     : "text-white hover:text-gray-200",
@@ -254,15 +261,17 @@ export function NavBar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn("md:hidden", isScrolled ? "text-gray-900 dark:text-white" : "text-white")}
+                  className={cn(
+                    "md:hidden h-16 px-4",
+                    isScrolled ? "text-gray-900 dark:text-white" : "text-white hover:text-gray-200"
+                  )}
                 >
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-full p-0 sm:max-w-sm">
-                <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
-                <div className="px-4 py-6">
+              <DialogContent className="w-full p-0 sm:max-w-sm bg-black">
+                <div className="px-6 py-8">
                   {navItems.map((item) => (
                     <MobileNavItem key={item.title} item={item} />
                   ))}
@@ -274,15 +283,15 @@ export function NavBar() {
       </div>
       {activeItem && (
         <div
-          className="absolute left-0 w-full bg-white dark:bg-black shadow-lg border-t border-gray-200 dark:border-gray-800"
+          className="absolute left-0 w-full bg-black/80 backdrop-blur-md shadow-lg border-t"
           onMouseEnter={() => setActiveItem(activeItem)}
           onMouseLeave={() => setActiveItem(null)}
         >
           <div className="mx-auto max-w-screen-xl">
             <div className="flex h-96">
-              <div className="w-1/3 p-4 border-r border-gray-200 dark:border-gray-800 flex items-center justify-center">
+              <div className="w-1/3 p-4 border-r flex items-center justify-center">
                 <div className="text-left">
-                  <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase">{activeItem}</h2>
+                  <h2 className="text-2xl font-serif text-white mb-4">{activeItem}</h2>
                   <div className="space-y-2">
                     {navItems
                       .find((item) => item.title === activeItem)
@@ -290,17 +299,17 @@ export function NavBar() {
                         <Link
                           key={subIndex}
                           href="#"
-                          className="block text-lg font-medium text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
+                          className="block text-lg font-cerebri font-light text-gray-300 hover:text-white transition-all duration-200"
                           onMouseEnter={() => setActiveDescription(subItem.description)}
                         >
-                          {subItem.name}
+                          {subItem.name.toUpperCase()}
                         </Link>
                       ))}
                   </div>
                 </div>
               </div>
               <div className="w-2/3 p-4 flex items-center">
-                <p className="text-gray-600 dark:text-gray-300">{activeDescription}</p>
+                <p className="text-gray-400 font-cerebri font-normal text-xl">{activeDescription}</p>
               </div>
             </div>
           </div>

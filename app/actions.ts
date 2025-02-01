@@ -93,3 +93,13 @@ export async function processImage(formData: FormData) {
   }
 }
 
+export async function uploadImage(formData: FormData) {
+  const file = formData.get('file') as File
+  const blob = await put(file.name, file, {
+    access: 'public',
+    token: process.env.BLOB_READ_WRITE_TOKEN
+  })
+  
+  return blob.url
+}
+

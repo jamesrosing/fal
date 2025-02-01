@@ -3,9 +3,15 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import BackgroundRemover from "@/components/background-remover"
+import VBlobImageUploader from "@/components/vblob-image-uploader"
 
 export default function AdminPage() {
   const [showBackgroundTool, setShowBackgroundTool] = useState(false)
+
+  const handleBlobImageUploaded = (url: string) => {
+    console.log("Image uploaded to Vercel Blob:", url)
+    // Do something with the URL if needed
+  }
 
   return (
     <main className="flex-1">
@@ -27,6 +33,12 @@ export default function AdminPage() {
                 </Button>
                 {/* Add more admin tools here */}
               </div>
+
+              {/* Blob Upload Section */}
+              <section>
+                <h2 className="text-xl mb-4">Vercel Blob Upload</h2>
+                <VBlobImageUploader onImageUploaded={handleBlobImageUploaded} />
+              </section>
             </div>
           )}
         </div>

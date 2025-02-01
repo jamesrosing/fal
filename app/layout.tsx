@@ -2,6 +2,7 @@ import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Footer } from "@/components/footer"
+import Script from "next/script"
 
 export const metadata: Metadata = {
   title: "Allure MD | Advanced Aesthetic Medicine in Newport Beach",
@@ -29,11 +30,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/lbp8vud.css" />
-        {/* Remove or comment out eruda.js if not needed */}
-        {/* <script src="/__replco/static/devtools/eruda/3.2.3/eruda.js"></script> */}
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
