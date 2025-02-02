@@ -102,7 +102,7 @@ export default function MedicalSpa() {
               </h2>
               <div className="space-y-6 text-lg font-cerebri font-light">
                 <p>
-                  Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD's Medical Spa.
+                  Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD&apos;s Medical Spa.
                   Our expert team delivers personalized care using the latest technologies and techniques.
                 </p>
                 <div className="space-y-4">

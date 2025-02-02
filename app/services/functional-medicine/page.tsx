@@ -101,7 +101,7 @@ export default function FunctionalMedicine() {
               </h2>
               <div className="space-y-6 text-lg font-cerebri font-light">
                 <p>
-                  Experience a comprehensive approach to health at Allure MD's Functional Medicine practice.
+                  Experience a comprehensive approach to health at Allure MD&apos;s Functional Medicine practice.
                   We focus on identifying and treating root causes to optimize your overall well-being.
                 </p>
                 <div className="space-y-4">

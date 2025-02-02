@@ -181,7 +181,7 @@ export default function Dermatology() {
             </h3>
             <div className="space-y-6 text-lg font-cerebri font-light">
               <p>
-                Discover the path to radiant, healthy skin with our expert dermatology team. We're here to guide you every step of the way.
+                Discover the path to radiant, healthy skin with our expert dermatology team. We&apos;re here to guide you every step of the way.
               </p>
               <div className="space-y-4">
                 <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
