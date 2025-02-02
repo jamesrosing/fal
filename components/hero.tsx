@@ -4,24 +4,27 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { BackgroundVideo } from "@/components/ui/background-video"
 
+// TODO: Replace these URLs with your CDN URLs
+// Recommended: Use a CDN service like Cloudinary, Bunny.net, or Amazon S3 + CloudFront
+// Example CDN URL structure: https://your-cdn.com/videos/allure-md/hero-720p.webm
 const videoSources = [
   {
-    src: "/videos/hero-720p.webm",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454119/oehjm5ldprdry2cpisyn.webm",
     type: "video/webm",
     media: "(min-width: 720px)",
   },
   {
-    src: "/videos/hero-720p.mp4",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454116/fdggfu5mcx2w8qm9ujip.mp4",
     type: "video/mp4",
     media: "(min-width: 720px)",
   },
   {
-    src: "/videos/hero-480p.webm",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454110/nsbm1clhxjadxnhjvovg.webm",
     type: "video/webm",
     media: "(max-width: 719px)",
   },
   {
-    src: "/videos/hero-480p.mp4",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454102/bsxhfycdxqda3nr5dosg.mp4",
     type: "video/mp4",
     media: "(max-width: 719px)",
   },

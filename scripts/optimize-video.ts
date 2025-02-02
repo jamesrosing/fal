@@ -5,16 +5,42 @@ import { promises as fs } from "node:fs"
 import { join, normalize } from "node:path"
 import { fileURLToPath } from "node:url"
 import { dirname } from "node:path"
+import { v2 as cloudinary } from "cloudinary"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const execAsync = promisify(exec)
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+})
+
 // Helper function to normalize paths for ffmpeg
 function normalizePath(path: string): string {
   // Normalize path and replace backslashes with forward slashes
   return normalize(path).replace(/\\/g, '/')
+}
+
+// Helper function to upload to Cloudinary
+async function uploadToCloudinary(filePath: string, publicId: string): Promise<string> {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      resource_type: "video",
+      public_id: publicId,
+      folder: process.env.CLOUDINARY_FOLDER,
+      overwrite: true
+    })
+    console.log(`✅ Uploaded ${publicId} to Cloudinary`)
+    return result.secure_url
+  } catch (error) {
+    console.error(`Error uploading ${publicId} to Cloudinary:`, error)
+    throw error
+  }
 }
 
 interface VideoConfig {
@@ -156,29 +182,48 @@ async function optimizeVideo() {
 
   try {
     console.log("🎬 Optimizing video for multiple formats...")
+    const uploadedUrls: Record<string, string> = {}
     
     for (const config of VIDEO_CONFIGS) {
       console.log(`\nProcessing ${config.name} version...`)
       
       // Convert to WebM with VP9 codec
       console.log(`- Creating WebM version...`)
+      const webmPath = join(targetDir, `hero-${config.name}.webm`)
       await execAsync(
         `ffmpeg -i "${normalizePath(videoPath)}" -c:v libvpx-vp9 -crf ${config.crf.webm} -b:v 0 ` +
         `-vf scale=${config.width}:${config.height} -c:a libopus ` +
-        `"${normalizePath(join(targetDir, `hero-${config.name}.webm`))}"`,
+        `"${normalizePath(webmPath)}"`,
+      )
+      
+      // Upload WebM to Cloudinary
+      uploadedUrls[`webm-${config.name}`] = await uploadToCloudinary(
+        webmPath,
+        `hero-${config.name}-webm`
       )
       
       // Convert to MP4 with H.264 codec
       console.log(`- Creating MP4 version...`)
+      const mp4Path = join(targetDir, `hero-${config.name}.mp4`)
       await execAsync(
         `ffmpeg -i "${normalizePath(videoPath)}" -c:v libx264 -crf ${config.crf.mp4} ` +
         `-vf scale=${config.width}:${config.height} -movflags +faststart ` +
-        `"${normalizePath(join(targetDir, `hero-${config.name}.mp4`))}"`,
+        `"${normalizePath(mp4Path)}"`,
+      )
+      
+      // Upload MP4 to Cloudinary
+      uploadedUrls[`mp4-${config.name}`] = await uploadToCloudinary(
+        mp4Path,
+        `hero-${config.name}-mp4`
       )
     }
     
-    console.log("\n✅ Video optimization completed")
-    return true
+    console.log("\n✅ Video optimization and upload completed")
+    console.log("\nCloudinary URLs:")
+    Object.entries(uploadedUrls).forEach(([key, url]) => {
+      console.log(`${key}: ${url}`)
+    })
+    return uploadedUrls
   } catch (error) {
     console.error("Error optimizing video:", error)
     return false
@@ -196,14 +241,10 @@ async function main() {
   const optimizeSuccess = await optimizeVideo()
 
   if (imagesSuccess && optimizeSuccess) {
-    console.log("\n✨ All done! Your video has been optimized and images have been generated.")
-    console.log("\nFiles created:")
-    console.log("- public/images/hero-poster.jpg")
-    console.log("- public/images/hero-fallback.jpg")
-    console.log("- public/videos/hero-720p.webm")
-    console.log("- public/videos/hero-720p.mp4")
-    console.log("- public/videos/hero-480p.webm")
-    console.log("- public/videos/hero-480p.mp4")
+    console.log("\n✨ All done! Your video has been optimized and uploaded to Cloudinary.")
+    console.log("\nNext steps:")
+    console.log("1. Update the videoSources array in components/hero.tsx with the Cloudinary URLs")
+    console.log("2. Update next.config.ts to include the Cloudinary domain")
   } else {
     console.log("\n⚠️ Some operations failed. Please check the errors above.")
   }

@@ -2,7 +2,6 @@ import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Footer } from "@/components/footer"
-import Script from "next/script"
 
 export const metadata: Metadata = {
   title: "Allure MD | Advanced Aesthetic Medicine in Newport Beach",
