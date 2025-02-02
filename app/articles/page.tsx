@@ -8,6 +8,26 @@ import { useState, useEffect } from "react"
 import { Play, Pause, Filter, X, ChevronDown } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { Suspense } from "react"
+
+function ScrollHandler({ setActiveCategory }: { setActiveCategory: (category: string) => void }) {
+  const searchParams = useSearchParams()
+  
+  useEffect(() => {
+    const section = searchParams.get('section')
+    if (section) {
+      const element = document.getElementById(section)
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' })
+          setActiveCategory(section)
+        }, 100)
+      }
+    }
+  }, [searchParams, setActiveCategory])
+
+  return null
+}
 
 // Sample articles data - in production, this would come from a CMS or API
 const articles = {
@@ -322,24 +342,10 @@ function Sidebar({
 }
 
 export default function Articles() {
-  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState("latest-news")
   const [activeService, setActiveService] = useState("all")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false)
-  
-  useEffect(() => {
-    const section = searchParams.get('section')
-    if (section) {
-      const element = document.getElementById(section)
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' })
-          setActiveCategory(section)
-        }, 100)
-      }
-    }
-  }, [searchParams])
 
   // Filter articles based on both content type and service category
   const filteredArticles = articles[activeCategory as keyof typeof articles].filter(article => {
@@ -349,6 +355,9 @@ export default function Articles() {
 
   return (
     <main className="min-h-screen bg-black">
+      <Suspense fallback={null}>
+        <ScrollHandler setActiveCategory={setActiveCategory} />
+      </Suspense>
       <NavBar />
       
       {/* Hero Section */}
