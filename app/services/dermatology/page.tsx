@@ -6,6 +6,25 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+
+function ScrollHandler() {
+  const searchParams = useSearchParams()
+  
+  useEffect(() => {
+    const section = searchParams.get('section')
+    if (section) {
+      const element = document.getElementById(section)
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      }
+    }
+  }, [searchParams])
+
+  return null
+}
 
 const treatments = [
   {
@@ -46,23 +65,11 @@ const treatments = [
 ]
 
 export default function Dermatology() {
-  const searchParams = useSearchParams()
-  
-  useEffect(() => {
-    const section = searchParams.get('section')
-    if (section) {
-      const element = document.getElementById(section)
-      if (element) {
-        // Add a slight delay to ensure smooth scrolling after page load
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
-      }
-    }
-  }, [searchParams])
-
   return (
     <main className="min-h-screen bg-black">
+      <Suspense fallback={null}>
+        <ScrollHandler />
+      </Suspense>
       <NavBar />
       
       {/* Hero Section */}
