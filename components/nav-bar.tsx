@@ -6,10 +6,12 @@ import { Menu, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 interface SubItem {
   name: string;
   description: string;
+  href?: string;
   subItems?: string[];
 }
 
@@ -26,16 +28,19 @@ const navItems: NavItem[] = [
       {
         name: "Head & neck",
         description: "Procedures for eyelids, ears, face, neck, and nose.",
+        href: "/services/plastic-surgery",
         subItems: ["Eyelids", "Ears", "Face", "Neck", "Nose"],
       },
       {
         name: "Breast",
         description: "Augmentation, lift, reduction, revision, and nipple areolar complex procedures.",
+        href: "/services/plastic-surgery?section=breast",
         subItems: ["Augmentation", "Lift", "Reduction", "Revision", "Nipple areolar complex"],
       },
       {
         name: "Body",
         description: "Abdominoplasty, Mini-Abdominoplasty, Liposuction, Arm Lift, and Thigh Lift.",
+        href: "/services/plastic-surgery?section=body",
         subItems: ["Abdominoplasty", "Mini-Abdominoplasty", "Liposuction", "Arm Lift", "Thigh Lift"],
       },
     ],
@@ -44,37 +49,102 @@ const navItems: NavItem[] = [
   {
     title: "DERMATOLOGY",
     items: [
-      { name: "Skin screening", description: "Comprehensive skin health evaluations." },
-      { name: "Acne", description: "Advanced treatments for acne and related conditions." },
-      { name: "Eczema", description: "Management and treatment of eczema and dermatitis." },
-      { name: "Rosacea", description: "Specialized care for rosacea symptoms." },
-      { name: "Psoriasis", description: "Cutting-edge psoriasis treatments and management." },
+      { 
+        name: "Skin screening", 
+        description: "Comprehensive skin health evaluations.",
+        href: "/services/dermatology"
+      },
+      { 
+        name: "Acne", 
+        description: "Advanced treatments for acne and related conditions.",
+        href: "/services/dermatology?section=acne"
+      },
+      { 
+        name: "Eczema", 
+        description: "Management and treatment of eczema and dermatitis.",
+        href: "/services/dermatology?section=eczema"
+      },
+      { 
+        name: "Rosacea", 
+        description: "Specialized care for rosacea symptoms.",
+        href: "/services/dermatology?section=rosacea"
+      },
+      { 
+        name: "Psoriasis", 
+        description: "Cutting-edge psoriasis treatments and management.",
+        href: "/services/dermatology?section=psoriasis"
+      },
     ],
     description: "Expert dermatological care for all your skin health needs.",
   },
   {
     title: "MEDICAL SPA",
     items: [
-      { name: "Emsculpt", description: "Non-invasive body contouring treatment." },
-      { name: "Shapescale", description: "Advanced 3D body scanning for precise measurements." },
-      { name: "RF microneedling", description: "Skin rejuvenation combining radiofrequency and microneedling." },
-      { name: "Cosmetic injections", description: "Botox, fillers, and other injectable treatments." },
-      { name: "Skin lasers", description: "Laser treatments for various skin concerns." },
-      { name: "Esthetician services", description: "Professional skincare treatments and facials." },
+      { 
+        name: "Emsculpt", 
+        description: "Non-invasive body contouring treatment.",
+        href: "/services/medical-spa"
+      },
+      { 
+        name: "Shapescale", 
+        description: "Advanced 3D body scanning for precise measurements.",
+        href: "/services/medical-spa?section=shapescale"
+      },
+      { 
+        name: "RF microneedling", 
+        description: "Skin rejuvenation combining radiofrequency and microneedling.",
+        href: "/services/medical-spa?section=rf-microneedling"
+      },
+      { 
+        name: "Cosmetic injections", 
+        description: "Botox, fillers, and other injectable treatments.",
+        href: "/services/medical-spa?section=cosmetic-injections"
+      },
+      { 
+        name: "Skin lasers", 
+        description: "Laser treatments for various skin concerns.",
+        href: "/services/medical-spa?section=skin-lasers"
+      },
+      { 
+        name: "Esthetician services", 
+        description: "Professional skincare treatments and facials.",
+        href: "/services/medical-spa?section=esthetician-services"
+      },
     ],
     description: "Advanced medical spa treatments for rejuvenation and wellness.",
   },
   {
     title: "FUNCTIONAL MEDICINE",
     items: [
-      { name: "Cardiometabolic optimization", description: "Comprehensive approach to heart and metabolic health." },
-      { name: "Epigenetic optimization", description: "Personalized treatments based on genetic factors." },
-      { name: "Hair restoration", description: "Advanced techniques for hair regrowth and restoration." },
-      { name: "Hormone optimization", description: "Balancing and optimizing hormone levels for overall well-being." },
-      { name: "Neurocognitive performance", description: "Enhancing brain function and cognitive abilities." },
+      { 
+        name: "Cardiometabolic optimization", 
+        description: "Comprehensive approach to heart and metabolic health.",
+        href: "/services/functional-medicine"
+      },
+      { 
+        name: "Epigenetic optimization", 
+        description: "Personalized treatments based on genetic factors.",
+        href: "/services/functional-medicine?section=epigenetic-optimization"
+      },
+      { 
+        name: "Hair restoration", 
+        description: "Advanced techniques for hair regrowth and restoration.",
+        href: "/services/functional-medicine?section=hair-restoration"
+      },
+      { 
+        name: "Hormone optimization", 
+        description: "Balancing and optimizing hormone levels for overall well-being.",
+        href: "/services/functional-medicine?section=hormone-optimization"
+      },
+      { 
+        name: "Neurocognitive performance", 
+        description: "Enhancing brain function and cognitive abilities.",
+        href: "/services/functional-medicine?section=neurocognitive-performance"
+      },
       {
         name: "Sleep & travel optimization",
         description: "Improving sleep quality and managing travel-related health issues.",
+        href: "/services/functional-medicine?section=sleep-travel-optimization"
       },
     ],
     description: "Holistic approach to optimize your overall health and well-being.",
@@ -117,6 +187,7 @@ export function NavBar() {
   const [activeDescription, setActiveDescription] = React.useState<string>("")
   const [isScrolled, setIsScrolled] = React.useState(false)
   const [isHidden, setIsHidden] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false)
   const lastScrollY = React.useRef(0)
 
   React.useEffect(() => {
@@ -133,6 +204,10 @@ export function NavBar() {
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [title]))
+  }
+
+  const handleLinkClick = () => {
+    setIsOpen(false)
   }
 
   const MobileNavItem = ({ item }: { item: (typeof navItems)[0] }) => (
@@ -155,11 +230,12 @@ export function NavBar() {
             <div key={index} className="py-3">
               {subItem.subItems ? (
                 <div>
-                  <button
+                  <Link
+                    href={subItem.href || "#"}
                     className={cn(
                       "flex w-full items-center justify-between text-xl font-cerebri font-normal text-gray-300 hover:text-white"
                     )}
-                    onClick={() => toggleExpanded(`${item.title}-${subItem.name}`)}
+                    onClick={handleLinkClick}
                   >
                     {subItem.name}
                     {expandedItems.includes(`${item.title}-${subItem.name}`) ? (
@@ -167,14 +243,15 @@ export function NavBar() {
                     ) : (
                       <Plus className="h-4 w-4" />
                     )}
-                  </button>
+                  </Link>
                   {expandedItems.includes(`${item.title}-${subItem.name}`) && (
                     <div className="ml-4 mt-3 space-y-3">
                       {subItem.subItems.map((nestedItem, nestedIndex) => (
                         <Link
                           key={nestedIndex}
-                          href="#"
+                          href={subItem.href || "#"}
                           className="block text-lg font-cerebri font-light text-gray-400 hover:text-white"
+                          onClick={handleLinkClick}
                         >
                           {nestedItem.toUpperCase()}
                         </Link>
@@ -184,8 +261,9 @@ export function NavBar() {
                 </div>
               ) : (
                 <Link
-                  href="#"
+                  href={subItem.href || "#"}
                   className="block text-xl font-cerebri font-light text-gray-300 hover:text-white"
+                  onClick={handleLinkClick}
                 >
                   {subItem.name.toUpperCase()}
                 </Link>
@@ -210,13 +288,15 @@ export function NavBar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className={cn(
-              "text-2xl font-semibold",
-              "font-['lorimer-no-2-condensed']",
-              isScrolled ? "text-gray-900 dark:text-white" : "text-white"
-            )}>
-              ALLURE MD
-            </span>
+            <div className="relative w-40 h-12">
+              <Image
+                src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738462872/logos/allure_md_plastic_surgery_dermatology_white_logo.png"
+                alt="ALLURE MD"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
           </Link>
           <nav className="hidden md:flex items-center">
             <div className="h-16 border-l flex items-center"></div>
@@ -260,7 +340,7 @@ export function NavBar() {
                 <Menu className="h-6 w-6" />
               </button>
             </div>
-            <Dialog>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
@@ -303,7 +383,7 @@ export function NavBar() {
                       ?.items.map((subItem, subIndex) => (
                         <Link
                           key={subIndex}
-                          href="#"
+                          href={subItem.href || "#"}
                           className="block text-lg font-cerebri font-light text-gray-300 hover:text-white transition-all duration-200"
                           onMouseEnter={() => setActiveDescription(subItem.description)}
                         >

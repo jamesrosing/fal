@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { MountainIcon } from "lucide-react"
 
 const footerSections = [
   {
@@ -68,7 +67,6 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-white/10">
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <div className="flex items-center space-x-2">
-              <MountainIcon className="h-6 w-6" />
               <span className="font-['lorimer-no-2-condensed'] font-semibold text-2xl">ALLURE MD</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-gray-400">
