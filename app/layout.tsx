@@ -2,6 +2,7 @@ import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
 import { Footer } from "@/components/footer"
+import { ChatBubble } from '@/components/ui/chat-bubble'
 
 export const metadata: Metadata = {
   title: "Allure MD | Advanced Aesthetic Medicine in Newport Beach",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
           <Footer />
+          <ChatBubble />
         </ThemeProvider>
       </body>
     </html>

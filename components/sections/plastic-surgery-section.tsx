@@ -15,7 +15,7 @@ export function PlasticSurgerySection() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
       
       <div className="relative h-full flex items-end">

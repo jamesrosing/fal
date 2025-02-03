@@ -5,73 +5,127 @@ import { notFound } from "next/navigation"
 
 // This would typically come from a CMS or API
 const articles = {
-  "new-emsculpt-location": {
-    title: "New EMSCULPT Location in Newport Beach",
-    excerpt: "Allure MD expands with dedicated EMSCULPT facility, offering the latest in body contouring technology.",
+  "new-rf-microneedling-technology": {
+    title: "Allure MD Introduces Revolutionary New RF Microneedling Technology",
+    excerpt: "Experience the latest advancement in skin rejuvenation with our new state-of-the-art RF microneedling system.",
     content: `
-      <p>We are thrilled to announce the opening of our new dedicated EMSCULPT facility in Newport Beach. This expansion represents our commitment to providing the most advanced body contouring solutions to our patients.</p>
+      <p>We are excited to announce the addition of our new, state-of-the-art RF microneedling system at Allure MD. This revolutionary technology combines the proven benefits of traditional microneedling with the power of radiofrequency energy to deliver unprecedented results in skin rejuvenation.</p>
 
-      <h2>Revolutionary Technology</h2>
-      <p>EMSCULPT is the first and only non-invasive body shaping procedure that simultaneously builds muscle and burns fat. This groundbreaking technology has revolutionized the field of body contouring, offering results that were previously only achievable through intensive workout regimens.</p>
-
-      <h2>Why Newport Beach?</h2>
-      <p>Our decision to open a dedicated facility in Newport Beach was driven by the growing demand for non-invasive body contouring solutions in Orange County. The new location features:</p>
+      <h2>What Makes RF Microneedling Different?</h2>
+      <p>Unlike traditional microneedling, our new system delivers precisely controlled RF energy deep into the dermis. This dual-action treatment triggers a more robust healing response, leading to:</p>
       <ul>
-        <li>Multiple EMSCULPT devices for reduced wait times</li>
-        <li>Comfortable, private treatment rooms</li>
-        <li>Expert staff trained specifically in EMSCULPT protocols</li>
-        <li>Convenient location with ample parking</li>
+        <li>Enhanced collagen and elastin production</li>
+        <li>Improved skin texture and tone</li>
+        <li>Reduced appearance of scars and stretch marks</li>
+        <li>More noticeable results with fewer treatments</li>
       </ul>
 
-      <h2>What to Expect</h2>
-      <p>During an EMSCULPT session, you can expect:</p>
+      <h2>The Science Behind the Technology</h2>
+      <p>The system uses ultra-fine needles to create micro-channels in the skin while simultaneously delivering RF energy at precise depths. This combination stimulates the body's natural healing response while providing controlled thermal damage that accelerates collagen remodeling.</p>
+
+      <h2>What to Expect During Treatment</h2>
+      <p>Each treatment session typically takes 30-60 minutes, depending on the area being treated. Patients can expect:</p>
       <ul>
-        <li>30-minute treatment sessions</li>
-        <li>No downtime or recovery period</li>
-        <li>Noticeable results after just 4 sessions</li>
-        <li>Personalized treatment plans</li>
+        <li>Minimal downtime</li>
+        <li>Customizable treatment settings</li>
+        <li>Consistent, predictable results</li>
+        <li>Comfortable treatment experience with topical numbing</li>
       </ul>
 
-      <p>Visit our new facility to experience the future of body contouring. Contact us today to schedule your consultation and learn how EMSCULPT can help you achieve your aesthetic goals.</p>
+      <p>Contact us today to schedule a consultation and learn how our new RF microneedling technology can help you achieve your skin rejuvenation goals.</p>
     `,
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/articles/emsculpt-location.webp",
-    category: "Latest News",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp",
+    category: "Technology",
     date: "2024-03-15",
-    readTime: "3 min read",
-    tags: ["medical-spa", "body-contouring", "emsculpt", "newport-beach"]
+    readTime: "4 min read",
+    tags: ["skincare", "technology", "treatments", "microneedling"]
   },
-  "advanced-dermatology-services": {
-    title: "Introducing Advanced Dermatology Services",
-    excerpt: "Allure MD adds cutting-edge treatments to its dermatology department, expanding patient care options.",
+  "pearose-top-physician-assistant": {
+    title: "Susan Pearose, PA-C Named Top Dermatology Physician Assistant in Newport Beach",
+    excerpt: "Our own Susan Pearose, PA-C has been recognized as one of Orange County's leading dermatology physician assistants for her exceptional expertise and patient care.",
     content: `
-      <p>Allure MD is proud to announce the expansion of our dermatology department with the introduction of several cutting-edge treatments and technologies. This expansion reflects our commitment to providing comprehensive skincare solutions using the most advanced techniques available.</p>
+      <p>We are proud to announce that Susan Pearose, PA-C has been recognized as one of Newport Beach's top dermatology physician assistants for 2024. This prestigious recognition comes from comprehensive patient satisfaction surveys, peer reviews, and demonstrated excellence in dermatological care across Orange County.</p>
+
+      <h2>A Legacy of Excellence</h2>
+      <p>Susan Pearose has been serving the Newport Beach community with distinction, bringing her expertise in medical and cosmetic dermatology to thousands of patients. Her commitment to excellence is reflected in:</p>
+      <ul>
+        <li>Advanced certifications and specialized training</li>
+        <li>Expertise in cutting-edge treatments and technologies</li>
+        <li>Outstanding patient satisfaction ratings</li>
+        <li>Continued professional development and education</li>
+      </ul>
+
+      <h2>Specialized Expertise</h2>
+      <p>As a Certified Physician Assistant specializing in dermatology, Susan is particularly known for her expertise in:</p>
+      <ul>
+        <li>Advanced skin cancer screenings and detection</li>
+        <li>Non-invasive facial rejuvenation techniques</li>
+        <li>Complex acne and rosacea management</li>
+        <li>Customized skincare treatment plans</li>
+      </ul>
+
+      <h2>Patient-First Approach</h2>
+      <p>What sets Susan apart is her dedication to personalized patient care. She takes time to understand each patient's unique concerns and develops customized treatment plans that address their specific needs while ensuring the highest standards of medical care.</p>
+
+      <h2>Professional Background</h2>
+      <p>Susan's credentials include:</p>
+      <ul>
+        <li>Certified Physician Assistant (PA-C)</li>
+        <li>Specialized dermatology training and certification</li>
+        <li>Extensive experience in medical and cosmetic dermatology</li>
+        <li>Ongoing advanced training in latest dermatological procedures</li>
+      </ul>
+
+      <p>Schedule your consultation with Susan Pearose, PA-C today and experience the exceptional care that has earned her this prestigious recognition in the field of dermatology.</p>
+    `,
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20dermatology%20headshot%201-gjRMjadCwzrB94HEchEd1TnD04XcMY.webp",
+    category: "Recognition",
+    date: "2024-03-10",
+    readTime: "5 min read",
+    tags: ["dermatology", "awards", "medical-care", "newport-beach", "physician-assistant"]
+  },
+  "new-medical-spa-services": {
+    title: "New Medical Spa Services Now Available",
+    excerpt: "Discover our expanded range of medical spa treatments designed for total body rejuvenation.",
+    content: `
+      <p>Allure MD is thrilled to announce the expansion of our medical spa services. Our new treatment offerings combine luxury and clinical excellence to provide you with the most advanced aesthetic solutions available.</p>
 
       <h2>New Treatment Options</h2>
-      <p>Our expanded services include:</p>
+      <p>Our expanded service menu now includes:</p>
       <ul>
-        <li>Advanced laser treatments for various skin conditions</li>
-        <li>Innovative acne therapies</li>
-        <li>Expanded medical dermatology services</li>
-        <li>New cosmetic dermatology options</li>
+        <li>Advanced hydrafacials with customized boosters</li>
+        <li>Medical-grade chemical peels</li>
+        <li>Laser hair removal with the latest technology</li>
+        <li>Body contouring and cellulite treatments</li>
+        <li>LED light therapy</li>
       </ul>
 
-      <h2>State-of-the-Art Technology</h2>
-      <p>We have invested in the latest dermatological equipment to ensure optimal results for our patients. Our new technology includes:</p>
+      <h2>Customized Treatment Plans</h2>
+      <p>Each treatment begins with a comprehensive consultation to create a personalized plan that addresses your specific concerns and goals. Our expert staff will guide you through:</p>
       <ul>
-        <li>Next-generation laser systems</li>
-        <li>Advanced diagnostic tools</li>
-        <li>Cutting-edge treatment delivery systems</li>
+        <li>Skin analysis and assessment</li>
+        <li>Treatment recommendations</li>
+        <li>Expected outcomes and timeline</li>
+        <li>Maintenance and care instructions</li>
       </ul>
 
-      <p>Schedule a consultation today to learn how our expanded dermatology services can address your specific skincare needs.</p>
+      <h2>The Allure MD Difference</h2>
+      <p>What sets our medical spa services apart:</p>
+      <ul>
+        <li>Medical-grade products and equipment</li>
+        <li>Licensed and certified professionals</li>
+        <li>Comfortable, luxury environment</li>
+        <li>Comprehensive aftercare support</li>
+      </ul>
+
+      <p>Visit us to experience our new medical spa services and start your journey to renewed confidence and radiance.</p>
     `,
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/articles/new-dermatology.webp",
-    category: "Latest News",
-    date: "2024-03-12",
-    readTime: "4 min read",
-    tags: ["dermatology", "skincare", "medical-treatments", "technology"]
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20medical%20esthetician%20facial%20procedure-BTAqIz6QTH8au0JcLo6JerhGR2Fyqw.webp",
+    category: "Services",
+    date: "2024-03-05",
+    readTime: "6 min read",
+    tags: ["medical-spa", "treatments", "skincare", "wellness"]
   }
-  // Add more articles as needed
 }
 
 export default function ArticlePage({ params }: { params: { slug: string } }) {
