@@ -4,22 +4,21 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
 
-const formSchema = z.object({
-  name: z.string().min(2),
+// Define the schema type but don't create an unused variable
+type FormSchema = z.infer<typeof z.object({
+  name: z.string(),
   email: z.string().email(),
-  phone: z.string().optional(),
-  preferredService: z.string().optional(),
-  preferredDate: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+  phone: z.string(),
+  service: z.string(),
+  preferredDate: z.string(),
+  message: z.string().optional(),
+})>
 
 export function DataForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormSchema>();
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: FormSchema) => {
     try {
       const response = await fetch('/api/data-input', {
         method: 'POST',
@@ -54,7 +53,7 @@ export function DataForm() {
 
       // Apply AI suggestions to form
       Object.entries(suggestions).forEach(([field, value]) => {
-        setValue(field as keyof FormData, value as string);
+        setValue(field as keyof FormSchema, value as string);
       });
     } catch (error) {
       console.error('AI assistance error:', error);
@@ -97,7 +96,7 @@ export function DataForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Phone (Optional)</label>
+            <label className="block text-sm font-medium text-gray-700">Phone</label>
             <input
               {...register('phone')}
               type="tel"
@@ -106,9 +105,9 @@ export function DataForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Preferred Service</label>
+            <label className="block text-sm font-medium text-gray-700">Service</label>
             <select
-              {...register('preferredService')}
+              {...register('service')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="">Select a service...</option>
@@ -128,9 +127,9 @@ export function DataForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Notes</label>
+            <label className="block text-sm font-medium text-gray-700">Message</label>
             <textarea
-              {...register('notes')}
+              {...register('message')}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />

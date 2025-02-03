@@ -9,23 +9,23 @@ import { BackgroundVideo } from "@/components/ui/background-video"
 // Example CDN URL structure: https://your-cdn.com/videos/allure-md/hero-720p.webm
 const videoSources = [
   {
-    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454119/oehjm5ldprdry2cpisyn.webm",
-    type: "video/webm",
-    media: "(min-width: 720px)",
-  },
-  {
-    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454116/fdggfu5mcx2w8qm9ujip.mp4",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738607439/emsculpt/videos/hero/hero-720p-mp4.mp4",
     type: "video/mp4",
     media: "(min-width: 720px)",
   },
   {
-    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454110/nsbm1clhxjadxnhjvovg.webm",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738607418/emsculpt/videos/hero/hero-720p-webm.webm",
     type: "video/webm",
+    media: "(min-width: 720px)",
+  },
+  {
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738607528/emsculpt/videos/hero/hero-480p-mp4.mp4",
+    type: "video/mp4",
     media: "(max-width: 719px)",
   },
   {
-    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738454102/bsxhfycdxqda3nr5dosg.mp4",
-    type: "video/mp4",
+    src: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1738607519/emsculpt/videos/hero/hero-480p-webm.webm",
+    type: "video/webm",
     media: "(max-width: 719px)",
   },
 ]

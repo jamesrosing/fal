@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, StopCircle } from 'lucide-react';
+import Image from 'next/image';
 
 interface ChatMessage {
   role: string;
@@ -81,55 +82,67 @@ export function ChatInterface() {
     <div className="flex flex-col h-full bg-zinc-900">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        {messages.length === 0 && (
+          <motion.div
+            key="welcome"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center h-full text-center"
+          >
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Welcome! I&apos;m Sophie, your Allure MD Assistant
+            </h2>
+            <p className="text-zinc-400 max-w-md">
+              I can help you schedule appointments, answer questions about our services,
+              and provide information about our treatments and providers.
+            </p>
+          </motion.div>
+        )}
         <AnimatePresence>
-          {messages.length === 0 ? (
+          {messages.map((msg) => (
             <motion.div
-              key="welcome"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex flex-col items-center justify-center h-full text-center"
+              key={msg.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Welcome! I'm Anna, your Allure MD Assistant
-              </h2>
-              <p className="text-zinc-400 max-w-md">
-                I can help you schedule appointments, answer questions about our services,
-                and provide information about our treatments and providers.
-              </p>
-            </motion.div>
-          ) : (
-            messages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`flex gap-3 max-w-[80%] ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
-                  {msg.role === 'assistant' && (
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-sm">AI</span>
-                    </div>
-                  )}
-                  <div
-                    className={`p-4 rounded-2xl ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-zinc-800 text-zinc-100'
-                    }`}
-                  >
-                    {msg.content}
+              <div className={`flex gap-3 max-w-[80%] ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
+                {msg.role === 'assistant' && (
+                  <div className="relative w-8 h-8 flex-shrink-0">
+                    <Image
+                      src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png"
+                      alt="Sophie"
+                      fill
+                      className="rounded-full object-cover"
+                      sizes="32px"
+                      priority
+                    />
                   </div>
-                  {msg.role === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-sm">U</span>
-                    </div>
-                  )}
+                )}
+                <div
+                  className={`p-4 rounded-2xl ${
+                    msg.role === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-zinc-800 text-zinc-100'
+                  }`}
+                >
+                  {msg.content}
                 </div>
-              </motion.div>
-            ))
-          )}
+                {msg.role === 'user' && (
+                  <div className="relative w-8 h-8">
+                    <Image
+                      src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png"
+                      alt="Sophie"
+                      fill
+                      className="rounded-full object-cover"
+                      sizes="32px"
+                    />
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))}
           {isLoading && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -138,7 +151,7 @@ export function ChatInterface() {
             >
               <div className="flex gap-3 items-start">
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-white text-sm">AI</span>
+                  <span className="text-white text-sm">S</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-zinc-800">
                   <div className="flex space-x-2">
@@ -150,8 +163,8 @@ export function ChatInterface() {
               </div>
             </motion.div>
           )}
-          <div ref={messagesEndRef} />
         </AnimatePresence>
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
@@ -161,7 +174,7 @@ export function ChatInterface() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Message Allure MD Assistant..."
+            placeholder="Message Sophie..."
             className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={1}
             disabled={isLoading}

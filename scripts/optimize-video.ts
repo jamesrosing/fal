@@ -6,11 +6,23 @@ import { join, normalize } from "node:path"
 import { fileURLToPath } from "node:url"
 import { dirname } from "node:path"
 import { v2 as cloudinary } from "cloudinary"
+import * as dotenv from "dotenv"
+
+// Load environment variables from .env.local
+dotenv.config({ path: '.env.local' })
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const execAsync = promisify(exec)
+
+// Validate Cloudinary configuration
+if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 
+    !process.env.CLOUDINARY_API_KEY || 
+    !process.env.CLOUDINARY_API_SECRET) {
+  console.error("❌ Missing Cloudinary configuration. Please check your .env.local file")
+  process.exit(1)
+}
 
 // Configure Cloudinary
 cloudinary.config({

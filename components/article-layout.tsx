@@ -3,7 +3,6 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { Play, Pause } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
