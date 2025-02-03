@@ -8,7 +8,6 @@ import { FunctionalMedicineSection } from "@/components/sections/functional-medi
 import { TeamSection } from "@/components/sections/team-section"
 import { AboutSection } from "@/components/sections/about-section"
 import { NewsSection } from "@/components/sections/news-section"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
 
 export default function Home() {
   return (
