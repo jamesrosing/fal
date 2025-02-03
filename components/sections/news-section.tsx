@@ -2,77 +2,90 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 import { LearnMoreButton } from "../ui/learn-more-button"
 
-const news = [
+const articles = [
   {
-    date: "1/23/2025",
-    title: "Allure MD Introduces Revolutionary New RF Microneedling Technology",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp",
+    title: "New EMSCULPT Location in Newport Beach",
+    excerpt: "Allure MD expands with dedicated EMSCULPT facility, offering the latest in body contouring technology.",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/articles/emsculpt-location.webp",
+    date: "2024-03-15",
+    slug: "new-emsculpt-location"
   },
   {
-    date: "1/16/2025",
-    title: "Dr. Pearose Named Top Dermatologist in Newport Beach",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20dermatology%20headshot%201-gjRMjadCwzrB94HEchEd1TnD04XcMY.webp",
-  },
-  {
-    date: "1/9/2025",
-    title: "New Medical Spa Services Now Available at Allure MD",
-    image:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20medical%20esthetician%20facial%20procedure-BTAqIz6QTH8au0JcLo6JerhGR2Fyqw.webp",
-  },
+    title: "Introducing Advanced Dermatology Services",
+    excerpt: "Allure MD adds cutting-edge treatments to its dermatology department, expanding patient care options.",
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/articles/new-dermatology.webp",
+    date: "2024-03-12",
+    slug: "advanced-dermatology-services"
+  }
 ]
 
 export function NewsSection() {
   return (
-    <section className="bg-[#f5f5f5] py-24 dark:bg-black">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section className="relative py-24 bg-[#f5f5f5] dark:bg-black">
+      <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
+          className="max-w-3xl mx-auto text-center mb-16"
         >
-          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Latest Articles</h2>
-          <h3 className="mb-8 text-[clamp(1.5rem,3vw,2.5rem)] leading-none tracking-tight font-serif">
-            Stay informed with Allure MD
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+            Latest News
+          </h2>
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
+            Stay informed about our latest developments
           </h3>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {news.map((item, index) => (
-              <motion.article
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                <div className="relative mb-4 h-48 overflow-hidden">
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title}
-                    fill
-                    className={`object-cover ${index === 1 ? "object-[center_15%]" : "object-center"}`}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
+        </motion.div>
+
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+          {articles.map((article, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              viewport={{ once: true }}
+              className="group relative flex flex-col overflow-hidden rounded-lg bg-black"
+            >
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={article.image}
+                  alt={article.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <div className="flex flex-1 flex-col justify-between p-6">
+                <div className="flex-1">
+                  <p className="text-sm font-cerebri text-gray-400">
+                    {new Date(article.date).toLocaleDateString()}
+                  </p>
+                  <Link href={`/articles/${article.slug}`} className="mt-2 block">
+                    <h3 className="text-xl font-serif text-white transition-colors duration-300 group-hover:text-gray-300">
+                      {article.title}
+                    </h3>
+                    <p className="mt-3 text-base font-cerebri font-light text-gray-400">
+                      {article.excerpt}
+                    </p>
+                  </Link>
                 </div>
-                <time className="text-sm font-cerebri font-light text-gray-500">{item.date}</time>
-                <h4 className="mb-4 text-2xl font-serif">{item.title}</h4>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/articles" underline={false} className="font-cerebri font-light">
+                <div className="mt-6">
+                  <LearnMoreButton href={`/articles/${article.slug}`}>
                     Read More
                   </LearnMoreButton>
                 </div>
-              </motion.article>
-            ))}
-          </div>
-          <div className="mt-12 text-right">
-            <LearnMoreButton href="/articles" className="font-cerebri font-light">
-              View All Articles
-            </LearnMoreButton>
-          </div>
-        </motion.div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <LearnMoreButton href="/articles">View All Articles</LearnMoreButton>
+        </div>
       </div>
     </section>
   )
