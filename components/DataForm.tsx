@@ -2,21 +2,25 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 
-// Define the schema type but don't create an unused variable
-type FormSchema = z.infer<typeof z.object({
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  service: z.string(),
-  preferredDate: z.string(),
+const formSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  service: z.string().min(1, 'Please select a service'),
+  preferredDate: z.string().min(1, 'Please select a date'),
   message: z.string().optional(),
-})>
+});
+
+type FormSchema = z.infer<typeof formSchema>;
 
 export function DataForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormSchema>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema)
+  });
 
   const onSubmit = async (data: FormSchema) => {
     try {

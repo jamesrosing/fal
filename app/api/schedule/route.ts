@@ -17,16 +17,33 @@ type ScheduleRequest = z.infer<typeof scheduleSchema>;
 export async function POST(req: Request): Promise<Response> {
   try {
     const data = await req.json();
-    const validatedData = scheduleSchema.parse(data);
+    const validatedData = scheduleSchema.parse(data) as ScheduleRequest;
     
-    // Process scheduling request
-    // TODO: Implement actual scheduling logic
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Appointment request received',
-      data: validatedData,
-    });
+    // Process scheduling request using Zenoti
+    try {
+      await zenotiClient.post('/v1/appointments', {
+        guest: {
+          name: validatedData.name,
+          email: validatedData.email,
+          phone: validatedData.phone,
+        },
+        service: validatedData.service,
+        preferred_date: validatedData.preferredDate,
+        notes: validatedData.message,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Appointment request received',
+        data: validatedData,
+      });
+    } catch (zenotiError) {
+      console.error('Zenoti API Error:', zenotiError);
+      return NextResponse.json({
+        success: false,
+        message: 'Failed to schedule appointment with Zenoti',
+      }, { status: 500 });
+    }
   } catch (error) {
     console.error('Schedule API Error:', error);
     

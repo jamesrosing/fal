@@ -1,6 +1,5 @@
 // app/api/chat/route.ts
-import { OpenAI } from 'openai';
-import { OpenAIStream, StreamingTextResponse } from 'ai';
+import OpenAI from 'openai';
 import { NextResponse } from 'next/server';
 
 interface Message {
@@ -22,6 +21,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+export const runtime = 'edge';
+
 export async function POST(req: Request): Promise<Response> {
   try {
     const { messages }: ChatRequest = await req.json();
@@ -35,7 +36,7 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     // Create chat completion
-    const response = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
       model: 'gpt-4-1106-preview',
       stream: true,
       messages: [
@@ -50,9 +51,17 @@ export async function POST(req: Request): Promise<Response> {
       ],
     });
 
-    // Create a stream response
-    const stream = OpenAIStream(response);
-    return new StreamingTextResponse(stream);
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk.choices[0]?.delta?.content || '');
+    }
+
+    return new Response(chunks.join(''), {
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'no-cache',
+      },
+    });
   } catch (error: unknown) {
     console.error('Chat API error:', error);
     const errorResponse: ErrorResponse = {
