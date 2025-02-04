@@ -152,8 +152,16 @@ const navItems: NavItem[] = [
   {
     title: "GALLERY",
     items: [
-      { name: "Before & after pictures", description: "Visual results of our successful treatments." },
-      { name: "Videos", description: "Informative videos about our procedures and patient experiences." },
+      { 
+        name: "Before & after pictures", 
+        description: "Visual results of our successful treatments.",
+        href: "/gallery"
+      },
+      { 
+        name: "Videos", 
+        description: "Informative videos about our procedures and patient experiences.",
+        href: "/gallery?section=videos"
+      },
     ],
     description: "View our portfolio of successful treatments and procedures.",
   },

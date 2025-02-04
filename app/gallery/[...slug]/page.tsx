@@ -130,19 +130,22 @@ export default function GalleryPage() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <Link href="/" passHref legacyBehavior>
-              <BreadcrumbLink>Gallery</BreadcrumbLink>
+            <Link href="/gallery" className="hover:text-white">
+              Gallery
             </Link>
           </BreadcrumbItem>
-          {slug.map((item, index) => (
-            <React.Fragment key={`${item}-${index}`}>
+          {slug.map((segment, i) => (
+            <React.Fragment key={segment}>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                {index === slug.length - 1 ? (
-                  <BreadcrumbPage>{item}</BreadcrumbPage>
+                {i === slug.length - 1 ? (
+                  <BreadcrumbPage>{segment.replace(/-/g, ' ')}</BreadcrumbPage>
                 ) : (
-                  <Link href={`/gallery/${slug.slice(0, index + 1).join("/")}`} passHref legacyBehavior>
-                    <BreadcrumbLink>{item}</BreadcrumbLink>
+                  <Link 
+                    href={`/gallery/${slug.slice(0, i + 1).join('/')}`}
+                    className="hover:text-white capitalize"
+                  >
+                    {segment.replace(/-/g, ' ')}
                   </Link>
                 )}
               </BreadcrumbItem>
@@ -252,4 +255,5 @@ export default function GalleryPage() {
     </SidebarProvider>
   )
 }
+
 

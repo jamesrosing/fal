@@ -17,22 +17,37 @@ interface GalleryCollection {
 // This would eventually come from your database
 const collections: GalleryCollection[] = [
   {
-    id: "before-after-face",
-    title: "Facial Transformations",
-    subtitle: "Before & After Gallery",
+    id: "plastic-surgery",
+    title: "Plastic Surgery",
+    subtitle: "Surgical Transformations",
     institution: "Allure MD",
-    imageUrl: "/images/gallery/facial-treatments.jpg",
-    itemCount: 24
+    imageUrl: "/images/gallery/plastic-surgery.jpg",
+    itemCount: 15
   },
   {
-    id: "body-contouring",
-    title: "Body Contouring",
-    subtitle: "Sculpting Excellence",
+    id: "emsculpt",
+    title: "Emsculpt",
+    subtitle: "Body Sculpting",
     institution: "Allure MD",
-    imageUrl: "/images/gallery/body-contouring.jpg",
-    itemCount: 18
+    imageUrl: "/images/gallery/emsculpt.jpg",
+    itemCount: 4
   },
-  // Add more collections as needed
+  {
+    id: "sylfirmx",
+    title: "SylfirmX",
+    subtitle: "Skin Rejuvenation",
+    institution: "Allure MD",
+    imageUrl: "/images/gallery/sylfirmx.jpg",
+    itemCount: 8
+  },
+  {
+    id: "facials",
+    title: "Facials",
+    subtitle: "Skin Care Treatments",
+    institution: "Allure MD",
+    imageUrl: "/images/gallery/facials.jpg",
+    itemCount: 6
+  }
 ]
 
 export default function GalleryPage() {
@@ -50,14 +65,20 @@ export default function GalleryPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="container mx-auto max-w-6xl">
-            <h1 className="text-5xl font-serif mb-4 text-white">Gallery</h1>
-            <div className="flex items-center gap-4">
-              <button className="p-2 rounded-full hover:bg-white/10">
-                <Heart className="w-6 h-6 text-white" />
-              </button>
-              <button className="p-2 rounded-full hover:bg-white/10">
-                <Share2 className="w-6 h-6 text-white" />
-              </button>
+            <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">Gallery</h1>
+            <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif text-white">Before & After Transformations</h2>
+            <div className="space-y-6 text-lg font-cerebri font-light">
+              <p className="text-white/90 max-w-3xl">
+                Explore our gallery to see the stunning transformations achieved by our expert team at Allure MD.
+              </p>
+              <div className="flex items-center gap-4">
+                <button className="p-2 rounded-full hover:bg-white/10">
+                  <Heart className="w-6 h-6 text-white" />
+                </button>
+                <button className="p-2 rounded-full hover:bg-white/10">
+                  <Share2 className="w-6 h-6 text-white" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -71,7 +92,7 @@ export default function GalleryPage() {
           </h2>
           <Link 
             href="/gallery/all"
-            className="text-sm text-blue-400 hover:text-blue-300"
+            className="text-sm text-white/70 hover:text-white"
           >
             View All
           </Link>
@@ -98,7 +119,7 @@ export default function GalleryPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium text-white group-hover:text-blue-400">
+                  <h3 className="text-lg font-medium text-white group-hover:text-white/80">
                     {collection.title}
                   </h3>
                   <p className="text-sm text-zinc-400">
