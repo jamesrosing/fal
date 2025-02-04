@@ -1,6 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import ImageUploadField from "@/components/image-upload-field"
+import BackgroundRemover from "@/components/background-remover"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -12,11 +15,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import ImageUploadField from "@/components/image-upload-field"
 import { type ImageArea } from "@/lib/image-utils"
-import BackgroundRemover from "@/components/background-remover"
 
 export default function AdminPage() {
   const handleImageUploaded = (area: ImageArea) => (url: string) => {

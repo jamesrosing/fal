@@ -6,35 +6,14 @@ import { NavBar } from "@/components/nav-bar"
 import { useSearchParams } from "next/navigation"
 
 // This would typically come from a CMS or API
-const articles = {
-  "new-rf-microneedling-technology": {
-    title: "Allure MD Introduces Revolutionary New RF Microneedling Technology",
-    excerpt: "Experience the latest advancement in skin rejuvenation with our new state-of-the-art RF microneedling system.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp",
-    category: "latest-news",
-    date: "2024-03-15",
-    readTime: "4 min read",
-    tags: ["skincare", "technology", "treatments", "microneedling"]
-  },
-  "pearose-top-physician-assistant": {
-    title: "Susan Pearose, PA-C Named Top Dermatology Physician Assistant in Newport Beach",
-    excerpt: "Our own Susan Pearose, PA-C has been recognized as one of Orange County's leading dermatology physician assistants for her exceptional expertise and patient care.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20dermatology%20headshot%201-gjRMjadCwzrB94HEchEd1TnD04XcMY.webp",
-    category: "latest-news",
-    date: "2024-03-10",
-    readTime: "5 min read",
-    tags: ["dermatology", "awards", "medical-care", "newport-beach", "physician-assistant"]
-  },
-  "new-medical-spa-services": {
-    title: "New Medical Spa Services Now Available",
-    excerpt: "Discover our expanded range of medical spa treatments designed for total body rejuvenation.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20medical%20esthetician%20facial%20procedure-BTAqIz6QTH8au0JcLo6JerhGR2Fyqw.webp",
-    category: "latest-news",
-    date: "2024-03-05",
-    readTime: "6 min read",
-    tags: ["medical-spa", "treatments", "skincare", "wellness"]
-  }
-};
+const articles = Array.from({ length: 12 }, (__, i) => ({
+  id: i + 1,
+  title: `Article ${i + 1}`,
+  excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+  imageUrl: `/placeholder.svg?height=200&width=300&text=Article${i + 1}`,
+  category: categories[Math.floor(Math.random() * categories.length)],
+  date: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString(),
+}));
 
 const categories = [
   { id: "latest-news", name: "Latest News" },
@@ -85,7 +64,7 @@ export default function ArticlesPage() {
             >
               <div className="relative h-48">
                 <Image 
-                  src={article.image}
+                  src={article.imageUrl}
                   alt={article.title}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -104,7 +83,6 @@ export default function ArticlesPage() {
                 </p>
                 <div className="flex justify-between items-center text-sm text-gray-500 font-cerebri">
                   <span>{article.date}</span>
-                  <span>{article.readTime}</span>
                 </div>
               </div>
             </Link>

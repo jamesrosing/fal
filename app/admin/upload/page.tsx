@@ -51,7 +51,7 @@ export default function UploadPage() {
               {isDragActive ? (
                 <p>Drop the files here ...</p>
               ) : (
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Drag &apos;n&apos; drop some files here, or click to select files</p>
               )}
             </div>
             {files.length > 0 && (
@@ -75,6 +75,9 @@ export default function UploadPage() {
                 <p className="text-center mt-2">{Math.round(progress)}% Uploaded</p>
               </div>
             )}
+            <p className="text-sm text-muted-foreground">
+              Here&apos;s what you&apos;ll need:
+            </p>
           </div>
         </SidebarInset>
       </div>

@@ -16,9 +16,32 @@ import {
 import { CaseViewer } from "@/components/case-viewer"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import Image from "next/image"
 
-// Updated mock data structure
-const mockData = {
+interface GalleryCase {
+  id: string
+  coverImage: string
+  images: Array<{
+    id: string
+    url: string
+  }>
+}
+
+interface GalleryAlbum {
+  id: string
+  title: string
+  imageUrl: string
+}
+
+interface GalleryData {
+  [key: string]: GalleryAlbum[]
+}
+
+interface CaseData {
+  [key: string]: GalleryCase[]
+}
+
+const mockData: GalleryData = {
   "plastic-surgery": [
     { id: "face", title: "Face", imageUrl: "/placeholder.svg?height=200&width=300&text=Face" },
     { id: "eyelids", title: "Eyelids", imageUrl: "/placeholder.svg?height=200&width=300&text=Eyelids" },
@@ -79,7 +102,7 @@ const mockData = {
 }
 
 // Function to generate case data
-const generateCaseData = (albumId: string, caseCount = 4) =>
+const generateCaseData = (albumId: string, caseCount = 4): GalleryCase[] =>
   Array.from({ length: caseCount }, (_, i) => ({
     id: String(i + 1),
     coverImage: `/placeholder.svg?height=200&width=300&text=${albumId}-Case${i + 1}`,
@@ -90,17 +113,17 @@ const generateCaseData = (albumId: string, caseCount = 4) =>
   }))
 
 // Generate case data for all albums
-Object.keys(mockData).forEach((gallery) => {
+const caseData: CaseData = Object.keys(mockData).reduce((acc, gallery) => {
   mockData[gallery].forEach((album) => {
-    mockData[`${gallery}/${album.id}`] = generateCaseData(album.id)
+    acc[`${gallery}/${album.id}`] = generateCaseData(album.id)
   })
-})
+  return acc
+}, {} as CaseData)
 
 export default function GalleryPage() {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string[]
-  const path = slug.join("/")
 
   const renderBreadcrumbs = () => {
     // For case view, only show the case number and a back button
@@ -161,7 +184,7 @@ export default function GalleryPage() {
     if (slug.length > 2 && !isNaN(Number(slug[slug.length - 1]))) {
       const caseNumber = Number(slug[slug.length - 1])
       const albumPath = slug.slice(0, -1).join("/")
-      const caseData = mockData[albumPath]?.[caseNumber - 1]
+      const caseData = caseData[albumPath]?.[caseNumber - 1]
 
       if (!caseData) return <div>Case not found</div>
 
@@ -178,20 +201,24 @@ export default function GalleryPage() {
 
     // If viewing an album
     if (slug.length > 1) {
-      const albumData = mockData[path]
-      if (!albumData) return <div>Album not found</div>
+      const albumPath = slug.join("/")
+      const albumCases = caseData[albumPath]
+      if (!albumCases) return <div>Album not found</div>
 
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {albumData.map((caseItem) => (
-            <Link href={`/gallery/${path}/${caseItem.id}`} key={`case-${caseItem.id}`} className="block">
+          {albumCases.map((caseItem) => (
+            <Link href={`/gallery/${albumPath}/${caseItem.id}`} key={`case-${caseItem.id}`} className="block">
               <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-                <img
-                  src={caseItem.coverImage || "/placeholder.svg"}
-                  alt={`Case ${caseItem.id}`}
-                  className="w-full h-40 object-cover rounded-md"
-                />
-                <h3 className="mt-2 text-lg font-semibold">{caseItem.id}</h3>
+                <div className="relative w-full h-40">
+                  <Image
+                    src={caseItem.coverImage}
+                    alt={`Case ${caseItem.id}`}
+                    fill
+                    className="object-cover rounded-md"
+                  />
+                </div>
+                <h3 className="mt-2 text-lg font-semibold">Case {caseItem.id}</h3>
               </div>
             </Link>
           ))}
@@ -209,11 +236,14 @@ export default function GalleryPage() {
           {galleryData.map((album) => (
             <Link href={`/gallery/${slug[0]}/${album.id}`} key={`album-${album.id}`} className="block">
               <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-                <img
-                  src={album.imageUrl || "/placeholder.svg"}
-                  alt={album.title}
-                  className="w-full h-40 object-cover rounded-md"
-                />
+                <div className="relative w-full h-40">
+                  <Image
+                    src={album.imageUrl}
+                    alt={album.title}
+                    fill
+                    className="object-cover rounded-md"
+                  />
+                </div>
                 <h3 className="mt-2 text-lg font-semibold">{album.title}</h3>
               </div>
             </Link>
@@ -225,14 +255,17 @@ export default function GalleryPage() {
     // Main gallery page (collections)
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(mockData).map(([collectionId, albums]) => (
+        {Object.entries(mockData).map(([collectionId]) => (
           <Link href={`/gallery/${collectionId}`} key={`collection-${collectionId}`} className="block">
             <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-              <img
-                src={`/placeholder.svg?height=200&width=300&text=${collectionId}`}
-                alt={collectionId}
-                className="w-full h-40 object-cover rounded-md"
-              />
+              <div className="relative w-full h-40">
+                <Image
+                  src={`/placeholder.svg?height=200&width=300&text=${collectionId}`}
+                  alt={collectionId}
+                  fill
+                  className="object-cover rounded-md"
+                />
+              </div>
               <h3 className="mt-2 text-lg font-semibold capitalize">{collectionId.replace("-", " ")}</h3>
             </div>
           </Link>

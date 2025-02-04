@@ -1,6 +1,8 @@
 "use client"
 
-import { MoreHorizontal, Plus, TypeIcon as type, type LucideIcon } from "lucide-react"
+import * as React from "react"
+import { usePathname } from "next/navigation"
+import { MoreHorizontal, Plus, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"

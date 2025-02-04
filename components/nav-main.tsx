@@ -3,31 +3,26 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRight, TypeIcon as type, type LucideIcon } from "lucide-react"
-
+import { ChevronRight } from "lucide-react"
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "./ui/sidebar"
 
-type NavItem = {
+interface NavItem {
   title: string
   url: string
-  icon?: LucideIcon
+  icon?: React.ComponentType<{ className?: string }>
   items?: NavItem[]
 }
 
-export function NavMain({
-  items,
-}: {
-  items: NavItem[]
-}) {
+export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>GALLERY</SidebarGroupLabel>
