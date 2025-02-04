@@ -160,10 +160,26 @@ const navItems: NavItem[] = [
   {
     title: "ARTICLES",
     items: [
-      { name: "Latest News", description: "Stay updated with our latest medical advances and clinic news." },
-      { name: "Educational Content", description: "In-depth articles about treatments and procedures." },
-      { name: "Patient Stories", description: "Real experiences from our satisfied patients." },
-      { name: "Health Tips", description: "Expert advice for maintaining your results." },
+      { 
+        name: "Latest News", 
+        description: "Stay updated with our latest medical advances and clinic news.",
+        href: "/articles?category=latest-news"
+      },
+      { 
+        name: "Educational Content", 
+        description: "In-depth articles about treatments and procedures.",
+        href: "/articles?category=educational-content"
+      },
+      { 
+        name: "Patient Stories", 
+        description: "Real experiences from our satisfied patients.",
+        href: "/articles?category=patient-stories"
+      },
+      { 
+        name: "Health Tips", 
+        description: "Expert advice for maintaining your results.",
+        href: "/articles?category=health-tips"
+      },
     ],
     description: "Stay informed with our latest articles and educational content.",
   },

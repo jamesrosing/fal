@@ -4,10 +4,10 @@ const footerSections = [
   {
     title: "Services",
     links: [
-      { name: "Plastic Surgery", href: "/plastic-surgery" },
-      { name: "Dermatology", href: "/dermatology" },
-      { name: "Medical Spa", href: "/medical-spa" },
-      { name: "Functional Medicine", href: "/functional-medicine" },
+      { name: "Plastic Surgery", href: "/services/plastic-surgery" },
+      { name: "Dermatology", href: "/services/dermatology" },
+      { name: "Medical Spa", href: "/services/medical-spa" },
+      { name: "Functional Medicine", href: "/services/functional-medicine" },
     ],
   },
   {
