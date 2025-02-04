@@ -339,6 +339,17 @@ export function NavBar() {
             ))}
           </nav>
           <div className="flex items-center space-x-4">
+            <a
+              href="tel:9497067874"
+              className={cn(
+                "hidden md:flex items-center h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
+                isScrolled
+                  ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
+                  : "text-white hover:text-gray-200"
+              )}
+            >
+              949-706-7874
+            </a>
             <div className="relative group border-l flex items-center h-16 hidden md:flex">
               <button
                 className={cn(

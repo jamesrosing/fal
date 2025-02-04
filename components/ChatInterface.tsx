@@ -30,35 +30,40 @@ export function ChatInterface() {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
     
-    const newMessage = { 
+    const userMessage = { 
       role: 'user', 
       content: input,
       id: `user-${Date.now()}-${Math.random()}`
     };
-    const newMessages = [...messages, newMessage];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content }))
+        }),
       });
 
-      if (!res.ok) throw new Error('Failed to get response');
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const data = await response.text();
       
-      const data = await res.json();
-      setMessages((prev) => [...prev, {
-        ...data,
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data,
         id: `assistant-${Date.now()}-${Math.random()}`
       }]);
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages((prev) => [...prev, { 
+      setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'I apologize, but I encountered an error. Please try again.',
+        content: "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
         id: `error-${Date.now()}-${Math.random()}`
       }]);
     } finally {
@@ -123,7 +128,7 @@ export function ChatInterface() {
                 <div
                   className={`p-4 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-zinc-700 text-white'
                       : 'bg-zinc-800 text-zinc-100'
                   }`}
                 >
@@ -150,7 +155,7 @@ export function ChatInterface() {
               className="flex justify-start"
             >
               <div className="flex gap-3 items-start">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
                   <span className="text-white text-sm">S</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-zinc-800">

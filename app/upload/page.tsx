@@ -15,10 +15,11 @@ export default function UploadPage() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-2xl mb-8">Upload Team Photo</h1>
+      <h1 className="text-2xl mb-8">Upload Image</h1>
       <div className="grid md:grid-cols-2 gap-8">
         <ImageUploader onImageProcessed={handleImageProcessed} />
         <ImageDisplay imageUrl={processedImageUrl} format={imageFormat} />
+
       </div>
     </div>
   )
