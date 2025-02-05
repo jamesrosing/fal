@@ -94,15 +94,7 @@ export default function AdminPage() {
 
                 <TabsContent value="uploads" className="space-y-6">
                   <div className="grid gap-6 md:grid-cols-2">
-                    {/* Background Remover */}
-                    <Card className="md:col-span-2">
-                      <CardHeader>
-                        <CardTitle>Background Removal Tool</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <BackgroundRemover />
-                      </CardContent>
-                    </Card>
+                   
 
                     {/* Hero Images */}
                     <Card>

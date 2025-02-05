@@ -1,27 +1,7 @@
 import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
 import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary';
-import { Readable } from 'stream';
 
-// Set runtime to nodejs
-export const runtime = 'nodejs';
-export const maxDuration = 60; // Set max duration to 60 seconds for large uploads
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-function bufferToStream(buffer: Buffer) {
-  return new Readable({
-    read() {
-      this.push(buffer);
-      this.push(null);
-    }
-  });
-}
+export const runtime = 'edge';
 
 export async function POST(request: Request) {
   try {
@@ -55,42 +35,46 @@ export async function POST(request: Request) {
       public_id += `/${cleanFilename}`;
     }
 
-    // Convert File to Buffer and then to Stream
+    // Convert File to ArrayBuffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const stream = bufferToStream(buffer);
 
-    // Upload to Cloudinary using stream
-    const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          public_id,
-          folder: placement.path,
-          transformation: placement.transformations,
-          resource_type: "auto",
-          overwrite: true,
-          tags: [area, section].filter(Boolean),
-          context: {
-            area: area,
-            section: section || "",
-            dimensions: `${placement.dimensions.width}x${placement.dimensions.height}`,
-            aspect_ratio: placement.dimensions.aspectRatio.toString()
-          }
-        },
-        (error, result) => {
-          if (error) {
-            console.error("Cloudinary upload error:", error);
-            reject(error);
-            return;
-          }
-          resolve(result);
-        }
-      );
-
-      // Pipe the stream to the upload stream
-      stream.pipe(uploadStream);
+    // Create form data for Cloudinary
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', new Blob([buffer]));
+    uploadFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+    uploadFormData.append('folder', placement.path);
+    uploadFormData.append('public_id', public_id);
+    
+    // Add transformation parameters
+    placement.transformations.forEach(transform => {
+      uploadFormData.append('transformation', transform);
     });
 
+    // Add tags and context
+    uploadFormData.append('tags', [area, section].filter(Boolean).join(','));
+    uploadFormData.append('context', JSON.stringify({
+      area: area,
+      section: section || "",
+      dimensions: `${placement.dimensions.width}x${placement.dimensions.height}`,
+      aspect_ratio: placement.dimensions.aspectRatio.toString()
+    }));
+
+    // Upload to Cloudinary using fetch
+    const uploadResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: uploadFormData,
+      }
+    );
+
+    if (!uploadResponse.ok) {
+      const error = await uploadResponse.json();
+      throw new Error(error.message || 'Upload failed');
+    }
+
+    const result = await uploadResponse.json();
     return NextResponse.json({
       success: true,
       url: result.secure_url,

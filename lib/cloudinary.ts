@@ -1,19 +1,11 @@
-import { v2 as cloudinary } from 'cloudinary';
-
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
+// Remove Node.js specific imports
 export type ImageArea = 
-  | "hero" // 16:9 for hero sections
-  | "article" // 16:9 for article headers
-  | "service" // 4:3 for service cards
-  | "team" // 1:1 for team member photos
-  | "gallery" // 4:3 for gallery items
-  | "logo"; // variable, preserved aspect ratio
+  | "hero"
+  | "article" 
+  | "service"
+  | "team"
+  | "gallery"
+  | "logo";
 
 export interface ImagePlacement {
   path: string;
@@ -26,7 +18,6 @@ export interface ImagePlacement {
   transformations: string[];
 }
 
-// Define specific placements and their requirements
 export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
   hero: {
     path: "hero",
@@ -83,8 +74,8 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
     description: "Logo and branding assets",
     dimensions: {
       width: 200,
-      height: 0, // Height will be auto-calculated
-      aspectRatio: 0 // Preserve original aspect ratio
+      height: 0,
+      aspectRatio: 0
     },
     transformations: ["c_scale", "f_auto", "q_auto"]
   }
@@ -105,9 +96,6 @@ export function getCloudinaryUrl(publicId: string, area: ImageArea, options: { w
     transformations.push(`q_${options.quality}`);
   }
 
-  return cloudinary.url(publicId, {
-    transformation: transformations.join(',')
-  });
-}
-
-export default cloudinary; 
+  const transformationString = transformations.join(',');
+  return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${transformationString}/${publicId}`;
+} 

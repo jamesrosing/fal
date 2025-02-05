@@ -22,12 +22,10 @@
       {
         name: "Admin",
         logo: Star,
-        plan: "Pro",
       },
       {
         name: "Staff",
         logo: Pin,
-        plan: "Free",
       },
     ],
     navMain: [
