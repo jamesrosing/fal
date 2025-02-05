@@ -184,9 +184,9 @@ export default function GalleryPage() {
     if (slug.length > 2 && !isNaN(Number(slug[slug.length - 1]))) {
       const caseNumber = Number(slug[slug.length - 1])
       const albumPath = slug.slice(0, -1).join("/")
-      const caseData = caseData[albumPath]?.[caseNumber - 1]
+      const currentCase = caseData[albumPath]?.[caseNumber - 1]
 
-      if (!caseData) return <div>Case not found</div>
+      if (!currentCase) return <div>Case not found</div>
 
       return (
         <div className="space-y-4">
@@ -194,7 +194,7 @@ export default function GalleryPage() {
             <ArrowLeft className="h-4 w-4" />
             Back to Album
           </Button>
-          <CaseViewer images={caseData.images} />
+          <CaseViewer images={currentCase.images} />
         </div>
       )
     }
