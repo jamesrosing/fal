@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { NavAdmin } from "@/components/nav-admin"
 import {
@@ -15,9 +15,33 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Plus, ChevronLeft } from "lucide-react"
+import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { useDropzone } from 'react-dropzone'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import type { FileRejection, DropEvent } from 'react-dropzone'
 
 interface Case {
   id: string
@@ -168,6 +192,9 @@ export default function AdminPage() {
   const [currentAlbum, setCurrentAlbum] = useState<string | undefined>()
   const [currentCase, setCurrentCase] = useState<string | undefined>()
   const [selectedImage, setSelectedImage] = useState<{ id: string; url: string } | null>(null)
+  const [isAddCaseDialogOpen, setIsAddCaseDialogOpen] = useState(false)
+  const [newCaseTitle, setNewCaseTitle] = useState("")
+  const [newCaseImages, setNewCaseImages] = useState<File[]>([])
 
   const handleNavigate = (section: string, collection?: string) => {
     setCurrentSection(section)
@@ -200,6 +227,110 @@ export default function AdminPage() {
       setSelectedImage(null)
     } else if (currentAlbum) {
       setCurrentAlbum(undefined)
+    }
+  }
+
+  // Handle image deletion
+  const handleDeleteImage = (imageId: string) => {
+    if (currentCollection && currentAlbum && currentCase) {
+      const updatedCollections = { ...collections }
+      const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+        .find(c => c.id === currentCase)
+      
+      if (caseItem) {
+        caseItem.images = caseItem.images.filter(img => img.id !== imageId)
+        // Update collections state here when we add proper state management
+      }
+    }
+  }
+
+  // Handle image replacement via drag and drop
+  const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
+    acceptedFiles.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const newImage = {
+          id: Math.random().toString(36).substr(2, 9),
+          url: reader.result as string
+        }
+        
+        if (currentCollection && currentAlbum && currentCase) {
+          const updatedCollections = { ...collections }
+          const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+            .find(c => c.id === currentCase)
+          
+          if (caseItem) {
+            caseItem.images.push(newImage)
+            // Update collections state here when we add proper state management
+          }
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+  }, [currentCollection, currentAlbum, currentCase])
+
+  // Handle image replacement for a specific image
+  const handleImageReplace = useCallback((imageId: string) => {
+    return (file: File) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const newImage = {
+          id: imageId,
+          url: reader.result as string
+        }
+        
+        if (currentCollection && currentAlbum && currentCase) {
+          const updatedCollections = { ...collections }
+          const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+            .find(c => c.id === currentCase)
+          
+          if (caseItem) {
+            const index = caseItem.images.findIndex(img => img.id === imageId)
+            if (index !== -1) {
+              caseItem.images[index] = newImage
+            }
+            // Update collections state here when we add proper state management
+          }
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }, [currentCollection, currentAlbum, currentCase])
+
+  const { getRootProps: getAddImageRootProps, getInputProps: getAddImageInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+    },
+    noClick: false,
+    noDrag: false
+  })
+
+  const { getRootProps: getReplaceImageRootProps, getInputProps: getReplaceImageInputProps } = useDropzone({
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+    },
+    noClick: false,
+    noDrag: false
+  })
+
+  // Handle new case creation
+  const handleAddCase = () => {
+    if (currentCollection && currentAlbum && newCaseTitle.trim()) {
+      const newCase: Case = {
+        id: Math.random().toString(36).substr(2, 9),
+        title: newCaseTitle,
+        images: []
+      }
+      
+      const updatedCollections = { ...collections }
+      updatedCollections[currentCollection].albums[currentAlbum].cases.push(newCase)
+      // Update collections state here when we add proper state management
+      
+      setNewCaseTitle("")
+      setNewCaseImages([])
+      setIsAddCaseDialogOpen(false)
+      handleCaseClick(newCase.id)
     }
   }
 
@@ -282,41 +413,101 @@ export default function AdminPage() {
               <h1 className="text-2xl font-semibold">{caseItem.title}</h1>
             </div>
 
-            {/* Main selected image */}
+            {/* Main selected image with drag-drop replacement */}
             <Card className="overflow-hidden bg-transparent border-0">
               <div className="relative aspect-video">
-                <Image
-                  src={selectedImage.url}
-                  alt={`Case image ${selectedImage.id}`}
-                  fill
-                  className="object-contain"
-                />
+                {selectedImage && (
+                  <>
+                    <div {...getReplaceImageRootProps({
+                      onDrop: () => {},
+                      onClick: (e) => e.stopPropagation()
+                    })}>
+                      <input {...getReplaceImageInputProps({
+                        onChange: (e) => {
+                          const files = e.target.files
+                          if (files?.length) {
+                            handleImageReplace(selectedImage.id)(files[0])
+                          }
+                        }
+                      })} />
+                      <Image
+                        src={selectedImage.url}
+                        alt={`Case image ${selectedImage.id}`}
+                        fill
+                        className="object-contain"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 transition-opacity">
+                        <Upload className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
-            {/* Image carousel */}
+            {/* Image carousel with management options */}
             <div className="grid grid-cols-5 gap-4">
               {caseItem.images.map((image) => (
                 <Card 
                   key={image.id} 
                   className={cn(
-                    "overflow-hidden cursor-pointer transition-all",
-                    selectedImage.id === image.id 
+                    "relative overflow-hidden cursor-pointer transition-all group",
+                    selectedImage?.id === image.id 
                       ? "ring-2 ring-primary" 
                       : "hover:ring-2 hover:ring-primary/50"
                   )}
-                  onClick={() => setSelectedImage(image)}
                 >
-                  <div className="relative aspect-square">
-                    <Image
-                      src={image.url}
-                      alt={`Case image ${image.id}`}
-                      fill
-                      className="object-cover"
-                    />
+                  <div 
+                    className="relative aspect-square"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <div {...getReplaceImageRootProps({
+                      onDrop: () => {},
+                      onClick: (e) => e.stopPropagation()
+                    })}>
+                      <input {...getReplaceImageInputProps({
+                        onChange: (e) => {
+                          const files = e.target.files
+                          if (files?.length) {
+                            handleImageReplace(image.id)(files[0])
+                          }
+                        }
+                      })} />
+                      <Image
+                        src={image.url}
+                        alt={`Case image ${image.id}`}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/50 transition-opacity">
+                        <Upload className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
                   </div>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteImage(image.id)
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </Card>
               ))}
+              {/* Add new image card */}
+              <Card 
+                className="overflow-hidden cursor-pointer hover:border-primary"
+              >
+                <div {...getAddImageRootProps()}>
+                  <input {...getAddImageInputProps()} />
+                  <div className="relative aspect-square flex items-center justify-center border-2 border-dashed">
+                    <Plus className="h-8 w-8" />
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         )
@@ -336,10 +527,41 @@ export default function AdminPage() {
               </Button>
               <div className="flex items-center justify-between flex-1">
                 <h1 className="text-2xl font-semibold">{album.title} Cases</h1>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Case
-                </Button>
+                <Dialog open={isAddCaseDialogOpen} onOpenChange={setIsAddCaseDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Case
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Case</DialogTitle>
+                      <DialogDescription>
+                        Create a new case and add images to it.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Case Title</Label>
+                        <Input
+                          id="title"
+                          placeholder="Enter case title"
+                          value={newCaseTitle}
+                          onChange={(e) => setNewCaseTitle(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsAddCaseDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddCase} disabled={!newCaseTitle.trim()}>
+                        Create Case
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             
@@ -397,7 +619,7 @@ export default function AdminPage() {
               <Card key={id} className="cursor-pointer hover:border-primary" 
                     onClick={() => handleAlbumClick(id)}>
                 <CardHeader>
-                  <CardTitle className="text-lg">{album.title}</CardTitle>
+                  <CardTitle className="text-lg font-cerebri font-light uppercase">{album.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between items-center">
