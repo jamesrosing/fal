@@ -185,7 +185,6 @@ export default function AdminPage() {
 
   const handleCaseClick = (caseId: string) => {
     setCurrentCase(caseId)
-    // Set the first image as selected when opening a case
     if (currentCollection && currentAlbum) {
       const caseItem = collections[currentCollection]?.albums[currentAlbum]?.cases.find(c => c.id === caseId)
       if (caseItem && caseItem.images && caseItem.images.length > 0) {
