@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { NavAdmin } from "@/components/nav-admin"
 import {
@@ -15,17 +15,55 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Plus, ChevronLeft } from "lucide-react"
+import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { useDropzone } from 'react-dropzone'
+import { uploadToCloudinary } from "@/lib/cloudinary-upload"
+import { getCloudinaryUrl } from "@/lib/cloudinary"
+import { resizeImage } from "@/lib/utils"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import type { FileRejection, DropEvent } from 'react-dropzone'
+import { toast } from "@/components/ui/use-toast"
+import { deleteFromCloudinary } from "@/lib/cloudinary-upload"
+import { Toaster } from "@/components/ui/toaster"
+
+interface CloudinaryImage {
+  id: string
+  url: string
+  public_id: string
+  metadata: {
+    width: number
+    height: number
+    format: string
+  }
+}
 
 interface Case {
   id: string
   title: string
-  images: Array<{
-    id: string
-    url: string
-  }>
+  images: CloudinaryImage[]
 }
 
 interface Album {
@@ -49,7 +87,13 @@ const generatePlaceholderCases = (albumName: string) => {
     title: String(i + 1),
     images: Array.from({ length: 5 }, (_, j) => ({
       id: String(j + 1),
-      url: "/placeholder.jpg"
+      url: "/placeholder.jpg",
+      public_id: `placeholder/${albumName}/${i + 1}/${j + 1}`,
+      metadata: {
+        width: 800,
+        height: 600,
+        format: "jpg"
+      }
     }))
   }))
 }
@@ -168,6 +212,9 @@ export default function AdminPage() {
   const [currentAlbum, setCurrentAlbum] = useState<string | undefined>()
   const [currentCase, setCurrentCase] = useState<string | undefined>()
   const [selectedImage, setSelectedImage] = useState<{ id: string; url: string } | null>(null)
+  const [isAddCaseDialogOpen, setIsAddCaseDialogOpen] = useState(false)
+  const [newCaseTitle, setNewCaseTitle] = useState("")
+  const [newCaseImages, setNewCaseImages] = useState<File[]>([])
 
   const handleNavigate = (section: string, collection?: string) => {
     setCurrentSection(section)
@@ -199,6 +246,167 @@ export default function AdminPage() {
       setSelectedImage(null)
     } else if (currentAlbum) {
       setCurrentAlbum(undefined)
+    }
+  }
+
+  // Handle image deletion
+  const handleDeleteImage = async (imageId: string) => {
+    if (currentCollection && currentAlbum && currentCase) {
+      try {
+        const updatedCollections = { ...collections }
+        const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+          .find(c => c.id === currentCase)
+        
+        if (caseItem) {
+          const imageToDelete = caseItem.images.find(img => img.id === imageId)
+          if (imageToDelete?.public_id) {
+            await deleteFromCloudinary(imageToDelete.public_id)
+          }
+          caseItem.images = caseItem.images.filter(img => img.id !== imageId)
+          // Update collections state here when we add proper state management
+          toast({
+            title: "Image deleted",
+            description: "The image has been successfully deleted.",
+          })
+        }
+      } catch (error) {
+        console.error('Failed to delete image:', error)
+        toast({
+          title: "Error",
+          description: "Failed to delete the image. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+  }
+
+  // Handle image upload to Cloudinary
+  const uploadImageToCloudinary = async (file: File, customFilename?: string) => {
+    try {
+      // Resize image before upload if needed
+      const resizedImage = await resizeImage(file, 2048)
+      
+      // Upload to Cloudinary with proper path structure
+      const section = `${currentCollection}/${currentAlbum}/${currentCase}`
+      const result = await uploadToCloudinary(
+        new File([resizedImage], file.name, { type: file.type }),
+        "gallery",
+        section,
+        customFilename
+      )
+
+      toast({
+        title: "Image uploaded",
+        description: "The image has been successfully uploaded.",
+      })
+
+      return {
+        id: result.public_id.split('/').pop() || Math.random().toString(36).substr(2, 9),
+        url: result.url,
+        public_id: result.public_id,
+        metadata: result.metadata
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error)
+      toast({
+        title: "Error",
+        description: "Failed to upload the image. Please try again.",
+        variant: "destructive",
+      })
+      throw error
+    }
+  }
+
+  // Handle image replacement via drag and drop
+  const onDrop = useCallback(async (acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
+    if (currentCollection && currentAlbum && currentCase) {
+      try {
+        const uploadPromises = acceptedFiles.map(file => uploadImageToCloudinary(file))
+        const uploadedImages = await Promise.all(uploadPromises)
+        
+        const updatedCollections = { ...collections }
+        const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+          .find(c => c.id === currentCase)
+        
+        if (caseItem) {
+          caseItem.images.push(...uploadedImages)
+          // Update collections state here when we add proper state management
+          toast({
+            title: "Images added",
+            description: `Successfully added ${uploadedImages.length} images.`,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to process images:', error)
+        toast({
+          title: "Error",
+          description: "Failed to process some images. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+  }, [currentCollection, currentAlbum, currentCase])
+
+  // Handle image replacement for a specific image
+  const handleImageReplace = useCallback((imageId: string) => {
+    return async (file: File) => {
+      try {
+        if (currentCollection && currentAlbum && currentCase) {
+          const uploadedImage = await uploadImageToCloudinary(file, imageId)
+          
+          const updatedCollections = { ...collections }
+          const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+            .find(c => c.id === currentCase)
+          
+          if (caseItem) {
+            const index = caseItem.images.findIndex(img => img.id === imageId)
+            if (index !== -1) {
+              caseItem.images[index] = uploadedImage
+            }
+            // Update collections state here when we add proper state management
+          }
+        }
+      } catch (error) {
+        console.error('Failed to replace image:', error)
+        // TODO: Add error handling UI feedback
+      }
+    }
+  }, [currentCollection, currentAlbum, currentCase])
+
+  const { getRootProps: getAddImageRootProps, getInputProps: getAddImageInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+    },
+    noClick: false,
+    noDrag: false
+  })
+
+  const { getRootProps: getReplaceImageRootProps, getInputProps: getReplaceImageInputProps } = useDropzone({
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+    },
+    noClick: false,
+    noDrag: false
+  })
+
+  // Handle new case creation
+  const handleAddCase = () => {
+    if (currentCollection && currentAlbum && newCaseTitle.trim()) {
+      const newCase: Case = {
+        id: Math.random().toString(36).substr(2, 9),
+        title: newCaseTitle,
+        images: []
+      }
+      
+      const updatedCollections = { ...collections }
+      updatedCollections[currentCollection].albums[currentAlbum].cases.push(newCase)
+      // Update collections state here when we add proper state management
+      
+      setNewCaseTitle("")
+      setNewCaseImages([])
+      setIsAddCaseDialogOpen(false)
+      handleCaseClick(newCase.id)
     }
   }
 
@@ -281,41 +489,107 @@ export default function AdminPage() {
               <h1 className="text-2xl font-semibold">{caseItem.title}</h1>
             </div>
 
-            {/* Main selected image */}
+            {/* Main selected image with drag-drop replacement */}
             <Card className="overflow-hidden bg-transparent border-0">
               <div className="relative aspect-video">
-                <Image
-                  src={selectedImage.url}
-                  alt={`Case image ${selectedImage.id}`}
-                  fill
-                  className="object-contain"
-                />
+                {selectedImage && (
+                  <>
+                    <div {...getReplaceImageRootProps({
+                      onDrop: () => {},
+                      onClick: (e) => e.stopPropagation()
+                    })}>
+                      <input {...getReplaceImageInputProps({
+                        onChange: (e) => {
+                          const files = e.target.files
+                          if (files?.length) {
+                            handleImageReplace(selectedImage.id)(files[0])
+                          }
+                        }
+                      })} />
+                      <Image
+                        src={selectedImage.url}
+                        alt={`Case image ${selectedImage.id}`}
+                        fill
+                        className="object-contain"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 transition-opacity">
+                        <Upload className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
-            {/* Image carousel */}
+            {/* Image carousel with management options */}
             <div className="grid grid-cols-5 gap-4">
               {caseItem.images.map((image) => (
                 <Card 
                   key={image.id} 
                   className={cn(
-                    "overflow-hidden cursor-pointer transition-all",
-                    selectedImage.id === image.id 
+                    "relative overflow-hidden cursor-pointer transition-all group",
+                    selectedImage?.id === image.id 
                       ? "ring-2 ring-primary" 
                       : "hover:ring-2 hover:ring-primary/50"
                   )}
-                  onClick={() => setSelectedImage(image)}
                 >
-                  <div className="relative aspect-square">
-                    <Image
-                      src={image.url}
-                      alt={`Case image ${image.id}`}
-                      fill
-                      className="object-cover"
-                    />
+                  <div 
+                    className="relative aspect-square"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <div {...getReplaceImageRootProps({
+                      onDrop: () => {},
+                      onClick: (e) => e.stopPropagation()
+                    })}>
+                      <input {...getReplaceImageInputProps({
+                        onChange: (e) => {
+                          const files = e.target.files
+                          if (files?.length) {
+                            handleImageReplace(image.id)(files[0])
+                          }
+                        }
+                      })} />
+                      <Image
+                        src={image.url}
+                        alt={`Case image ${image.id}`}
+                        fill
+                        className="object-cover"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/50 transition-opacity">
+                        <Upload className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
                   </div>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteImage(image.id)
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </Card>
               ))}
+              {/* Add new image card */}
+              <Card 
+                className="overflow-hidden cursor-pointer hover:border-primary"
+              >
+                <div {...getAddImageRootProps()}>
+                  <input {...getAddImageInputProps()} />
+                  <div className="relative aspect-square flex items-center justify-center border-2 border-dashed">
+                    <Plus className="h-8 w-8" />
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         )
@@ -335,10 +609,41 @@ export default function AdminPage() {
               </Button>
               <div className="flex items-center justify-between flex-1">
                 <h1 className="text-2xl font-semibold">{album.title} Cases</h1>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Case
-                </Button>
+                <Dialog open={isAddCaseDialogOpen} onOpenChange={setIsAddCaseDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Case
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Case</DialogTitle>
+                      <DialogDescription>
+                        Create a new case and add images to it.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Case Title</Label>
+                        <Input
+                          id="title"
+                          placeholder="Enter case title"
+                          value={newCaseTitle}
+                          onChange={(e) => setNewCaseTitle(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsAddCaseDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddCase} disabled={!newCaseTitle.trim()}>
+                        Create Case
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             
@@ -353,6 +658,9 @@ export default function AdminPage() {
                         alt={case_.title}
                         fill
                         className="object-cover"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
                       />
                     </div>
                   )}
@@ -396,7 +704,7 @@ export default function AdminPage() {
               <Card key={id} className="cursor-pointer hover:border-primary" 
                     onClick={() => handleAlbumClick(id)}>
                 <CardHeader>
-                  <CardTitle className="text-lg">{album.title}</CardTitle>
+                  <CardTitle className="text-lg font-cerebri font-light uppercase">{album.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between items-center">
@@ -453,6 +761,7 @@ export default function AdminPage() {
             </div>
           </div>
         </SidebarInset>
+        <Toaster />
       </div>
     </SidebarProvider>
   )
