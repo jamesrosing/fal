@@ -254,7 +254,7 @@ export default function GalleryPage() {
 
     // Main gallery page (collections)
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
         {Object.entries(mockData).map(([collectionId]) => (
           <Link href={`/gallery/${collectionId}`} key={`collection-${collectionId}`} className="block">
             <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">

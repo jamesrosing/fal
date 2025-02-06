@@ -329,7 +329,14 @@ export default function AdminPage() {
           .find(c => c.id === currentCase)
         
         if (caseItem) {
-          caseItem.images.push(...uploadedImages)
+          // Update the images array with the new uploads
+          caseItem.images = [...caseItem.images, ...uploadedImages]
+          
+          // If this is the first image being added, set it as selected
+          if (caseItem.images.length === uploadedImages.length) {
+            setSelectedImage(uploadedImages[0])
+          }
+          
           // Update collections state here when we add proper state management
           toast({
             title: "Images added",
@@ -490,28 +497,21 @@ export default function AdminPage() {
             </div>
 
             {/* Main selected image with drag-drop replacement */}
-            <Card className="overflow-hidden bg-transparent border-0">
-              <div className="relative aspect-video">
+            <Card className="overflow-hidden bg-transparent border-0 w-full max-w-[1800px] mx-auto">
+              <div className="relative aspect-[16/9] w-full">
                 {selectedImage && (
                   <>
                     <div {...getReplaceImageRootProps({
                       onDrop: () => {},
                       onClick: (e) => e.stopPropagation()
                     })}>
-                      <input {...getReplaceImageInputProps({
-                        onChange: (e) => {
-                          const files = e.target.files
-                          if (files?.length) {
-                            handleImageReplace(selectedImage.id)(files[0])
-                          }
-                        }
-                      })} />
+                      <input {...getReplaceImageInputProps()} />
                       <Image
                         src={selectedImage.url}
                         alt={`Case image ${selectedImage.id}`}
                         fill
                         className="object-contain"
-                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        sizes="(min-width: 1800px) 1800px, (min-width: 1200px) 1200px, 100vw"
                         quality={90}
                         loading="lazy"
                       />
@@ -525,39 +525,32 @@ export default function AdminPage() {
             </Card>
 
             {/* Image carousel with management options */}
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-5 gap-4 max-w-[1800px] mx-auto">
               {caseItem.images.map((image) => (
                 <Card 
                   key={image.id} 
                   className={cn(
-                    "relative overflow-hidden cursor-pointer transition-all group",
+                    "relative overflow-hidden cursor-pointer transition-all group w-full",
                     selectedImage?.id === image.id 
-                      ? "ring-2 ring-primary" 
-                      : "hover:ring-2 hover:ring-primary/50"
+                      ? "ring-1 ring-primary" 
+                      : "hover:ring-1 hover:ring-primary/50"
                   )}
                 >
                   <div 
-                    className="relative aspect-square"
+                    className="relative aspect-[16/9]"
                     onClick={() => setSelectedImage(image)}
                   >
                     <div {...getReplaceImageRootProps({
                       onDrop: () => {},
                       onClick: (e) => e.stopPropagation()
                     })}>
-                      <input {...getReplaceImageInputProps({
-                        onChange: (e) => {
-                          const files = e.target.files
-                          if (files?.length) {
-                            handleImageReplace(image.id)(files[0])
-                          }
-                        }
-                      })} />
+                      <input {...getReplaceImageInputProps()} />
                       <Image
                         src={image.url}
                         alt={`Case image ${image.id}`}
                         fill
                         className="object-cover"
-                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        sizes="(min-width: 1800px) 360px, (min-width: 1200px) 300px, (min-width: 768px) 240px, 100vw"
                         quality={90}
                         loading="lazy"
                       />
@@ -569,7 +562,7 @@ export default function AdminPage() {
                   <Button
                     variant="destructive"
                     size="icon"
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleDeleteImage(image.id)
@@ -581,11 +574,11 @@ export default function AdminPage() {
               ))}
               {/* Add new image card */}
               <Card 
-                className="overflow-hidden cursor-pointer hover:border-primary"
+                className="overflow-hidden cursor-pointer hover:border-primary w-full"
               >
                 <div {...getAddImageRootProps()}>
                   <input {...getAddImageInputProps()} />
-                  <div className="relative aspect-square flex items-center justify-center border-2 border-dashed">
+                  <div className="relative aspect-[16/9] flex items-center justify-center border-2 border-dashed">
                     <Plus className="h-8 w-8" />
                   </div>
                 </div>
@@ -647,25 +640,25 @@ export default function AdminPage() {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
               {album.cases.map((case_) => (
-                <Card key={case_.id} className="overflow-hidden cursor-pointer hover:border-primary" 
+                <Card key={case_.id} className="overflow-hidden cursor-pointer hover:border-primary w-full" 
                       onClick={() => handleCaseClick(case_.id)}>
                   {case_.images[0] && (
-                    <div className="relative aspect-video">
+                    <div className="relative aspect-[16/9] w-full">
                       <Image
                         src={case_.images[0].url}
                         alt={case_.title}
                         fill
-                        className="object-cover"
-                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        className="object-contain"
+                        sizes="(min-width: 1800px) 800px, (min-width: 1200px) 600px, 100vw"
                         quality={90}
                         loading="lazy"
                       />
                     </div>
                   )}
                   <CardHeader>
-                    <CardTitle className="text-lg">{case_.title}</CardTitle>
+                    <CardTitle className="text-lg font-cerebri font-light uppercase">{case_.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <span className="text-sm text-muted-foreground">
@@ -756,7 +749,7 @@ export default function AdminPage() {
             </div>
           </header>
           <div className="flex-1 overflow-auto">
-            <div className="container mx-auto p-6">
+            <div className="container max-w-[1800px] mx-auto px-8 py-6">
               {renderContent()}
             </div>
           </div>
