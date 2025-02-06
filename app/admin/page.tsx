@@ -19,6 +19,9 @@ import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useDropzone } from 'react-dropzone'
+import { uploadToCloudinary } from "@/lib/cloudinary-upload"
+import { getCloudinaryUrl } from "@/lib/cloudinary"
+import { resizeImage } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,14 +45,25 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { FileRejection, DropEvent } from 'react-dropzone'
+import { toast } from "@/components/ui/use-toast"
+import { deleteFromCloudinary } from "@/lib/cloudinary-upload"
+import { Toaster } from "@/components/ui/toaster"
+
+interface CloudinaryImage {
+  id: string
+  url: string
+  public_id: string
+  metadata: {
+    width: number
+    height: number
+    format: string
+  }
+}
 
 interface Case {
   id: string
   title: string
-  images: Array<{
-    id: string
-    url: string
-  }>
+  images: CloudinaryImage[]
 }
 
 interface Album {
@@ -73,7 +87,13 @@ const generatePlaceholderCases = (albumName: string) => {
     title: String(i + 1),
     images: Array.from({ length: 5 }, (_, j) => ({
       id: String(j + 1),
-      url: "/placeholder.jpg"
+      url: "/placeholder.jpg",
+      public_id: `placeholder/${albumName}/${i + 1}/${j + 1}`,
+      metadata: {
+        width: 800,
+        height: 600,
+        format: "jpg"
+      }
     }))
   }))
 }
@@ -231,55 +251,110 @@ export default function AdminPage() {
   }
 
   // Handle image deletion
-  const handleDeleteImage = (imageId: string) => {
+  const handleDeleteImage = async (imageId: string) => {
     if (currentCollection && currentAlbum && currentCase) {
-      const updatedCollections = { ...collections }
-      const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
-        .find(c => c.id === currentCase)
-      
-      if (caseItem) {
-        caseItem.images = caseItem.images.filter(img => img.id !== imageId)
-        // Update collections state here when we add proper state management
+      try {
+        const updatedCollections = { ...collections }
+        const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+          .find(c => c.id === currentCase)
+        
+        if (caseItem) {
+          const imageToDelete = caseItem.images.find(img => img.id === imageId)
+          if (imageToDelete?.public_id) {
+            await deleteFromCloudinary(imageToDelete.public_id)
+          }
+          caseItem.images = caseItem.images.filter(img => img.id !== imageId)
+          // Update collections state here when we add proper state management
+          toast({
+            title: "Image deleted",
+            description: "The image has been successfully deleted.",
+          })
+        }
+      } catch (error) {
+        console.error('Failed to delete image:', error)
+        toast({
+          title: "Error",
+          description: "Failed to delete the image. Please try again.",
+          variant: "destructive",
+        })
       }
     }
   }
 
-  // Handle image replacement via drag and drop
-  const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
-    acceptedFiles.forEach(file => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const newImage = {
-          id: Math.random().toString(36).substr(2, 9),
-          url: reader.result as string
-        }
-        
-        if (currentCollection && currentAlbum && currentCase) {
-          const updatedCollections = { ...collections }
-          const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
-            .find(c => c.id === currentCase)
-          
-          if (caseItem) {
-            caseItem.images.push(newImage)
-            // Update collections state here when we add proper state management
-          }
-        }
+  // Handle image upload to Cloudinary
+  const uploadImageToCloudinary = async (file: File, customFilename?: string) => {
+    try {
+      // Resize image before upload if needed
+      const resizedImage = await resizeImage(file, 2048)
+      
+      // Upload to Cloudinary with proper path structure
+      const section = `${currentCollection}/${currentAlbum}/${currentCase}`
+      const result = await uploadToCloudinary(
+        new File([resizedImage], file.name, { type: file.type }),
+        "gallery",
+        section,
+        customFilename
+      )
+
+      toast({
+        title: "Image uploaded",
+        description: "The image has been successfully uploaded.",
+      })
+
+      return {
+        id: result.public_id.split('/').pop() || Math.random().toString(36).substr(2, 9),
+        url: result.url,
+        public_id: result.public_id,
+        metadata: result.metadata
       }
-      reader.readAsDataURL(file)
-    })
+    } catch (error) {
+      console.error('Failed to upload image:', error)
+      toast({
+        title: "Error",
+        description: "Failed to upload the image. Please try again.",
+        variant: "destructive",
+      })
+      throw error
+    }
+  }
+
+  // Handle image replacement via drag and drop
+  const onDrop = useCallback(async (acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
+    if (currentCollection && currentAlbum && currentCase) {
+      try {
+        const uploadPromises = acceptedFiles.map(file => uploadImageToCloudinary(file))
+        const uploadedImages = await Promise.all(uploadPromises)
+        
+        const updatedCollections = { ...collections }
+        const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
+          .find(c => c.id === currentCase)
+        
+        if (caseItem) {
+          caseItem.images.push(...uploadedImages)
+          // Update collections state here when we add proper state management
+          toast({
+            title: "Images added",
+            description: `Successfully added ${uploadedImages.length} images.`,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to process images:', error)
+        toast({
+          title: "Error",
+          description: "Failed to process some images. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
   }, [currentCollection, currentAlbum, currentCase])
 
   // Handle image replacement for a specific image
   const handleImageReplace = useCallback((imageId: string) => {
-    return (file: File) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const newImage = {
-          id: imageId,
-          url: reader.result as string
-        }
-        
+    return async (file: File) => {
+      try {
         if (currentCollection && currentAlbum && currentCase) {
+          const uploadedImage = await uploadImageToCloudinary(file, imageId)
+          
           const updatedCollections = { ...collections }
           const caseItem = updatedCollections[currentCollection].albums[currentAlbum].cases
             .find(c => c.id === currentCase)
@@ -287,13 +362,15 @@ export default function AdminPage() {
           if (caseItem) {
             const index = caseItem.images.findIndex(img => img.id === imageId)
             if (index !== -1) {
-              caseItem.images[index] = newImage
+              caseItem.images[index] = uploadedImage
             }
             // Update collections state here when we add proper state management
           }
         }
+      } catch (error) {
+        console.error('Failed to replace image:', error)
+        // TODO: Add error handling UI feedback
       }
-      reader.readAsDataURL(file)
     }
   }, [currentCollection, currentAlbum, currentCase])
 
@@ -435,6 +512,9 @@ export default function AdminPage() {
                         alt={`Case image ${selectedImage.id}`}
                         fill
                         className="object-contain"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/50 transition-opacity">
                         <Upload className="h-8 w-8 text-white" />
@@ -478,6 +558,9 @@ export default function AdminPage() {
                         alt={`Case image ${image.id}`}
                         fill
                         className="object-cover"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
                       />
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/50 transition-opacity">
                         <Upload className="h-6 w-6 text-white" />
@@ -576,6 +659,9 @@ export default function AdminPage() {
                         alt={case_.title}
                         fill
                         className="object-cover"
+                        sizes="(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw"
+                        quality={90}
+                        loading="lazy"
                       />
                     </div>
                   )}
@@ -676,6 +762,7 @@ export default function AdminPage() {
             </div>
           </div>
         </SidebarInset>
+        <Toaster />
       </div>
     </SidebarProvider>
   )
