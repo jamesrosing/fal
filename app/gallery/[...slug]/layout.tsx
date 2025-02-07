@@ -86,8 +86,8 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
       }
     }
 
-    // If we get here, the URL structure is invalid
-    console.error(`No matching content found for URL: ${slug.join('/')}`)
+    // If we get here, the URL structure is invalid or content wasn't found
+    console.log(`No matching content found for URL: ${slug.join('/')}`)
     notFound()
   } catch (error) {
     // Log the full error object for debugging

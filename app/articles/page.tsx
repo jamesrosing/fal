@@ -5,16 +5,6 @@ import Link from "next/link"
 import { NavBar } from "@/components/nav-bar"
 import { useSearchParams } from "next/navigation"
 
-// This would typically come from a CMS or API
-const articles = Array.from({ length: 12 }, (__, i) => ({
-  id: i + 1,
-  title: `Article ${i + 1}`,
-  excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-  imageUrl: `/placeholder.svg?height=200&width=300&text=Article${i + 1}`,
-  category: categories[Math.floor(Math.random() * categories.length)],
-  date: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString(),
-}));
-
 const categories = [
   { id: "latest-news", name: "Latest News" },
   { id: "educational-content", name: "Educational Content" },
@@ -22,11 +12,21 @@ const categories = [
   { id: "health-tips", name: "Health Tips" }
 ];
 
+// This would typically come from a CMS or API
+const articles = Array.from({ length: 12 }, (__, i) => ({
+  id: i + 1,
+  title: `Article ${i + 1}`,
+  excerpt: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+  imageUrl: `/placeholder.svg?height=200&width=300&text=Article${i + 1}`,
+  category: categories[Math.floor(Math.random() * categories.length)].id,
+  date: new Date(Date.now() - Math.random() * 10000000000).toLocaleDateString(),
+}));
+
 export default function ArticlesPage() {
   const searchParams = useSearchParams();
   const selectedCategory = searchParams.get('category') || 'latest-news';
 
-  const filteredArticles = Object.entries(articles).filter(([_, article]) => 
+  const filteredArticles = articles.filter(article => 
     !selectedCategory || article.category === selectedCategory
   );
 
@@ -56,10 +56,10 @@ export default function ArticlesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredArticles.map(([slug, article]) => (
+          {filteredArticles.map((article) => (
             <Link 
-              key={slug} 
-              href={`/articles/${slug}`}
+              key={article.id} 
+              href={`/articles/${article.id}`}
               className="group border border-white/10 overflow-hidden hover:border-white/20 transition-colors duration-300"
             >
               <div className="relative h-48">
@@ -99,4 +99,4 @@ export default function ArticlesPage() {
       </div>
     </main>
   )
-} 
+}

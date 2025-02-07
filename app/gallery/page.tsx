@@ -90,12 +90,6 @@ export default function GalleryPage() {
           <h2 className="text-2xl font-serif text-white">
             {collections.length} Collections
           </h2>
-          <Link 
-            href="/gallery/all"
-            className="text-sm text-white/70 hover:text-white"
-          >
-            View All
-          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
