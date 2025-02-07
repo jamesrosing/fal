@@ -1,0 +1,120 @@
+import { createClient } from '@supabase/supabase-js';
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
+}
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
+}
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+// Types for our database tables
+export interface Gallery {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+}
+
+export interface Album {
+  id: string;
+  gallery_id: string;
+  title: string;
+  description: string;
+  created_at: string;
+}
+
+export interface Case {
+  id: string;
+  album_id: string;
+  title: string;
+  description: string;
+  metadata: Record<string, any>;
+  created_at: string;
+}
+
+export interface Image {
+  id: string;
+  case_id: string;
+  cloudinary_url: string;
+  caption: string;
+  tags: string[];
+  created_at: string;
+}
+
+// Helper functions for database operations
+export async function getGalleries() {
+  const { data, error } = await supabase
+    .from('galleries')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data as Gallery[];
+}
+
+export async function getGalleryByTitle(title: string) {
+  const { data, error } = await supabase
+    .from('galleries')
+    .select('*')
+    .eq('title', title)
+    .single();
+  
+  if (error) throw error;
+  return data as Gallery;
+}
+
+export async function getAlbumsByGallery(galleryIdOrTitle: string) {
+  // First try to get albums by gallery ID
+  let { data, error } = await supabase
+    .from('albums')
+    .select('*')
+    .eq('gallery_id', galleryIdOrTitle)
+    .order('created_at', { ascending: false });
+  
+  if (error?.code === '22P02') { // Invalid UUID error
+    // If gallery ID is invalid, try to get gallery by title first
+    const gallery = await getGalleryByTitle(galleryIdOrTitle);
+    if (!gallery) throw new Error('Gallery not found');
+    
+    const result = await supabase
+      .from('albums')
+      .select('*')
+      .eq('gallery_id', gallery.id)
+      .order('created_at', { ascending: false });
+    
+    if (result.error) throw result.error;
+    data = result.data;
+  } else if (error) {
+    throw error;
+  }
+  
+  return data as Album[];
+}
+
+export async function getCasesByAlbum(albumId: string) {
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*, images(*)')
+    .eq('album_id', albumId)
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  return data as (Case & { images: Image[] })[];
+}
+
+export async function getCase(caseId: string) {
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*, images(*)')
+    .eq('id', caseId)
+    .single();
+  
+  if (error) throw error;
+  return data as Case & { images: Image[] };
+} 

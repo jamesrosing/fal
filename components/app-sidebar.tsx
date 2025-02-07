@@ -1,32 +1,25 @@
   "use client"
 
-  import type * as React from "react"
-  import { Album, ImageIcon, LayoutGrid, Settings, Upload, Star, Pin, LogIn } from "lucide-react"
+  import * as React from "react"
+  import { Album, ImageIcon, LayoutGrid, Settings, Upload, Star, Pin, LogIn, Building2, Calendar, LayoutDashboard } from "lucide-react"
   import Link from "next/link"
 
   import { NavMain } from "./nav-main"
   import { NavUser } from "./nav-user"
   import { TeamSwitcher } from "./team-switcher"
   import { NavAdmin } from "./nav-admin"
-  import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarFooter } from "./ui/sidebar"
+  import { Sidebar, SidebarContent, SidebarHeader, SidebarRail, SidebarFooter, SidebarMenuItem, SidebarMenuButton } from "./ui/sidebar"
   import { Button } from "./ui/button"
   import { ThemeToggle } from "./theme-toggle"
+  import { ScrollArea } from "./ui/scroll-area"
 
   const data = {
-    user: {
-      name: "Admin",
-      email: "admin@example.com",
-      avatar: "CN",
-    },
     teams: [
       {
-        name: "Admin",
-        logo: Star,
-      },
-      {
-        name: "Staff",
-        logo: Pin,
-      },
+        name: "Allure MD",
+        logo: Building2,
+        plan: "Pro"
+      }
     ],
     navMain: [
       {
@@ -110,6 +103,12 @@
   }
 
   export function AppSidebar({ isAdminPage = true, ...props }: AppSidebarProps) {
+    const [currentSection, setCurrentSection] = React.useState<string>("")
+
+    const handleNavigate = (section: string) => {
+      setCurrentSection(section)
+    }
+
     return (
       <Sidebar className="border-r bg-background" collapsible="icon" {...props}>
         <SidebarHeader className="border-b px-2 py-2">
@@ -117,54 +116,17 @@
             <TeamSwitcher teams={data.teams} />
           ) : (
             <Link href="/" className="flex items-center justify-center">
-              <svg className="w-full h-8 md:h-10 lg:h-12" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
-                <rect
-                  width="98"
-                  height="48"
-                  x="1"
-                  y="1"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-foreground"
-                />
-                <text
-                  x="50"
-                  y="30"
-                  fontFamily="Arial"
-                  fontSize="16"
-                  className="text-foreground"
-                  fill="currentColor"
-                  textAnchor="middle"
-                >
-                  Logo
-                </text>
-              </svg>
+              <span className="font-['lorimer-no-2-condensed'] font-semibold text-2xl">ALLURE MD</span>
             </Link>
           )}
         </SidebarHeader>
         <SidebarContent>
-          <div className="group-data-[collapsed=true]:hidden">
-            <NavMain items={data.navMain} />
-            {isAdminPage && <NavAdmin items={data.admin} />}
-          </div>
-          <div className="hidden group-data-[collapsed=true]:block">
-            {data.navMain.map((item) => (
-              <Link key={item.title} href={item.url} className="flex items-center justify-center p-2 hover:bg-white/5 rounded-lg">
-                <item.icon className="h-5 w-5" />
-              </Link>
-            ))}
-            {isAdminPage && data.admin.map((item) => (
-              <Link key={item.name} href={item.url} className="flex items-center justify-center p-2 hover:bg-white/5 rounded-lg">
-                <item.icon className="h-5 w-5" />
-              </Link>
-            ))}
-          </div>
+          <NavMain items={data.navMain} />
+          {isAdminPage && <NavAdmin onNavigate={handleNavigate} currentSection={currentSection} />}
         </SidebarContent>
         <SidebarFooter className="border-t">
           {isAdminPage ? (
             <div className="p-2 space-y-2">
-              <NavUser user={data.user} />
               <div className="flex justify-center">
                 <ThemeToggle />
               </div>

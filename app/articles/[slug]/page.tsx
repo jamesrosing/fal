@@ -1,4 +1,4 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { NavBar } from "@/components/nav-bar"
@@ -175,8 +175,14 @@ const articles: Record<string, Article> = {
   }
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const article = articles[params.slug as keyof typeof articles];
+type Props = {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { params } = props;
+  const resolvedParams = await params;
+  const article = articles[resolvedParams.slug as keyof typeof articles];
 
   if (!article) {
     return {
@@ -191,8 +197,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = articles[params.slug as keyof typeof articles];
+export default async function ArticlePage(props: Props) {
+  const { params } = props;
+  const resolvedParams = await params;
+  const article = articles[resolvedParams.slug as keyof typeof articles];
   
   if (!article) {
     notFound();

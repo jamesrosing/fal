@@ -17,110 +17,17 @@ import { CaseViewer } from "@/components/case-viewer"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
+import { Gallery, Album, Case, Image as GalleryImage } from "@/lib/supabase"
 
-interface GalleryCase {
-  id: string
-  coverImage: string
-  images: Array<{
-    id: string
-    url: string
-  }>
+interface GalleryPageProps {
+  galleries: Gallery[];
+  albums?: Album[];
+  cases?: (Case & { images: GalleryImage[] })[];
+  currentCase?: Case & { images: GalleryImage[] };
+  currentAlbum?: Album;
 }
 
-interface GalleryAlbum {
-  id: string
-  title: string
-  imageUrl: string
-}
-
-interface GalleryData {
-  [key: string]: GalleryAlbum[]
-}
-
-interface CaseData {
-  [key: string]: GalleryCase[]
-}
-
-const mockData: GalleryData = {
-  "plastic-surgery": [
-    { id: "face", title: "Face", imageUrl: "/placeholder.svg?height=200&width=300&text=Face" },
-    { id: "eyelids", title: "Eyelids", imageUrl: "/placeholder.svg?height=200&width=300&text=Eyelids" },
-    { id: "ears", title: "Ears", imageUrl: "/placeholder.svg?height=200&width=300&text=Ears" },
-    { id: "nose", title: "Nose", imageUrl: "/placeholder.svg?height=200&width=300&text=Nose" },
-    { id: "neck", title: "Neck", imageUrl: "/placeholder.svg?height=200&width=300&text=Neck" },
-    {
-      id: "breast-augmentation",
-      title: "Breast Augmentation",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Breast+Augmentation",
-    },
-    { id: "breast-lift", title: "Breast Lift", imageUrl: "/placeholder.svg?height=200&width=300&text=Breast+Lift" },
-    {
-      id: "breast-reduction",
-      title: "Breast Reduction",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Breast+Reduction",
-    },
-    {
-      id: "breast-revision",
-      title: "Breast Revision",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Breast+Revision",
-    },
-    {
-      id: "breast-nipple-areolar-complex",
-      title: "Breast Nipple Areolar Complex",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Breast+Nipple+Areolar+Complex",
-    },
-    {
-      id: "abdominoplasty",
-      title: "Abdominoplasty",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Abdominoplasty",
-    },
-    {
-      id: "mini-abdominoplasty",
-      title: "Mini Abdominoplasty",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=Mini+Abdominoplasty",
-    },
-    { id: "liposuction", title: "Liposuction", imageUrl: "/placeholder.svg?height=200&width=300&text=Liposuction" },
-    { id: "arm-lift", title: "Arm Lift", imageUrl: "/placeholder.svg?height=200&width=300&text=Arm+Lift" },
-    { id: "thigh-lift", title: "Thigh Lift", imageUrl: "/placeholder.svg?height=200&width=300&text=Thigh+Lift" },
-  ],
-  emsculpt: [
-    { id: "abdomen", title: "Abdomen", imageUrl: "/placeholder.svg?height=200&width=300&text=Abdomen" },
-    { id: "buttocks", title: "Buttocks", imageUrl: "/placeholder.svg?height=200&width=300&text=Buttocks" },
-    { id: "arms", title: "Arms", imageUrl: "/placeholder.svg?height=200&width=300&text=Arms" },
-    { id: "calves", title: "Calves", imageUrl: "/placeholder.svg?height=200&width=300&text=Calves" },
-  ],
-  sylfirmx: [
-    {
-      id: "placeholder",
-      title: "SylfirmX Placeholder",
-      imageUrl: "/placeholder.svg?height=200&width=300&text=SylfirmX",
-    },
-  ],
-  facials: [
-    { id: "placeholder", title: "Facials Placeholder", imageUrl: "/placeholder.svg?height=200&width=300&text=Facials" },
-  ],
-}
-
-// Function to generate case data
-const generateCaseData = (albumId: string, caseCount = 4): GalleryCase[] =>
-  Array.from({ length: caseCount }, (_, i) => ({
-    id: String(i + 1),
-    coverImage: `/placeholder.svg?height=200&width=300&text=${albumId}-Case${i + 1}`,
-    images: Array.from({ length: 5 }, (_, j) => ({
-      id: `result-${j + 1}`,
-      url: `/placeholder.svg?height=600&width=800&text=${albumId}-Case${i + 1}-Image${j + 1}`,
-    })),
-  }))
-
-// Generate case data for all albums
-const caseData: CaseData = Object.keys(mockData).reduce((acc, gallery) => {
-  mockData[gallery].forEach((album) => {
-    acc[`${gallery}/${album.id}`] = generateCaseData(album.id)
-  })
-  return acc
-}, {} as CaseData)
-
-export default function GalleryPage() {
+export default function GalleryPage({ galleries, albums, cases, currentCase, currentAlbum }: GalleryPageProps) {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string[]
@@ -180,93 +87,117 @@ export default function GalleryPage() {
   }
 
   const renderContent = () => {
-    // If viewing a case (number)
-    if (slug.length > 2 && !isNaN(Number(slug[slug.length - 1]))) {
-      const caseNumber = Number(slug[slug.length - 1])
-      const albumPath = slug.slice(0, -1).join("/")
-      const currentCase = caseData[albumPath]?.[caseNumber - 1]
-
-      if (!currentCase) return <div>Case not found</div>
-
+    if (currentCase) {
       return (
-        <div className="space-y-4">
-          <Button variant="ghost" className="items-center gap-2 md:hidden" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4" />
-            Back to Album
-          </Button>
-          <CaseViewer images={currentCase.images} />
+        <div className="max-w-7xl mx-auto">
+          <CaseViewer images={currentCase.images.map(img => ({
+            id: img.id,
+            url: img.cloudinary_url
+          }))} />
         </div>
       )
     }
 
-    // If viewing an album
-    if (slug.length > 1) {
-      const albumPath = slug.join("/")
-      const albumCases = caseData[albumPath]
-      if (!albumCases) return <div>Album not found</div>
+    if (cases) {
+      // Sort cases by extracting the number from the title (e.g. "Case 1" -> 1)
+      const sortedCases = [...cases].sort((a, b) => {
+        const aNum = parseInt(a.title.replace(/[^0-9]/g, ''))
+        const bNum = parseInt(b.title.replace(/[^0-9]/g, ''))
+        return aNum - bNum
+      })
 
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {albumCases.map((caseItem) => (
-            <Link href={`/gallery/${albumPath}/${caseItem.id}`} key={`case-${caseItem.id}`} className="block">
-              <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-                <div className="relative w-full h-40">
-                  <Image
-                    src={caseItem.coverImage}
-                    alt={`Case ${caseItem.id}`}
-                    fill
-                    className="object-cover rounded-md"
-                  />
-                </div>
-                <h3 className="mt-2 text-lg font-semibold">Case {caseItem.id}</h3>
-              </div>
-            </Link>
-          ))}
+        <div>
+          {cases.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Cases Yet</h3>
+              <p className="text-zinc-400">
+                This album is currently empty. Check back soon for new cases.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedCases.map((case_) => (
+                <Link
+                  key={case_.id}
+                  href={`/gallery/${slug[0]}/${case_.id}`}
+                  className="group block"
+                >
+                  <div className="bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors">
+                    {case_.images[0] && (
+                      <div className="relative w-full h-48">
+                        <Image
+                          src={case_.images[0].cloudinary_url}
+                          alt={case_.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-cerebri text-sm uppercase tracking-wide font-light">{case_.title}</h3>
+                      {case_.description && (
+                        <p className="text-zinc-400 text-sm mt-1">{case_.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )
     }
 
     // If viewing a gallery collection
-    if (slug.length === 1) {
-      const galleryData = mockData[slug[0]]
-      if (!galleryData) return <div>Gallery not found</div>
-
+    if (albums) {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {galleryData.map((album) => (
-            <Link href={`/gallery/${slug[0]}/${album.id}`} key={`album-${album.id}`} className="block">
-              <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
-                <div className="relative w-full h-40">
-                  <Image
-                    src={album.imageUrl}
-                    alt={album.title}
-                    fill
-                    className="object-cover rounded-md"
-                  />
+          {albums.map((album) => {
+            const albumSlug = album.title.toLowerCase().replace(/\s+/g, '-');
+            return (
+              <Link 
+                href={`/gallery/${slug[0]}/${albumSlug}`} 
+                key={`album-${album.id}`} 
+                className="block"
+              >
+                <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                  <div className="relative w-full h-40">
+                    <Image
+                      src={`/placeholder.svg?height=200&width=300&text=${album.title}`}
+                      alt={album.title}
+                      fill
+                      className="object-cover rounded-md"
+                    />
+                  </div>
+                  <h3 className="mt-2 text-lg font-cerebri font-light uppercase tracking-wide">{album.title}</h3>
                 </div>
-                <h3 className="mt-2 text-lg font-semibold">{album.title}</h3>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       )
     }
 
     // Main gallery page (collections)
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-        {Object.entries(mockData).map(([collectionId]) => (
-          <Link href={`/gallery/${collectionId}`} key={`collection-${collectionId}`} className="block">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {galleries.map((gallery) => (
+          <Link 
+            href={`/gallery/${gallery.id}`} 
+            key={`collection-${gallery.id}`} 
+            className="block"
+          >
             <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
               <div className="relative w-full h-40">
                 <Image
-                  src={`/placeholder.svg?height=200&width=300&text=${collectionId}`}
-                  alt={collectionId}
+                  src={`/placeholder.svg?height=200&width=300&text=${gallery.title}`}
+                  alt={gallery.title}
                   fill
                   className="object-cover rounded-md"
                 />
               </div>
-              <h3 className="mt-2 text-lg font-semibold capitalize">{collectionId.replace("-", " ")}</h3>
+              <h3 className="mt-2 text-lg font-semibold capitalize">{gallery.title.replace(/-/g, " ")}</h3>
             </div>
           </Link>
         ))}
