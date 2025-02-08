@@ -18,8 +18,9 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import { Gallery, Album, Case, Image as GalleryImage } from "@/lib/supabase"
+import { Share2, Heart } from "lucide-react"
 
-interface GalleryPageProps {
+interface PageProps {
   galleries: Gallery[];
   albums?: Album[];
   cases?: (Case & { images: GalleryImage[] })[];
@@ -27,7 +28,7 @@ interface GalleryPageProps {
   currentAlbum?: Album;
 }
 
-export default function GalleryPage({ galleries, albums, cases, currentCase, currentAlbum }: GalleryPageProps) {
+export default function GalleryPage({ galleries, albums, cases, currentCase, currentAlbum }: PageProps) {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string[]
