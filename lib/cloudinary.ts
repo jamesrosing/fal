@@ -53,9 +53,9 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
     path: "team",
     description: "Team member headshots",
     dimensions: {
-      width: 400,
-      height: 400,
-      aspectRatio: 1
+      width: 600,
+      height: 800,
+      aspectRatio: 3/4
     },
     transformations: ["c_fill", "g_face", "f_auto", "q_auto"]
   },

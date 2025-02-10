@@ -35,21 +35,18 @@ export async function POST(request: Request) {
       public_id += `/${cleanFilename}`;
     }
 
-    // Convert File to ArrayBuffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
     // Create form data for Cloudinary
     const uploadFormData = new FormData();
-    uploadFormData.append('file', new Blob([buffer]));
+    uploadFormData.append('file', file);
+    uploadFormData.append('api_key', process.env.CLOUDINARY_API_KEY!);
+    uploadFormData.append('timestamp', String(Math.round(Date.now() / 1000)));
     uploadFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
     uploadFormData.append('folder', placement.path);
     uploadFormData.append('public_id', public_id);
     
     // Add transformation parameters
-    placement.transformations.forEach(transform => {
-      uploadFormData.append('transformation', transform);
-    });
+    const transformations = placement.transformations.join(',');
+    uploadFormData.append('transformation', transformations);
 
     // Add tags and context
     uploadFormData.append('tags', [area, section].filter(Boolean).join(','));
@@ -60,7 +57,18 @@ export async function POST(request: Request) {
       aspect_ratio: placement.dimensions.aspectRatio.toString()
     }));
 
-    // Upload to Cloudinary using fetch
+    // Generate signature
+    const timestamp = Math.round(Date.now() / 1000);
+    const signature = await generateSignature({
+      public_id,
+      timestamp,
+      upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+      folder: placement.path,
+      transformation: transformations
+    });
+    uploadFormData.append('signature', signature);
+
+    // Upload to Cloudinary
     const uploadResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
@@ -71,6 +79,7 @@ export async function POST(request: Request) {
 
     if (!uploadResponse.ok) {
       const error = await uploadResponse.json();
+      console.error('Cloudinary error:', error);
       throw new Error(error.message || 'Upload failed');
     }
 
@@ -93,4 +102,33 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+async function generateSignature(params: Record<string, any>) {
+  const apiSecret = process.env.CLOUDINARY_API_SECRET!;
+  const timestamp = Math.round(Date.now() / 1000);
+  
+  // Sort parameters alphabetically
+  const sortedParams = Object.keys(params)
+    .sort()
+    .reduce((acc: Record<string, any>, key) => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
+        acc[key] = params[key];
+      }
+      return acc;
+    }, {});
+
+  // Create signature string
+  const signatureString = Object.entries(sortedParams)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&') + apiSecret;
+
+  // Generate SHA-1 hash
+  const encoder = new TextEncoder();
+  const data = encoder.encode(signatureString);
+  const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  return hashHex;
 } 

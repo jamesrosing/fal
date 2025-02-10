@@ -37,7 +37,7 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
   team: {
     path: "team/headshots",
     description: "Professional headshots of team members",
-    dimensions: "400x400px (1:1)",
+    dimensions: "600x800px (3:4)",
     example: "Professional headshot with neutral background (e.g., 'dr-smith.jpg')"
   },
   gallery: {
@@ -77,9 +77,9 @@ const IMAGE_DIMENSIONS: Record<ImageArea, ImageDimensions> = {
     className: "object-cover w-full aspect-[4/3]"
   },
   team: {
-    width: 400,
-    height: 400,
-    className: "object-cover w-full aspect-square"
+    width: 600,
+    height: 800,
+    className: "object-cover w-full aspect-[3/4]"
   },
   gallery: {
     width: 800,
@@ -109,7 +109,7 @@ export const IMAGE_SIZES = {
   hero: "(min-width: 1280px) 1920px, 100vw",
   article: "(min-width: 1280px) 1200px, (min-width: 768px) 800px, 100vw",
   service: "(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw",
-  team: "(min-width: 1280px) 400px, (min-width: 768px) 300px, 250px",
+  team: "(min-width: 1280px) 600px, (min-width: 768px) 400px, 250px",
   gallery: "(min-width: 1280px) 800px, (min-width: 768px) 600px, 100vw",
   logo: "(min-width: 1280px) 200px, 150px"
 } as const; 
