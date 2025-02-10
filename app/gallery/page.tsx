@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
 import { Share2, Heart } from "lucide-react"
+import { NavBar } from "@/components/nav-bar"
 
 interface GalleryCollection {
   id: string
@@ -53,6 +54,7 @@ const collections: GalleryCollection[] = [
 export default function GalleryPage() {
   return (
     <main className="min-h-screen bg-black">
+      <NavBar />
       {/* Hero Section */}
       <div className="relative h-[70vh] w-full">
         <Image

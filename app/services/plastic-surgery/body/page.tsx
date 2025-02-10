@@ -2,68 +2,79 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import { useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-import { Suspense } from "react"
-
-function ScrollHandler() {
-  const searchParams = useSearchParams()
-  
-  useEffect(() => {
-    const section = searchParams.get('section')
-    if (section) {
-      const element = document.getElementById(section)
-      if (element) {
-        setTimeout(() => {
-          element.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
-      }
-    }
-  }, [searchParams])
-
-  return null
-}
 
 const procedures = [
   {
-    category: "Head & Neck",
-    id: "head-and-neck",
-    description: "Refined procedures for facial rejuvenation and harmony.",
-    procedures: ["Eyelids", "Ears", "Face", "Neck", "Nose"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-face-neck-procedures.webp"
+    title: "Tummy Tuck (Abdominoplasty)",
+    description: "Achieve a flatter, more toned abdominal profile.",
+    details: [
+      "Full tummy tuck for comprehensive results",
+      "Mini tummy tuck for lower abdomen",
+      "Extended tummy tuck for post-weight loss",
+      "Muscle repair and skin tightening"
+    ],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/tummy-tuck.jpg"
   },
   {
-    category: "Breast",
-    id: "breast",
-    description: "Customized breast enhancement and reconstruction procedures.",
-    procedures: ["Augmentation", "Lift", "Reduction", "Revision", "Nipple Areolar Complex"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-breast-procedures.webp"
+    title: "Liposuction",
+    description: "Sculpt and contour various areas of the body.",
+    details: [
+      "Traditional tumescent liposuction",
+      "Power-assisted liposuction (PAL)",
+      "360° liposuction",
+      "High-definition liposculpting"
+    ],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/liposuction.jpg"
   },
   {
-    category: "Body",
-    id: "body",
-    description: "Comprehensive body contouring and refinement procedures.",
-    procedures: ["Abdominoplasty", "Mini-Abdominoplasty", "Liposuction", "Arm Lift", "Thigh Lift"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-body-procedures.webp"
+    title: "Body Lift",
+    description: "Comprehensive body contouring after weight loss.",
+    details: [
+      "Lower body lift",
+      "Upper body lift",
+      "Total body lift",
+      "Thigh lift procedures"
+    ],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/body-lift.jpg"
+  },
+  {
+    title: "Brazilian Butt Lift",
+    description: "Natural enhancement using your own fat tissue.",
+    details: [
+      "Fat transfer to buttocks",
+      "Liposuction of donor areas",
+      "Custom shape and projection",
+      "Long-lasting results"
+    ],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/bbl.jpg"
+  },
+  {
+    title: "Arm Lift (Brachioplasty)",
+    description: "Reshape and tighten the upper arms.",
+    details: [
+      "Traditional arm lift",
+      "Mini arm lift",
+      "Extended arm lift",
+      "Liposuction-assisted techniques"
+    ],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/arm-lift.jpg"
   }
 ]
 
-export default function PlasticSurgery() {
+export default function BodyPage() {
   return (
     <main className="min-h-screen bg-black">
-      <Suspense fallback={null}>
-        <ScrollHandler />
-      </Suspense>
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-screen">
+      <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-hero.webp"
-            alt="Plastic Surgery at Allure MD"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/body-hero.jpg"
+            alt="Body Procedures"
             fill
             className="object-cover"
             priority
@@ -80,20 +91,19 @@ export default function PlasticSurgery() {
               className="max-w-3xl text-white"
             >
               <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                Plastic Surgery
+                Body Procedures
               </h1>
               <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Artistry in aesthetic transformation
+                Advanced body contouring and sculpting
               </h2>
               <div className="space-y-6 text-lg font-cerebri font-light">
                 <p>
-                  At Allure MD, we combine surgical expertise with an artistic vision to enhance your natural beauty.
-                  Our board-certified plastic surgeons deliver personalized care and exceptional results.
+                  Our comprehensive body procedures are designed to help you achieve your ideal silhouette. From post-weight loss contouring to targeted fat reduction, we offer customized solutions for your unique goals.
                 </p>
                 <div className="space-y-4">
                   <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
                   <br />
-                  <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+                  <LearnMoreButton href="/gallery/plastic-surgery/body">View Before & After Gallery</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -105,23 +115,22 @@ export default function PlasticSurgery() {
       <section className="py-24">
         <div className="container mx-auto px-4">
           <div className="grid gap-24">
-            {procedures.map((category, index) => (
+            {procedures.map((procedure, index) => (
               <motion.div
-                id={category.id}
-                key={category.category}
+                key={procedure.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
                 className={`flex flex-col ${
                   index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                } gap-12 items-center scroll-mt-20`}
+                } gap-12 items-center`}
               >
                 <div className="w-full lg:w-1/2">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
                     <Image
-                      src={category.image}
-                      alt={category.category}
+                      src={procedure.image}
+                      alt={procedure.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
@@ -131,23 +140,21 @@ export default function PlasticSurgery() {
                 
                 <div className="w-full lg:w-1/2 text-white">
                   <h3 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                    {category.category}
+                    {procedure.title}
                   </h3>
                   <p className="mb-8 text-[clamp(1.5rem,3vw,2rem)] leading-none tracking-tight font-serif">
-                    {category.description}
+                    {procedure.description}
                   </p>
                   <ul className="space-y-4">
-                    {category.procedures.map((procedure) => (
-                      <li key={procedure} className="flex items-center space-x-4">
+                    {procedure.details.map((detail) => (
+                      <li key={detail} className="flex items-center space-x-4">
                         <span className="w-8 h-[1px] bg-white"></span>
-                        <span className="text-lg font-cerebri font-light">{procedure}</span>
+                        <span className="text-lg font-cerebri font-light">{detail}</span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href={`/services/plastic-surgery/${category.id}`}>
-                      Learn More
-                    </LearnMoreButton>
+                    <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
@@ -170,11 +177,11 @@ export default function PlasticSurgery() {
               Your Journey Begins Here
             </h2>
             <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
-              Schedule your consultation today
+              Transform with confidence
             </h3>
             <div className="space-y-6 text-lg font-cerebri font-light">
               <p>
-                Take the first step towards achieving your aesthetic goals. Our expert team is ready to guide you through your transformation journey.
+                Take the first step towards achieving your aesthetic goals with our expert team of board-certified plastic surgeons.
               </p>
               <div className="space-y-4">
                 <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>

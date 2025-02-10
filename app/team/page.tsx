@@ -5,56 +5,42 @@ import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 
-const teamMembers = [
+const physicians = [
   {
-    name: "Dr. James Rosing",
-    role: "Board-Certified Plastic Surgeon",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dr-rosing.webp",
-    credentials: "MD, FACS",
-    specialties: ["Facial Plastic Surgery", "Body Contouring", "Breast Surgery"],
-    education: [
-      "Harvard Medical School",
-      "Stanford University Plastic Surgery Residency",
-      "Aesthetic Surgery Fellowship"
-    ],
-    description: "Dr. Rosing brings over 15 years of experience in aesthetic and reconstructive plastic surgery. His artistic vision and technical expertise have earned him recognition as one of Southern California's leading plastic surgeons."
+    name: "Dr. Sarah Johnson",
+    title: "Medical Director, Board-Certified Plastic Surgeon",
+    specialties: ["Facial Rejuvenation", "Breast Surgery", "Body Contouring"],
+    education: ["MD - Harvard Medical School", "Residency - Johns Hopkins"],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-johnson.jpg"
   },
   {
-    name: "Susan Pearose, PA-C",
-    role: "Board-Certified Dermatology Physician Assistant",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dr-chen.webp",
-    credentials: "PA-C",
-    specialties: ["Medical Dermatology", "Skin Cancer Management","Cosmetic Dermatology", "Laser Treatments"],
-
-    education: [
-
-      "Yale School of Medicine",
-      "University of California Dermatology Residency",
-      "Procedural Dermatology Fellowship"
-    ],
-    description: "Dr. Chen specializes in both medical and cosmetic dermatology, with particular expertise in laser treatments and minimally invasive procedures for skin rejuvenation."
+    name: "Dr. Michael Chen",
+    title: "Board-Certified Dermatologist",
+    specialties: ["Medical Dermatology", "Cosmetic Dermatology", "Laser Treatments"],
+    education: ["MD - Stanford University", "Residency - UCLA"],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-chen.jpg"
   }
 ]
 
-const staffMembers = [
+const staff = [
   {
-    name: "Julia Kowalczyk",
-    role: "Medical Esthetician, Skin Care Specialist",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/nurse-jennifer.webp",
-    credentials: "Licensed Esthetician",
-    specialties: ["Injectable Treatments", "Emsculpt Provider","Laser Procedures", "Skin Care"]
+    name: "Emily Rodriguez",
+    title: "Lead Aesthetic Nurse",
+    specialties: ["Injectable Treatments", "Laser Procedures", "Skin Care"],
+    certifications: ["RN", "Certified Aesthetic Nurse Specialist"],
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/nurse-rodriguez.jpg"
   },
   {
-    name: "Rachelle Gallardo",
-    role: "Practice Manager",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/manager-michael.webp",
-    credentials: "20 Years of Plastic Surgery and Dermatology Experience",
-    specialties: ["Patient Experience", "Practice Operations", "Quality Assurance"]
+    name: "David Kim",
+    title: "Patient Care Coordinator",
+    specialties: ["Treatment Planning", "Patient Education", "Recovery Support"],
+    experience: "10+ years in aesthetic medicine",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/coordinator-kim.jpg"
   }
 ]
 
 function TeamMemberCard({ member, isPhysician = false }: { 
-  member: typeof teamMembers[0] | typeof staffMembers[0]
+  member: typeof physicians[0] | typeof staff[0]
   isPhysician?: boolean 
 }) {
   return (
@@ -63,58 +49,61 @@ function TeamMemberCard({ member, isPhysician = false }: {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      className="flex flex-col lg:flex-row gap-8 items-start"
+      className="bg-zinc-900 rounded-lg overflow-hidden"
     >
-      <div className="w-full lg:w-1/3">
-        <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-          <Image
-            src={member.image}
-            alt={member.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 33vw"
-          />
-        </div>
+      <div className="relative aspect-[3/4] mb-6">
+        <Image
+          src={member.image}
+          alt={member.name}
+          fill
+          className="object-cover"
+        />
       </div>
-      
-      <div className="w-full lg:w-2/3 space-y-4">
-        <div>
-          <h3 className="text-2xl font-serif">{member.name}</h3>
-          <p className="text-lg font-cerebri text-gray-400">{member.role}</p>
-          {member.credentials && (
-            <p className="text-sm font-cerebri text-gray-400">{member.credentials}</p>
+      <div className="p-6">
+        <h3 className="text-xl font-serif text-white mb-2">{member.name}</h3>
+        <p className="text-gray-400 font-cerebri font-light mb-4">{member.title}</p>
+        
+        <div className="space-y-4">
+          {member.specialties && (
+            <div>
+              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Specialties</h4>
+              <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                {member.specialties.map((specialty) => (
+                  <li key={specialty}>{specialty}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {isPhysician && 'education' in member && (
+            <div>
+              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Education</h4>
+              <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                {member.education.map((edu) => (
+                  <li key={edu}>{edu}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {'certifications' in member && (
+            <div>
+              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Certifications</h4>
+              <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                {member.certifications.map((cert) => (
+                  <li key={cert}>{cert}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {'experience' in member && (
+            <div>
+              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Experience</h4>
+              <p className="text-gray-400 font-cerebri font-light">{member.experience}</p>
+            </div>
           )}
         </div>
-        
-        {'education' in member && (
-          <div>
-            <h4 className="text-sm font-cerebri uppercase tracking-wide text-gray-400 mb-2">Education</h4>
-            <ul className="space-y-1">
-              {member.education.map((edu, index) => (
-                <li key={index} className="text-base font-cerebri">{edu}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        <div>
-          <h4 className="text-sm font-cerebri uppercase tracking-wide text-gray-400 mb-2">Specialties</h4>
-          <ul className="space-y-1">
-            {member.specialties.map((specialty, index) => (
-              <li key={index} className="text-base font-cerebri">{specialty}</li>
-            ))}
-          </ul>
-        </div>
-        
-        {'description' in member && (
-          <p className="text-base font-cerebri font-light">{member.description}</p>
-        )}
-        
-        {isPhysician && (
-          <div className="pt-4">
-            <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-          </div>
-        )}
       </div>
     </motion.div>
   )
@@ -126,11 +115,11 @@ export default function Team() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-[50vh]">
+      <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/team-hero.webp"
-            alt="Our Team at Allure MD"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/hero.jpg"
+            alt="Our Team"
             fill
             className="object-cover"
             priority
@@ -150,12 +139,13 @@ export default function Team() {
                 Our Team
               </h1>
               <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Meet our exceptional providers
+                Expert care from experienced professionals
               </h2>
-              <p className="text-lg font-cerebri font-light">
-                Our team of board-certified physicians and experienced medical professionals is dedicated to 
-                providing exceptional care and achieving outstanding results for our patients.
-              </p>
+              <div className="space-y-6 text-lg font-cerebri font-light">
+                <p>
+                  Meet our team of board-certified physicians, skilled nurses, and dedicated staff members who are committed to providing you with exceptional care and outstanding results.
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>
@@ -164,21 +154,29 @@ export default function Team() {
       {/* Physicians Section */}
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <div className="space-y-24">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-400">
-                Physicians
-              </h2>
-              <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
-                Expert care from trusted professionals
-              </h3>
-            </div>
-            
-            <div className="space-y-24">
-              {teamMembers.map((member, index) => (
-                <TeamMemberCard key={index} member={member} isPhysician={true} />
-              ))}
-            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center text-white mb-16"
+          >
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+              Our Physicians
+            </h2>
+            <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
+              Board-certified expertise
+            </h3>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {physicians.map((physician) => (
+              <TeamMemberCard
+                key={physician.name}
+                member={physician}
+                isPhysician={true}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -186,21 +184,28 @@ export default function Team() {
       {/* Staff Section */}
       <section className="py-24 bg-zinc-900">
         <div className="container mx-auto px-4">
-          <div className="space-y-24">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-400">
-                Medical Staff
-              </h2>
-              <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
-                Supporting your journey
-              </h3>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-16">
-              {staffMembers.map((member, index) => (
-                <TeamMemberCard key={index} member={member} />
-              ))}
-            </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center text-white mb-16"
+          >
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+              Our Staff
+            </h2>
+            <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
+              Dedicated to your care
+            </h3>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {staff.map((member) => (
+              <TeamMemberCard
+                key={member.name}
+                member={member}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -215,19 +220,18 @@ export default function Team() {
             viewport={{ once: true }}
             className="max-w-3xl mx-auto text-center"
           >
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-400">
-              Start Your Journey
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
+              Meet Our Team in Person
             </h2>
             <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
               Schedule your consultation today
             </h3>
             <div className="space-y-6 text-lg font-cerebri font-light text-gray-400">
               <p>
-                Take the first step towards achieving your aesthetic goals with our expert team.
-                We&apos;re here to guide you through your transformation journey.
+                Experience personalized care and expert guidance from our team of professionals.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
               </div>
             </div>
           </motion.div>
