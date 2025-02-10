@@ -106,8 +106,7 @@ export default function Dermatology() {
                 </p>
                 <div className="space-y-4">
                   <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+                  <LearnMoreButton href="/about#susan-pearose">Learn more about Susan Pearose, Certified Dermatology Specialist</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -191,7 +190,7 @@ export default function Dermatology() {
                 Discover the path to radiant, healthy skin with our expert dermatology team. We&apos;re here to guide you every step of the way.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>

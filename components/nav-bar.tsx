@@ -194,38 +194,48 @@ const navItems: NavItem[] = [
   {
     title: "RESOURCES",
     items: [
-      { 
-        name: "About Us", 
-        description: "Learn about our practice, mission, and values.",
+      {
+        name: "About Us",
+        description: "Learn about our practice and team",
         href: "/about"
       },
-      { 
-        name: "Contact", 
-        description: "Get in touch with us for consultations and inquiries.",
+      {
+        name: "Our Team",
+        description: "Meet our expert medical professionals",
+        href: "/team"
+      },
+      {
+        name: "Contact",
+        description: "Get in touch with us",
         href: "/contact"
       },
-      { 
-        name: "Membership", 
-        description: "Exclusive benefits for our members.",
+      {
+        name: "Reviews",
+        description: "Read patient success stories and testimonials",
+        href: "/reviews"
+      },
+      {
+        name: "Membership",
+        description: "Join our exclusive membership program",
         href: "/membership"
       },
-      { 
-        name: "Financing", 
-        description: "Flexible payment options for your treatments.",
+      {
+        name: "Financing",
+        description: "Learn about our financing options",
         href: "/financing"
       },
-      { 
-        name: "Gift certificates", 
-        description: "Perfect gifts for your loved ones.",
+      {
+        name: "Gift certificates",
+        description: "Purchase a gift certificate",
         href: "/gift-certificates"
       },
-      { 
-        name: "Out-of-town clients", 
-        description: "Special arrangements for non-local patients.",
+      {
+        name: "Out-of-town clients",
+        description: "Information for out-of-town patients",
         href: "/out-of-town"
       },
     ],
-    description: "Helpful information and resources for our patients.",
+    description: "Learn more about our practice and services"
   },
 ]
 

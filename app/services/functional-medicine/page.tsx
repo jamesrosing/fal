@@ -114,7 +114,7 @@ export default function FunctionalMedicine() {
                 <div className="space-y-4">
                   <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
                   <br />
-                  <LearnMoreButton href="/gallery">View Success Stories</LearnMoreButton>
+                  <LearnMoreButton href="/reviews">View Success Stories</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -198,7 +198,7 @@ export default function FunctionalMedicine() {
                 Take the first step towards optimizing your health with our comprehensive functional medicine approach.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>

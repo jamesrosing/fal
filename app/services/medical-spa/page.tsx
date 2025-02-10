@@ -37,38 +37,43 @@ const treatments = [
   },
   {
     category: "Body Analysis",
-    id: "shapescale",
+    id: "body-analysis",
     description: "Precise 3D body scanning and progress tracking.",
     treatments: ["3D Body Scanning", "Progress Tracking", "Body Composition", "Measurements", "Visual Progress"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-shapescale.webp"
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-shapescale.webp",
+    path: "/services/medical-spa/body-analysis"
   },
   {
     category: "Skin Rejuvenation",
-    id: "rf-microneedling",
+    id: "skin-rejuvenation",
     description: "Combined RF and microneedling for skin transformation.",
     treatments: ["Skin Tightening", "Wrinkle Reduction", "Scar Treatment", "Texture Improvement", "Pore Refinement"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-rf-microneedling.webp"
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-rf-microneedling.webp",
+    path: "/services/medical-spa/skin-rejuvenation"
   },
   {
     category: "Injectable Treatments",
-    id: "cosmetic-injections",
+    id: "injectables",
     description: "Premium injectable treatments for facial enhancement.",
     treatments: ["Botox", "Dermal Fillers", "Lip Enhancement", "Jawline Contouring", "Under-eye Treatment"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-injections.webp"
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-injections.webp",
+    path: "/services/medical-spa/injectables"
   },
   {
     category: "Laser Treatments",
-    id: "skin-lasers",
+    id: "laser-treatments",
     description: "Advanced laser therapies for various skin concerns.",
     treatments: ["Hair Removal", "Skin Resurfacing", "Pigmentation", "Vascular Lesions", "Tattoo Removal"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-lasers.webp"
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-lasers.webp",
+    path: "/services/medical-spa/laser-treatments"
   },
   {
     category: "Facial Treatments",
-    id: "esthetician-services",
+    id: "facial-treatments",
     description: "Luxurious facial treatments for radiant skin.",
     treatments: ["Custom Facials", "Chemical Peels", "Dermaplaning", "LED Therapy", "Oxygen Treatment"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-facials.webp"
+    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-facials.webp",
+    path: "/services/medical-spa/facial-treatments"
   }
 ]
 
@@ -115,7 +120,7 @@ export default function MedicalSpa() {
                 <div className="space-y-4">
                   <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
                   <br />
-                  <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+                  <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -167,7 +172,7 @@ export default function MedicalSpa() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href={category.externalLink || `/medical-spa/${category.category.toLowerCase()}`}>
+                    <LearnMoreButton href={category.externalLink || category.path || '#'}>
                       Learn More
                     </LearnMoreButton>
                   </div>

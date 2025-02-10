@@ -5,42 +5,48 @@ import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 
-const physicians = [
+const providers = [
   {
-    name: "Dr. Sarah Johnson",
-    title: "Medical Director, Board-Certified Plastic Surgeon",
-    specialties: ["Facial Rejuvenation", "Breast Surgery", "Body Contouring"],
-    education: ["MD - Harvard Medical School", "Residency - Johns Hopkins"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-johnson.jpg"
+    name: "James Rosing",
+    title: "MD, FACS",
+    role: "Board Certified Plastic Surgeon",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-rosing.jpg",
+    description: "Dr. Rosing is a highly skilled board-certified plastic surgeon known for his artistic eye and commitment to natural-looking results. With years of experience in aesthetic and reconstructive surgery, he provides personalized care to help patients achieve their aesthetic goals.",
   },
   {
-    name: "Dr. Michael Chen",
-    title: "Board-Certified Dermatologist",
-    specialties: ["Medical Dermatology", "Cosmetic Dermatology", "Laser Treatments"],
-    education: ["MD - Stanford University", "Residency - UCLA"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-chen.jpg"
+    name: "Susan Pearose",
+    title: "PA-C",
+    role: "Dermatology Certified Physician Assistant",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/susan-pearose.jpg",
+    description: "Susan is a certified physician assistant specializing in dermatology. Her expertise in skin health and aesthetic treatments, combined with her patient-centered approach, helps clients achieve and maintain healthy, radiant skin.",
+  },
+  {
+    name: "Julie Bandy",
+    title: "",
+    role: "Certified Medical Esthetician and Skin Care Specialist",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/julie-bandy.jpg",
+    description: "Julie brings extensive experience in advanced skincare treatments and medical aesthetics. Her expertise in customized facial treatments and skincare protocols helps clients achieve their best skin ever.",
+  },
+  {
+    name: "Pooja Gidwani",
+    title: "MD",
+    role: "Board Certified Physician, Functional Medicine",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-gidwani.jpg",
+    description: "Dr. Gidwani specializes in functional medicine, focusing on identifying and treating root causes of health issues. Her comprehensive approach to wellness helps patients achieve optimal health through personalized treatment plans.",
   }
 ]
 
 const staff = [
   {
-    name: "Emily Rodriguez",
-    title: "Lead Aesthetic Nurse",
-    specialties: ["Injectable Treatments", "Laser Procedures", "Skin Care"],
-    certifications: ["RN", "Certified Aesthetic Nurse Specialist"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/nurse-rodriguez.jpg"
-  },
-  {
-    name: "David Kim",
-    title: "Patient Care Coordinator",
-    specialties: ["Treatment Planning", "Patient Education", "Recovery Support"],
-    experience: "10+ years in aesthetic medicine",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/coordinator-kim.jpg"
+    name: "Rachelle Gallardo",
+    role: "Practice Manager and Patient Care Coordinator",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/rachelle-gallardo.jpg",
+    description: "Rachelle ensures smooth operations of the practice while maintaining the highest standards of patient care and service. Her dedication to excellence helps create an exceptional experience for every patient.",
   }
 ]
 
 function TeamMemberCard({ member, isPhysician = false }: { 
-  member: typeof physicians[0] | typeof staff[0]
+  member: typeof providers[0] | typeof staff[0]
   isPhysician?: boolean 
 }) {
   return (
@@ -49,61 +55,23 @@ function TeamMemberCard({ member, isPhysician = false }: {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      className="bg-zinc-900 rounded-lg overflow-hidden"
+      className="group relative"
     >
-      <div className="relative aspect-[3/4] mb-6">
+      <div className="relative aspect-[3/4] overflow-hidden">
         <Image
           src={member.image}
           alt={member.name}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
       </div>
-      <div className="p-6">
-        <h3 className="text-xl font-serif text-white mb-2">{member.name}</h3>
-        <p className="text-gray-400 font-cerebri font-light mb-4">{member.title}</p>
-        
-        <div className="space-y-4">
-          {member.specialties && (
-            <div>
-              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Specialties</h4>
-              <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                {member.specialties.map((specialty) => (
-                  <li key={specialty}>{specialty}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {isPhysician && 'education' in member && (
-            <div>
-              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Education</h4>
-              <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                {member.education.map((edu) => (
-                  <li key={edu}>{edu}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {'certifications' in member && (
-            <div>
-              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Certifications</h4>
-              <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                {member.certifications.map((cert) => (
-                  <li key={cert}>{cert}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          
-          {'experience' in member && (
-            <div>
-              <h4 className="text-sm font-cerebri uppercase tracking-wide text-white mb-2">Experience</h4>
-              <p className="text-gray-400 font-cerebri font-light">{member.experience}</p>
-            </div>
-          )}
-        </div>
+      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+        <h3 className="text-2xl font-serif">
+          {member.name}
+          {isPhysician && member.title && <span className="ml-2 text-zinc-300">{member.title}</span>}
+        </h3>
+        <p className="mt-1 text-sm text-zinc-300">{member.role}</p>
       </div>
     </motion.div>
   )
@@ -118,7 +86,7 @@ export default function Team() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/hero.jpg"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/team-hero.jpg"
             alt="Our Team"
             fill
             className="object-cover"
@@ -139,11 +107,12 @@ export default function Team() {
                 Our Team
               </h1>
               <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Expert care from experienced professionals
+                Meet our expert providers and staff
               </h2>
               <div className="space-y-6 text-lg font-cerebri font-light">
                 <p>
-                  Meet our team of board-certified physicians, skilled nurses, and dedicated staff members who are committed to providing you with exceptional care and outstanding results.
+                  Our team of experienced medical professionals is dedicated to providing exceptional care
+                  and helping you achieve your aesthetic and wellness goals.
                 </p>
               </div>
             </motion.div>
@@ -151,31 +120,20 @@ export default function Team() {
         </div>
       </section>
 
-      {/* Physicians Section */}
+      {/* Providers Section */}
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center text-white mb-16"
-          >
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-              Our Physicians
+          <div className="max-w-3xl mb-16">
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-zinc-500">
+              Our Providers
             </h2>
-            <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
-              Board-certified expertise
+            <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
+              Expert care from experienced professionals
             </h3>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {physicians.map((physician) => (
-              <TeamMemberCard
-                key={physician.name}
-                member={physician}
-                isPhysician={true}
-              />
+          </div>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {providers.map((provider) => (
+              <TeamMemberCard key={provider.name} member={provider} isPhysician={true} />
             ))}
           </div>
         </div>
@@ -184,27 +142,17 @@ export default function Team() {
       {/* Staff Section */}
       <section className="py-24 bg-zinc-900">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center text-white mb-16"
-          >
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+          <div className="max-w-3xl mb-16">
+            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-zinc-500">
               Our Staff
             </h2>
-            <h3 className="text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
-              Dedicated to your care
+            <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
+              Supporting your journey
             </h3>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          </div>
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {staff.map((member) => (
-              <TeamMemberCard
-                key={member.name}
-                member={member}
-              />
+              <TeamMemberCard key={member.name} member={member} />
             ))}
           </div>
         </div>
@@ -212,28 +160,21 @@ export default function Team() {
 
       {/* CTA Section */}
       <section className="py-24">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-3xl mx-auto"
           >
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
-              Meet Our Team in Person
+            <h2 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
+              Schedule your consultation
             </h2>
-            <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
-              Schedule your consultation today
-            </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light text-gray-400">
-              <p>
-                Experience personalized care and expert guidance from our team of professionals.
-              </p>
-              <div className="space-y-4">
-                <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
-              </div>
-            </div>
+            <p className="text-lg text-zinc-300 mb-8 font-cerebri font-light">
+              Take the first step towards achieving your aesthetic and wellness goals with our expert team.
+            </p>
+            <LearnMoreButton href="/consultation">Book a Consultation</LearnMoreButton>
           </motion.div>
         </div>
       </section>

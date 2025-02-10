@@ -31,7 +31,7 @@ const footerSections = [
   {
     title: "Contact",
     links: [
-      { name: "Schedule Consultation", href: "/consultation" },
+      { name: "Schedule Consultation", href: "/appointment" },
       { name: "Location", href: "/location" },
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
