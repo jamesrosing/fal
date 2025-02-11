@@ -5,6 +5,7 @@ import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { MapPin, Plane, Hotel, Car, Phone, Calendar } from "lucide-react"
+import { getImageUrl } from "@/lib/image-config"
 
 const services = [
   {
@@ -31,13 +32,17 @@ const services = [
   },
   {
     title: "Accommodations",
-    description: "Luxury lodging options near our facility.",
+    description: "Experience extraordinary natural beauty and impeccable service at our partner luxury properties.",
     icon: Hotel,
     details: [
-      "Premium hotel partnerships",
-      "Extended stay apartments",
-      "Recovery-friendly amenities",
-      "Concierge services"
+      "Luxury bungalows and private villas",
+      "Private entrances and patios",
+      "Meticulous cleaning and safety protocols",
+      "Flexible housekeeping services",
+      "Ample luxury bedding and pillows",
+      "Pre-arrival questionnaire for special needs",
+      "Special rates for our clients",
+      "Recovery-friendly amenities"
     ]
   },
   {
@@ -55,22 +60,41 @@ const services = [
 
 const locations = [
   {
-    name: "Fashion Island Hotel",
+    name: "Pendry Newport Beach",
     distance: "0.5 miles",
     description: "Luxury accommodations with recovery-friendly amenities",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/locations/fashion-island-hotel.jpg"
+    image: getImageUrl('pendry')
   },
   {
     name: "The Resort at Pelican Hill",
     distance: "3.2 miles",
-    description: "Five-star resort with private bungalows and full service spa",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/locations/pelican-hill.jpg"
+    description: "A destination of extraordinary natural beauty and impeccable service",
+    details: {
+      accommodations: "204 Bungalows and 128 private 2, 3, and 4-bedroom fully-furnished Villas along residential-styled streets",
+      comfort: [
+        "Meticulous cleaning and safety protocols",
+        "Flexible Housekeeping",
+        "Every accommodation has its own private entrance and patio",
+        "Ample luxury bedding and pillows"
+      ],
+      care: [
+        "Specialized pre-arrival questionnaire",
+        "Anticipating special needs or unique requests"
+      ],
+      cuisine: [
+        "Straw-to-spoon menus that emphasize seasonal produce",
+        "Specialized ingredients to maximize healing based on expert feedback",
+        "Collaborative menu development with top physicians"
+      ],
+      specialRate: "15% off the best-available rate, 50% off the resort fee for AllureMD VIP clients"
+    },
+    image: getImageUrl('pelican-hill')
   },
   {
     name: "Lido House, Autograph Collection",
     distance: "2.1 miles",
     description: "Boutique hotel with personalized service and coastal charm",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/locations/lido-house.jpg"
+    image: getImageUrl('lido-house')
   }
 ]
 
@@ -83,7 +107,7 @@ export default function OutOfTownPage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/out-of-town-hero.jpg"
+            src={getImageUrl('hero-out-of-town', { width: 1920, quality: 85 })}
             alt="Out of Town Patients"
             fill
             className="object-cover"
@@ -206,7 +230,57 @@ export default function OutOfTownPage() {
                     <span className="text-sm font-cerebri">{location.distance}</span>
                   </div>
                   <h4 className="text-xl font-serif text-white mb-2">{location.name}</h4>
-                  <p className="text-gray-400 font-cerebri font-light">{location.description}</p>
+                  <p className="text-gray-400 font-cerebri font-light mb-4">{location.description}</p>
+                  
+                  {location.details && (
+                    <div className="space-y-4">
+                      <div>
+                        <h5 className="text-white font-cerebri text-lg mb-2">Accommodations</h5>
+                        <p className="text-gray-400 font-cerebri font-light">{location.details.accommodations}</p>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-white font-cerebri text-lg mb-2">Comfort</h5>
+                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                          {location.details.comfort.map((item, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-white font-cerebri text-lg mb-2">Care</h5>
+                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                          {location.details.care.map((item, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-white font-cerebri text-lg mb-2">Cuisine</h5>
+                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                          {location.details.cuisine.map((item, index) => (
+                            <li key={index} className="flex items-center">
+                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h5 className="text-white font-cerebri text-lg mb-2">Special Rate</h5>
+                        <p className="text-gray-400 font-cerebri font-light">{location.details.specialRate}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

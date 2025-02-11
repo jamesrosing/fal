@@ -6,11 +6,31 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect, useState } from "react"
 import { TeamMember } from "@/lib/supabase"
+import { getImageUrl, IMAGE_ASSETS } from "@/lib/image-config"
+import { Button } from "@/components/ui/button"
+import { Copy, Upload } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 function TeamMemberCard({ member, isPhysician = false }: { 
   member: TeamMember
   isPhysician?: boolean 
 }) {
+  const { toast } = useToast()
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const assetId = `team-${member.id}`
+  const hasUploadedImage = Boolean(IMAGE_ASSETS[assetId])
+
+  const copyAssetId = () => {
+    navigator.clipboard.writeText(assetId)
+    toast({
+      title: "Asset ID copied",
+      description: `Copied "${assetId}" to clipboard. Use this ID when uploading the image in the admin panel.`
+    })
+  }
+
+  // Use member.image_url as fallback if no uploaded image
+  const imageUrl = hasUploadedImage ? getImageUrl(assetId) : (member.image_url || '/images/placeholder-team.jpg')
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -21,12 +41,40 @@ function TeamMemberCard({ member, isPhysician = false }: {
     >
       <div className="relative aspect-[3/4] overflow-hidden">
         <Image
-          src={member.image_url}
+          src={imageUrl}
           alt={member.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
+        
+        {isDevelopment && (
+          <div className="absolute top-2 right-2 flex gap-2">
+            {!hasUploadedImage && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-black/50 hover:bg-black/70"
+                onClick={() => {
+                  copyAssetId()
+                  window.open('/admin/images', '_blank')
+                }}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload Image
+              </Button>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-black/50 hover:bg-black/70"
+              onClick={copyAssetId}
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Copy ID
+            </Button>
+          </div>
+        )}
       </div>
       <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
         <h3 className="text-2xl font-serif">
@@ -34,6 +82,14 @@ function TeamMemberCard({ member, isPhysician = false }: {
           {isPhysician && member.title && <span className="ml-2 text-zinc-300">{member.title}</span>}
         </h3>
         <p className="mt-1 text-sm text-zinc-300">{member.role}</p>
+        {isDevelopment && (
+          <div className="mt-2 text-xs text-zinc-400">
+            <p>Asset ID: {assetId}</p>
+            {!hasUploadedImage && (
+              <p className="text-yellow-400">Image not yet uploaded to Cloudinary</p>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   )
@@ -82,7 +138,7 @@ export default function Team() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/c_fill,g_auto,f_auto,q_auto/team/team-hero.jpg"
+            src={getImageUrl('hero-team')}
             alt="Our Team"
             fill
             className="object-cover"

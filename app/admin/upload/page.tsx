@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { StructuredImageUpload } from "@/components/structured-image-upload"
+import { ImageAssetUpload } from "@/components/image-asset-upload"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Trash } from "lucide-react"
+import Image from "next/image"
+import { getImageUrl } from "@/lib/image-config"
 
 interface UploadedImage {
   url: string
@@ -38,39 +40,28 @@ export default function UploadPage() {
                   <CardTitle>Upload Images</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <StructuredImageUpload
+                  <ImageAssetUpload
                     onUploadComplete={handleUploadComplete}
                   />
                 </CardContent>
               </Card>
 
+              {/* Display uploaded images */}
               {uploadedImages.length > 0 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Recently Uploaded</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {uploadedImages.map((image, i) => (
-                        <div
-                          key={i}
-                          className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
-                        >
-                          <img
+                    <div className="grid grid-cols-3 gap-4">
+                      {uploadedImages.map((image) => (
+                        <div key={image.public_id} className="relative aspect-[4/3]">
+                          <Image
                             src={image.url}
-                            alt=""
-                            className="h-full w-full object-cover"
+                            alt={`Uploaded ${image.public_id}`}
+                            fill
+                            className="object-cover rounded-lg"
                           />
-                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent p-4">
-                            <p className="text-xs text-white">
-                              {image.metadata.width}x{image.metadata.height}
-                            </p>
-                          </div>
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Button variant="destructive" size="icon">
-                              <Trash className="h-4 w-4" />
-                            </Button>
-                          </div>
                         </div>
                       ))}
                     </div>

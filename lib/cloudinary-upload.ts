@@ -12,7 +12,13 @@ export async function uploadToCloudinary(
     formData.append('file', file);
     formData.append('area', area);
     if (section) formData.append('section', section);
-    if (customFilename) formData.append('customFilename', customFilename);
+    if (customFilename) {
+      formData.append('customFilename', customFilename);
+      // If this is a team member upload, use the full ID as the asset_id
+      if (customFilename.startsWith('team-')) {
+        formData.append('asset_id', customFilename);
+      }
+    }
 
     const response = await fetch('/api/cloudinary', {
       method: 'POST',

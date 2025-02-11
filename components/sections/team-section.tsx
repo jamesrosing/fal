@@ -27,67 +27,61 @@ export function TeamSection() {
   return (
     <section className="relative min-h-screen bg-black">
       {/* Mobile Layout */}
-      <div className="lg:hidden flex flex-col">
-        {/* Mobile Text Content */}
-        <div className="w-full px-4 py-12 bg-black">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="max-w-3xl text-white"
-          >
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Team</h2>
-            <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
-              Expert care from trusted professionals
-            </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light">
-              <p>
-                Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
-                decades of combined experience in aesthetic medicine.
-              </p>
-              <div className="space-y-4">
-                <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
+      <div className="lg:hidden relative h-screen">
         {/* Mobile Image Grid */}
-        <div className="relative h-screen">
-          <div className="grid grid-cols-2 gap-1 h-full mx-1">
-            {teamImages.map((image, index) => (
+        <div className="grid grid-cols-2 gap-1 h-full">
+          {teamImages.map((image, index) => (
+            <motion.div
+              key={index}
+              className="relative aspect-[3/4]"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1, delay: index * 0.2 }}
+              viewport={{ once: true }}
+            >
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                className="object-fill"
+                sizes="50vw"
+                priority={index === 0}
+              />
               <motion.div
-                key={index}
-                className="relative"
-                initial={{ opacity: 0 }}
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"
+                initial={{ opacity: 0.4 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ duration: 1, delay: index * 0.2 }}
                 viewport={{ once: true }}
-              >
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  className="object-cover object-[center_15%]"
-                  sizes="50vw"
-                  priority={index === 0}
-                />
-                <motion.div
-                  className="absolute inset-0 bg-black/40"
-                  initial={{ opacity: 0.4 }}
-                  whileInView={{ opacity: 0 }}
-                  transition={{ duration: 1, delay: index * 0.2 }}
-                  viewport={{ once: true }}
-                />
-              </motion.div>
-            ))}
-          </div>
+              />
+            </motion.div>
+          ))}
         </div>
+
+        {/* Mobile Text Content - Overlaid at bottom */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="absolute bottom-0 left-0 right-0 p-6 z-10 text-white"
+        >
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Team</h2>
+          <h3 className="mb-4 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+            Expert care from trusted professionals
+          </h3>
+          <div className="space-y-4 text-lg font-cerebri font-light">
+            <p className="line-clamp-3">
+              Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
+              decades of combined experience in aesthetic medicine.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+              <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Desktop Layout */}
@@ -143,7 +137,7 @@ export function TeamSection() {
                 src={image.src}
                 alt={image.alt}
                 fill
-                className="object-cover object-[center_15%]"
+                className="object-cover"
                 sizes="25vw"
                 priority={index === 0}
               />
