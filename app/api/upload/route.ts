@@ -35,38 +35,40 @@ export async function POST(request: Request) {
       public_id += `/${cleanFilename}`;
     }
 
+    const timestamp = Math.round(Date.now() / 1000).toString();
+    const transformations = placement.transformations.join(',');
+    
+    // Prepare parameters for signature
+    const params = {
+      timestamp,
+      public_id,
+      upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+      transformation: transformations,
+      tags: [area, section].filter(Boolean).join(','),
+      context: JSON.stringify({
+        area: area,
+        section: section || "",
+        dimensions: `${placement.dimensions.width}x${placement.dimensions.height}`,
+        aspect_ratio: placement.dimensions.aspectRatio.toString()
+      })
+    };
+
+    // Generate signature first
+    const signature = await generateSignature(params);
+
     // Create form data for Cloudinary
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
     uploadFormData.append('api_key', process.env.CLOUDINARY_API_KEY!);
-    uploadFormData.append('timestamp', String(Math.round(Date.now() / 1000)));
-    uploadFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-    uploadFormData.append('folder', placement.path);
-    uploadFormData.append('public_id', public_id);
-    
-    // Add transformation parameters
-    const transformations = placement.transformations.join(',');
-    uploadFormData.append('transformation', transformations);
-
-    // Add tags and context
-    uploadFormData.append('tags', [area, section].filter(Boolean).join(','));
-    uploadFormData.append('context', JSON.stringify({
-      area: area,
-      section: section || "",
-      dimensions: `${placement.dimensions.width}x${placement.dimensions.height}`,
-      aspect_ratio: placement.dimensions.aspectRatio.toString()
-    }));
-
-    // Generate signature
-    const timestamp = Math.round(Date.now() / 1000);
-    const signature = await generateSignature({
-      public_id,
-      timestamp,
-      upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-      folder: placement.path,
-      transformation: transformations
-    });
+    uploadFormData.append('timestamp', timestamp);
     uploadFormData.append('signature', signature);
+
+    // Add all other parameters that were used in signature
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        uploadFormData.append(key, value);
+      }
+    });
 
     // Upload to Cloudinary
     const uploadResponse = await fetch(
@@ -106,9 +108,8 @@ export async function POST(request: Request) {
 
 async function generateSignature(params: Record<string, any>) {
   const apiSecret = process.env.CLOUDINARY_API_SECRET!;
-  const timestamp = Math.round(Date.now() / 1000);
   
-  // Sort parameters alphabetically
+  // Sort parameters alphabetically and filter out undefined/null/empty values
   const sortedParams = Object.keys(params)
     .sort()
     .reduce((acc: Record<string, any>, key) => {

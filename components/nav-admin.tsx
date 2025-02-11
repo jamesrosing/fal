@@ -64,6 +64,11 @@ const items = [
     id: "dashboard",
   },
   {
+    title: "Team",
+    id: "team",
+    icon: Users,
+  },
+  {
     title: "Collections",
     id: "collections",
     icon: FolderOpen,
@@ -83,11 +88,6 @@ const items = [
     title: "Media",
     id: "media",
     icon: Image,
-  },
-  {
-    title: "Users",
-    id: "users",
-    icon: Users,
   },
   {
     title: "Settings",
@@ -136,7 +136,13 @@ export function NavAdmin({ onNavigate, currentSection, currentCollection }: NavA
           variant={isActive || isParentOfActive ? "secondary" : "ghost"}
           size="icon"
           className="w-full h-9"
-          onClick={() => onNavigate(item.id)}
+          onClick={() => {
+            if (item.id === 'team') {
+              window.location.href = '/admin/team'
+            } else {
+              onNavigate(item.id)
+            }
+          }}
         >
           {item.icon && <item.icon className="h-4 w-4" />}
           <span className="sr-only">{item.title}</span>
@@ -157,7 +163,9 @@ export function NavAdmin({ onNavigate, currentSection, currentCollection }: NavA
             level === 2 && "text-sm"
           )}
           onClick={() => {
-            if (hasChildren) {
+            if (item.id === 'team') {
+              window.location.href = '/admin/team'
+            } else if (hasChildren) {
               toggleExpanded(item.id)
             } else {
               onNavigate(item.id)

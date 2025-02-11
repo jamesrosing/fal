@@ -4,49 +4,11 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-
-const providers = [
-  {
-    name: "James Rosing",
-    title: "MD, FACS",
-    role: "Board Certified Plastic Surgeon",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-rosing.jpg",
-    description: "Dr. Rosing is a highly skilled board-certified plastic surgeon known for his artistic eye and commitment to natural-looking results. With years of experience in aesthetic and reconstructive surgery, he provides personalized care to help patients achieve their aesthetic goals.",
-  },
-  {
-    name: "Susan Pearose",
-    title: "PA-C",
-    role: "Dermatology Certified Physician Assistant",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/susan-pearose.jpg",
-    description: "Susan is a certified physician assistant specializing in dermatology. Her expertise in skin health and aesthetic treatments, combined with her patient-centered approach, helps clients achieve and maintain healthy, radiant skin.",
-  },
-  {
-    name: "Julie Bandy",
-    title: "",
-    role: "Certified Medical Esthetician and Skin Care Specialist",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/julie-bandy.jpg",
-    description: "Julie brings extensive experience in advanced skincare treatments and medical aesthetics. Her expertise in customized facial treatments and skincare protocols helps clients achieve their best skin ever.",
-  },
-  {
-    name: "Pooja Gidwani",
-    title: "MD",
-    role: "Board Certified Physician, Functional Medicine",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-gidwani.jpg",
-    description: "Dr. Gidwani specializes in functional medicine, focusing on identifying and treating root causes of health issues. Her comprehensive approach to wellness helps patients achieve optimal health through personalized treatment plans.",
-  }
-]
-
-const staff = [
-  {
-    name: "Rachelle Gallardo",
-    role: "Practice Manager and Patient Care Coordinator",
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/rachelle-gallardo.jpg",
-    description: "Rachelle ensures smooth operations of the practice while maintaining the highest standards of patient care and service. Her dedication to excellence helps create an exceptional experience for every patient.",
-  }
-]
+import { useEffect, useState } from "react"
+import { TeamMember } from "@/lib/supabase"
 
 function TeamMemberCard({ member, isPhysician = false }: { 
-  member: typeof providers[0] | typeof staff[0]
+  member: TeamMember
   isPhysician?: boolean 
 }) {
   return (
@@ -59,7 +21,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
     >
       <div className="relative aspect-[3/4] overflow-hidden">
         <Image
-          src={member.image}
+          src={member.image_url}
           alt={member.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -78,6 +40,40 @@ function TeamMemberCard({ member, isPhysician = false }: {
 }
 
 export default function Team() {
+  const [providers, setProviders] = useState<TeamMember[]>([])
+  const [staff, setStaff] = useState<TeamMember[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchTeamMembers() {
+      try {
+        const response = await fetch('/api/team')
+        if (!response.ok) throw new Error('Failed to fetch team members')
+        
+        const data = await response.json()
+        
+        // Split into providers and staff
+        setProviders(data.filter((member: TeamMember) => member.is_provider))
+        setStaff(data.filter((member: TeamMember) => !member.is_provider))
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load team members')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTeamMembers()
+  }, [])
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
   return (
     <main className="min-h-screen bg-black">
       <NavBar />
@@ -86,7 +82,7 @@ export default function Team() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/team-hero.jpg"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/c_fill,g_auto,f_auto,q_auto/team/team-hero.jpg"
             alt="Our Team"
             fill
             className="object-cover"
@@ -133,30 +129,32 @@ export default function Team() {
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {providers.map((provider) => (
-              <TeamMemberCard key={provider.name} member={provider} isPhysician={true} />
+              <TeamMemberCard key={provider.id} member={provider} isPhysician={true} />
             ))}
           </div>
         </div>
       </section>
 
       {/* Staff Section */}
-      <section className="py-24 bg-zinc-900">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mb-16">
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-zinc-500">
-              Our Staff
-            </h2>
-            <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
-              Supporting your journey
-            </h3>
+      {staff.length > 0 && (
+        <section className="py-24 bg-zinc-900">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mb-16">
+              <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-zinc-500">
+                Our Staff
+              </h2>
+              <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
+                Supporting your journey
+              </h3>
+            </div>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {staff.map((member) => (
+                <TeamMemberCard key={member.id} member={member} />
+              ))}
+            </div>
           </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {staff.map((member) => (
-              <TeamMemberCard key={member.name} member={member} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-24">

@@ -50,7 +50,7 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
     transformations: ["c_fill", "g_auto", "f_auto", "q_auto"]
   },
   team: {
-    path: "team",
+    path: "team/headshots",
     description: "Team member headshots",
     dimensions: {
       width: 600,

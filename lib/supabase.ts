@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
+import { Database } from './database.types';
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined');
+  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
 }
 
 if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY is not defined');
+  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(
+export const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
@@ -46,6 +47,19 @@ export interface Image {
   tags: string[];
   created_at: string;
 }
+
+export type TeamMember = {
+  id: string;
+  name: string;
+  title?: string;
+  role: string;
+  image_url: string;
+  description: string;
+  order: number;
+  is_provider: boolean;
+  created_at: string;
+  updated_at: string;
+};
 
 // Helper functions for database operations
 export async function getGalleries() {

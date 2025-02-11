@@ -58,16 +58,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Invalid image area' }, { status: 400 });
       }
 
-      // Generate folder path and public_id separately
-      let folder = placement.path;
-      if (section) {
-        folder += `/${section}`;
-      }
+      // Generate folder path - use only the placement path
+      const folder = placement.path;
 
       // Generate a clean filename for the public_id
       const public_id = customFilename 
-        ? customFilename.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-        : file.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        ? customFilename.toLowerCase()
+            .replace(/\.[^/.]+$/, '') // Remove file extension
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '')
+        : file.name.toLowerCase()
+            .replace(/\.[^/.]+$/, '') // Remove file extension
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
 
       // Convert File to ArrayBuffer
       const bytes = await file.arrayBuffer();
