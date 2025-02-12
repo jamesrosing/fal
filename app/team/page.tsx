@@ -135,8 +135,8 @@ export default function Team() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-[70vh]">
-        <div className="absolute inset-0">
+      <section className="relative pt-20">
+        <div className="relative aspect-[16/9] w-full">
           <Image
             src={getImageUrl('hero-team')}
             alt="Our Team"
@@ -144,31 +144,30 @@ export default function Team() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-3xl text-white"
-            >
-              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                Our Team
-              </h1>
-              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Meet our expert providers and staff
-              </h2>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  Our team of experienced medical professionals is dedicated to providing exceptional care
-                  and helping you achieve your aesthetic and wellness goals.
-                </p>
-              </div>
-            </motion.div>
-          </div>
+        {/* Hero Text Content */}
+        <div className="lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl text-white"
+          >
+            <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+              Our Team
+            </h1>
+            <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+              Meet our expert providers and staff
+            </h2>
+            <div className="space-y-6 text-lg font-cerebri font-light">
+              <p>
+                Our team of experienced medical professionals is dedicated to providing exceptional care
+                and helping you achieve your aesthetic and wellness goals.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 

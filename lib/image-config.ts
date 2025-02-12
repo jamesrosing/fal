@@ -38,7 +38,7 @@ export const IMAGE_ASSETS: Record<string, ImageAsset> = {
     id: 'hero-about',
     area: 'hero',
     description: 'About Page Hero Image',
-    publicId: 'hero/about-hero',
+    publicId: 'hero/hero-about',
     dimensions: {
       width: 1920,
       height: 1080,

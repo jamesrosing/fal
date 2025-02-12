@@ -27,10 +27,22 @@ export function TeamSection() {
   return (
     <section className="relative min-h-screen bg-black">
       {/* Mobile Layout */}
-      <div className="lg:hidden relative h-screen">
-        {/* Mobile Image Grid */}
-        <div className="grid grid-cols-2 gap-1 h-full">
-          {teamImages.map((image, index) => (
+      <div className="lg:hidden relative">
+        {/* Hero Container with 16:9 aspect ratio */}
+        <div className="relative aspect-[16/9] w-full">
+          <Image
+            src={teamImages[0].src}
+            alt={teamImages[0].alt}
+            fill
+            className="object-fill"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+        </div>
+
+        {/* Team Grid */}
+        <div className="grid grid-cols-2 gap-1">
+          {teamImages.slice(1).map((image, index) => (
             <motion.div
               key={index}
               className="relative aspect-[3/4]"
@@ -45,7 +57,6 @@ export function TeamSection() {
                 fill
                 className="object-fill"
                 sizes="50vw"
-                priority={index === 0}
               />
               <motion.div
                 className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"
