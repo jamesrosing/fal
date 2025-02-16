@@ -89,7 +89,7 @@ export default function LaserTreatmentsPage() {
                   Experience the latest in laser technology with our comprehensive range of treatments designed to address various skin concerns with precision and effectiveness.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -140,7 +140,7 @@ export default function LaserTreatmentsPage() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href="/consultation">Schedule a Treatment</LearnMoreButton>
+                    <LearnMoreButton href="/appointment">Schedule a Treatment</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
@@ -170,7 +170,7 @@ export default function LaserTreatmentsPage() {
                 Let our expert team help you achieve your aesthetic goals with our state-of-the-art laser treatments.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Appointment</LearnMoreButton>
               </div>
             </div>
           </motion.div>

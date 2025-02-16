@@ -104,9 +104,10 @@ export default function Dermatology() {
                   At Allure MD, our dermatology team provides comprehensive care for all your skin health needs.
                   From medical treatments to cosmetic enhancements, we offer personalized solutions for every patient.
                 </p>
-                <div className="space-y-4">
+                <div>
                   <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                  <LearnMoreButton href="/about#susan-pearose">Learn more about Susan Pearose, Certified Dermatology Specialist</LearnMoreButton>
+                  <br />
+                  <LearnMoreButton href="/about#susan-pearose">Susan Pearose, Certified Dermatology Specialist</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -158,7 +159,7 @@ export default function Dermatology() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href={`/dermatology/${category.category.toLowerCase()}`}>
+                    <LearnMoreButton href={`/services/dermatology/${category.id}`}>
                       Learn More
                     </LearnMoreButton>
                   </div>
@@ -189,7 +190,7 @@ export default function Dermatology() {
               <p>
                 Discover the path to radiant, healthy skin with our expert dermatology team. We&apos;re here to guide you every step of the way.
               </p>
-              <div className="space-y-4">
+              <div>
                 <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>

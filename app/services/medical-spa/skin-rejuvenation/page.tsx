@@ -89,7 +89,7 @@ export default function SkinRejuvenationPage() {
                   Experience the latest in skin rejuvenation technology with our comprehensive range of treatments designed to restore and enhance your skin's natural beauty.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -140,7 +140,7 @@ export default function SkinRejuvenationPage() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href="/consultation">Schedule a Treatment</LearnMoreButton>
+                    <LearnMoreButton href="/appointment">Schedule a Treatment</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
@@ -170,7 +170,7 @@ export default function SkinRejuvenationPage() {
                 Let our expert team help you achieve the radiant, healthy skin you deserve with our customized rejuvenation treatments.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Appointment</LearnMoreButton>
               </div>
             </div>
           </motion.div>

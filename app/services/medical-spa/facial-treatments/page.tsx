@@ -89,7 +89,7 @@ export default function FacialTreatmentsPage() {
                   Experience our luxurious facial treatments designed to rejuvenate, refresh, and restore your skin's natural radiance using advanced techniques and premium products.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Treatment</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule a Treatment</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -140,7 +140,7 @@ export default function FacialTreatmentsPage() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href="/consultation">Book This Treatment</LearnMoreButton>
+                    <LearnMoreButton href="/appointment">Book This Treatment</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
@@ -170,7 +170,7 @@ export default function FacialTreatmentsPage() {
                 Let our skilled aestheticians customize a facial treatment plan to help you achieve your skincare goals.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule Your Treatment</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Treatment</LearnMoreButton>
               </div>
             </div>
           </motion.div>

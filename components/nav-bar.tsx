@@ -195,19 +195,19 @@ const navItems: NavItem[] = [
     title: "RESOURCES",
     items: [
       {
-        name: "About Us",
-        description: "Learn about our practice and team",
-        href: "/about"
+        name: "Contact",
+        description: "Get in touch with us",
+        href: "/contact"
       },
       {
-        name: "Our Team",
+        name: "Team",
         description: "Meet our expert medical professionals",
         href: "/team"
       },
       {
-        name: "Contact",
-        description: "Get in touch with us",
-        href: "/contact"
+        name: "About",
+        description: "Learn about our practice and team",
+        href: "/about"
       },
       {
         name: "Reviews",

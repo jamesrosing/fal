@@ -118,7 +118,7 @@ export default function MedicalSpa() {
                   Our expert team delivers personalized care using the latest technologies and techniques.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                   <br />
                   <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
                 </div>
@@ -204,7 +204,7 @@ export default function MedicalSpa() {
                 Transform your beauty and wellness journey with our luxurious medical spa treatments. Let our expert team guide you to your aesthetic goals.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Appointment</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>

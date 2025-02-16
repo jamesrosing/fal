@@ -78,7 +78,7 @@ export default function BodyAnalysisPage() {
                   Our state-of-the-art body analysis services provide detailed insights into your body composition, helping us create personalized treatment plans for optimal results.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                 </div>
               </div>
             </motion.div>
@@ -129,7 +129,7 @@ export default function BodyAnalysisPage() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href="/consultation">Schedule an Analysis</LearnMoreButton>
+                    <LearnMoreButton href="/appointment">Schedule an Analysis</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
@@ -159,7 +159,7 @@ export default function BodyAnalysisPage() {
                 Begin your transformation journey with a comprehensive body analysis that will guide your personalized treatment plan.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule Your Analysis</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Analysis</LearnMoreButton>
               </div>
             </div>
           </motion.div>

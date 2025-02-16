@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { getImageUrl } from "@/lib/image-config"
 
 const values = [
   {
@@ -52,39 +53,38 @@ export default function AboutPage() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-[70vh]">
-        <div className="absolute inset-0">
+      <section className="relative">
+        <div className="relative aspect-[16/9] w-full">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/about/hero.jpg"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739333317/hero/hero-about.jpg"
             alt="About Allure MD"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-3xl text-white"
-            >
-              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                About Us
-              </h1>
-              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Excellence in aesthetic medicine
-              </h2>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  At Allure MD, we combine artistic vision with surgical precision to help our patients achieve their aesthetic goals. Our commitment to excellence, innovation, and patient care sets us apart in the field of aesthetic medicine.
-                </p>
-              </div>
-            </motion.div>
-          </div>
+        {/* Hero Text Content */}
+        <div className="lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl text-white"
+          >
+            <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+              About Us
+            </h1>
+            <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+              Excellence in aesthetic medicine
+            </h2>
+            <div className="space-y-6 text-lg font-cerebri font-light">
+              <p>
+                At Allure MD, we combine artistic vision with surgical precision to help our patients achieve their aesthetic goals. Our commitment to excellence, innovation, and patient care sets us apart in the field of aesthetic medicine.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
