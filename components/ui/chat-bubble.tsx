@@ -22,7 +22,7 @@ export function ChatBubble() {
         
         {/* Tooltip */}
         <span className="absolute right-full mr-4 hidden whitespace-nowrap rounded-md bg-zinc-800 px-4 py-2 text-sm text-white group-hover:block max-w-xs">
-          Hi, I&apos;m Sophie, AI assistant at Allure MD
+          Hi, I&apos;m Anna, AI assistant at Allure MD
           <span className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-4 border-transparent border-l-zinc-800"></span>
         </span>
 
