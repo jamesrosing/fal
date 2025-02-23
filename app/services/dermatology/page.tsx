@@ -191,7 +191,7 @@ export default function Dermatology() {
                 Discover the path to radiant, healthy skin with our expert dermatology team. We&apos;re here to guide you every step of the way.
               </p>
               <div>
-                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Consultation</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>

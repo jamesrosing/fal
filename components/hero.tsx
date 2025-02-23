@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { BackgroundVideo } from "@/components/ui/background-video"
+import Link from "next/link"
 
 // TODO: Replace these URLs with your CDN URLs
 // Recommended: Use a CDN service like Cloudinary, Bunny.net, or Amazon S3 + CloudFront
@@ -49,13 +50,15 @@ export function Hero() {
           >
             <h1 className="hero-text mb-6">Advanced Aesthetic Medicine</h1>
             <p className="hero-tagline text-xl sm:text-2xl mb-8 text-gray-200">Where artistry meets science</p>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-white border-white hover:bg-white hover:text-black transition-colors bg-transparent"
-            >
-              Schedule Consultation
-            </Button>
+            <Link href="/appointment">
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-white border-white hover:bg-white hover:text-black transition-colors bg-transparent"
+              >
+                Schedule Consultation
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </div>

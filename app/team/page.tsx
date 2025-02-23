@@ -227,7 +227,7 @@ export default function Team() {
             <p className="text-lg text-zinc-300 mb-8 font-cerebri font-light">
               Take the first step towards achieving your aesthetic and wellness goals with our expert team.
             </p>
-            <LearnMoreButton href="/consultation">Book a Consultation</LearnMoreButton>
+            <LearnMoreButton href="/appointment">Book a Consultation</LearnMoreButton>
           </motion.div>
         </div>
       </section>

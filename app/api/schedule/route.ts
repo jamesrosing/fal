@@ -1,14 +1,15 @@
 // app/api/schedule/route.ts
-import zenotiClient from '@/lib/zenoti';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { ZenotiAPI } from '@/lib/zenoti';
 
 const scheduleSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  service: z.string(),
-  preferredDate: z.string(),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
+  service: z.string().min(1, 'Service is required'),
+  therapist: z.string().min(1, 'Therapist is required'),
+  preferredDate: z.string().min(1, 'Preferred date is required'),
   message: z.string().optional(),
 });
 
@@ -21,14 +22,19 @@ export async function POST(req: Request): Promise<Response> {
     
     // Process scheduling request using Zenoti
     try {
-      await zenotiClient.post('/v1/appointments', {
+      const [firstName, ...lastNameParts] = validatedData.name.split(' ');
+      const lastName = lastNameParts.join(' ');
+
+      await ZenotiAPI.bookAppointment({
+        service_id: validatedData.service,
+        therapist_id: validatedData.therapist,
+        start_time: validatedData.preferredDate,
         guest: {
-          name: validatedData.name,
+          first_name: firstName,
+          last_name: lastName || firstName, // Use first name as last name if no last name provided
           email: validatedData.email,
           phone: validatedData.phone,
         },
-        service: validatedData.service,
-        preferred_date: validatedData.preferredDate,
         notes: validatedData.message,
       });
 

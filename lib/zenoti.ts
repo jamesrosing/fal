@@ -1,33 +1,140 @@
-// lib/zenoti.ts
-import axios from 'axios';
+'use client';
 
-const zenotiClient = axios.create({
-  baseURL: process.env.ZENOTI_API_URL || 'https://api.zenoti.com',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-zenoti-api-key': process.env.ZENOTI_API_KEY,
-    'x-zenoti-api-secret': process.env.ZENOTI_API_SECRET,
-    'x-zenoti-application-id': process.env.ZENOTI_APPLICATION_ID,
-  },
-});
+// Types
+export interface ZenotiService {
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+  category: string;
+  description?: string;
+}
 
-// Response interceptor for rate limit logging and error handling
-zenotiClient.interceptors.response.use(
-  (response) => {
-    const limit = response.headers['x-ratelimit-limit'];
-    const remaining = response.headers['x-ratelimit-remaining'];
-    const reset = response.headers['x-ratelimit-reset'];
-    console.log(`Zenoti Rate Limit: Limit=${limit}, Remaining=${remaining}, Reset=${reset}`);
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 429) {
-      const reset = error.response.headers['x-ratelimit-reset'];
-      console.error(`Rate limit exceeded. Try again after ${reset} seconds.`);
-      return Promise.reject(new Error(`Zenoti API rate limit exceeded. Please try again after ${reset} seconds.`));
+export interface ZenotiProvider {
+  id: string;
+  name: string;
+  specialties: string[];
+  image_url?: string;
+  bio?: string;
+}
+
+export interface ZenotiSlot {
+  id: string;
+  start_time: string;
+  end_time: string;
+  provider_id: string;
+  provider_name: string;
+}
+
+export interface ZenotiBooking {
+  id: string;
+  service_id: string;
+  provider_id: string;
+  slot_id: string;
+  guest: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+  };
+  notes?: string;
+}
+
+// API Methods
+export const ZenotiAPI = {
+  // Get all services
+  async getServices(): Promise<ZenotiService[]> {
+    try {
+      const response = await fetch('/api/zenoti?action=services');
+      const data = await response.json();
+      return data.services;
+    } catch (error) {
+      console.error('Failed to fetch services:', error);
+      throw error;
     }
-    return Promise.reject(error);
-  }
-);
+  },
 
-export default zenotiClient;
+  // Get all providers
+  async getProviders(): Promise<ZenotiProvider[]> {
+    try {
+      const response = await fetch('/api/zenoti?action=providers');
+      const data = await response.json();
+      return data.providers;
+    } catch (error) {
+      console.error('Failed to fetch providers:', error);
+      throw error;
+    }
+  },
+
+  // Get available time slots
+  async getAvailability(
+    serviceId: string,
+    date: string,
+    providerId?: string
+  ): Promise<{ booking_id: string; slots: ZenotiSlot[] }> {
+    try {
+      const params = new URLSearchParams({
+        action: 'availability',
+        serviceId,
+        date,
+        ...(providerId && { providerId }),
+      });
+      
+      const response = await fetch(`/api/zenoti?${params}`);
+      const data = await response.json();
+      return {
+        booking_id: data.booking_id,
+        slots: data.availability,
+      };
+    } catch (error) {
+      console.error('Failed to fetch availability:', error);
+      throw error;
+    }
+  },
+
+  // Book an appointment
+  async bookAppointment(booking: Omit<ZenotiBooking, 'id'>): Promise<ZenotiBooking> {
+    try {
+      const response = await fetch('/api/zenoti', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'reserve',
+          ...booking,
+        }),
+      });
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to book appointment');
+      }
+      
+      return data.appointment;
+    } catch (error) {
+      console.error('Failed to book appointment:', error);
+      throw error;
+    }
+  },
+
+  // Cancel booking
+  async cancelBooking(bookingId: string, reason?: string): Promise<void> {
+    try {
+      await fetch('/api/zenoti', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'cancel',
+          booking_id: bookingId,
+          reason,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to cancel booking:', error);
+      throw error;
+    }
+  },
+};

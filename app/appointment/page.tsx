@@ -3,34 +3,26 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { AppointmentScheduler } from "@/components/scheduling/AppointmentScheduler"
+import { Suspense } from "react"
+import { Loader2 } from "lucide-react"
 
-const services = [
-  { value: "plastic-surgery", label: "Plastic Surgery Consultation" },
-  { value: "dermatology", label: "Dermatology Consultation" },
-  { value: "medical-spa", label: "Medical Spa Treatment" },
-  { value: "functional-medicine", label: "Functional Medicine Consultation" },
-]
+function LoadingScheduler() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[600px] space-y-4">
+      <Loader2 className="w-8 h-8 animate-spin text-white" />
+      <p className="text-zinc-400">Loading scheduler...</p>
+    </div>
+  )
+}
 
 export default function AppointmentPage() {
-  const [date, setDate] = useState<Date>()
-
   return (
     <main className="min-h-screen bg-black">
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-[50vh]">
+      <section className="relative h-[40vh] lg:h-[50vh]">
         <div className="absolute inset-0">
           <Image
             src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/appointment-hero.jpg"
@@ -64,139 +56,67 @@ export default function AppointmentPage() {
         </div>
       </section>
 
-      {/* Form Section */}
-      <section className="py-24">
+      {/* Scheduler Section */}
+      <section className="py-16 lg:py-24 bg-black">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            <form className="space-y-8">
-              {/* Personal Information */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-serif text-white">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input 
-                      id="firstName" 
-                      name="firstName"
-                      autoComplete="given-name"
-                      data-form-type="other"
-                      placeholder="Enter your first name" 
-                    />
+          <Suspense fallback={<LoadingScheduler />}>
+            <AppointmentScheduler />
+          </Suspense>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input 
-                      id="lastName" 
-                      name="lastName"
-                      autoComplete="family-name"
-                      data-form-type="other"
-                      placeholder="Enter your last name" 
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email" 
-                    name="email"
-                    type="email" 
-                    autoComplete="email"
-                    data-form-type="other"
-                    placeholder="Enter your email" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input 
-                    id="phone" 
-                    name="phone"
-                    type="tel" 
-                    autoComplete="tel"
-                    data-form-type="other"
-                    placeholder="Enter your phone number" 
-                  />
-                </div>
+      </section>
+
+      {/* Additional Information */}
+      <section className="py-16 lg:py-24 bg-zinc-900">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center space-y-12">
+            <div className="space-y-6 text-white">
+              <h3 className="text-3xl font-serif">What to Expect</h3>
+              <p className="text-lg font-cerebri font-light">
+                During your consultation, our expert team will:
+              </p>
+              <ul className="text-lg font-cerebri font-light space-y-4">
+                <li className="flex items-center justify-center space-x-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span>Listen to your goals and concerns</span>
+                </li>
+                <li className="flex items-center justify-center space-x-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span>Perform a thorough evaluation</span>
+                </li>
+                <li className="flex items-center justify-center space-x-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span>Discuss treatment options</span>
+                </li>
+                <li className="flex items-center justify-center space-x-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span>Create a personalized treatment plan</span>
+                </li>
+                <li className="flex items-center justify-center space-x-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                  <span>Answer all your questions</span>
+                </li>
+              </ul>
               </div>
 
-              {/* Appointment Details */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-serif text-white">Appointment Details</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="service">Service</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a service" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {services.map((service) => (
-                        <SelectItem key={service.value} value={service.value}>
-                          {service.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Preferred Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !date && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : "Pick a date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message">Additional Information</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Please share any specific concerns or questions you have"
-                    className="min-h-[100px]"
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" size="lg" className="w-full">
-                Schedule Consultation
-              </Button>
-
-              {/* Additional Information */}
-              <div className="text-sm text-muted-foreground text-center space-y-2">
-                <p>
-                  By submitting this form, you agree to our{" "}
-                  <a href="/terms" className="underline hover:text-primary">
+            <div className="text-sm text-zinc-400">
+              <p>
+                By scheduling an appointment, you agree to our{" "}
+                <a href="/terms" className="text-white underline hover:text-primary">
                     Terms of Service
                   </a>{" "}
                   and{" "}
-                  <a href="/privacy" className="underline hover:text-primary">
+                <a href="/privacy" className="text-white underline hover:text-primary">
                     Privacy Policy
                   </a>
                   .
                 </p>
-                <p>
+              <p className="mt-4">
                   For immediate assistance, please call us at{" "}
-                  <a href="tel:9497067874" className="text-primary hover:underline">
+                <a href="tel:9497067874" className="text-white hover:text-primary">
                     (949) 706-7874
                   </a>
                 </p>
               </div>
-            </form>
           </div>
         </div>
       </section>
