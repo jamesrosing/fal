@@ -121,7 +121,7 @@ export default function GalleryPage({ galleries, albums, cases, currentCase, cur
               {sortedCases.map((case_) => (
                 <Link
                   key={case_.id}
-                  href={`/gallery/${slug[0]}/${case_.id}`}
+                  href={`/gallery/${slug[0]}/${slug[1]}/${case_.id}`}
                   className="group block"
                 >
                   <div className="bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors">

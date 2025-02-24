@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Plus, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getAlbumsByGallery, getCasesByAlbum } from '@/lib/supabase';
 
 interface Album {
   title: string;
@@ -15,6 +17,12 @@ interface Collection {
   title: string;
   description: string;
   albums: Record<string, Album>;
+}
+
+interface AlbumStats {
+  id: string;
+  caseCount: number;
+  photoCount: number;
 }
 
 // Use the same collections structure
@@ -70,6 +78,41 @@ export default function CollectionPage() {
   const params = useParams();
   const collectionId = params.collection as string;
   const collection = collections[collectionId];
+  const [albumStats, setAlbumStats] = useState<Record<string, AlbumStats>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAlbumStats() {
+      try {
+        // Get all albums for this gallery
+        const albums = await getAlbumsByGallery(collectionId);
+        
+        // For each album, get its cases and count photos
+        const stats: Record<string, AlbumStats> = {};
+        
+        for (const album of albums || []) {
+          const cases = await getCasesByAlbum(album.id);
+          const photoCount = cases?.reduce((total, c) => total + (c.images?.length || 0), 0) || 0;
+          
+          stats[album.title.toLowerCase().replace(/\s+/g, '-')] = {
+            id: album.id,
+            caseCount: cases?.length || 0,
+            photoCount
+          };
+        }
+        
+        setAlbumStats(stats);
+      } catch (error) {
+        console.error('Error fetching album stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (collection) {
+      fetchAlbumStats();
+    }
+  }, [collectionId, collection]);
 
   if (!collection) {
     return <div>Collection not found</div>;
@@ -99,34 +142,43 @@ export default function CollectionPage() {
 
       {/* Albums Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(collection.albums).map(([id, album]) => (
-          <motion.div
-            key={id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Link href={`/admin/gallery/${collectionId}/${id}`}>
-              <Card className="hover:bg-zinc-900 transition-colors cursor-pointer">
-                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                  <CardTitle className="flex-1">{album.title}</CardTitle>
-                  <ImageIcon className="w-5 h-5 text-zinc-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-zinc-500">
-                      5 Cases {/* TODO: Add actual case count */}
-                    </span>
-                    <span className="text-zinc-700">•</span>
-                    <span className="text-zinc-500">
-                      25 Photos {/* TODO: Add actual photo count */}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
+        {loading ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-zinc-500">Loading albums...</p>
+          </div>
+        ) : (
+          Object.entries(collection.albums).map(([id, album]) => {
+            const stats = albumStats[id] || { caseCount: 0, photoCount: 0 };
+            return (
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Link href={`/admin/gallery/${collectionId}/${id}`}>
+                  <Card className="hover:bg-zinc-900 transition-colors cursor-pointer">
+                    <CardHeader className="flex flex-row items-center space-y-0 pb-2">
+                      <CardTitle className="flex-1">{album.title}</CardTitle>
+                      <ImageIcon className="w-5 h-5 text-zinc-500" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-zinc-500">
+                          {stats.caseCount} Cases
+                        </span>
+                        <span className="text-zinc-700">•</span>
+                        <span className="text-zinc-500">
+                          {stats.photoCount} Photos
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            );
+          })
+        )}
       </div>
     </div>
   );

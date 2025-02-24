@@ -69,7 +69,8 @@ export default function GalleryLayout({
     const collectionIndex = parts.indexOf('gallery') + 1;
     if (parts[collectionIndex]) {
       setActiveCollection(parts[collectionIndex]);
-      if (parts[collectionIndex + 1]) {
+      // Only set active album if it's not a UUID (case ID)
+      if (parts[collectionIndex + 1] && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(parts[collectionIndex + 1])) {
         setActiveAlbum(parts[collectionIndex + 1]);
       }
     }

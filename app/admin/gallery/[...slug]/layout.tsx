@@ -1,6 +1,6 @@
 import { getGalleries, getAlbumsByGallery, getCasesByAlbum, getCase } from "@/lib/supabase"
-import GalleryPage from "./page"
 import { notFound } from "next/navigation"
+import GalleryPage from "./page"
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,13 +15,11 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
   // If no slug, show main gallery page
   if (!params.slug || params.slug.length === 0) {
     const galleries = await getGalleries();
-    return <GalleryPage galleries={galleries} />;
+    return <GalleryPage />;
   }
 
   try {
-    const galleries = await getGalleries();
     const albums = await getAlbumsByGallery(collectionId);
-    
     if (!albums?.length) {
       notFound();
     }
@@ -32,10 +30,7 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
       if (!currentCase) {
         notFound();
       }
-      return <GalleryPage 
-        galleries={galleries} 
-        currentCase={currentCase}
-      />;
+      return <GalleryPage />;
     }
 
     // If we have an album ID, fetch cases for that album
@@ -47,15 +42,11 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
         notFound();
       }
       const cases = await getCasesByAlbum(album.id);
-      return <GalleryPage 
-        galleries={galleries} 
-        cases={cases || []} 
-        currentAlbum={album}
-      />;
+      return <GalleryPage />;
     }
 
     // If only collection ID, show albums
-    return <GalleryPage galleries={galleries} albums={albums} />;
+    return <GalleryPage />;
 
   } catch (error) {
     console.error('Error fetching data:', error);

@@ -112,7 +112,7 @@ export default function FunctionalMedicine() {
                   We focus on identifying and treating root causes to optimize your overall well-being.
                 </p>
                 <div className="space-y-4">
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
                   <br />
                   <LearnMoreButton href="/reviews">View Success Stories</LearnMoreButton>
                 </div>
@@ -166,7 +166,7 @@ export default function FunctionalMedicine() {
                     ))}
                   </ul>
                   <div className="mt-8">
-                    <LearnMoreButton href={`/functional-medicine/${category.category.toLowerCase()}`}>
+                    <LearnMoreButton href={`/services/functional-medicine/${category.id}`}>
                       Learn More
                     </LearnMoreButton>
                   </div>
@@ -198,7 +198,7 @@ export default function FunctionalMedicine() {
                 Take the first step towards optimizing your health with our comprehensive functional medicine approach.
               </p>
               <div className="space-y-4">
-                <LearnMoreButton href="/consultation">Schedule Your Consultation</LearnMoreButton>
+                <LearnMoreButton href="/appointment">Schedule Your Consultation</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>
