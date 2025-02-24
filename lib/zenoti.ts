@@ -27,7 +27,6 @@ export interface ZenotiSlot {
 }
 
 export interface ZenotiBooking {
-  id: string;
   service_id: string;
   provider_id: string;
   slot_id: string;
@@ -93,7 +92,7 @@ export const ZenotiAPI = {
   },
 
   // Book an appointment
-  async bookAppointment(booking: Omit<ZenotiBooking, 'id'>): Promise<ZenotiBooking> {
+  async bookAppointment(booking: ZenotiBooking): Promise<any> {
     try {
       const response = await fetch('/api/zenoti', {
         method: 'POST',

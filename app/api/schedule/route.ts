@@ -9,7 +9,7 @@ const scheduleSchema = z.object({
   phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number'),
   service: z.string().min(1, 'Service is required'),
   therapist: z.string().min(1, 'Therapist is required'),
-  preferredDate: z.string().min(1, 'Preferred date is required'),
+  slot_id: z.string().min(1, 'Time slot is required'),
   message: z.string().optional(),
 });
 
@@ -27,11 +27,11 @@ export async function POST(req: Request): Promise<Response> {
 
       await ZenotiAPI.bookAppointment({
         service_id: validatedData.service,
-        therapist_id: validatedData.therapist,
-        start_time: validatedData.preferredDate,
+        provider_id: validatedData.therapist,
+        slot_id: validatedData.slot_id,
         guest: {
           first_name: firstName,
-          last_name: lastName || firstName, // Use first name as last name if no last name provided
+          last_name: lastName || firstName,
           email: validatedData.email,
           phone: validatedData.phone,
         },

@@ -61,6 +61,43 @@ export type TeamMember = {
   updated_at: string;
 };
 
+export interface Article {
+  id: string;
+  title: string;
+  subtitle?: string;
+  slug: string;
+  content: ArticleContent[];
+  excerpt: string;
+  author_id: string;
+  category_id: string;
+  status: 'draft' | 'published' | 'archived';
+  featured_image?: string;
+  featured_video?: string;
+  meta_description?: string;
+  meta_keywords?: string[];
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+  reading_time?: number;
+  tags?: string[];
+}
+
+export interface ArticleContent {
+  type: 'paragraph' | 'heading' | 'image' | 'video' | 'quote' | 'list';
+  content: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ArticleCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  order_position: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // Helper functions for database operations
 export async function getGalleries() {
   const { data, error } = await supabase

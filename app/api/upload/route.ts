@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary';
+import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary-client';
 
 export const runtime = 'edge';
 
@@ -65,8 +65,8 @@ export async function POST(request: Request) {
 
     // Add all other parameters that were used in signature
     Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        uploadFormData.append(key, value);
+      if (value !== undefined && value !== null && value !== '') {
+        uploadFormData.append(key, value.toString());
       }
     });
 
@@ -101,6 +101,61 @@ export async function POST(request: Request) {
     console.error("Upload error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Upload failed" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { public_id } = await request.json();
+    
+    if (!public_id) {
+      return NextResponse.json({ error: "No public_id provided" }, { status: 400 });
+    }
+
+    const timestamp = Math.round(Date.now() / 1000).toString();
+    
+    // Prepare parameters for signature
+    const params = {
+      public_id,
+      timestamp,
+    };
+
+    // Generate signature
+    const signature = await generateSignature(params);
+
+    // Create form data for Cloudinary
+    const deleteFormData = new FormData();
+    deleteFormData.append('public_id', public_id);
+    deleteFormData.append('api_key', process.env.CLOUDINARY_API_KEY!);
+    deleteFormData.append('timestamp', timestamp);
+    deleteFormData.append('signature', signature);
+
+    // Delete from Cloudinary
+    const deleteResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/destroy`,
+      {
+        method: 'POST',
+        body: deleteFormData,
+      }
+    );
+
+    if (!deleteResponse.ok) {
+      const error = await deleteResponse.json();
+      console.error('Cloudinary error:', error);
+      throw new Error(error.message || 'Delete failed');
+    }
+
+    const result = await deleteResponse.json();
+    return NextResponse.json({
+      success: true,
+      result
+    });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Delete failed" },
       { status: 500 }
     );
   }

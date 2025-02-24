@@ -1,17 +1,31 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary';
+import cloudinary from '@/lib/cloudinary-server';
+import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary-client';
 
-if (!process.env.CLOUDINARY_API_KEY) {
+// @deprecated Use /api/upload instead. This route will be removed in a future version.
+// The /api/upload route provides the same functionality with Edge runtime support.
+
+// Environment variable validation
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+if (!CLOUDINARY_API_KEY) {
   throw new Error('CLOUDINARY_API_KEY is not defined');
 }
 
-if (!process.env.CLOUDINARY_API_SECRET) {
+if (!CLOUDINARY_API_SECRET) {
   throw new Error('CLOUDINARY_API_SECRET is not defined');
 }
 
-if (!process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET) {
+if (!CLOUDINARY_UPLOAD_PRESET) {
   throw new Error('NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET is not defined');
+}
+
+if (!CLOUDINARY_CLOUD_NAME) {
+  throw new Error('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not defined');
 }
 
 function generateSignature(params: Record<string, any>) {
@@ -30,7 +44,7 @@ function generateSignature(params: Record<string, any>) {
     .join('&');
 
   // Append API secret
-  const stringToSign = sortedParams + process.env.CLOUDINARY_API_SECRET;
+  const stringToSign = sortedParams + CLOUDINARY_API_SECRET;
   
   console.log('String to sign:', stringToSign);
 
@@ -96,7 +110,7 @@ export async function POST(request: Request) {
         context,
         tags: tags.join(','),
         transformation: transformation || undefined,
-        upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+        upload_preset: CLOUDINARY_UPLOAD_PRESET
       };
 
       // Generate signature
@@ -105,14 +119,14 @@ export async function POST(request: Request) {
       // Create form data for Cloudinary
       const uploadFormData = new FormData();
       uploadFormData.append('file', new Blob([buffer]));
-      uploadFormData.append('api_key', process.env.CLOUDINARY_API_KEY);
+      uploadFormData.append('api_key', CLOUDINARY_API_KEY as string);
       uploadFormData.append('timestamp', timestamp);
       uploadFormData.append('signature', signature);
       uploadFormData.append('folder', folder);
       uploadFormData.append('public_id', public_id);
       uploadFormData.append('tags', tags.join(','));
       uploadFormData.append('context', JSON.stringify(context));
-      uploadFormData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+      uploadFormData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET as string);
 
       // Add transformation if exists
       if (transformation) {
@@ -125,12 +139,12 @@ export async function POST(request: Request) {
         timestamp,
         signature: signature.slice(0, 10) + '...',
         transformation,
-        upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+        upload_preset: CLOUDINARY_UPLOAD_PRESET
       });
 
       // Upload to Cloudinary
       const uploadResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
         {
           method: 'POST',
           body: uploadFormData,
@@ -175,12 +189,12 @@ export async function POST(request: Request) {
 
       const deleteFormData = new FormData();
       deleteFormData.append('public_id', public_id);
-      deleteFormData.append('api_key', process.env.CLOUDINARY_API_KEY);
+      deleteFormData.append('api_key', CLOUDINARY_API_KEY as string);
       deleteFormData.append('timestamp', timestamp);
       deleteFormData.append('signature', signature);
 
       const deleteResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/destroy`,
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/destroy`,
         {
           method: 'POST',
           body: deleteFormData,
