@@ -133,6 +133,9 @@ export default function GalleryPage({ galleries, albums, cases, currentCase, cur
                           fill
                           className="object-cover"
                         />
+                        <div className="absolute bottom-2 right-2 w-5 h-5 flex items-center justify-center bg-black/40 rounded-full text-xs text-zinc-400 opacity-70">
+                          {parseInt(case_.title.replace(/[^0-9]/g, ''))}
+                        </div>
                       </div>
                     )}
                     <div className="p-4">

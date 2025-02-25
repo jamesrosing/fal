@@ -10,10 +10,12 @@ interface LayoutProps {
 }
 
 export default async function GalleryLayout({ children, params }: LayoutProps) {
-  const [collectionId, albumId, caseId] = params.slug || [];
+  // Make sure params.slug is properly awaited before using it
+  const slugParams = await Promise.resolve(params.slug || []);
+  const [collectionId, albumId, caseId] = slugParams;
 
   // If no slug, show main gallery page
-  if (!params.slug || params.slug.length === 0) {
+  if (!slugParams || slugParams.length === 0) {
     const galleries = await getGalleries();
     return <GalleryPage galleries={galleries} />;
   }

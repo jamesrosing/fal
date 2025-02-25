@@ -19,8 +19,8 @@ import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useDropzone } from 'react-dropzone'
-import { uploadToCloudinary } from "@/lib/cloudinary-upload"
-import { getCloudinaryUrl } from "@/lib/cloudinary"
+import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary-upload"
+import { getCloudinaryUrl } from "@/lib/cloudinary-client"
 import { resizeImage } from "@/lib/utils"
 import {
   AlertDialog,
@@ -46,7 +46,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { FileRejection, DropEvent } from 'react-dropzone'
 import { toast } from "@/components/ui/use-toast"
-import { deleteFromCloudinary } from "@/lib/cloudinary-upload"
 import { Toaster } from "@/components/ui/toaster"
 
 interface CloudinaryImage {

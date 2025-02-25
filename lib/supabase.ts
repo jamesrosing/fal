@@ -46,6 +46,7 @@ export interface Image {
   caption: string;
   tags: string[];
   created_at: string;
+  display_order: number;
 }
 
 export type TeamMember = {
@@ -156,7 +157,21 @@ export async function getCasesByAlbum(albumId: string) {
     .order('created_at', { ascending: false });
   
   if (error) throw error;
-  return data as (Case & { images: Image[] })[];
+  
+  // Sort images by display_order for each case
+  const casesWithSortedImages = data.map(caseItem => {
+    if (caseItem.images && Array.isArray(caseItem.images)) {
+      caseItem.images.sort((a, b) => {
+        // Default to 0 if display_order doesn't exist yet
+        const orderA = a.display_order || 0;
+        const orderB = b.display_order || 0;
+        return orderA - orderB;
+      });
+    }
+    return caseItem;
+  });
+  
+  return casesWithSortedImages as (Case & { images: Image[] })[];
 }
 
 export async function getCase(caseId: string) {
@@ -167,5 +182,16 @@ export async function getCase(caseId: string) {
     .single();
   
   if (error) throw error;
+  
+  // Sort images by display_order if it exists
+  if (data && data.images && Array.isArray(data.images)) {
+    data.images.sort((a, b) => {
+      // Default to 0 if display_order doesn't exist yet
+      const orderA = a.display_order || 0;
+      const orderB = b.display_order || 0;
+      return orderA - orderB;
+    });
+  }
+  
   return data as Case & { images: Image[] };
 } 

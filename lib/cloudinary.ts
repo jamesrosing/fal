@@ -1,3 +1,4 @@
-// Re-export everything from client and server modules
+// Only export client-side functionality for use in browser
+// This prevents server-side code with Node.js dependencies from being bundled with client code
 export * from './cloudinary-client';
-export { default as cloudinary } from './cloudinary-server'; 
+// Do NOT export server-side modules in this file 

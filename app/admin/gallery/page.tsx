@@ -3,10 +3,23 @@
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderOpen } from 'lucide-react';
+import { Plus, FolderOpen, Loader2, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getAlbumsByGallery, getCasesByAlbum } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
 
 interface CollectionStats {
   albumCount: number;
@@ -64,8 +77,16 @@ const collections = {
 };
 
 export default function GalleryPage() {
+  const router = useRouter();
   const [collectionStats, setCollectionStats] = useState<Record<string, CollectionStats>>({});
   const [loading, setLoading] = useState(true);
+  
+  // Add these states for collection creation
+  const [newCollectionOpen, setNewCollectionOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [collectionTitle, setCollectionTitle] = useState('');
+  const [collectionDescription, setCollectionDescription] = useState('');
+  const [collectionSlug, setCollectionSlug] = useState('');
 
   useEffect(() => {
     async function fetchCollectionStats() {
@@ -107,6 +128,63 @@ export default function GalleryPage() {
 
     fetchCollectionStats();
   }, []);
+
+  // Add this function to handle collection creation
+  const handleCreateCollection = async () => {
+    if (!collectionTitle || !collectionSlug) return;
+    
+    try {
+      setCreating(true);
+      
+      const response = await fetch('/api/gallery/collections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: collectionTitle,
+          description: collectionDescription,
+          slug: collectionSlug
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create collection');
+      }
+      
+      const newCollection = await response.json();
+      
+      // Reset form
+      setCollectionTitle('');
+      setCollectionDescription('');
+      setCollectionSlug('');
+      setNewCollectionOpen(false);
+      
+      toast({
+        title: "Collection created",
+        description: `The collection "${collectionTitle}" has been created.`
+      });
+      
+      // Refresh the page to show the new collection
+      router.refresh();
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create collection. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  // Add this function to handle slug generation
+  const handleTitleChange = (value: string) => {
+    setCollectionTitle(value);
+    // Generate slug from title (lowercase, replace spaces with dashes)
+    setCollectionSlug(value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
+  };
 
   return (
     <div className="space-y-8">
@@ -166,6 +244,81 @@ export default function GalleryPage() {
             );
           })
         )}
+      </div>
+
+      {/* Add this right before the grid of collections */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Gallery Collections</h1>
+        
+        <Dialog open={newCollectionOpen} onOpenChange={setNewCollectionOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Collection
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Collection</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Collection Title</Label>
+                <Input
+                  id="title"
+                  placeholder="e.g., Dermatology"
+                  value={collectionTitle}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="slug">Collection Slug</Label>
+                <Input
+                  id="slug"
+                  placeholder="e.g., dermatology"
+                  value={collectionSlug}
+                  onChange={(e) => setCollectionSlug(e.target.value)}
+                />
+                <p className="text-xs text-zinc-500">
+                  The slug is used in the URL: /gallery/{collectionSlug}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe this collection..."
+                  value={collectionDescription}
+                  onChange={(e) => setCollectionDescription(e.target.value)}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setNewCollectionOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreateCollection}
+                disabled={!collectionTitle || !collectionSlug || creating}
+              >
+                {creating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Create Collection
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -71,19 +71,9 @@
     ],
     admin: [
       {
-        name: "Collections",
-        url: "/admin/collections",
+        name: "Gallery",
+        url: "/admin/gallery",
         icon: LayoutGrid,
-      },
-      {
-        name: "Albums",
-        url: "/admin/albums",
-        icon: Album,
-      },
-      {
-        name: "Cases",
-        url: "/admin/cases",
-        icon: ImageIcon,
       },
       {
         name: "Upload",
