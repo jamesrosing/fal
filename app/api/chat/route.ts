@@ -1,5 +1,5 @@
 // app/api/chat/route.ts
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
 interface Message {
@@ -17,7 +17,7 @@ interface ErrorResponse {
 }
 
 // Initialize OpenAI client
-const openai = new OpenAI({
+const openaiClient = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -36,7 +36,7 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     // Create chat completion
-    const stream = await openai.chat.completions.create({
+    const stream = await openaiClient.chat.completions.create({
       model: 'gpt-4-1106-preview',
       stream: true,
       messages: [

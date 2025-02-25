@@ -19,14 +19,37 @@ interface Case {
   }>;
 }
 
-const collections = {
+interface Album {
+  title: string;
+}
+
+interface Collection {
+  title: string;
+  description: string;
+  albums: Record<string, Album>;
+}
+
+// Use the same collections structure
+const collections: Record<string, Collection> = {
   "plastic-surgery": {
     title: "Plastic Surgery",
     description: "Before and after photos of plastic surgery procedures",
     albums: {
-      "head-neck": { title: "Head & Neck" },
-      "breast": { title: "Breast" },
-      "body": { title: "Body" }
+      "face": { title: "Face" },
+      "eyelids": { title: "Eyelids" },
+      "ears": { title: "Ears" },
+      "nose": { title: "Nose" },
+      "neck": { title: "Neck" },
+      "breast-augmentation": { title: "Breast Augmentation" },
+      "breast-lift": { title: "Breast Lift" },
+      "breast-reduction": { title: "Breast Reduction" },
+      "breast-revision": { title: "Breast Revision" },
+      "breast-nipple-areolar-complex": { title: "Breast Nipple Areolar Complex" },
+      "abdominoplasty": { title: "Abdominoplasty" },
+      "mini-abdominoplasty": { title: "Mini Abdominoplasty" },
+      "liposuction": { title: "Liposuction" },
+      "arm-lift": { title: "Arm Lift" },
+      "thigh-lift": { title: "Thigh Lift" }
     }
   },
   "dermatology": {
@@ -125,7 +148,7 @@ export default function CasePage() {
           Back to {album.title}
         </Link>
       </div>
-
+      
       <h1 className="text-2xl font-bold mb-6">{currentCase.title}</h1>
       
       {currentCase.description && (

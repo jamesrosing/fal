@@ -21,7 +21,7 @@ interface Case {
 
 export default function CasePage() {
   const params = useParams();
-  const id = params.id as string;
+  const caseId = params.caseId as string;
   const [currentCase, setCurrentCase] = useState<Case | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export default function CasePage() {
     async function fetchCase() {
       try {
         setLoading(true);
-        const caseData = await getCase(id);
+        const caseData = await getCase(caseId);
         setCurrentCase(caseData);
       } catch (error) {
         console.error('Error fetching case:', error);
@@ -38,10 +38,10 @@ export default function CasePage() {
       }
     }
 
-    if (id) {
+    if (caseId) {
       fetchCase();
     }
-  }, [id]);
+  }, [caseId]);
 
   if (loading) {
     return (
