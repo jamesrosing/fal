@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ImageAssetUpload } from "@/components/image-asset-upload"
-import { ImageArea } from "@/lib/cloudinary"
+import { ImageArea, deleteFromCloudinary } from "@/lib/cloudinary"
 import { IMAGE_ASSETS, type ImageAsset, getImageUrl } from "@/lib/image-config"
 import Image from "next/image"
 import { Edit2, Trash2, Plus } from "lucide-react"
@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { deleteFromCloudinary } from "@/lib/cloudinary-upload"
 import { toast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { updateImageConfig, deleteImageAsset } from "@/app/actions/image-config"
@@ -237,10 +236,12 @@ export default function ImagesPage() {
                         <SelectContent>
                           <SelectItem value="all">All Areas</SelectItem>
                           <SelectItem value="hero">Hero Images</SelectItem>
+                          <SelectItem value="article">Article Images</SelectItem>
                           <SelectItem value="gallery">Gallery Images</SelectItem>
                           <SelectItem value="service">Service Images</SelectItem>
                           <SelectItem value="team">Team Member Images</SelectItem>
                           <SelectItem value="logo">Logo & Branding</SelectItem>
+                          <SelectItem value="video-thumbnail">Video Thumbnails</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

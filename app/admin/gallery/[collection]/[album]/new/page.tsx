@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
-import { uploadToCloudinary } from '@/lib/cloudinary-client';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 interface Collection {
   title: string;

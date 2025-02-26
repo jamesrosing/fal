@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useDropzone } from "react-dropzone"
-import { ImageArea } from "@/lib/cloudinary"
+import { ImageArea, uploadToCloudinary } from "@/lib/cloudinary"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
-import { uploadToCloudinary } from "@/lib/cloudinary-upload"
 
 interface ImageAssetUploadProps {
   assetId?: string

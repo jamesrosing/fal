@@ -27,6 +27,7 @@ export interface ZenotiSlot {
 }
 
 export interface ZenotiBooking {
+  booking_id: string;
   service_id: string;
   provider_id: string;
   slot_id: string;

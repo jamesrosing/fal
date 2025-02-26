@@ -16,7 +16,7 @@ import {
   Link as LinkIcon,
   Image as ImageIcon,
 } from 'lucide-react';
-import { uploadToCloudinary } from '@/lib/cloudinary-client';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 
 interface RichTextEditorProps {
   content: string;

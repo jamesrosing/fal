@@ -1,9 +1,9 @@
-import { getCloudinaryUrl } from './cloudinary';
+import { getCloudinaryImageUrl, ImageArea } from './cloudinary';
 
 // Define the ImageAsset type
 export interface ImageAsset {
   id: string;
-  area: 'hero' | 'gallery' | 'service' | 'team' | 'logo';
+  area: ImageArea;
   description: string;
   publicId: string;
   dimensions?: {
@@ -364,7 +364,7 @@ export function getImageUrl(assetId: string, options: { width?: number; height?:
     ...options
   };
   
-  return getCloudinaryUrl(asset.publicId, asset.area, finalOptions);
+  return getCloudinaryImageUrl(asset.publicId, finalOptions);
 }
 
 // Helper function to update image URL after upload

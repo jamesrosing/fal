@@ -7,7 +7,7 @@ import { ArrowLeft, Trash2, Plus, Save, Loader2, MoveVertical } from 'lucide-rea
 import { useEffect, useState } from 'react';
 import { getCase } from '@/lib/supabase';
 import { CaseViewer } from '@/components/case-viewer';
-import { deleteFromCloudinary, uploadToCloudinary } from '@/lib/cloudinary-client';
+import { deleteFromCloudinary, uploadToCloudinary } from '@/lib/cloudinary';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { 

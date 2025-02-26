@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary-client';
+import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary';
 
 export const runtime = 'edge';
 

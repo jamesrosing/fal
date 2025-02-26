@@ -41,8 +41,8 @@ const menuItems = [
     icon: ImageIcon,
   },
   {
-    title: 'Images',
-    href: '/admin/images',
+    title: 'Media',
+    href: '/admin/media',
     icon: ImageIcon,
   },
   {

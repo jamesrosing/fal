@@ -1,3 +1,9 @@
+/**
+ * @deprecated This file is deprecated and will be removed in a future version.
+ * Please use the unified Cloudinary module from '@/lib/cloudinary' instead.
+ * It provides all the same functionality with improved typings and organization.
+ */
+
 'use client';
 
 export type ImageArea = 

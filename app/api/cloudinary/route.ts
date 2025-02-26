@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
-import cloudinary from '@/lib/cloudinary-server';
-import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary-client';
+import { ImageArea, IMAGE_PLACEMENTS } from '@/lib/cloudinary';
+
+export const runtime = 'edge';
 
 // @deprecated Use /api/upload instead. This route will be removed in a future version.
 // The /api/upload route provides the same functionality with Edge runtime support.
@@ -28,7 +28,7 @@ if (!CLOUDINARY_CLOUD_NAME) {
   throw new Error('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not defined');
 }
 
-function generateSignature(params: Record<string, any>) {
+async function generateSignature(params: Record<string, any>) {
   // Create a copy of params without undefined values and convert objects to strings
   const cleanParams = Object.entries(params)
     .filter(([_, value]) => value !== undefined)
@@ -48,8 +48,14 @@ function generateSignature(params: Record<string, any>) {
   
   console.log('String to sign:', stringToSign);
 
-  // Generate SHA-256 hash
-  return crypto.createHash('sha256').update(stringToSign).digest('hex');
+  // Use Web Crypto API which is available in Edge Runtime
+  const msgUint8 = new TextEncoder().encode(stringToSign);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  
+  // Convert hash to hex string
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 export async function POST(request: Request) {
@@ -86,10 +92,7 @@ export async function POST(request: Request) {
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
 
-      // Convert File to ArrayBuffer
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
+      // Convert File to ArrayBuffer (not needed for Edge, we can pass File directly)
       const timestamp = Math.floor(Date.now() / 1000).toString();
       const tags = [area, section].filter(Boolean);
       const context = {
@@ -107,18 +110,18 @@ export async function POST(request: Request) {
         timestamp,
         folder,
         public_id,
-        context,
+        context: JSON.stringify(context),
         tags: tags.join(','),
         transformation: transformation || undefined,
         upload_preset: CLOUDINARY_UPLOAD_PRESET
       };
 
       // Generate signature
-      const signature = generateSignature(paramsToSign);
+      const signature = await generateSignature(paramsToSign);
 
       // Create form data for Cloudinary
       const uploadFormData = new FormData();
-      uploadFormData.append('file', new Blob([buffer]));
+      uploadFormData.append('file', file); // Now we can directly use the File object
       uploadFormData.append('api_key', CLOUDINARY_API_KEY as string);
       uploadFormData.append('timestamp', timestamp);
       uploadFormData.append('signature', signature);
@@ -185,7 +188,7 @@ export async function POST(request: Request) {
         timestamp
       };
 
-      const signature = generateSignature(paramsToSign);
+      const signature = await generateSignature(paramsToSign);
 
       const deleteFormData = new FormData();
       deleteFormData.append('public_id', public_id);

@@ -19,6 +19,7 @@ const zenotiClient = axios.create({
     'X-Application-Id': ZENOTI_APPLICATION_ID,
     'Accept': 'application/json',
   },
+  timeout: 15000, // 15 second timeout
 });
 
 // Add request interceptor for logging
@@ -42,19 +43,59 @@ if (process.env.NODE_ENV === 'development') {
     response => {
       console.log('Zenoti API Response:', {
         status: response.status,
+        statusText: response.statusText,
         data: response.data,
+        url: response.config?.url,
       });
       return response;
     },
     error => {
       console.error('Zenoti API Error:', {
         status: error.response?.status,
+        statusText: error.response?.statusText,
         data: error.response?.data,
         message: error.message,
+        url: error.config?.url,
+        method: error.config?.method,
+        credentials: {
+          apiKeyLength: ZENOTI_API_KEY?.length || 0,
+          apiSecretLength: ZENOTI_API_SECRET?.length || 0,
+          applicationIdLength: ZENOTI_APPLICATION_ID?.length || 0,
+          apiUrlPresent: !!ZENOTI_API_URL
+        }
       });
+
+      // Enhance error object with more details
+      if (error.response) {
+        error.zenotiDetails = {
+          endpoint: error.config?.url,
+          statusCode: error.response.status,
+          message: error.response.data?.message || error.message,
+          errors: error.response.data?.errors,
+          timestamp: new Date().toISOString()
+        };
+      }
+      
       throw error;
     }
   );
+}
+
+/**
+ * Utility for retrying failed requests
+ */
+export async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (retries <= 0 || (error.response && error.response.status === 401)) {
+      throw error; // Don't retry auth errors or if no retries left
+    }
+    
+    console.log(`Retrying failed request, ${retries} attempts remaining...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return withRetry(fn, retries - 1, delay * 1.5); // Exponential backoff
+  }
 }
 
 export default zenotiClient; 
