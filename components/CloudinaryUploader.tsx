@@ -185,6 +185,8 @@ export function CloudinaryUploader({
       return;
     }
 
+    console.log('Opening Cloudinary upload widget...');
+
     // Prepare context metadata as string
     const contextString = Object.entries(context)
       .map(([key, value]) => `${key}=${value}`)
@@ -219,13 +221,27 @@ export function CloudinaryUploader({
       ...(useUploadPreset ? { uploadPreset, useUploadPreset: true } : { useUploadPreset: false })
     };
 
+    console.log('Widget configuration:', {
+      useUploadPreset, 
+      uploadPreset: useUploadPreset ? uploadPreset : 'Not using upload preset', 
+      folder: folderPath,
+      tags: combinedTags
+    });
+
     setIsOpen(true);
     setUploadedAssets([]);
-    initUploadWidget(options, processResults);
+    
+    try {
+      initUploadWidget(options, processResults);
+      console.log('Widget initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize upload widget:', error);
+      if (onFailure) onFailure({error: 'Failed to initialize upload widget'});
+    }
   }, [
     isScriptLoaded, area, folder, tags, context, resourceType, 
     multiple, maxFiles, cropping, croppingAspectRatio, processResults,
-    useUploadPreset, uploadPreset, showAdvancedOptions, sources
+    useUploadPreset, uploadPreset, showAdvancedOptions, sources, onFailure
   ]);
 
   return (

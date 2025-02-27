@@ -34,28 +34,29 @@ export async function POST(request: NextRequest) {
     
     console.log('Request parameters:', params);
 
-    // Create parameters to sign
-    const timestamp = Math.floor(Date.now() / 1000).toString();
+    // Create parameters to sign - include ALL parameters from the original request
+    // This is critical for the signature to match what Cloudinary expects
+    const timestamp = params.timestamp || Math.floor(Date.now() / 1000).toString();
     
-    // Per Cloudinary's documentation, we only need these key parameters for a valid signature
+    // Create a new object with all original parameters plus timestamp
     const paramsToSign: Record<string, string> = {
-      timestamp,
-      // If a folder is specified, include it
-      ...(params.folder ? { folder: params.folder } : {}),
-      // If tags are specified, include them
-      ...(params.tags ? { tags: params.tags } : {}),
+      ...params,  // Include all original parameters (folder, tags, source, etc.)
+      timestamp   // Add or update the timestamp
     };
+    
+    // Don't include the api_key in the parameters to sign - we'll add it separately
+    delete paramsToSign.api_key;
     
     // Generate signature
     const signature = await generateSignature(paramsToSign);
-    console.log('Generated signature for params:', paramsToSign);
+    console.log('Generated signature for string:', paramsToSign);
 
     // Return all needed parameters for the upload
     return NextResponse.json({
       signature,
       timestamp,
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.CLOUDINARY_API_KEY
+      api_key: process.env.CLOUDINARY_API_KEY,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
     });
   } catch (error) {
     console.error('Error generating signature:', error);
@@ -77,12 +78,14 @@ async function generateSignature(params: Record<string, any>) {
   const apiSecret = process.env.CLOUDINARY_API_SECRET as string;
   
   try {
-    // Add API key to parameters
-    params.api_key = process.env.CLOUDINARY_API_KEY;
+    // Explicitly do NOT add API key to parameters for signature
+    // This aligns with Cloudinary's approach that handles api_key separately
     
     // Create a sorted string of parameters
-    const paramString = Object.keys(params)
-      .sort()
+    const sortedParams = Object.keys(params).sort();
+    
+    // Construct the string to sign with sorted parameters
+    const paramString = sortedParams
       .map(key => `${key}=${params[key]}`)
       .join('&');
       
@@ -93,9 +96,12 @@ async function generateSignature(params: Record<string, any>) {
     const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8); // Cloudinary uses SHA-1
     
     // Convert to hex string
-    return Array.from(new Uint8Array(hashBuffer))
+    const signature = Array.from(new Uint8Array(hashBuffer))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
+      
+    console.log('Generated signature:', signature);
+    return signature;
   } catch (error) {
     console.error('Error in signature generation:', error);
     throw error;

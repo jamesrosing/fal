@@ -160,7 +160,7 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
  */
 export function getCloudinaryImageUrl(
   publicId: string,
-  options: CloudinaryImageOptions = {}
+  options: CloudinaryImageOptions & { simplifiedMode?: boolean } = {}
 ): string {
   if (!publicId) {
     console.error('Missing publicId for Cloudinary image URL');
@@ -169,9 +169,40 @@ export function getCloudinaryImageUrl(
 
   // Clean public ID (remove any existing Cloudinary URL parts)
   const cleanPublicId = publicId.includes('/')
-    ? publicId.split('/').slice(-1)[0]
+    ? publicId
     : publicId;
 
+  const cloudName = typeof process !== 'undefined' 
+    ? process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 
+    : '';
+
+  // For simplified mode, only use essential transformations
+  if (options.simplifiedMode) {
+    const transformations = [];
+    
+    // Add width if specified (most essential transformation)
+    if (options.width) {
+      transformations.push(`w_${options.width}`);
+    }
+    
+    // Add height only if both width and height are needed
+    if (options.height && options.width) {
+      transformations.push(`h_${options.height}`);
+    }
+    
+    // Add crop only for width+height
+    if (options.width && options.height) {
+      transformations.push(`c_${options.crop || 'fill'}`);
+    }
+    
+    const transformationString = transformations.length > 0 
+      ? transformations.join(',') + '/'
+      : '';
+    
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}${cleanPublicId}`;
+  }
+
+  // Standard approach with all transformations
   const transformations: string[] = [];
   
   // Add format
@@ -210,13 +241,9 @@ export function getCloudinaryImageUrl(
     transformations.push('g_auto');
   }
 
-  const cloudName = typeof process !== 'undefined' 
-    ? process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 
-    : '';
-
   const transformationString = transformations.join(',');
   
-  return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}/${publicId}`;
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}/${cleanPublicId}`;
 }
 
 /**
@@ -283,14 +310,15 @@ export function getCloudinaryVideoUrl(
  */
 export function getCloudinaryImageProps(publicId: string, options: CloudinaryImageOptions = {}) {
   return {
-    src: getCloudinaryImageUrl(publicId, options),
+    src: getCloudinaryImageUrl(publicId, { ...options, simplifiedMode: true }),
     width: options.width || 800,
     height: options.height || 600,
     alt: "",
     blurDataURL: getCloudinaryImageUrl(publicId, {
       width: 10,
       quality: 30,
-      format: 'webp'
+      format: 'webp',
+      simplifiedMode: true
     }),
     placeholder: "blur" as const
   };
@@ -509,7 +537,7 @@ export function initUploadWidget(options: UploadWidgetOptions, callback: (error:
     if (window.cloudinary) {
       clearInterval(checkWidgetReady);
       
-      const cloudName = options.cloudName || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || options.cloudName;
       
       // Base widget options without authentication yet
       const widgetOptions: Record<string, any> = {
@@ -558,9 +586,10 @@ export function initUploadWidget(options: UploadWidgetOptions, callback: (error:
  */
 async function generateSignatureCallback(callback: Function, params: Record<string, any>) {
   try {
-    console.log('Generating signature for params:', params);
+    console.log('Widget requesting signature for params:', params);
     
-    // Create form data with parameters
+    // Create form data with ALL parameters from the widget
+    // This is critical to match what Cloudinary expects in the signature
     const formData = new FormData();
     for (const key in params) {
       formData.append(key, params[key]);
@@ -581,10 +610,26 @@ async function generateSignatureCallback(callback: Function, params: Record<stri
     }
     
     const data = await response.json();
-    console.log('Signature response:', data);
+    console.log('Signature response from server:', data);
     
-    // Return just the signature string as expected by the widget
-    callback(data.signature);
+    // Return EXACTLY these parameters in this format
+    // Cloudinary widget expects these specific keys
+    const signatureData: Record<string, any> = {
+      signature: data.signature,
+      api_key: data.api_key,
+      timestamp: data.timestamp
+    };
+    
+    // Add any additional parameters from the original widget request
+    // (except those that are handled separately)
+    for (const key in params) {
+      if (key !== 'timestamp' && key !== 'api_key' && key !== 'callback') {
+        signatureData[key] = params[key];
+      }
+    }
+    
+    console.log('Returning signature data to widget:', signatureData);
+    callback(signatureData);
   } catch (error) {
     console.error('Error generating signature:', error);
     // Return null to let the widget try its default approach

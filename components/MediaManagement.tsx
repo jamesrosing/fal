@@ -67,12 +67,26 @@ import {
   Image as ImageIcon,
   Video,
   LayoutGrid,
-  PlusCircle
+  PlusCircle,
+  FolderTree,
+  CheckSquare2,
+  FileSymlink,
+  FolderInput,
+  SlidersHorizontal,
+  AlertCircle,
+  Camera
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface MediaQueryParams {
   area?: ImageArea | 'all';
@@ -93,6 +107,32 @@ interface MediaManagementProps {
   uploadFolder?: string;
   viewMode?: 'grid' | 'list';
   allowedResourceTypes?: ('image' | 'video')[];
+}
+
+interface FolderStructure {
+  name: string;
+  path: string;
+  children: FolderStructure[];
+}
+
+interface AssetUsage {
+  page: string;
+  component: string;
+  usage: string;
+}
+
+interface DuplicateGroup {
+  publicIds: string[];
+  similarity: number;
+  assets?: Array<{
+    publicId: string;
+    url?: string;
+    width?: number;
+    height?: number;
+    format?: string;
+    created?: string;
+  }>;
+  criteria?: string;
 }
 
 /**
@@ -131,6 +171,43 @@ export function MediaManagement({
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [organizeFolders, setOrganizeFolders] = useState<string[]>([]);
   const [organizeTags, setOrganizeTags] = useState<string[]>([]);
+  
+  // Add these states to your component
+  const [folderStructure, setFolderStructure] = useState<FolderStructure[]>([]);
+  const [currentFolder, setCurrentFolder] = useState<string>('');
+  const [breadcrumbs, setBreadcrumbs] = useState<{name: string, path: string}[]>([]);
+  const [showUsage, setShowUsage] = useState<boolean>(false);
+  const [assetUsage, setAssetUsage] = useState<Record<string, AssetUsage[]>>({});
+  const [duplicateGroups, setDuplicateGroups] = useState<DuplicateGroup[]>([]);
+  const [showDuplicates, setShowDuplicates] = useState<boolean>(false);
+  const [loadingDuplicates, setLoadingDuplicates] = useState<boolean>(false);
+  
+  // Add immediately after the other states in the component
+  const [queryParams, setQueryParams] = useState<{
+    area?: ImageArea | 'all';
+    folder?: string;
+    tag?: string;
+    resourceType?: 'image' | 'video' | 'all';
+    searchTerm?: string;
+  }>({
+    area: initialArea,
+    resourceType: 'all',
+    folder: '',
+    tag: '',
+    searchTerm: ''
+  });
+  
+  // Add immediately after the organizeTags state declaration
+  // Define area options for filtering
+  const areaOptions = [
+    { label: 'Hero Images', value: 'hero' },
+    { label: 'Gallery', value: 'gallery' },
+    { label: 'Team', value: 'team' },
+    { label: 'Article', value: 'article' },
+    { label: 'Service', value: 'service' },
+    { label: 'Logo', value: 'logo' },
+    { label: 'Video Thumbnail', value: 'video-thumbnail' }
+  ];
   
   // Load available folders and tags for organization
   useEffect(() => {
@@ -306,6 +383,9 @@ export function MediaManagement({
     const isSelected = selectedAssets.some(a => a.publicId === asset.publicId);
     const isImage = asset.resourceType === 'image';
     
+    const usage = showUsage ? getAssetUsageInfo(asset.publicId) : [];
+    const hasUsage = usage.length > 0;
+    
     if (viewMode === 'grid') {
       return (
         <Card 
@@ -392,6 +472,28 @@ export function MediaManagement({
                 </Badge>
               )}
             </CardFooter>
+          )}
+          {showUsage && (
+            <div className="absolute top-2 right-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div 
+                      className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        hasUsage ? 'bg-green-500' : 'bg-gray-500'
+                      }`}
+                    >
+                      <FileSymlink className="w-3 h-3 text-white" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {hasUsage 
+                      ? `Used in ${usage.length} place${usage.length > 1 ? 's' : ''}`
+                      : 'Not used in any tracked components'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           )}
         </Card>
       );
@@ -661,337 +763,378 @@ export function MediaManagement({
     );
   };
   
+  // Add these functions to your component
+  const fetchFolderStructure = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/cloudinary/folders');
+      const data = await response.json();
+      
+      if (data.success && data.folderStructure) {
+        setFolderStructure(data.folderStructure);
+      } else {
+        console.error('Failed to fetch folder structure:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching folder structure:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const navigateToFolder = (path: string) => {
+    setCurrentFolder(path);
+    
+    // Update breadcrumbs
+    if (!path) {
+      setBreadcrumbs([]);
+    } else {
+      const parts = path.split('/');
+      const crumbs = [];
+      let currentPath = '';
+      
+      for (const part of parts) {
+        currentPath = currentPath ? `${currentPath}/${part}` : part;
+        crumbs.push({
+          name: part,
+          path: currentPath
+        });
+      }
+      
+      setBreadcrumbs(crumbs);
+    }
+    
+    // Update query parameters and fetch assets for this folder
+    setQueryParams(prevParams => ({
+      ...prevParams,
+      folder: path || undefined
+    }));
+  };
+
+  const fetchAssetUsage = useCallback(async () => {
+    try {
+      const response = await fetch('/api/cloudinary/asset-usage');
+      const data = await response.json();
+      
+      if (data.success && data.usage) {
+        setAssetUsage(data.usage);
+      } else {
+        console.error('Failed to fetch asset usage:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching asset usage:', error);
+    }
+  }, []);
+
+  const findDuplicates = useCallback(async () => {
+    try {
+      setLoadingDuplicates(true);
+      const response = await fetch('/api/cloudinary/duplicates', {
+        method: 'GET', // Using the basic duplicate detection
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.potentialDuplicates) {
+        setDuplicateGroups(data.potentialDuplicates);
+        setShowDuplicates(true);
+      } else {
+        alert('No duplicate assets found.');
+        setShowDuplicates(false);
+      }
+    } catch (error) {
+      console.error('Error finding duplicates:', error);
+      alert('Failed to find duplicates. See console for details.');
+    } finally {
+      setLoadingDuplicates(false);
+    }
+  }, []);
+
+  const getAssetUsageInfo = (publicId: string) => {
+    return assetUsage[publicId] || [];
+  };
+
+  // Add these useEffects to your component initialization
+  useEffect(() => {
+    fetchFolderStructure();
+  }, [fetchFolderStructure]);
+
+  useEffect(() => {
+    if (showUsage) {
+      fetchAssetUsage();
+    }
+  }, [showUsage, fetchAssetUsage]);
+  
+  // Render folder tree structure recursively
+  const renderFolderTree = (folders: FolderStructure[], level = 0) => {
+    return (
+      <div className={`pl-${level > 0 ? 4 : 0}`}>
+        {folders.map((folder) => (
+          <div key={folder.path} className="my-1">
+            <button
+              onClick={() => navigateToFolder(folder.path)}
+              className={`flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left ${
+                currentFolder === folder.path ? 'bg-primary/20 font-medium' : ''
+              }`}
+            >
+              <FolderInput className="w-4 h-4 mr-2" />
+              <span>{folder.name}</span>
+            </button>
+            
+            {folder.children.length > 0 && (
+              <div className="pl-4 mt-1">
+                {renderFolderTree(folder.children, level + 1)}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
   return (
-    <div className="w-full h-full flex flex-col">
-      {/* Header with search and filters */}
-      <div className="flex flex-col gap-4 p-4 border-b">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Media Library</h2>
-          
-          <div className="flex items-center gap-2">
-            {/* View mode toggle */}
-            <div className="flex items-center rounded-md overflow-hidden border">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                size="sm"
-                className="rounded-none h-8"
-                onClick={() => setViewMode('grid')}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
-                size="sm"
-                className="rounded-none h-8"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            {/* Selection actions - visible when items are selected */}
-            {selectedAssets.length > 0 && (
-              <div className="flex items-center">
-                <span className="text-sm mr-2">
-                  {selectedAssets.length} selected
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedAssets([])}
-                >
-                  Clear
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Organize
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Organize Assets</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleOrganize({ folder: 'gallery' })}>
-                      <Folder className="mr-2 h-4 w-4" />
-                      Move to Gallery
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleOrganize({ tags: ['featured'] })}>
-                      <Tag className="mr-2 h-4 w-4" />
-                      Add "featured" Tag
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={() => {
-                    // Bulk delete confirmation
-                    if (confirm(`Are you sure you want to delete ${selectedAssets.length} assets?`)) {
-                      Promise.all(selectedAssets.map(asset => deleteFromCloudinary(asset.publicId)))
-                        .then(() => {
-                          toast({
-                            title: 'Assets Deleted',
-                            description: `Successfully deleted ${selectedAssets.length} assets.`,
-                          });
-                          setSelectedAssets([]);
-                          loadAssets(true);
-                        })
-                        .catch((error) => {
-                          console.error('Failed to delete assets:', error);
-                          toast({
-                            title: 'Error',
-                            description: 'Failed to delete some assets. Please try again.',
-                            variant: 'destructive'
-                          });
-                        });
-                    }
-                  }}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </Button>
-              </div>
-            )}
-            
-            {/* Upload button */}
-            {showUploadButton && (
-              <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Upload Media</DialogTitle>
-                    <DialogDescription>
-                      Upload new images or videos to your media library
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  <Tabs defaultValue="upload">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="upload">Upload</TabsTrigger>
-                      <TabsTrigger value="options">Options</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="upload" className="pt-4">
-                      <CloudinaryUploader
-                        multiple={true}
-                        maxFiles={10}
-                        onSuccess={handleUploadSuccess}
-                        area={uploadArea}
-                        folder={uploadFolder}
-                        resourceType="auto"
-                        buttonLabel="Upload Media Files"
-                        buttonClassName="w-full"
-                      />
-                    </TabsContent>
-                    
-                    <TabsContent value="options" className="pt-4 space-y-4">
-                      <div>
-                        <Label htmlFor="upload-area">Media Area</Label>
-                        <Select defaultValue={uploadArea || "gallery"}>
-                          <SelectTrigger id="upload-area">
-                            <SelectValue placeholder="Select area" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hero">Hero Images</SelectItem>
-                            <SelectItem value="gallery">Gallery</SelectItem>
-                            <SelectItem value="article">Article Images</SelectItem>
-                            <SelectItem value="team">Team</SelectItem>
-                            <SelectItem value="service">Services</SelectItem>
-                            <SelectItem value="logo">Logos</SelectItem>
-                            <SelectItem value="video-thumbnail">Video Thumbnails</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="upload-tags">Tags</Label>
-                        <Input id="upload-tags" placeholder="Comma-separated tags" />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Example: featured, homepage, summer-2023
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox id="upload-cropping" />
-                        <label
-                          htmlFor="upload-cropping"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Enable cropping tool
-                        </label>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
+    <div className="flex h-full">
+      {/* Sidebar with folders */}
+      <div className="w-64 border-r h-full flex flex-col bg-card">
+        <div className="p-4 border-b">
+          <h3 className="font-medium text-sm">Media Organization</h3>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="relative flex-grow">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search media..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        <ScrollArea className="flex-grow">
+          <div className="p-4">
+            <Accordion type="single" collapsible defaultValue="folders">
+              <AccordionItem value="folders">
+                <AccordionTrigger className="text-sm">
+                  <div className="flex items-center">
+                    <FolderTree className="w-4 h-4 mr-2" />
+                    Folders
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="mt-2">
+                    <button
+                      onClick={() => navigateToFolder('')}
+                      className={`flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left ${
+                        !currentFolder ? 'bg-primary/20 font-medium' : ''
+                      }`}
+                    >
+                      <FolderInput className="w-4 h-4 mr-2" />
+                      <span>All Assets</span>
+                    </button>
+                    
+                    {renderFolderTree(folderStructure)}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="areas">
+                <AccordionTrigger className="text-sm">
+                  <div className="flex items-center">
+                    <SlidersHorizontal className="w-4 h-4 mr-2" />
+                    Areas
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-1 mt-2">
+                    <button
+                      onClick={() => setQueryParams(prevParams => ({ ...prevParams, area: 'all' }))}
+                      className={`flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left ${
+                        queryParams.area === 'all' ? 'bg-primary/20 font-medium' : ''
+                      }`}
+                    >
+                      All Areas
+                    </button>
+                    
+                    {areaOptions.map(area => (
+                      <button
+                        key={area.value}
+                        onClick={() => setQueryParams(prevParams => ({ ...prevParams, area: area.value as any }))}
+                        className={`flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left ${
+                          queryParams.area === area.value ? 'bg-primary/20 font-medium' : ''
+                        }`}
+                      >
+                        {area.label}
+                      </button>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              
+              <AccordionItem value="tools">
+                <AccordionTrigger className="text-sm">
+                  <div className="flex items-center">
+                    <Camera className="w-4 h-4 mr-2" />
+                    Tools
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2 mt-2">
+                    <button
+                      onClick={() => setShowUsage(!showUsage)}
+                      className={`flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left ${
+                        showUsage ? 'bg-primary/20 font-medium' : ''
+                      }`}
+                    >
+                      <FileSymlink className="w-4 h-4 mr-2" />
+                      {showUsage ? 'Hide Usage Info' : 'Show Usage Info'}
+                    </button>
+                    
+                    <button
+                      onClick={findDuplicates}
+                      disabled={loadingDuplicates}
+                      className="flex items-center px-2 py-1 text-sm rounded hover:bg-primary/10 w-full text-left"
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      {loadingDuplicates ? 'Scanning...' : 'Find Duplicates'}
+                    </button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </ScrollArea>
+      </div>
+      
+      {/* Main content */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* Toolbar */}
+        <div className="p-4 border-b flex items-center justify-between">
+          {/* Breadcrumbs */}
+          <div className="flex items-center text-sm">
+            <button
+              onClick={() => navigateToFolder('')}
+              className="hover:underline"
+            >
+              Root
+            </button>
+            
+            {breadcrumbs.map((crumb, index) => (
+              <span key={crumb.path} className="flex items-center">
+                <span className="mx-2 text-gray-500">/</span>
+                <button
+                  onClick={() => navigateToFolder(crumb.path)}
+                  className={`hover:underline ${
+                    index === breadcrumbs.length - 1 ? 'font-medium' : ''
+                  }`}
+                >
+                  {crumb.name}
+                </button>
+              </span>
+            ))}
           </div>
           
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={() => loadAssets(true)}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+          {/* View options and upload button (your existing code) */}
         </div>
         
-        {/* Filters */}
-        {showFilters && (
-          <div className="grid grid-cols-4 gap-4 p-4 border rounded-md bg-muted/50">
+        {/* Duplicate warning banner */}
+        {showDuplicates && duplicateGroups.length > 0 && (
+          <div className="bg-amber-50 border-amber-200 border-y p-3 text-amber-800 flex items-center space-x-2">
+            <AlertCircle className="w-5 h-5 text-amber-600" />
             <div>
-              <Label htmlFor="filter-area">Area</Label>
-              <Select 
-                value={selectedArea} 
-                onValueChange={(value) => setSelectedArea(value as ImageArea | 'all')}
-              >
-                <SelectTrigger id="filter-area">
-                  <SelectValue placeholder="All areas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Areas</SelectItem>
-                  <SelectItem value="hero">Hero</SelectItem>
-                  <SelectItem value="gallery">Gallery</SelectItem>
-                  <SelectItem value="article">Article</SelectItem>
-                  <SelectItem value="team">Team</SelectItem>
-                  <SelectItem value="service">Service</SelectItem>
-                  <SelectItem value="logo">Logo</SelectItem>
-                  <SelectItem value="video-thumbnail">Video Thumbnail</SelectItem>
-                </SelectContent>
-              </Select>
+              <span className="font-medium">Found {duplicateGroups.length} potential duplicate groups.</span> 
+              <span className="ml-2">Review and delete unnecessary duplicates to free up storage space.</span>
             </div>
-            
-            <div>
-              <Label htmlFor="filter-type">Type</Label>
-              <Select 
-                value={selectedResourceType} 
-                onValueChange={(value) => setSelectedResourceType(value as 'image' | 'video' | 'all')}
-              >
-                <SelectTrigger id="filter-type">
-                  <SelectValue placeholder="All types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="image">Images</SelectItem>
-                  <SelectItem value="video">Videos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="filter-folder">Folder</Label>
-              <Select 
-                value={selectedFolder} 
-                onValueChange={setSelectedFolder}
-              >
-                <SelectTrigger id="filter-folder">
-                  <SelectValue placeholder="All folders" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Folders</SelectItem>
-                  {organizeFolders.map(folder => (
-                    <SelectItem key={folder} value={folder}>{folder}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="filter-tag">Tag</Label>
-              <Select 
-                value={selectedTag} 
-                onValueChange={setSelectedTag}
-              >
-                <SelectTrigger id="filter-tag">
-                  <SelectValue placeholder="All tags" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Tags</SelectItem>
-                  {organizeTags.map(tag => (
-                    <SelectItem key={tag} value={tag}>{tag}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <button 
+              onClick={() => setShowDuplicates(false)}
+              className="ml-auto text-amber-600 hover:text-amber-900"
+            >
+              Hide
+            </button>
           </div>
         )}
-      </div>
-      
-      {/* Media Grid/List */}
-      <div className="flex-grow overflow-auto p-4">
-        {loading && assets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="animate-spin w-10 h-10 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
-            <p className="text-muted-foreground">Loading media assets...</p>
-          </div>
-        ) : assets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-muted-foreground mb-4">No media assets found</p>
-            <Button onClick={() => setUploadDialogOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Media
-            </Button>
-          </div>
-        ) : (
-          <>
-            {viewMode === 'grid' ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {assets.map(asset => renderAssetItem(asset))}
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {assets.map(asset => renderAssetItem(asset))}
-              </div>
-            )}
-            
-            {hasMore && (
-              <div className="flex justify-center mt-8">
-                <Button 
-                  variant="outline"
-                  disabled={loading}
-                  onClick={() => loadAssets()}
-                >
-                  {loading ? (
-                    <>
-                      <div className="animate-spin w-4 h-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                      Loading...
-                    </>
-                  ) : (
-                    'Load More'
-                  )}
-                </Button>
-              </div>
-            )}
-          </>
+        
+        {/* Main content area (your existing code for asset grid or list) */}
+        
+        {/* Duplicate assets modal */}
+        {showDuplicates && (
+          <Dialog open={showDuplicates} onOpenChange={setShowDuplicates}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+              <DialogHeader>
+                <DialogTitle>Potential Duplicate Assets</DialogTitle>
+                <DialogDescription>
+                  Review these assets that appear to be duplicates. Keep the one you want to use and delete the others.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <ScrollArea className="flex-grow">
+                <div className="space-y-8 p-4">
+                  {duplicateGroups.map((group, groupIndex) => (
+                    <div key={groupIndex} className="border rounded-lg overflow-hidden">
+                      <div className="bg-muted p-3 flex justify-between items-center">
+                        <h3 className="font-medium">Duplicate Group #{groupIndex + 1}</h3>
+                        <span className="text-sm text-muted-foreground">
+                          {group.publicIds?.length || group.assets?.length} similar items
+                        </span>
+                      </div>
+                      
+                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(group.assets || group.publicIds.map(id => ({ 
+                          publicId: id 
+                        }))).map((asset, assetIndex) => (
+                          <div key={assetIndex} className="border rounded-md overflow-hidden">
+                            <div className="aspect-square relative">
+                              <CloudinaryImage
+                                publicId={asset.publicId}
+                                alt={`Duplicate ${assetIndex + 1}`}
+                                options={{ width: 300, height: 300, crop: 'fill' }}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            
+                            <div className="p-2 bg-card">
+                              <p className="text-xs truncate">{asset.publicId}</p>
+                              {typeof asset !== 'string' && 
+                               'created' in asset && 
+                               typeof asset.created === 'string' && (
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {new Date(asset.created).toLocaleDateString()}
+                                </p>
+                              )}
+                              
+                              <div className="flex mt-2">
+                                <button
+                                  onClick={() => handleDelete({ publicId: asset.publicId } as CloudinaryAsset)}
+                                  className="flex items-center text-xs text-red-600 hover:text-red-800"
+                                >
+                                  <Trash2 className="w-3 h-3 mr-1" />
+                                  Delete
+                                </button>
+                                
+                                <button
+                                  onClick={() => {
+                                    // Keep this asset, view it in the main library
+                                    setShowDuplicates(false);
+                                    setQueryParams({
+                                      searchTerm: asset.publicId.split('/').pop() || '',
+                                      area: 'all',
+                                      resourceType: 'all'
+                                    });
+                                  }}
+                                  className="flex items-center text-xs ml-auto"
+                                >
+                                  <CheckSquare2 className="w-3 h-3 mr-1" />
+                                  Keep
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+              
+              <DialogFooter>
+                <Button onClick={() => setShowDuplicates(false)}>Close</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
-      
-      {/* Edit asset dialog */}
-      {renderAssetEditDialog()}
     </div>
   );
 }
