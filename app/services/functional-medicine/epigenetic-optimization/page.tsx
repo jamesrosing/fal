@@ -72,7 +72,7 @@ export default function EpigeneticPage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-epigenetic.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133466/articles/categories/functional-medicine-epigenetic.png"
             alt="Epigenetic Optimization Services"
             fill
             className="object-cover"

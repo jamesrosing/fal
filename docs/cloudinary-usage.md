@@ -5,14 +5,15 @@ This document provides a comprehensive guide to the unified Cloudinary integrati
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Utility Functions](#utility-functions)
-3. [Components](#components)
-4. [API Routes](#api-routes)
-5. [Image Areas and Placements](#image-areas-and-placements)
-6. [Best Practices](#best-practices)
-7. [Media Management System](#media-management-system)
-8. [Testing Your Implementation](#testing-your-implementation)
-9. [Migration Guide](#migration-guide)
+2. [Environment Configuration](#environment-configuration)
+3. [Utility Functions](#utility-functions)
+4. [Components](#components)
+5. [API Routes](#api-routes)
+6. [Image Areas and Placements](#image-areas-and-placements)
+7. [Best Practices](#best-practices)
+8. [Media Management System](#media-management-system)
+9. [Testing Your Implementation](#testing-your-implementation)
+10. [Migration Guide](#migration-guide)
 
 ## Overview
 
@@ -24,6 +25,47 @@ Our application uses Cloudinary for all media asset management. This includes:
 
 We've implemented a unified approach to Cloudinary integration to ensure consistency, performance, and maintainability across the application.
 
+## Environment Configuration
+
+To use Cloudinary in your application, you need to set up the proper environment variables:
+
+```
+# .env.local
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_UPLOAD_PRESET=your_unsigned_upload_preset  # Optional, for client-side uploads
+```
+
+### Required Variables
+
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name (publicly accessible).
+- `CLOUDINARY_API_KEY`: Your Cloudinary API key (keep secure, server-side only).
+- `CLOUDINARY_API_SECRET`: Your Cloudinary API secret (keep secure, server-side only).
+- `CLOUDINARY_UPLOAD_PRESET`: An optional unsigned upload preset for client-side uploads.
+
+### Configuration in the Application
+
+The application loads these environment variables in `lib/cloudinary.ts`:
+
+```typescript
+// Client-side configuration
+export const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
+export const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '';
+export const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fal_uploads';
+
+// Server-side configuration (only used in server components/API routes)
+export const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
+```
+
+### Troubleshooting Environment Issues
+
+- If images fail to load, check that your `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is correctly set.
+- For upload failures, verify your API key, secret, and upload preset.
+- For production deployments, ensure all environment variables are properly configured in your hosting platform.
+
+Remember to keep your local development environment in sync with your production Cloudinary setup by using consistent folder structures across environments.
+
 ## Utility Functions
 
 All Cloudinary utility functions are centralized in the `lib/cloudinary.ts` file. This file provides:
@@ -32,7 +74,7 @@ All Cloudinary utility functions are centralized in the `lib/cloudinary.ts` file
 
 ```typescript
 // Generate an optimized image URL
-const imageUrl = getCloudinaryImageUrl('public-id', {
+const imageUrl = getCloudinaryUrl('public-id', {
   width: 800,
   height: 600,
   crop: 'fill',
@@ -505,5 +547,167 @@ If you're migrating from the old approach to our unified Cloudinary integration:
    import { getCloudinaryUrl } from '@/lib/cloudinary-client';
 
    // After
-   import { uploadToCloudinary, getCloudinaryImageUrl } from '@/lib/cloudinary';
-   ``` 
+   import { uploadToCloudinary, getCloudinaryUrl } from '@/lib/cloudinary';
+   ```
+
+## Cloudinary Folder Organization
+
+Proper folder organization is critical for efficiently managing your media assets. Our application uses two main approaches to folder structure:
+
+### URL-Based Structure
+
+The recommended approach is to mirror your website's URL structure in your Cloudinary folders. This makes it easy to find images for specific pages:
+
+```
+/services/dermatology/
+/services/plastic-surgery/
+/services/medical-spa/
+/about/team/
+/gallery/before-after/
+```
+
+### Content Type Structure
+
+Alternatively, you can organize by content type, which is useful for reusable assets:
+
+```
+/hero-banners/
+/team-members/
+/services/
+/galleries/
+```
+
+### Guidelines for Folder Organization
+
+1. **Avoid Duplicate Folders**: Do not create similarly named folders like `services-dermatology` and `services/dermatology`. Use one consistent pattern.
+
+2. **Use Hierarchical Structure**: Prefer `/services/dermatology/` over flatter structures like `/services-dermatology/`.
+
+3. **Consistent Naming Conventions**: Use kebab-case for folder names (e.g., `team-members` instead of `team_members` or `TeamMembers`).
+
+4. **Limit Nesting Depth**: Keep folder nesting to 3-4 levels maximum for better manageability.
+
+5. **Public ID Prefix Conventions**: When referencing images, use the full path as the public ID:
+   ```tsx
+   // For an image in the /services/dermatology/ folder
+   <CloudinaryImage publicId="services/dermatology/acne-treatment" alt="Acne Treatment" />
+   ```
+
+6. **Shared Resource Folders**: Create a `/common/` or `/shared/` folder for assets used across multiple sections.
+
+### Recommended Folder Structure
+
+```
+/hero/                       # Main hero banners
+  /homepage/
+  /services/
+  /about/
+/services/                   # All service-related images
+  /dermatology/
+  /plastic-surgery/
+  /medical-spa/
+/team/                       # Team member photos
+  /doctors/
+  /staff/
+/gallery/                    # Gallery images
+  /before-after/
+  /treatments/
+/common/                     # Shared resources
+  /logos/
+  /icons/
+  /backgrounds/
+```
+
+### Transitioning from a Disorganized Structure
+
+If you need to reorganize your Cloudinary folders:
+
+1. Create the new folder structure first
+2. Upload new assets to the correct folders
+3. Move existing assets to the proper folders using the Cloudinary Media Library or API
+4. Update references in your code to the new public IDs
+5. Use the migration scripts to ensure all references are updated
+
+Remember to keep your local development environment in sync with your production Cloudinary setup by using consistent folder structures across environments.
+
+## Troubleshooting
+
+Here are solutions for common issues you might encounter when working with Cloudinary:
+
+### Image Loading Issues
+
+1. **Images Not Loading**
+   - Check your `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is correctly set
+   - Verify the publicId is correct (including folder structure)
+   - Ensure you're using the correct format (e.g., `publicId="services/dermatology/image"` not `publicId="services-dermatology-image"`)
+   - Check the browser console for errors
+
+2. **Broken Images After Migration**
+   - Make sure you've run the migration scripts completely
+   - Check for typos in folder paths or publicIds
+   - Use the `CloudinaryImage` component with proper error handling
+
+3. **Slow Loading Images**
+   - Ensure you're using appropriate transformations (width/height)
+   - Add format and quality parameters (f_auto, q_auto)
+   - Consider implementing responsive sizing with srcset
+
+### Upload Issues
+
+1. **Upload Failures**
+   - Verify your API key and secret are correct
+   - Check that your upload preset exists and is properly configured
+   - Ensure the file size is within limits
+   - Look for CORS issues if uploading from the browser
+
+2. **Wrong Folder Uploads**
+   - Confirm folder paths in upload configuration
+   - Ensure folders exist in Cloudinary before uploading
+
+3. **Duplicate Assets**
+   - Use the `use_filename` parameter to maintain original filenames
+   - Consider enabling `unique_filename: false` for more predictable names
+
+### Component Issues
+
+1. **CloudinaryImage Errors**
+   - Check for missing required props (publicId, alt)
+   - Verify the import path is correct (`import { CloudinaryImage } from '@/components/CloudinaryImage'`)
+   - Ensure you're passing options correctly
+
+2. **Placeholder/Blur Issues**
+   - Verify that blurDataURL is being generated
+   - Check that placeholder="blur" is correctly set
+
+### Common Error Messages
+
+1. **"Resource not found"**
+   - The publicId doesn't exist in your Cloudinary account
+   - Check for typos in the publicId
+   - Verify the asset exists in the specified folder
+
+2. **"Invalid transformation"**
+   - Review your transformation parameters
+   - Ensure you have access to the specified transformations in your plan
+
+3. **"Missing required parameter"**
+   - Check that all required props are provided to components
+   - Verify API calls include necessary parameters
+
+### Debugging Tips
+
+1. **Use the Cloudinary URL Debugger**
+   - Log the full URL being generated (`console.log(getCloudinaryUrl(publicId, options))`)
+   - Test the URL directly in the browser
+
+2. **Check Network Requests**
+   - Use browser dev tools to inspect image requests
+   - Look for 4xx or 5xx errors in the Network tab
+
+3. **Component Debugging**
+   - Add console logs to component lifecycle methods
+   - Use the React DevTools to inspect props and state
+
+## Testing Your Implementation
+
+// ... existing code ... 

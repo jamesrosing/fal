@@ -82,19 +82,37 @@ export function SiteMediaManager({ initialActivePageId }: SiteMediaManagerProps)
     const fetchSiteStructure = async () => {
       try {
         setLoading(true);
-        // In a real implementation, this would fetch from an API
-        // For now, we'll use mock data
+        console.log('Fetching site media structure from API...');
+        // Fetch actual site structure from API
+        const response = await fetch('/api/site/media-map');
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`API Error (${response.status}):`, errorText);
+          throw new Error(`Failed to fetch site media structure: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Site structure data received:', data);
+        setSitePages(data);
+        
+        if (!activePageId && data.length > 0) {
+          setActivePageId(data[0].id);
+        }
+      } catch (error) {
+        console.error('Error fetching site structure:', error);
+        // Fallback to mock data if API fails
+        console.log('Falling back to mock data');
         const mockSiteStructure = getMockSiteStructure();
         setSitePages(mockSiteStructure);
         
         if (!activePageId && mockSiteStructure.length > 0) {
           setActivePageId(mockSiteStructure[0].id);
         }
-      } catch (error) {
-        console.error('Error fetching site structure:', error);
+        
         toast({
           title: 'Error',
-          description: 'Failed to load site media structure',
+          description: 'Failed to load dynamic site media structure. Using fallback data.',
           variant: 'destructive',
         });
       } finally {

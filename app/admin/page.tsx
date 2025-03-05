@@ -19,7 +19,7 @@ import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useDropzone } from 'react-dropzone'
-import { uploadToCloudinary, deleteFromCloudinary, getCloudinaryImageUrl } from "@/lib/cloudinary"
+import { uploadToCloudinary, deleteFromCloudinary, getCloudinaryUrl } from "@/lib/cloudinary"
 import { resizeImage } from "@/lib/utils"
 import {
   AlertDialog,

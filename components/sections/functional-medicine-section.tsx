@@ -38,7 +38,7 @@ export function FunctionalMedicineSection() {
         {/* Image Container */}
         <div className="w-full h-[40vh] lg:h-screen relative overflow-hidden">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dr.%20pooja%20gidwani%20functional%20medicine-Bu2sPZSjIHB98KY4WsMna2D9ii12tL.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133483/uncategorized/dr.png"
             alt="Dr. Gidwani consulting with patient"
             fill
             className="object-cover object-center"

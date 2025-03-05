@@ -1,11 +1,14 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { 
-  getCloudinaryVideoUrl, 
-  getCloudinaryVideoSources, 
-  getCloudinaryImageUrl,
-  CloudinaryVideoOptions 
+import {
+  getCloudinaryUrl,
+  getCloudinaryVideoUrl,
+  getCloudinaryVideoSources,
+  CloudinaryVideoOptions,
+  CloudinaryImageOptions,
+  ImageFormat,
+  VideoFormat
 } from '@/lib/cloudinary';
 
 export interface CloudinaryVideoProps {
@@ -100,11 +103,11 @@ export function CloudinaryVideo({
 
   // Generate poster image URL from the video or custom thumbnail
   const posterUrl = thumbnailOptions.publicId
-    ? getCloudinaryImageUrl(thumbnailOptions.publicId, {
+    ? getCloudinaryUrl(thumbnailOptions.publicId, {
         format: thumbnailOptions.format || 'auto',
         quality: thumbnailOptions.quality || 80
       })
-    : getCloudinaryImageUrl(`${publicId.replace(/\.[^/.]+$/, '')}.jpg`, {
+    : getCloudinaryUrl(`${publicId.replace(/\.[^/.]+$/, '')}.jpg`, {
         format: 'auto',
         quality: 70
       });

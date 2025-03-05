@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image, { ImageProps } from 'next/image';
 import { 
-  getCloudinaryImageUrl, 
+  getCloudinaryUrl, 
   getCloudinaryImageProps, 
   CloudinaryImageOptions, 
   ImageArea 
@@ -65,23 +65,31 @@ export function CloudinaryImage({
     // Generate the appropriate URL based on current state
     if (publicId) {
       // Always start with simplified mode
-      const url = getCloudinaryImageUrl(publicId, { ...options, simplifiedMode: true });
-      setImageUrl(url);
+      const url = getCloudinaryUrl(publicId, { ...options, simplifiedMode: true });
+      setImageUrl(url || '');
       console.log(`Setting image URL for ${publicId}: ${url}`);
+    } else {
+      // Make sure imageUrl is never empty
+      setImageUrl('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODgiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==');
     }
   }, [publicId, options]);
 
   // Handle missing or empty publicId
-  if (!publicId) {
-    console.warn('CloudinaryImage: Missing publicId');
-    return fallbackSrc ? (
+  if (!publicId || publicId === '') {
+    console.warn('CloudinaryImage: Missing or empty publicId');
+    // Use an inline data URI as a fallback to avoid network requests
+    const fallbackImageSrc = fallbackSrc || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODgiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==";
+    
+    return (
       <Image
-        src={fallbackSrc}
-        alt={alt}
+        src={fallbackImageSrc}
+        alt={alt || "Placeholder image"}
+        width={options.width || props.width || 200}
+        height={options.height || props.height || 150}
         className={`${className} ${expandOnHover ? 'transition-transform hover:scale-105' : ''}`}
         {...props}
       />
-    ) : null;
+    );
   }
 
   // Get image props from Cloudinary (for blur data)
@@ -99,8 +107,8 @@ export function CloudinaryImage({
       
       // Try the other URL format
       const newUrl = !useSimpleUrl 
-        ? getCloudinaryImageUrl(publicId, { ...options, simplifiedMode: true })
-        : getCloudinaryImageUrl(publicId, options);
+        ? getCloudinaryUrl(publicId, { ...options, simplifiedMode: true })
+        : getCloudinaryUrl(publicId, options);
       
       console.log(`New URL: ${newUrl}`);
       setUseSimpleUrl(!useSimpleUrl);
@@ -127,10 +135,10 @@ export function CloudinaryImage({
     <div className="relative">
       <Image
         key={`${publicId}-${useSimpleUrl}`} // Add key to prevent remounting issues
-        src={imageUrl}
+        src={imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODgiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='}
         alt={alt}
-        width={options.width || props.width || imageProps.width}
-        height={options.height || props.height || imageProps.height}
+        width={options.width || props.width || imageProps.width || 200}
+        height={options.height || props.height || imageProps.height || 150}
         className={`${className} ${!isLoaded ? 'animate-pulse bg-gray-200' : ''} ${
           expandOnHover ? 'transition-transform hover:scale-105' : ''
         }`}

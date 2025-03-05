@@ -1,102 +1,54 @@
-"use client"
-
-import Image from "next/image"
-import Link from "next/link"
 import { NavBar } from "@/components/nav-bar"
-import { useSearchParams } from "next/navigation"
-import { articles } from "@/lib/articles"
+import { PageHero } from "@/components/ui/page-hero"
+import { Metadata } from "next"
+import { ArticlesList } from "./articles-list"
+import { CldOgImage } from "next-cloudinary"
 
-const categories = [
-  { id: "latest-news", name: "Latest News" },
-  { id: "educational-content", name: "Educational Content" },
-  { id: "patient-stories", name: "Patient Stories" },
-  { id: "health-tips", name: "Health Tips" }
-];
+export const metadata: Metadata = {
+  title: 'Articles & Resources | Allure MD',
+  description: 'Stay informed with the latest news, educational content, and resources about aesthetic procedures, dermatology, medical spa treatments, and functional medicine.',
+  openGraph: {
+    title: 'Articles & Resources | Allure MD',
+    description: 'Stay informed with the latest news, educational content, and resources about aesthetic procedures, dermatology, medical spa treatments, and functional medicine.',
+    images: [
+      {
+        url: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+        width: 1200,
+        height: 630,
+        alt: 'Articles & Resources'
+      }
+    ]
+  }
+}
 
-export default function ArticlesPage() {
-  const searchParams = useSearchParams();
-  const selectedCategory = searchParams.get('category') || 'latest-news';
-
-  const filteredArticles = articles.filter(article => 
-    !selectedCategory || article.category === selectedCategory
-  );
-
+export default async function ArticlesPage({ 
+  searchParams 
+}: { 
+  searchParams: { [key: string]: string | string[] | undefined } 
+}) {
   return (
-    <main className="min-h-screen bg-black">
+    <main className="flex min-h-screen flex-col bg-black text-white">
       <NavBar />
-      <div className="container mx-auto px-4 py-24">
-        <div className="mb-16">
-          <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-400">Articles</h1>
-          <h2 className="text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif text-white">Latest Updates</h2>
-        </div>
-        
-        <div className="flex flex-wrap gap-4 mb-12">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/articles?category=${category.id}`}
-              className={`px-4 py-2 text-sm font-cerebri font-normal transition-colors duration-300 border ${
-                selectedCategory === category.id 
-                  ? 'border-white text-white' 
-                  : 'border-white/10 text-gray-400 hover:border-white/20'
-              }`}
-            >
-              {category.name}
-            </Link>
-          ))}
-        </div>
+      
+      <PageHero
+        title="Articles & Resources"
+        subtitle="Stay informed and educated"
+        description="Discover the latest news, educational content, and resources about aesthetic procedures, dermatology treatments, and wellness."
+        image={{
+          path: "hero/hero-articles",
+          alt: "Articles and Resources"
+        }}
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredArticles.map((article) => (
-            <Link 
-              key={article.id} 
-              href={`/articles/${article.slug}`}
-              className="group relative flex flex-col overflow-hidden border border-zinc-800 bg-black transition-colors duration-300 hover:border-zinc-700"
-            >
-              <div className="relative w-full aspect-[4/3] overflow-hidden">
-                <Image 
-                  src={article.image}
-                  alt={article.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <div className="flex flex-1 flex-col justify-between p-6">
-                <div className="flex-1">
-                  <div className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-400 mb-2">
-                    {categories.find(cat => cat.id === article.category)?.name}
-                  </div>
-                  <h2 className="text-xl font-serif mb-2 text-white group-hover:text-gray-300 transition-colors duration-300">
-                    {article.title}
-                  </h2>
-                  <p className="text-gray-400 mb-4 font-cerebri font-light line-clamp-2">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex justify-between items-center text-sm text-gray-500 font-cerebri">
-                    <span>{new Date(article.date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}</span>
-                    {article.readTime && (
-                      <span>{article.readTime}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {filteredArticles.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-lg font-cerebri text-gray-400">
-              No articles found in this category.
-            </p>
+      <section className="py-16 md:py-24 bg-zinc-900 text-white">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Browse Articles</h2>
+            <p className="text-lg md:text-xl max-w-3xl mx-auto">Filter by category to find exactly what you're looking for</p>
           </div>
-        )}
-      </div>
+          <ArticlesList searchParams={searchParams} />
+        </div>
+      </section>
     </main>
   )
 }

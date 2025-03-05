@@ -12,7 +12,7 @@ export function MedicalSpaSection() {
     <section className="relative min-h-screen bg-[#f5f5f5] dark:bg-black">
       <div className="absolute inset-0">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp"
+          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133483/procedures/julia%2520oxygeneo%2520facial%2520procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.png"
           alt="Medical spa treatment"
           fill
           className="object-cover"

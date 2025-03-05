@@ -1,36 +1,54 @@
 // components/ChatInterface.tsx
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, StopCircle } from 'lucide-react';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
+// Define the interface for the ChatInterface props
+interface ChatInterfaceProps {
+  model?: string;
+}
+
+// Define the chat message type
 interface ChatMessage {
-  role: string;
+  role: 'user' | 'assistant' | 'system';
   content: string;
   id?: string;
 }
 
-export function ChatInterface() {
+interface CodeProps {
+  node?: any;
+  inline?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+  [key: string]: any;
+}
+
+export function ChatInterface({ model = 'gpt-4' }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
-  const handleSend = async () => {
+  const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
     
-    const userMessage = { 
+    const userMessage: ChatMessage = { 
       role: 'user', 
       content: input,
       id: `user-${Date.now()}-${Math.random()}`
@@ -44,7 +62,8 @@ export function ChatInterface() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content }))
+          messages: [...messages, userMessage],
+          model: model
         }),
       });
 
@@ -74,7 +93,7 @@ export function ChatInterface() {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      sendMessage();
     }
   };
 
@@ -133,7 +152,7 @@ export function ChatInterface() {
                     {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </button>
                   <button
-                    onClick={handleSend}
+                    onClick={sendMessage}
                     disabled={isLoading || !input.trim()}
                     className={`p-2 rounded-lg transition-colors ${
                       isLoading || !input.trim()
@@ -181,7 +200,35 @@ export function ChatInterface() {
                             : 'bg-zinc-800 text-zinc-100'
                         }`}
                       >
-                        {msg.content}
+                        <div
+                          className={`text-sm whitespace-pre-wrap break-words ${
+                            msg.role === 'assistant' ? 'text-zinc-200' : 'text-white'
+                          }`}
+                        >
+                          {msg.role === 'assistant' ? (
+                            <ReactMarkdown components={{
+                              code: ({ node, inline, className, children, ...props }: CodeProps) => {
+                                const language = className ? className.replace(/language-/, '') : '';
+                                return !inline ? (
+                                  <SyntaxHighlighter
+                                    style={vscDarkPlus}
+                                    language={language}
+                                    PreTag="div"
+                                    {...props}
+                                  >
+                                    {String(children).replace(/\n$/, '')}
+                                  </SyntaxHighlighter>
+                                ) : (
+                                  <code className="bg-gray-800 px-1 rounded" {...props}>
+                                    {children}
+                                  </code>
+                                );
+                              }
+                            }}>
+                              {msg.content}
+                            </ReactMarkdown>
+                          ) : msg.content}
+                        </div>
                       </div>
                       {msg.role === 'user' && (
                         <div className="relative w-8 h-8">
@@ -246,7 +293,7 @@ export function ChatInterface() {
                       {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                     </button>
                     <button
-                      onClick={handleSend}
+                      onClick={sendMessage}
                       disabled={isLoading || !input.trim()}
                       className={`p-2 rounded-lg transition-colors ${
                         isLoading || !input.trim()

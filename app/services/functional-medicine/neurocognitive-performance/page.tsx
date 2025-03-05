@@ -72,7 +72,7 @@ export default function NeurocognitivePage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-neuro.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-neuro.png"
             alt="Neurocognitive Performance Services"
             fill
             className="object-cover"

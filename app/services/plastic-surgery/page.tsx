@@ -32,21 +32,21 @@ const procedures = [
     id: "head-and-neck",
     description: "Refined procedures for facial rejuvenation and harmony.",
     procedures: ["Eyelids", "Ears", "Face", "Neck", "Nose"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-face-neck-procedures.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133478/services-plastic-surgery/hero/plastic-surgery-face-neck-procedures.png"
   },
   {
     category: "Breast",
     id: "breast",
     description: "Customized breast enhancement and reconstruction procedures.",
     procedures: ["Augmentation", "Lift", "Reduction", "Revision", "Nipple Areolar Complex"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-breast-procedures.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-breast-procedures.png"
   },
   {
     category: "Body",
     id: "body",
     description: "Comprehensive body contouring and refinement procedures.",
     procedures: ["Abdominoplasty", "Mini-Abdominoplasty", "Liposuction", "Arm Lift", "Thigh Lift"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-body-procedures.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-body-procedures.png"
   }
 ]
 
@@ -62,7 +62,7 @@ export default function PlasticSurgery() {
       <section className="relative h-screen">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/plastic-surgery-hero.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133480/services-plastic-surgery/hero/plastic-surgery-hero.png"
             alt="Plastic Surgery at Allure MD"
             fill
             className="object-cover"

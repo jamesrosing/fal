@@ -3,9 +3,33 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
-import { Article } from "@/lib/articles"
+import { Article, ArticleContent, ARTICLE_CATEGORIES } from "@/lib/types"
 import Link from "next/link"
-import { articles } from "@/lib/articles"
+import { articles, getRelatedArticles } from "@/lib/articles"
+import { Section } from "@/components/ui/section"
+import { getCloudinaryUrl } from "@/lib/cloudinary"
+import Head from "next/head"
+import { Footer } from "./footer"
+
+// Inline StructuredData component
+function StructuredData({ type, data }: { type: string; data: Record<string, any> }) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': type,
+    ...data,
+  };
+
+  return (
+    <Head>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+    </Head>
+  );
+}
 
 interface ArticleLayoutProps {
   article: Article;
@@ -13,18 +37,111 @@ interface ArticleLayoutProps {
 
 export function ArticleLayout({ article }: ArticleLayoutProps) {
   // Get 3 other articles, excluding the current one
-  const relatedArticles = articles
-    .filter(a => a.id !== article.id)
-    .slice(0, 3);
+  const relatedArticles = getRelatedArticles(article, 3);
+
+  // Get the article category display name
+  const category = ARTICLE_CATEGORIES.find(cat => cat.id === article.category);
+  const categoryName = category?.name || article.category;
+  
+  // Convert article image to proper Cloudinary URL
+  const imageUrl = article.image ? 
+    (article.image.includes('https://res.cloudinary.com') 
+      ? article.image 
+      : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`) 
+    : null;
+
+  // Generate structured data for the article
+  const structuredData = {
+    type: "Article",
+    data: {
+      headline: article.title,
+      description: article.excerpt,
+      image: imageUrl || '/placeholder-image.jpg',
+      datePublished: article.publishedAt || article.date,
+      dateModified: article.updatedAt || article.date,
+      author: article.author ? {
+        "@type": "Person",
+        name: article.author
+      } : {
+        "@type": "Organization",
+        name: "Allure MD"
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Allure MD",
+        logo: {
+          "@type": "ImageObject",
+          url: `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/branding/logo`
+        }
+      },
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": `https://www.alluremd.com/articles/${article.slug}`
+      }
+    }
+  };
+
+  // Helper function to render article content
+  const renderContent = () => {
+    if (!article.content) return null;
+    
+    if (typeof article.content === 'string') {
+      return article.content.split('\n\n').map((paragraph: string, index: number) => {
+        if (paragraph.startsWith('# ')) {
+          return <h2 key={index} className="text-3xl font-serif font-semibold mt-8 mb-4">{paragraph.slice(2)}</h2>
+        } else if (paragraph.startsWith('## ')) {
+          return <h3 key={index} className="text-2xl font-serif font-semibold mt-6 mb-3">{paragraph.slice(3)}</h3>
+        } else if (paragraph.startsWith('> ')) {
+          return (
+            <blockquote key={index} className="border-l-4 border-zinc-700 pl-4 italic my-6">
+              {paragraph.slice(2)}
+            </blockquote>
+          )
+        } else {
+          return <p key={index} className="mb-6">{paragraph}</p>
+        }
+      });
+    } else {
+      // Handle structured content
+      return article.content.map((block: ArticleContent, index: number) => {
+        // Implement rendering logic for structured content
+        return <p key={index}>{block.content}</p>;
+      });
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-black">
+    <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white">
       <NavBar />
       
-      {/* Hero Section */}
-      <section className="relative">
-        {/* Category Tag */}
-        <div className="absolute top-32 left-0 right-0 z-10">
+      {/* Structured Data for SEO */}
+      <StructuredData type={structuredData.type} data={structuredData.data} />
+      
+      {/* Article Hero */}
+      <section className="relative pt-20">
+        {/* Meta tags */}
+        <div className="hidden">
+          <h1>{article.title}</h1>
+          <p>{article.excerpt}</p>
+          <div itemProp="image" itemScope itemType="https://schema.org/ImageObject">
+            <meta itemProp="url" content={imageUrl || ''} />
+            <meta itemProp="width" content="1200" />
+            <meta itemProp="height" content="630" />
+          </div>
+          <div itemProp="publisher" itemScope itemType="https://schema.org/Organization">
+            <meta itemProp="name" content="Allure MD" />
+            <div itemProp="logo" itemScope itemType="https://schema.org/ImageObject">
+              <meta itemProp="url" content="/logo.png" />
+            </div>
+          </div>
+          <meta itemProp="datePublished" content={article.date} />
+          <meta itemProp="dateModified" content={article.date} />
+          <meta itemProp="author" content={article.author} />
+          <meta itemProp="mainEntityOfPage" content={`/articles/${article.slug}`} />
+        </div>
+        
+        {/* Category Badge */}
+        <div className="absolute top-24 left-0 z-10 p-8">
           <div className="container mx-auto px-4">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -32,7 +149,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
               transition={{ duration: 0.8 }}
               className="inline-block px-4 py-2 text-sm font-cerebri font-normal uppercase tracking-wide text-white bg-black/50 backdrop-blur-sm"
             >
-              {article.category}
+              {categoryName}
             </motion.span>
           </div>
         </div>
@@ -40,144 +157,109 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
         {/* Hero Image */}
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src={article.image}
+            src={imageUrl || '/placeholder-image.jpg'}
             alt={article.title}
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
-        
-        {/* Hero Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="container mx-auto"
-          >
-            <div className="max-w-3xl">
-              <h1 className="text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif text-white mb-6">
+
+        {/* Article Title */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-white max-w-4xl mb-4">
                 {article.title}
               </h1>
-              {article.subtitle && (
-                <p className="text-xl font-cerebri font-light text-gray-300 mb-8">
-                  {article.subtitle}
-                </p>
-              )}
-              <div className="flex items-center gap-4 text-gray-400 font-cerebri">
-                <time>{new Date(article.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}</time>
-                {article.readTime && (
-                  <>
-                    <span>•</span>
-                    <span>{article.readTime}</span>
-                  </>
-                )}
+              <div className="text-gray-300 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm md:text-base font-cerebri">
+                <span>{article.author}</span>
+                <span className="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span>{new Date(article.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+                <span className="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span>{article.readTime} read</span>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
-
+      
       {/* Article Content */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-3xl mx-auto"
-          >
-            <div 
-              className="prose prose-lg prose-invert max-w-none
-                prose-headings:font-serif prose-headings:tracking-tight prose-headings:leading-tight
-                prose-h2:text-[clamp(1.75rem,3vw,2rem)] prose-h2:mt-20 prose-h2:mb-6 prose-h2:font-serif prose-h2:text-white
-                prose-h3:text-[clamp(1.25rem,2vw,1.5rem)] prose-h3:mt-12 prose-h3:mb-4 prose-h3:font-serif prose-h3:text-white
-                prose-p:font-cerebri prose-p:font-light prose-p:text-lg prose-p:leading-relaxed prose-p:text-gray-300 prose-p:mb-6
-                prose-ul:mt-4 prose-ul:mb-6 prose-ul:grid prose-ul:gap-2
-                prose-li:relative prose-li:pl-6 prose-li:text-gray-300 prose-li:font-cerebri prose-li:font-light prose-li:text-lg
-                prose-li:before:absolute prose-li:before:left-0 prose-li:before:top-[0.6em] prose-li:before:h-1.5 prose-li:before:w-1.5 prose-li:before:rounded-full prose-li:before:bg-gray-300
-                [&_.article-section]:mb-20
-                [&_.article-lead]:text-lg [&_.article-lead]:font-cerebri [&_.article-lead]:font-light [&_.article-lead]:leading-relaxed [&_.article-lead]:text-gray-300 [&_.article-lead]:mb-12
-                [&_.article-cta]:text-lg [&_.article-cta]:font-cerebri [&_.article-cta]:font-light [&_.article-cta]:text-white [&_.article-cta]:mt-12"
-              dangerouslySetInnerHTML={{ __html: article.content || '' }}
-            />
-
-            {/* Article Tags */}
-            {article.tags && article.tags.length > 0 && (
-              <div className="mt-16 pt-8 border-t border-zinc-800">
-                <h3 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-400 mb-4">
-                  Related Topics
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {article.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-4 py-2 text-sm font-cerebri font-light text-gray-400 border border-zinc-800 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Related Articles */}
-            <div className="mt-24">
-              <h3 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-400 mb-8">
-                More Articles
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedArticles.map((relatedArticle) => (
-                  <Link 
-                    key={relatedArticle.id} 
-                    href={`/articles/${relatedArticle.slug}`}
-                    className="group relative flex flex-col overflow-hidden border border-zinc-800 bg-black transition-colors duration-300 hover:border-zinc-700"
+      <section className="container mx-auto px-4 py-16">
+        <div className="max-w-3xl mx-auto font-cerebri text-lg">
+          <div className="prose prose-lg dark:prose-invert max-w-none">
+            {renderContent()}
+          </div>
+        </div>
+      </section>
+      
+      {/* Related Articles */}
+      {relatedArticles && relatedArticles.length > 0 && (
+        <section className="container mx-auto px-4 py-16 border-t border-gray-200 dark:border-gray-800">
+          <h2 className="text-3xl font-serif font-semibold mb-8 text-center">Related Articles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {relatedArticles.map((relatedArticle: Article) => {
+              // Convert related article image to proper Cloudinary URL
+              const relatedImageUrl = relatedArticle.image ? 
+                (relatedArticle.image.includes('https://res.cloudinary.com') 
+                  ? relatedArticle.image 
+                  : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${relatedArticle.image}`) 
+                : '/placeholder-image.jpg';
+                
+              return (
+                <Link 
+                  href={`/articles/${relatedArticle.slug}`} 
+                  key={relatedArticle.id}
+                  className="group"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden h-full flex flex-col"
                   >
-                    <div className="relative w-full aspect-[4/3] overflow-hidden">
-                      <Image 
-                        src={relatedArticle.image}
+                    <div className="relative h-48">
+                      <Image
+                        src={relatedImageUrl}
                         alt={relatedArticle.title}
                         fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                     </div>
-                    <div className="flex flex-1 flex-col justify-between p-6">
-                      <div className="flex-1">
-                        <div className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-400 mb-2">
-                          {relatedArticle.category}
-                        </div>
-                        <h2 className="text-xl font-serif mb-2 text-white group-hover:text-gray-300 transition-colors duration-300">
-                          {relatedArticle.title}
-                        </h2>
-                        <p className="text-gray-400 mb-4 font-cerebri font-light line-clamp-2">
-                          {relatedArticle.excerpt}
-                        </p>
-                        <div className="flex justify-between items-center text-sm text-gray-500 font-cerebri">
-                          <span>{new Date(relatedArticle.date).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}</span>
-                          {relatedArticle.readTime && (
-                            <span>{relatedArticle.readTime}</span>
-                          )}
-                        </div>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <h3 className="text-xl font-serif font-semibold group-hover:text-primary transition-colors duration-300 mb-2">
+                        {relatedArticle.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1">{relatedArticle.excerpt}</p>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(relatedArticle.date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
                       </div>
                     </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </main>
-  );
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+      
+      <Footer />
+    </div>
+  )
 } 

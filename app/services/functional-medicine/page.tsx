@@ -32,42 +32,42 @@ const approaches = [
     id: "cardiometabolic-optimization",
     description: "Comprehensive approach to heart and metabolic health.",
     approaches: ["Heart Health Assessment", "Metabolic Testing", "Nutritional Guidance", "Exercise Programs", "Lifestyle Modifications"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-cardio.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133465/articles/categories/functional-medicine-cardio.png"
   },
   {
     category: "Epigenetic Optimization",
     id: "epigenetic-optimization",
     description: "Personalized treatments based on genetic factors.",
     approaches: ["Genetic Testing", "DNA Analysis", "Personalized Protocols", "Environmental Factors", "Lifestyle Integration"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-epigenetic.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133466/articles/categories/functional-medicine-epigenetic.png"
   },
   {
     category: "Hair Restoration",
     id: "hair-restoration",
     description: "Advanced techniques for hair regrowth and restoration.",
     approaches: ["PRP Therapy", "Stem Cell Treatment", "Scalp Micropigmentation", "Nutritional Support", "Hormone Optimization"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-hair.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133467/articles/categories/functional-medicine-hair.png"
   },
   {
     category: "Hormone Optimization",
     id: "hormone-optimization",
     description: "Balancing and optimizing hormone levels for overall well-being.",
     approaches: ["Hormone Testing", "Bioidentical Hormones", "Thyroid Management", "Adrenal Support", "Sexual Health"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-hormone.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-hormone.png"
   },
   {
     category: "Neurocognitive Health",
     id: "neurocognitive-performance",
     description: "Enhancing brain function and cognitive abilities.",
     approaches: ["Cognitive Assessment", "Brain Mapping", "Memory Enhancement", "Focus Improvement", "Stress Management"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-neuro.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-neuro.png"
   },
   {
     category: "Sleep & Travel Health",
     id: "sleep-travel-optimization",
     description: "Improving sleep quality and managing travel-related health issues.",
     approaches: ["Sleep Analysis", "Circadian Optimization", "Jet Lag Management", "Travel Wellness", "Recovery Protocols"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-sleep.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133469/articles/categories/functional-medicine-sleep.png"
   }
 ]
 
@@ -83,7 +83,7 @@ export default function FunctionalMedicine() {
       <section className="relative h-screen">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-hero.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133470/articles/categories/functional-medicine-hero.png"
             alt="Functional Medicine at Allure MD"
             fill
             className="object-cover"

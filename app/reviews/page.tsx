@@ -69,6 +69,8 @@ export default function ReviewsPage() {
                   Discover the experiences of our patients and their transformative journeys at Allure MD. 
                   Read their stories and learn about the exceptional care and results they've achieved.
                 </p>
+                <p>We&apos;re proud of our patients&apos; results and their stories.</p>
+                <p>Read what our patients have to say about their experiences.</p>
               </div>
             </motion.div>
           </div>

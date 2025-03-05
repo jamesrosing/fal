@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Search, Loader2, MoreVertical, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,11 +33,7 @@ export default function CategoriesPage() {
   const [showNewCategoryDialog, setShowNewCategoryDialog] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  async function loadCategories() {
+  const loadCategories = useCallback(async () => {
     try {
       const response = await fetch('/api/categories');
       if (!response.ok) throw new Error('Failed to load categories');
@@ -53,7 +49,11 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 
   async function handleCreateCategory() {
     try {

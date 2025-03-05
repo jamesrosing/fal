@@ -12,7 +12,7 @@ export function AboutSection() {
         {/* Desktop Background Image */}
         <div className="absolute inset-0 group">
           <Image
-            src="https://z5qbcqdwyuqdzrkq.public.blob.vercel-storage.com/allure%20md%20team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133481/team/headshots/allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.png"
             alt="Allure MD Medical Team"
             fill
             className="object-cover object-[center_15%]"
@@ -86,7 +86,7 @@ export function AboutSection() {
         {/* Mobile Image */}
         <div className="relative h-[40vh] group">
           <Image
-            src="https://z5qbcqdwyuqdzrkq.public.blob.vercel-storage.com/allure%20md%20team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133481/team/headshots/allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.png"
             alt="Allure MD Medical Team"
             fill
             className="object-cover object-[center_15%]"

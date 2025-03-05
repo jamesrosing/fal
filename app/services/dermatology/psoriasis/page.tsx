@@ -72,7 +72,7 @@ export default function PsoriasisPage() {
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-psoriasis.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133463/services-dermatology/hero/dermatology-psoriasis.png"
             alt="Psoriasis Treatment Services"
             fill
             className="object-cover"
@@ -100,6 +100,8 @@ export default function PsoriasisPage() {
                 Our comprehensive psoriasis treatment program combines cutting-edge therapies
                 with personalized care to help you achieve clearer, healthier skin.
               </p>
+              <p>We&apos;re here to help you manage your psoriasis effectively.</p>
+              <p>Our dermatology team specializes in treating psoriasis and related conditions.</p>
               <div>
                 <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                 <br />

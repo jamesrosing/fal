@@ -167,7 +167,10 @@ export default function SkinRejuvenationPage() {
             </h3>
             <div className="space-y-6 text-lg font-cerebri font-light">
               <p>
-                Let our expert team help you achieve the radiant, healthy skin you deserve with our customized rejuvenation treatments.
+                We&apos;re here to help you achieve youthful, radiant skin.
+              </p>
+              <p>
+                Our medical spa team specializes in skin rejuvenation treatments.
               </p>
               <div className="space-y-4">
                 <LearnMoreButton href="/appointment">Schedule Your Appointment</LearnMoreButton>

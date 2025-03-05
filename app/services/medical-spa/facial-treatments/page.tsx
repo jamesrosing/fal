@@ -88,6 +88,8 @@ export default function FacialTreatmentsPage() {
                 <p>
                   Experience our luxurious facial treatments designed to rejuvenate, refresh, and restore your skin's natural radiance using advanced techniques and premium products.
                 </p>
+                <p>We&apos;re here to help you achieve radiant, healthy skin.</p>
+                <p>Our medical spa team specializes in facial treatments and skin rejuvenation.</p>
                 <div className="space-y-4">
                   <LearnMoreButton href="/appointment">Schedule a Treatment</LearnMoreButton>
                 </div>

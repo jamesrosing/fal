@@ -92,14 +92,16 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
   if (!isMounted || hasError) {
     return (
       <div className="absolute inset-0">
-        <Image
-          src={fallbackImage}
-          alt="Background"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
+        {fallbackImage && (
+          <Image
+            src={fallbackImage}
+            alt="Background"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        )}
         <div className="absolute inset-0 bg-black/30" />
         {errorDetails && (
           <div className="absolute bottom-4 left-4 right-4 bg-red-500/80 text-white p-2 rounded text-sm">
@@ -112,12 +114,14 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
 
   return (
     <>
-      <Head>
-        <link rel="preload" as="image" href={poster} />
-        {sources.map((source, index) => (
-          <link key={index} rel="preload" as="video" href={source.src} />
-        ))}
-      </Head>
+      {poster && sources && sources.length > 0 && (
+        <Head>
+          <link rel="preload" as="image" href={poster} />
+          {sources.map((source, index) => (
+            <link key={index} rel="preload" as="video" href={source.src} />
+          ))}
+        </Head>
+      )}
       <div className="absolute inset-0">
         <video
           ref={videoRef}
@@ -139,7 +143,7 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
         <div className="absolute inset-0 bg-black/30" />
         
         {/* Show poster while video loads */}
-        {!isVideoLoaded && (
+        {!isVideoLoaded && poster && (
           <Image
             src={poster}
             alt="Video poster"

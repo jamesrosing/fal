@@ -1,178 +1,125 @@
-export interface Article {
-  id: string;
-  title: string;
-  subtitle?: string;
-  excerpt: string;
-  content?: string;
-  image: string;
-  category: string;
-  date: string;
-  readTime?: string;
-  tags?: string[];
-  slug: string;
-}
+import { Article, ArticleCategory, ArticleSubcategories } from './types';
 
+// Sample articles data
 export const articles: Article[] = [
   {
-    id: "new-rf-microneedling-technology",
-    title: "Allure MD Introduces Revolutionary New RF Microneedling Technology",
-    subtitle: "A breakthrough in skin rejuvenation technology that combines traditional microneedling with radiofrequency energy for enhanced results.",
-    excerpt: "Experience the latest advancement in skin rejuvenation with our new state-of-the-art RF microneedling system.",
-    content: `
-      <div class="article-section">
-        <p class="article-lead">We are excited to announce the addition of our new, state-of-the-art RF microneedling system at Allure MD. This revolutionary technology combines the proven benefits of traditional microneedling with the power of radiofrequency energy to deliver unprecedented results in skin rejuvenation.</p>
-      </div>
-
-      <div class="article-section">
-        <h2>What Makes RF Microneedling Different?</h2>
-        <p>Unlike traditional microneedling, our new system delivers precisely controlled RF energy deep into the dermis. This dual-action treatment triggers a more robust healing response, leading to:</p>
-        <ul>
-          <li>Enhanced collagen and elastin production</li>
-          <li>Improved skin texture and tone</li>
-          <li>Reduced appearance of scars and stretch marks</li>
-          <li>More noticeable results with fewer treatments</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <h2>The Science Behind the Technology</h2>
-        <p>The system uses ultra-fine needles to create micro-channels in the skin while simultaneously delivering RF energy at precise depths. This combination stimulates the body's natural healing response while providing controlled thermal damage that accelerates collagen remodeling.</p>
-      </div>
-
-      <div class="article-section">
-        <h2>What to Expect During Treatment</h2>
-        <p>Each treatment session typically takes 30-60 minutes, depending on the area being treated. Patients can expect:</p>
-        <ul>
-          <li>Minimal downtime</li>
-          <li>Customizable treatment settings</li>
-          <li>Consistent, predictable results</li>
-          <li>Comfortable treatment experience with topical numbing</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <p class="article-cta">Contact us today to schedule a consultation and learn how our new RF microneedling technology can help you achieve your skin rejuvenation goals.</p>
-      </div>
-    `,
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.webp",
-    category: "latest-news",
-    date: "2024-03-15",
-    readTime: "4 min read",
-    tags: ["skincare", "technology", "treatments", "microneedling"],
-    slug: "new-rf-microneedling-technology"
+    id: '1',
+    slug: 'latest-news-article',
+    title: 'Latest News in Aesthetic Medicine',
+    excerpt: 'Stay updated with the newest trends and innovations in aesthetic medicine.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'latest-news',
+    date: '2023-06-15',
+    author: 'Dr. Smith',
+    readTime: '5 min'
   },
   {
-    id: "pearose-top-physician-assistant",
-    title: "Susan Pearose, PA-C Named Top Dermatology Physician Assistant in Newport Beach",
-    subtitle: "Recognized for exceptional expertise and dedication to patient care in dermatology across Orange County.",
-    excerpt: "Our own Susan Pearose, PA-C has been recognized as one of Orange County's leading dermatology physician assistants for her exceptional expertise and patient care.",
-    content: `
-      <div class="article-section">
-        <p class="article-lead">We are proud to announce that Susan Pearose, PA-C has been recognized as one of Newport Beach's top dermatology physician assistants for 2024. This prestigious recognition comes from comprehensive patient satisfaction surveys, peer reviews, and demonstrated excellence in dermatological care across Orange County.</p>
-      </div>
-
-      <div class="article-section">
-        <h2>A Legacy of Excellence</h2>
-        <p>Susan Pearose has been serving the Newport Beach community with distinction, bringing her expertise in medical and cosmetic dermatology to thousands of patients. Her commitment to excellence is reflected in:</p>
-        <ul>
-          <li>Advanced certifications and specialized training</li>
-          <li>Expertise in cutting-edge treatments and technologies</li>
-          <li>Outstanding patient satisfaction ratings</li>
-          <li>Continued professional development and education</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <h2>Specialized Expertise</h2>
-        <p>As a Certified Physician Assistant specializing in dermatology, Susan is particularly known for her expertise in:</p>
-        <ul>
-          <li>Advanced skin cancer screenings and detection</li>
-          <li>Non-invasive facial rejuvenation techniques</li>
-          <li>Complex acne and rosacea management</li>
-          <li>Customized skincare treatment plans</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <h2>Patient-First Approach</h2>
-        <p>What sets Susan apart is her dedication to personalized patient care. She takes time to understand each patient's unique concerns and develops customized treatment plans that address their specific needs while ensuring the highest standards of medical care.</p>
-      </div>
-
-      <div class="article-section">
-        <h2>Professional Background</h2>
-        <p>Susan's credentials include:</p>
-        <ul>
-          <li>Certified Physician Assistant (PA-C)</li>
-          <li>Specialized dermatology training and certification</li>
-          <li>Extensive experience in medical and cosmetic dermatology</li>
-          <li>Ongoing advanced training in latest dermatological procedures</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <p class="article-cta">Schedule your consultation with Susan Pearose, PA-C today and experience the exceptional care that has earned her this prestigious recognition in the field of dermatology.</p>
-      </div>
-    `,
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20dermatology%20headshot%201-gjRMjadCwzrB94HEchEd1TnD04XcMY.webp",
-    category: "latest-news",
-    date: "2024-03-10",
-    readTime: "5 min read",
-    tags: ["dermatology", "awards", "medical-care", "newport-beach", "physician-assistant"],
-    slug: "pearose-top-physician-assistant"
+    id: '2',
+    slug: 'plastic-surgery-innovations',
+    title: 'New Innovations in Plastic Surgery',
+    excerpt: 'Discover the latest techniques and technologies in plastic surgery procedures.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'plastic-surgery',
+    subcategory: 'face',
+    date: '2023-05-20',
+    author: 'Dr. Johnson',
+    readTime: '8 min'
   },
   {
-    id: "new-medical-spa-services",
-    title: "New Medical Spa Services Now Available",
-    subtitle: "Expanding our luxury medical spa offerings with advanced treatments for comprehensive body rejuvenation.",
-    excerpt: "Discover our expanded range of medical spa treatments designed for total body rejuvenation.",
-    content: `
-      <div class="article-section">
-        <p class="article-lead">Allure MD is thrilled to announce the expansion of our medical spa services. Our new treatment offerings combine luxury and clinical excellence to provide you with the most advanced aesthetic solutions available.</p>
-      </div>
-
-      <div class="article-section">
-        <h2>New Treatment Options</h2>
-        <p>Our expanded service menu now includes:</p>
-        <ul>
-          <li>Advanced hydrafacials with customized boosters</li>
-          <li>Medical-grade chemical peels</li>
-          <li>Laser hair removal with the latest technology</li>
-          <li>Body contouring and cellulite treatments</li>
-          <li>LED light therapy</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <h2>Customized Treatment Plans</h2>
-        <p>Each treatment begins with a comprehensive consultation to create a personalized plan that addresses your specific concerns and goals. Our expert staff will guide you through:</p>
-        <ul>
-          <li>Skin analysis and assessment</li>
-          <li>Treatment recommendations</li>
-          <li>Expected outcomes and timeline</li>
-          <li>Maintenance and care instructions</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <h2>The Allure MD Difference</h2>
-        <p>What sets our medical spa services apart:</p>
-        <ul>
-          <li>Medical-grade products and equipment</li>
-          <li>Licensed and certified professionals</li>
-          <li>Comfortable, luxury environment</li>
-          <li>Comprehensive aftercare support</li>
-        </ul>
-      </div>
-
-      <div class="article-section">
-        <p class="article-cta">Visit us to experience our new medical spa services and start your journey to renewed confidence and radiance.</p>
-      </div>
-    `,
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20medical%20esthetician%20facial%20procedure-BTAqIz6QTH8au0JcLo6JerhGR2Fyqw.webp",
-    category: "latest-news",
-    date: "2024-03-05",
-    readTime: "6 min read",
-    tags: ["medical-spa", "treatments", "skincare", "wellness"],
-    slug: "new-medical-spa-services"
+    id: '3',
+    slug: 'dermatology-treatments',
+    title: 'Advanced Dermatology Treatments',
+    excerpt: 'Learn about cutting-edge treatments for common skin conditions.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'dermatology',
+    subcategory: 'medical',
+    date: '2023-04-10',
+    author: 'Dr. Williams',
+    readTime: '6 min'
+  },
+  {
+    id: '4',
+    slug: 'medical-spa-services',
+    title: 'Popular Medical Spa Services',
+    excerpt: 'Explore the most sought-after medical spa treatments and their benefits.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'medical-spa',
+    subcategory: 'injectables',
+    date: '2023-03-25',
+    author: 'Dr. Brown',
+    readTime: '7 min'
+  },
+  {
+    id: '5',
+    slug: 'functional-medicine-approach',
+    title: 'The Functional Medicine Approach',
+    excerpt: 'Understanding how functional medicine addresses the root causes of health issues.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'functional-medicine',
+    subcategory: 'wellness',
+    date: '2023-02-18',
+    author: 'Dr. Davis',
+    readTime: '10 min'
+  },
+  {
+    id: '6',
+    slug: 'educational-guide-skincare',
+    title: 'Complete Guide to Skincare',
+    excerpt: 'An educational guide to developing an effective skincare routine.',
+    image: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+    category: 'educational',
+    date: '2023-01-10',
+    author: 'Dr. Wilson',
+    readTime: '12 min'
   }
-]; 
+];
+
+// Article categories with display names
+export const ARTICLE_CATEGORIES = [
+  { id: 'latest-news' as ArticleCategory, name: 'Latest News', description: 'Recent updates and news in aesthetic medicine' },
+  { id: 'plastic-surgery' as ArticleCategory, name: 'Plastic Surgery', description: 'Information about plastic surgery procedures' },
+  { id: 'dermatology' as ArticleCategory, name: 'Dermatology', description: 'Skin health and dermatological treatments' },
+  { id: 'medical-spa' as ArticleCategory, name: 'Medical Spa', description: 'Non-surgical aesthetic treatments' },
+  { id: 'functional-medicine' as ArticleCategory, name: 'Functional Medicine', description: 'Holistic approach to health and wellness' },
+  { id: 'educational' as ArticleCategory, name: 'Educational', description: 'Educational resources and guides' }
+];
+
+// Subcategories for each main category
+export const ARTICLE_SUBCATEGORIES: Record<ArticleCategory, { id: string, name: string }[]> = {
+  'plastic-surgery': [
+    { id: 'face', name: 'Face' },
+    { id: 'breast', name: 'Breast' },
+    { id: 'body', name: 'Body' }
+  ],
+  'dermatology': [
+    { id: 'medical', name: 'Medical Dermatology' },
+    { id: 'cosmetic', name: 'Cosmetic Dermatology' },
+    { id: 'conditions', name: 'Skin Conditions' }
+  ],
+  'medical-spa': [
+    { id: 'injectables', name: 'Injectables' },
+    { id: 'laser', name: 'Laser Treatments' },
+    { id: 'skincare', name: 'Professional Skincare' }
+  ],
+  'functional-medicine': [
+    { id: 'nutrition', name: 'Nutrition' },
+    { id: 'hormone', name: 'Hormone Health' },
+    { id: 'wellness', name: 'Wellness' }
+  ],
+  'latest-news': [],
+  'educational': []
+};
+
+// Helper function to get article by slug
+export function getArticleBySlug(slug: string): Article | undefined {
+  if (!slug) return undefined;
+  return articles.find(article => article.slug === slug);
+}
+
+// Helper function to get related articles
+export function getRelatedArticles(article: Article, limit: number = 3): Article[] {
+  if (!article) return [];
+  return articles
+    .filter(a => a.id !== article.id && a.category === article.category)
+    .slice(0, limit);
+} 

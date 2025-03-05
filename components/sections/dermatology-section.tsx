@@ -9,7 +9,7 @@ export function DermatologySection() {
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20skin%20examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.webp"
+          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133482/uncategorized/susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.png"
           alt="Dermatology examination"
           fill
           className="object-cover"

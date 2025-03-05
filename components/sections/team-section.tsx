@@ -7,19 +7,19 @@ import { LearnMoreButton } from "../ui/learn-more-button"
 export function TeamSection() {
   const teamImages = [
     {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ.png",
+      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133485/uncategorized/Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ.png",
       alt: "Dr. James Rosing"
     },
     {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/susan%20pearose%20dermatology%20headshot%201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL.webp",
+      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/services/dermatology/susan%2520pearose%2520dermatology%2520headshot%25201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL.png",
       alt: "Dr. Susan Pearose"
     },
     {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/julia%20medical%20esthetican%20headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ.webp",
+      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/team/headshots/julia%2520medical%2520esthetican%2520headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ.png",
       alt: "Julia, Medical Esthetician"
     },
     {
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pooja%20gidwani%20md%20functional%20medince%20headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR.webp",
+      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133487/team/headshots/pooja%2520gidwani%2520md%2520functional%2520medince%2520headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR.png",
       alt: "Dr. Pooja Gidwani"
     }
   ];

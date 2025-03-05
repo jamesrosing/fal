@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, FolderOpen, Loader2, Save } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getAlbumsByGallery, getCasesByAlbum } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 import { 
@@ -88,46 +88,46 @@ export default function GalleryPage() {
   const [collectionDescription, setCollectionDescription] = useState('');
   const [collectionSlug, setCollectionSlug] = useState('');
 
-  useEffect(() => {
-    async function fetchCollectionStats() {
-      try {
-        const stats: Record<string, CollectionStats> = {};
+  const fetchCollectionStats = useCallback(async () => {
+    try {
+      const stats: Record<string, CollectionStats> = {};
+      
+      // For each collection
+      for (const [collectionId, collection] of Object.entries(collections)) {
+        // Get all albums for this collection
+        const albums = await getAlbumsByGallery(collectionId);
+        if (!albums) continue;
         
-        // For each collection
-        for (const [collectionId, collection] of Object.entries(collections)) {
-          // Get all albums for this collection
-          const albums = await getAlbumsByGallery(collectionId);
-          if (!albums) continue;
+        let totalCases = 0;
+        let totalPhotos = 0;
+        
+        // For each album, get its cases and count photos
+        for (const album of albums) {
+          const cases = await getCasesByAlbum(album.id);
+          if (!cases) continue;
           
-          let totalCases = 0;
-          let totalPhotos = 0;
-          
-          // For each album, get its cases and count photos
-          for (const album of albums) {
-            const cases = await getCasesByAlbum(album.id);
-            if (!cases) continue;
-            
-            totalCases += cases.length;
-            totalPhotos += cases.reduce((total, c) => total + (c.images?.length || 0), 0);
-          }
-          
-          stats[collectionId] = {
-            albumCount: albums.length,
-            caseCount: totalCases,
-            photoCount: totalPhotos
-          };
+          totalCases += cases.length;
+          totalPhotos += cases.reduce((total, c) => total + (c.images?.length || 0), 0);
         }
         
-        setCollectionStats(stats);
-      } catch (error) {
-        console.error('Error fetching collection stats:', error);
-      } finally {
-        setLoading(false);
+        stats[collectionId] = {
+          albumCount: albums.length,
+          caseCount: totalCases,
+          photoCount: totalPhotos
+        };
       }
+      
+      setCollectionStats(stats);
+    } catch (error) {
+      console.error('Error fetching collection stats:', error);
+    } finally {
+      setLoading(false);
     }
-
-    fetchCollectionStats();
   }, []);
+
+  useEffect(() => {
+    fetchCollectionStats();
+  }, [fetchCollectionStats]);
 
   // Add this function to handle collection creation
   const handleCreateCollection = async () => {

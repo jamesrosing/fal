@@ -32,35 +32,35 @@ const treatments = [
     id: "skin-screening",
     description: "Comprehensive evaluations and treatments for optimal skin health.",
     treatments: ["Full Body Examination", "Mole Mapping", "Early Detection", "Prevention Strategies", "Regular Monitoring"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-skin-health.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png"
   },
   {
     category: "Acne",
     id: "acne",
     description: "Advanced treatments for acne and related conditions.",
     treatments: ["Topical Treatments", "Oral Medications", "Chemical Peels", "Light Therapy", "Scar Treatment"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-acne.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133459/services-dermatology/hero/dermatology-acne.png"
   },
   {
     category: "Eczema",
     id: "eczema",
     description: "Management and treatment of eczema and dermatitis.",
     treatments: ["Moisturizing Therapy", "Topical Steroids", "Immunomodulators", "Trigger Avoidance", "Lifestyle Modifications"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-eczema.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133460/services-dermatology/hero/dermatology-eczema.png"
   },
   {
     category: "Rosacea",
     id: "rosacea",
     description: "Specialized care for rosacea symptoms.",
     treatments: ["Trigger Management", "Topical Treatments", "Oral Antibiotics", "Laser Therapy", "Skincare Routine"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-rosacea.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133462/services-dermatology/hero/dermatology-rosacea.png"
   },
   {
     category: "Psoriasis",
     id: "psoriasis",
     description: "Cutting-edge psoriasis treatments and management.",
     treatments: ["Topical Therapy", "Phototherapy", "Systemic Medications", "Biologics", "Lifestyle Support"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-psoriasis.webp"
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133463/services-dermatology/hero/dermatology-psoriasis.png"
   }
 ]
 
@@ -76,7 +76,7 @@ export default function Dermatology() {
       <section className="relative h-screen">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-hero.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133464/services-dermatology/hero/dermatology-hero.png"
             alt="Dermatology at Allure MD"
             fill
             className="object-cover"

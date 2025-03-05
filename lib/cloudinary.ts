@@ -9,6 +9,13 @@
  * - lib/cloudinaryLoader.ts (exported from here)
  */
 
+// Client-side configuration
+const cloudinaryConfig = {
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+};
+
 // Add type declaration for the Cloudinary Upload Widget
 declare global {
   interface Window {
@@ -34,19 +41,17 @@ export type VideoFormat = 'mp4' | 'webm' | 'mov';
 export interface CloudinaryImageOptions {
   width?: number;
   height?: number;
-  quality?: number; 
-  format?: ImageFormat;
-  crop?: 'fill' | 'scale' | 'fit' | 'thumb' | 'crop';
-  gravity?: 'auto' | 'face' | 'center' | 'north' | 'south' | 'east' | 'west';
+  quality?: number;
+  format?: string;
+  crop?: string;
+  gravity?: string;
+  simplifiedMode?: boolean;
 }
 
 export interface CloudinaryVideoOptions {
-  width?: number;
-  height?: number;
+  format?: string;
   quality?: number;
-  format?: VideoFormat;
-  crop?: 'fill' | 'scale' | 'fit' | 'thumb' | 'crop';
-  gravity?: 'auto' | 'center' | 'north' | 'south' | 'east' | 'west';
+  width?: number;
 }
 
 export interface CloudinaryAsset {
@@ -155,172 +160,62 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
   }
 };
 
-/**
- * Generates a Cloudinary URL for an image with the given public ID and options
- */
-export function getCloudinaryImageUrl(
+// Helper function to generate Cloudinary URLs
+export const getCloudinaryUrl = (
   publicId: string,
-  options: CloudinaryImageOptions & { simplifiedMode?: boolean } = {}
-): string {
-  if (!publicId) {
-    console.error('Missing publicId for Cloudinary image URL');
-    return '';
-  }
+  options: CloudinaryImageOptions = {}
+) => {
+  const {
+    width = 'auto',
+    height = 'auto',
+    quality = 90,
+    format = 'auto',
+    crop = 'scale',
+    gravity = 'auto'
+  } = options;
 
-  // Clean public ID (remove any existing Cloudinary URL parts)
-  const cleanPublicId = publicId.includes('/')
-    ? publicId
-    : publicId;
+  return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}${height !== 'auto' ? `,h_${height}` : ''},c_${crop},g_${gravity}/${publicId}`;
+};
 
-  const cloudName = typeof process !== 'undefined' 
-    ? process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 
-    : '';
-
-  // For simplified mode, only use essential transformations
-  if (options.simplifiedMode) {
-    const transformations = [];
-    
-    // Add width if specified (most essential transformation)
-    if (options.width) {
-      transformations.push(`w_${options.width}`);
-    }
-    
-    // Add height only if both width and height are needed
-    if (options.height && options.width) {
-      transformations.push(`h_${options.height}`);
-    }
-    
-    // Add crop only for width+height
-    if (options.width && options.height) {
-      transformations.push(`c_${options.crop || 'fill'}`);
-    }
-    
-    const transformationString = transformations.length > 0 
-      ? transformations.join(',') + '/'
-      : '';
-    
-    return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}${cleanPublicId}`;
-  }
-
-  // Standard approach with all transformations
-  const transformations: string[] = [];
-  
-  // Add format
-  transformations.push(`f_${options.format || 'auto'}`);
-  
-  // Add quality
-  transformations.push(`q_${options.quality || 'auto'}`);
-  
-  // Add width if specified
-  if (options.width) {
-    transformations.push(`w_${options.width}`);
-  }
-  
-  // Add height if specified
-  if (options.height) {
-    transformations.push(`h_${options.height}`);
-  }
-  
-  // Add crop if specified
-  if (options.crop) {
-    transformations.push(`c_${options.crop}`);
-  } else {
-    // Default to fill if both width and height are specified
-    if (options.width && options.height) {
-      transformations.push('c_fill');
-    } else {
-      transformations.push('c_scale');
-    }
-  }
-  
-  // Add gravity if specified
-  if (options.gravity) {
-    transformations.push(`g_${options.gravity}`);
-  } else {
-    // Default to auto gravity for better subject positioning
-    transformations.push('g_auto');
-  }
-
-  const transformationString = transformations.join(',');
-  
-  return `https://res.cloudinary.com/${cloudName}/image/upload/${transformationString}/${cleanPublicId}`;
-}
-
-/**
- * Generates a Cloudinary URL for a video with the given public ID and options
- */
-export function getCloudinaryVideoUrl(
+// Helper function for video URLs
+export const getCloudinaryVideoUrl = (
   publicId: string,
   options: CloudinaryVideoOptions = {}
-): string {
-  if (!publicId) {
-    console.error('Missing publicId for Cloudinary video URL');
-    return '';
-  }
+) => {
+  const {
+    format = 'auto',
+    quality = 90,
+    width
+  } = options;
 
-  // Clean public ID (remove any existing Cloudinary URL parts)
-  const cleanPublicId = publicId.includes('/')
-    ? publicId.split('/').slice(-1)[0]
-    : publicId;
+  return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/video/upload/f_${format},q_${quality}${width ? `,w_${width}` : ''}/${publicId}`;
+};
 
-  const transformations: string[] = [];
-  
-  // Add format if specified (mp4 is default)
-  if (options.format) {
-    transformations.push(`f_${options.format}`);
+// Helper function to check if an asset exists in Cloudinary
+export const checkCloudinaryAsset = async (publicId: string): Promise<boolean> => {
+  try {
+    const response = await fetch(`https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`);
+    return response.ok;
+  } catch (error) {
+    return false;
   }
-  
-  // Add quality (default is auto)
-  transformations.push(`q_${options.quality || 'auto'}`);
-  
-  // Add width if specified
-  if (options.width) {
-    transformations.push(`w_${options.width}`);
-  }
-  
-  // Add height if specified
-  if (options.height) {
-    transformations.push(`h_${options.height}`);
-  }
-  
-  // Add crop if specified
-  if (options.crop) {
-    transformations.push(`c_${options.crop}`);
-  } else if (options.width && options.height) {
-    // Default to fill if both width and height are specified
-    transformations.push('c_fill');
-  }
-  
-  // Add gravity if specified
-  if (options.gravity) {
-    transformations.push(`g_${options.gravity}`);
-  }
-
-  const cloudName = typeof process !== 'undefined' 
-    ? process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 
-    : '';
-
-  const transformationString = transformations.join(',');
-  
-  return `https://res.cloudinary.com/${cloudName}/video/upload/${transformationString}/${publicId}`;
-}
+};
 
 /**
  * Gets optimized image props for use with Next.js Image component
  */
 export function getCloudinaryImageProps(publicId: string, options: CloudinaryImageOptions = {}) {
   return {
-    src: getCloudinaryImageUrl(publicId, { ...options, simplifiedMode: true }),
+    src: getCloudinaryUrl(publicId, options),
     width: options.width || 800,
     height: options.height || 600,
     alt: "",
-    blurDataURL: getCloudinaryImageUrl(publicId, {
+    blurDataURL: getCloudinaryUrl(publicId, {
       width: 10,
       quality: 30,
-      format: 'webp',
-      simplifiedMode: true
+      format: 'webp'
     }),
-    placeholder: "blur" as const
+    placeholder: "blur",
   };
 }
 
@@ -359,15 +254,12 @@ export function getPublicIdFromUrl(url: string): string {
 /**
  * Generates a responsive image srcset for Cloudinary images
  */
-export function getCloudinaryImageSrcSet(
-  publicId: string,
-  widths: number[] = [640, 750, 828, 1080, 1200, 1920, 2048],
-  options: CloudinaryImageOptions = {}
-): string {
+export function getCloudinaryImageSrcSet(publicId: string, options: CloudinaryImageOptions = {}) {
+  const widths = [640, 750, 828, 1080, 1200, 1920, 2048, 3840];
   return widths
     .map(
       (width) =>
-        `${getCloudinaryImageUrl(publicId, { ...options, width })} ${width}w`
+        `${getCloudinaryUrl(publicId, { ...options, width })} ${width}w`
     )
     .join(', ');
 }
@@ -647,4 +539,28 @@ export async function cloudinaryLoader(params: {src: string; width: number; qual
   
   // Return the Cloudinary optimized URL
   return `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_${quality},w_${width}/${filename}`;
+}
+
+/**
+ * Verifies that all required Cloudinary assets exist
+ */
+export async function verifyRequiredAssets() {
+  const requiredAssets = [
+    'hero/hero-poster',
+    'hero/hero-fallback',
+    'hero/hero-articles'
+  ];
+
+  console.log('Verifying required Cloudinary assets...');
+  
+  for (const asset of requiredAssets) {
+    const exists = await checkCloudinaryAsset(asset);
+    console.log(`${asset}: ${exists ? '✅ Found' : '❌ Missing'}`);
+    
+    if (!exists) {
+      console.log(`Please upload ${asset} to Cloudinary`);
+      console.log(`Expected path: ${asset}`);
+      console.log('---');
+    }
+  }
 } 

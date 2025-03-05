@@ -7,6 +7,7 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -32,7 +33,7 @@ const treatments = [
     id: "emsculpt",
     description: "Advanced non-invasive body sculpting treatments.",
     treatments: ["Muscle Building", "Fat Reduction", "Core Strengthening", "Buttocks Toning", "Arms & Calves"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-emsculpt.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131822/services-medical-spa/hero/medical-spa-emsculpt.webp",
     externalLink: "https://emsculpt-newportbeach.com"
   },
   {
@@ -40,7 +41,7 @@ const treatments = [
     id: "body-analysis",
     description: "Precise 3D body scanning and progress tracking.",
     treatments: ["3D Body Scanning", "Progress Tracking", "Body Composition", "Measurements", "Visual Progress"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-shapescale.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131824/services-medical-spa/hero/medical-spa-shapescale.webp",
     path: "/services/medical-spa/body-analysis"
   },
   {
@@ -48,7 +49,7 @@ const treatments = [
     id: "skin-rejuvenation",
     description: "Combined RF and microneedling for skin transformation.",
     treatments: ["Skin Tightening", "Wrinkle Reduction", "Scar Treatment", "Texture Improvement", "Pore Refinement"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-rf-microneedling.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131825/services-medical-spa/hero/medical-spa-rf-microneedling.webp",
     path: "/services/medical-spa/skin-rejuvenation"
   },
   {
@@ -56,7 +57,7 @@ const treatments = [
     id: "injectables",
     description: "Premium injectable treatments for facial enhancement.",
     treatments: ["Botox", "Dermal Fillers", "Lip Enhancement", "Jawline Contouring", "Under-eye Treatment"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-injections.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131827/services-medical-spa/hero/medical-spa-injections.webp",
     path: "/services/medical-spa/injectables"
   },
   {
@@ -64,7 +65,7 @@ const treatments = [
     id: "laser-treatments",
     description: "Advanced laser therapies for various skin concerns.",
     treatments: ["Hair Removal", "Skin Resurfacing", "Pigmentation", "Vascular Lesions", "Tattoo Removal"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-lasers.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131829/services-medical-spa/hero/medical-spa-lasers.webp",
     path: "/services/medical-spa/laser-treatments"
   },
   {
@@ -72,7 +73,7 @@ const treatments = [
     id: "facial-treatments",
     description: "Luxurious facial treatments for radiant skin.",
     treatments: ["Custom Facials", "Chemical Peels", "Dermaplaning", "LED Therapy", "Oxygen Treatment"],
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-facials.webp",
+    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131831/services-medical-spa/hero/medical-spa-facials.webp",
     path: "/services/medical-spa/facial-treatments"
   }
 ]
@@ -88,13 +89,11 @@ export default function MedicalSpa() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/medical-spa-hero.webp"
-            alt="Medical Spa at Allure MD"
-            fill
-            className="object-cover"
-            priority
-          />
+          <CloudinaryImage
+  publicId="services-medical-spa/hero/medical-spa-hero"
+  alt="Medical Spa at Allure MD"
+  
+/>
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

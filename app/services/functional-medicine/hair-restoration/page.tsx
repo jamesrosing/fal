@@ -72,7 +72,7 @@ export default function HairRestorationPage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-hair.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133467/articles/categories/functional-medicine-hair.png"
             alt="Hair Restoration Services"
             fill
             className="object-cover"

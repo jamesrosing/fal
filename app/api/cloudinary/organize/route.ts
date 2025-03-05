@@ -42,24 +42,45 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     
     // Validate request
-    if (!body.name) {
-      return NextResponse.json({ error: 'Missing collection name' }, { status: 400 });
+    if (!body.collections || (!Array.isArray(body.collections) && !body.name)) {
+      return NextResponse.json({ error: 'Missing collection information' }, { status: 400 });
     }
 
-    // Create collection from tag or folder
-    const result = await createCollection(
-      body.name,
-      body.tag,
-      body.folder
-    );
+    // For backward compatibility, convert a single name to collections array
+    const collections = body.collections || [body.name];
+    
+    // Create collections from tag or folder
+    const results = [];
+    
+    for (const collectionName of collections) {
+      const result = await createCollection(
+        collectionName,
+        body.tag,
+        body.folder
+      );
+      results.push(result);
+      
+      // If publicId provided, add it to the collection
+      if (body.publicId) {
+        try {
+          const organizeResult = await organizeAssets({
+            publicIds: [body.publicId],
+            tags: [collectionName]
+          });
+          console.log(`Added ${body.publicId} to collection ${collectionName}`);
+        } catch (err) {
+          console.error(`Error adding asset to collection ${collectionName}:`, err);
+        }
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 
-      message: `Successfully created or updated collection: ${body.name}`,
-      result 
+      message: `Successfully created or updated ${results.length} collections`,
+      results 
     });
   } catch (error) {
-    console.error('Error creating Cloudinary collection:', error);
+    console.error('Error creating Cloudinary collections:', error);
     return NextResponse.json({ 
       error: error instanceof Error ? error.message : 'An unknown error occurred' 
     }, { status: 500 });

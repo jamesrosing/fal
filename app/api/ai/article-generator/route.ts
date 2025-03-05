@@ -36,7 +36,10 @@ export async function POST(request: Request) {
   try {
     // Check if API key is configured
     const apiKey = process.env.ANTHROPIC_API_KEY;
+    console.log(`API Key present: ${!!apiKey}`);
+    
     if (!apiKey) {
+      console.error('ANTHROPIC_API_KEY not configured in environment variables');
       return NextResponse.json(
         { error: 'API key not configured' },
         { status: 500 }
@@ -51,6 +54,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    console.log(`Received article generation request with prompt: "${prompt.slice(0, 30)}..." for category: ${category}`);
 
     // Initialize Anthropic client
     const anthropic = new Anthropic({
@@ -87,45 +92,60 @@ Now write the complete article in the JSON format specified above.`;
 
     console.log('Sending request to Claude API...');
     // Create a message and get the model's response
-    const message = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 4000,
-      temperature: 0.7,
-      messages: [
-        { role: 'user', content: fullPrompt }
-      ],
-      system: "You are an expert medical content creator focused on plastic surgery and aesthetics. Generate well-structured, factual content using medical expertise and marketing knowledge."
-    });
-
-    // Parse the content from JSON format
-    const content = message.content[0].text;
     try {
-      // Extract the JSON portion - Claude sometimes wraps the JSON in markdown code blocks
-      const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+      const message = await anthropic.messages.create({
+        model: 'claude-3-sonnet-20240229',
+        max_tokens: 4000,
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: fullPrompt }
+        ],
+        system: "You are an expert medical content creator focused on plastic surgery and aesthetics. Generate well-structured, factual content using medical expertise and marketing knowledge."
+      });
+
+      // Parse the content from JSON format
+      // Access the content safely with type checking
+      const contentBlock = message.content[0];
+      const content = contentBlock && 'text' in contentBlock ? contentBlock.text : '';
+      
+      try {
+        // Extract the JSON portion - Claude sometimes wraps the JSON in markdown code blocks
+        const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
                          content.match(/```\s*([\s\S]*?)\s*```/) ||
                          [null, content];
-      
-      const jsonContent = jsonMatch[1].trim();
-      const article = JSON.parse(jsonContent);
-      
-      // Ensure the content is in the correct format
-      if (!article.title || !article.excerpt || !article.content) {
-        throw new Error('Generated content is missing required fields');
+        
+        const jsonContent = jsonMatch[1].trim();
+        const article = JSON.parse(jsonContent);
+        
+        // Ensure the content is in the correct format
+        if (!article.title || !article.excerpt || !article.content) {
+          throw new Error('Generated content is missing required fields');
+        }
+        
+        // Add status and category
+        article.status = 'draft';
+        article.category_id = category;
+        
+        return NextResponse.json({ article });
+      } catch (parseError) {
+        console.error('Error parsing Claude response:', parseError);
+        console.log('Raw content:', content);
+        return NextResponse.json(
+          { 
+            error: 'Failed to parse AI response', 
+            details: parseError instanceof Error ? parseError.message : 'Unknown parsing error',
+            raw_content: content
+          },
+          { status: 500 }
+        );
       }
-      
-      // Add status and category
-      article.status = 'draft';
-      article.category_id = category;
-      
-      return NextResponse.json({ article });
-    } catch (parseError) {
-      console.error('Error parsing Claude response:', parseError);
-      console.log('Raw content:', content);
+    } catch (apiError) {
+      console.error('Anthropic API error:', apiError);
       return NextResponse.json(
         { 
-          error: 'Failed to parse AI response', 
-          details: parseError instanceof Error ? parseError.message : 'Unknown parsing error',
-          raw_content: content
+          error: 'Anthropic API error', 
+          details: apiError instanceof Error ? apiError.message : 'Unknown API error',
+          status: 'error'
         },
         { status: 500 }
       );
@@ -135,7 +155,8 @@ Now write the complete article in the JSON format specified above.`;
     return NextResponse.json(
       { 
         error: 'Failed to generate article', 
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : null
       },
       { status: 500 }
     );

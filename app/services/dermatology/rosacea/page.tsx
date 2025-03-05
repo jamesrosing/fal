@@ -72,7 +72,7 @@ export default function RosaceaPage() {
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-rosacea.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133462/services-dermatology/hero/dermatology-rosacea.png"
             alt="Rosacea Treatment Services"
             fill
             className="object-cover"
@@ -100,6 +100,8 @@ export default function RosaceaPage() {
                 Our comprehensive rosacea treatment program combines advanced medical therapies
                 with personalized care to help you achieve clearer, calmer skin.
               </p>
+              <p>We&apos;re here to help you manage your rosacea effectively.</p>
+              <p>Our dermatology team specializes in treating rosacea and related conditions.</p>
               <div>
                 <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                 <br />

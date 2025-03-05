@@ -5,6 +5,9 @@ import { ChatInterface } from '@/components/ChatInterface';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const presetPrompts = [
   {
@@ -25,8 +28,19 @@ const presetPrompts = [
   }
 ];
 
+// Define available models
+const MODELS = [
+  { id: 'gpt-4', name: 'OpenAI GPT-4', description: 'Most capable model for complex tasks' },
+  { 
+    id: 'deepseek-reasoner', 
+    name: 'DeepSeek Reasoner', 
+    description: 'Shows step-by-step reasoning before providing the final answer'
+  }
+];
+
 export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
 
   return (
     <div className="flex h-screen bg-zinc-900">
@@ -97,6 +111,30 @@ export default function ChatPage() {
             ))}
           </div>
         </div>
+
+        <div className="p-4 border-b border-zinc-800">
+          <h2 className="text-lg font-semibold mb-4">Select AI Model</h2>
+          <RadioGroup value={selectedModel} onValueChange={setSelectedModel} className="space-y-4">
+            {MODELS.map((model) => (
+              <div key={model.id} className="flex items-start space-x-2">
+                <RadioGroupItem value={model.id} id={model.id} />
+                <div className="grid gap-1">
+                  <Label htmlFor={model.id} className="font-medium">{model.name}</Label>
+                  <p className="text-xs text-gray-500">{model.description}</p>
+                </div>
+              </div>
+            ))}
+          </RadioGroup>
+          
+          {selectedModel === 'deepseek-reasoner' && (
+            <div className="mt-4 p-3 bg-blue-900/30 rounded-md text-sm">
+              <p className="text-blue-200">
+                <strong>New!</strong> The DeepSeek Reasoner model shows its thinking process before
+                giving an answer, making it more transparent and helpful for complex questions.
+              </p>
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Main Chat Area */}
@@ -105,7 +143,7 @@ export default function ChatPage() {
         animate={{ opacity: 1 }}
         className="flex-1 relative"
       >
-        <ChatInterface />
+        <ChatInterface model={selectedModel} />
       </motion.div>
     </div>
   );

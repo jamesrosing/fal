@@ -90,9 +90,8 @@ export default function FinancingPage() {
                 Making your transformation accessible
               </h2>
               <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  We believe that financial considerations shouldn't stand in the way of achieving your aesthetic goals. Explore our flexible financing options and payment plans designed to make your treatment accessible.
-                </p>
+                <p>We&apos;re committed to making our services accessible to everyone.</p>
+                <p>We offer flexible financing options to help you achieve your goals.</p>
               </div>
             </motion.div>
           </div>

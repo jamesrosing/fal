@@ -72,7 +72,7 @@ export default function AcnePage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-acne.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133459/services-dermatology/hero/dermatology-acne.png"
             alt="Acne Treatment Services"
             fill
             className="object-cover"
@@ -100,6 +100,8 @@ export default function AcnePage() {
                   Our comprehensive acne treatment program combines the latest medical advances with
                   personalized care to help you achieve clear, healthy skin.
                 </p>
+                <p>We&apos;re here to help you achieve clear, healthy skin.</p>
+                <p>Our dermatology team specializes in treating acne and related conditions.</p>
                 <div>
                   <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
                   <br />

@@ -72,7 +72,7 @@ export default function SkinScreeningPage() {
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-skin-health.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png"
             alt="Skin Screening Services"
             fill
             className="object-cover"

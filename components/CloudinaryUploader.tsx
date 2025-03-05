@@ -142,19 +142,30 @@ export function CloudinaryUploader({
       // Add to collections if specified
       if (collections.length > 0 && typeof window !== 'undefined') {
         try {
-          // Add to collections via API - this is a server-side operation
-          // but we can trigger it via fetch
-          await fetch('/api/cloudinary/organize', {
+          // Log collection information for debugging
+          console.log('Adding to collections:', collections);
+          console.log('Asset public ID:', asset.publicId);
+          
+          // Add to collections via API
+          const response = await fetch('/api/cloudinary/organize', {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              name: collections[0], // Primary collection
+              publicId: asset.publicId,
+              collections: collections,
               tag: asset.tags && asset.tags.length > 0 ? asset.tags[0] : undefined,
               folder: folder || undefined
             }),
           });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error adding to collection:', errorData);
+          } else {
+            console.log('Successfully added to collections');
+          }
         } catch (err) {
           console.error('Error adding to collection:', err);
         }

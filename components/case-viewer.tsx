@@ -16,13 +16,13 @@ export function CaseViewer({ images }: CaseViewerProps) {
   const [currentIndex, setCurrentIndex] = React.useState(0)
   const [isLoading, setIsLoading] = React.useState(true)
 
-  const handlePrevious = () => {
+  const handlePrevious = React.useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
-  }
+  }, [images.length])
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
-  }
+  }, [images.length])
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -32,7 +32,7 @@ export function CaseViewer({ images }: CaseViewerProps) {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [])
+  }, [handlePrevious, handleNext])
 
   // Reset loading state when image changes
   React.useEffect(() => {

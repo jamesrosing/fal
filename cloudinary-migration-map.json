@@ -1,0 +1,655 @@
+{
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133459/services-dermatology/hero/dermatology-acne.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-acne",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133460/services-dermatology/hero/dermatology-eczema.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-eczema",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-skin-health",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133462/services-dermatology/hero/dermatology-rosacea.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-rosacea",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133463/services-dermatology/hero/dermatology-psoriasis.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-psoriasis",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133464/services-dermatology/hero/dermatology-hero.png": {
+    "folder": "services-dermatology/hero",
+    "publicId": "dermatology-hero",
+    "tags": [
+      "dermatology",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for dermatology page",
+    "context": {
+      "page": "Dermatology",
+      "section": "Hero Section",
+      "usage": "Hero image for dermatology page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133465/articles/categories/functional-medicine-cardio.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-cardio",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133466/articles/categories/functional-medicine-epigenetic.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-epigenetic",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133467/articles/categories/functional-medicine-hair.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-hair",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-hormone.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-hormone",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-neuro.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-neuro",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133469/articles/categories/functional-medicine-sleep.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-sleep",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133470/articles/categories/functional-medicine-hero.png": {
+    "folder": "articles/categories",
+    "publicId": "functional-medicine-hero",
+    "tags": [
+      "articles",
+      "categories",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Thumbnail for functional medicine articles",
+    "context": {
+      "page": "Articles",
+      "section": "Article Categories",
+      "usage": "Thumbnail for functional medicine articles"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133471/services-medical-spa/hero/medical-spa-emsculpt.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-emsculpt",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133472/services-medical-spa/hero/medical-spa-shapescale.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-shapescale",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133473/services-medical-spa/hero/medical-spa-rf-microneedling.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-rf-microneedling",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133474/services-medical-spa/hero/medical-spa-injections.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-injections",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133475/services-medical-spa/hero/medical-spa-lasers.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-lasers",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133476/services-medical-spa/hero/medical-spa-facials.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-facials",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133477/services-medical-spa/hero/medical-spa-hero.png": {
+    "folder": "services-medical-spa/hero",
+    "publicId": "medical-spa-hero",
+    "tags": [
+      "medical-spa",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for medical spa page",
+    "context": {
+      "page": "Medical Spa",
+      "section": "Hero Section",
+      "usage": "Hero image for medical spa page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133478/services-plastic-surgery/hero/plastic-surgery-face-neck-procedures.png": {
+    "folder": "services-plastic-surgery/hero",
+    "publicId": "plastic-surgery-face-neck-procedures",
+    "tags": [
+      "plastic-surgery",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for plastic surgery page",
+    "context": {
+      "page": "Plastic Surgery",
+      "section": "Hero Section",
+      "usage": "Hero image for plastic surgery page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-breast-procedures.png": {
+    "folder": "services-plastic-surgery/hero",
+    "publicId": "plastic-surgery-breast-procedures",
+    "tags": [
+      "plastic-surgery",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for plastic surgery page",
+    "context": {
+      "page": "Plastic Surgery",
+      "section": "Hero Section",
+      "usage": "Hero image for plastic surgery page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-body-procedures.png": {
+    "folder": "services-plastic-surgery/hero",
+    "publicId": "plastic-surgery-body-procedures",
+    "tags": [
+      "plastic-surgery",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for plastic surgery page",
+    "context": {
+      "page": "Plastic Surgery",
+      "section": "Hero Section",
+      "usage": "Hero image for plastic surgery page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133480/services-plastic-surgery/hero/plastic-surgery-hero.png": {
+    "folder": "services-plastic-surgery/hero",
+    "publicId": "plastic-surgery-hero",
+    "tags": [
+      "plastic-surgery",
+      "hero",
+      "image",
+      "single",
+      "image",
+      "image",
+      "image",
+      "image"
+    ],
+    "alt": "Hero image for plastic surgery page",
+    "context": {
+      "page": "Plastic Surgery",
+      "section": "Hero Section",
+      "usage": "Hero image for plastic surgery page"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133481/team/headshots/allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.png": {
+    "folder": "team/headshots",
+    "publicId": "allure%20md%20team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6",
+    "tags": [
+      "image",
+      "team",
+      "headshot"
+    ],
+    "alt": "allure%20md%20team 6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6",
+    "context": {
+      "usage": "allure%20md%20team 6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133482/uncategorized/susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.png": {
+    "folder": "uncategorized",
+    "publicId": "susan%20pearose%20skin%20examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3",
+    "tags": [
+      "image"
+    ],
+    "alt": "susan%20pearose%20skin%20examination Jdk8aLXVjRXYUUjqB525YpkY7dPtI3",
+    "context": {
+      "usage": "susan%20pearose%20skin%20examination Jdk8aLXVjRXYUUjqB525YpkY7dPtI3"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133483/uncategorized/dr.png": {
+    "folder": "uncategorized",
+    "publicId": "dr",
+    "tags": [
+      "image"
+    ],
+    "alt": "dr",
+    "context": {
+      "usage": "dr"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133483/procedures/julia%2520oxygeneo%2520facial%2520procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm.png": {
+    "folder": "procedures",
+    "publicId": "julia%20oxygeneo%20facial%20procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm",
+    "tags": [
+      "image",
+      "procedure"
+    ],
+    "alt": "julia%20oxygeneo%20facial%20procedure ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm",
+    "context": {
+      "usage": "julia%20oxygeneo%20facial%20procedure ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133484/uncategorized/Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology.png": {
+    "folder": "uncategorized",
+    "publicId": "Allure%20MD%20Plastic%20Surgery%20+%20Dermatology",
+    "tags": [
+      "image"
+    ],
+    "alt": "Allure%20MD%20Plastic%20Surgery%20+%20Dermatology",
+    "context": {
+      "usage": "Allure%20MD%20Plastic%20Surgery%20+%20Dermatology"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133485/uncategorized/Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ.png": {
+    "folder": "uncategorized",
+    "publicId": "Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ",
+    "tags": [
+      "image"
+    ],
+    "alt": "Dr_James_Rosing_white_bg 5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ",
+    "context": {
+      "usage": "Dr_James_Rosing_white_bg 5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/services/dermatology/susan%2520pearose%2520dermatology%2520headshot%25201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL.png": {
+    "folder": "services/dermatology",
+    "publicId": "susan%20pearose%20dermatology%20headshot%201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL",
+    "tags": [
+      "image",
+      "service",
+      "dermatology"
+    ],
+    "alt": "susan%20pearose%20dermatology%20headshot%201 Jsjg50FwPodXo3xuTN7sv0WlGo63gL",
+    "context": {
+      "usage": "susan%20pearose%20dermatology%20headshot%201 Jsjg50FwPodXo3xuTN7sv0WlGo63gL"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/team/headshots/julia%2520medical%2520esthetican%2520headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ.png": {
+    "folder": "team/headshots",
+    "publicId": "julia%20medical%20esthetican%20headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ",
+    "tags": [
+      "image",
+      "team",
+      "headshot"
+    ],
+    "alt": "julia%20medical%20esthetican%20headshot ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ",
+    "context": {
+      "usage": "julia%20medical%20esthetican%20headshot ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133487/team/headshots/pooja%2520gidwani%2520md%2520functional%2520medince%2520headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR.png": {
+    "folder": "team/headshots",
+    "publicId": "pooja%20gidwani%20md%20functional%20medince%20headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR",
+    "tags": [
+      "image",
+      "team",
+      "headshot"
+    ],
+    "alt": "pooja%20gidwani%20md%20functional%20medince%20headshot yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR",
+    "context": {
+      "usage": "pooja%20gidwani%20md%20functional%20medince%20headshot yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR"
+    }
+  },
+  "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133488/uncategorized/example-image-UniqueID.png": {
+    "folder": "uncategorized",
+    "publicId": "example-image-UniqueID",
+    "tags": [
+      "image"
+    ],
+    "alt": "example image UniqueID",
+    "context": {
+      "usage": "example image UniqueID"
+    }
+  }
+}

@@ -72,7 +72,7 @@ export default function CardiometabolicPage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-cardio.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133465/articles/categories/functional-medicine-cardio.png"
             alt="Cardiometabolic Health Services"
             fill
             className="object-cover"

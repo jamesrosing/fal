@@ -6,10 +6,10 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect, useState } from "react"
 import { TeamMember } from "@/lib/supabase"
-import { getImageUrl, IMAGE_ASSETS } from "@/lib/image-config"
 import { Button } from "@/components/ui/button"
 import { Copy, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { getCloudinaryUrl } from "@/lib/cloudinary"
 
 function TeamMemberCard({ member, isPhysician = false }: { 
   member: TeamMember
@@ -17,8 +17,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
 }) {
   const { toast } = useToast()
   const isDevelopment = process.env.NODE_ENV === 'development'
-  const assetId = `team-${member.id}`
-  const hasUploadedImage = Boolean(IMAGE_ASSETS[assetId])
+  const assetId = `team/headshots/team-${member.id}`
 
   const copyAssetId = () => {
     navigator.clipboard.writeText(assetId)
@@ -28,8 +27,14 @@ function TeamMemberCard({ member, isPhysician = false }: {
     })
   }
 
-  // Use member.image_url as fallback if no uploaded image
-  const imageUrl = hasUploadedImage ? getImageUrl(assetId) : (member.image_url || '/images/placeholder-team.jpg')
+  // Get the Cloudinary URL for the team member's image
+  const imageUrl = member.image_url ? getCloudinaryUrl(assetId, {
+    width: 600,
+    height: 800,
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90
+  }) : '/images/placeholder-team.jpg'
 
   return (
     <motion.div
@@ -45,25 +50,24 @@ function TeamMemberCard({ member, isPhysician = false }: {
           alt={member.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
         
         {isDevelopment && (
           <div className="absolute top-2 right-2 flex gap-2">
-            {!hasUploadedImage && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-black/50 hover:bg-black/70"
-                onClick={() => {
-                  copyAssetId()
-                  window.open('/admin/images', '_blank')
-                }}
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Upload Image
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-black/50 hover:bg-black/70"
+              onClick={() => {
+                copyAssetId()
+                window.open('/admin/images', '_blank')
+              }}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Image
+            </Button>
             <Button 
               variant="outline" 
               size="sm"
@@ -85,9 +89,6 @@ function TeamMemberCard({ member, isPhysician = false }: {
         {isDevelopment && (
           <div className="mt-2 text-xs text-zinc-400">
             <p>Asset ID: {assetId}</p>
-            {!hasUploadedImage && (
-              <p className="text-yellow-400">Image not yet uploaded to Cloudinary</p>
-            )}
           </div>
         )}
       </div>
@@ -130,6 +131,14 @@ export default function Team() {
     return <div>Error: {error}</div>
   }
 
+  const heroImageUrl = getCloudinaryUrl('hero/hero-team', {
+    width: 1920,
+    height: 1080,
+    crop: 'fill',
+    gravity: 'auto',
+    quality: 85
+  })
+
   return (
     <main className="min-h-screen bg-black">
       <NavBar />
@@ -138,11 +147,12 @@ export default function Team() {
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src={getImageUrl('hero-team')}
+            src={heroImageUrl}
             alt="Our Team"
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>

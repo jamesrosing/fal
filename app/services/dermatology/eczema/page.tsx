@@ -72,7 +72,7 @@ export default function EczemaPage() {
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dermatology-eczema.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133460/services-dermatology/hero/dermatology-eczema.png"
             alt="Eczema Treatment Services"
             fill
             className="object-cover"
@@ -97,8 +97,10 @@ export default function EczemaPage() {
             </h2>
             <div className="space-y-6 text-lg font-cerebri font-light">
               <p>
-                Our specialized eczema treatment program combines proven medical therapies with
-                personalized care to help you achieve lasting relief and healthier skin.
+                We&apos;re here to help you manage your eczema effectively.
+              </p>
+              <p>
+                Our dermatology team specializes in treating eczema and related conditions.
               </p>
               <div>
                 <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>

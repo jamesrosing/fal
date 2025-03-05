@@ -8,6 +8,16 @@ interface DuplicateGroup {
   similarity: number;
 }
 
+interface CloudinaryAsset {
+  public_id: string;
+  secure_url: string;
+  width: number;
+  height: number;
+  format: string;
+  created_at: string;
+  bytes: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { threshold = 0.8 } = await request.json();
@@ -136,53 +146,64 @@ export async function GET(request: NextRequest) {
     }
     
     const searchResult = await searchResponse.json();
-    const assets = searchResult.resources || [];
+    const assets = searchResult.resources || [] as CloudinaryAsset[];
     
     // Create basic duplicate groups by filename, size, and dimensions
     // This is a simpler approach than perceptual hashing
-    const sizeMap = new Map();
-    const dimensionMap = new Map();
-    const filenameMap = new Map();
+    const sizeMap = new Map<number, CloudinaryAsset[]>();
+    const dimensionMap = new Map<string, CloudinaryAsset[]>();
+    const filenameMap = new Map<string, CloudinaryAsset[]>();
     
-    assets.forEach(asset => {
+    assets.forEach((asset: CloudinaryAsset) => {
       // Group by file size
       const size = asset.bytes;
       if (!sizeMap.has(size)) sizeMap.set(size, []);
-      sizeMap.get(size).push(asset);
+      sizeMap.get(size)?.push(asset);
       
       // Group by dimensions
       const dimensions = `${asset.width}x${asset.height}`;
       if (!dimensionMap.has(dimensions)) dimensionMap.set(dimensions, []);
-      dimensionMap.get(dimensions).push(asset);
+      dimensionMap.get(dimensions)?.push(asset);
       
       // Group by filename (without path)
-      const filename = asset.public_id.split('/').pop();
+      const filename = asset.public_id.split('/').pop() || '';
       if (!filenameMap.has(filename)) filenameMap.set(filename, []);
-      filenameMap.get(filename).push(asset);
+      filenameMap.get(filename)?.push(asset);
     });
     
     // Find potential duplicates (assets that share multiple characteristics)
-    const potentialDuplicates = [];
+    const potentialDuplicates: Array<{
+      criteria: string;
+      publicIds: string[];
+      assets: Array<{
+        publicId: string;
+        url: string;
+        width: number;
+        height: number;
+        format: string;
+        created: string;
+      }>;
+    }> = [];
     
     // Check size groups
-    for (const [size, sizeGroup] of sizeMap.entries()) {
+    for (const [size, sizeGroup] of Array.from(sizeMap.entries())) {
       if (sizeGroup.length > 1) {
         // Further refine by dimensions
-        const sizeAndDimGroups = new Map();
+        const sizeAndDimGroups = new Map<string, CloudinaryAsset[]>();
         
-        sizeGroup.forEach(asset => {
+        sizeGroup.forEach((asset: CloudinaryAsset) => {
           const dimensions = `${asset.width}x${asset.height}`;
           if (!sizeAndDimGroups.has(dimensions)) sizeAndDimGroups.set(dimensions, []);
-          sizeAndDimGroups.get(dimensions).push(asset);
+          sizeAndDimGroups.get(dimensions)?.push(asset);
         });
         
         // Add dimension groups with multiple assets as potential duplicates
-        for (const [dimensions, assets] of sizeAndDimGroups.entries()) {
+        for (const [dimensions, assets] of Array.from(sizeAndDimGroups.entries())) {
           if (assets.length > 1) {
             potentialDuplicates.push({
               criteria: `size ${size} bytes, dimensions ${dimensions}`,
-              publicIds: assets.map(a => a.public_id),
-              assets: assets.map(a => ({
+              publicIds: assets.map((a: CloudinaryAsset) => a.public_id),
+              assets: assets.map((a: CloudinaryAsset) => ({
                 publicId: a.public_id,
                 url: a.secure_url,
                 width: a.width,
@@ -197,12 +218,12 @@ export async function GET(request: NextRequest) {
     }
     
     // Check filename groups (different paths but same filename)
-    for (const [filename, assets] of filenameMap.entries()) {
+    for (const [filename, assets] of Array.from(filenameMap.entries())) {
       if (assets.length > 1 && filename) { // Ensure filename isn't empty
         potentialDuplicates.push({
           criteria: `filename "${filename}"`,
-          publicIds: assets.map(a => a.public_id),
-          assets: assets.map(a => ({
+          publicIds: assets.map((a: CloudinaryAsset) => a.public_id),
+          assets: assets.map((a: CloudinaryAsset) => ({
             publicId: a.public_id,
             url: a.secure_url,
             width: a.width,

@@ -72,7 +72,7 @@ export default function SleepTravelPage() {
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/functional-medicine-sleep.webp"
+            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133469/articles/categories/functional-medicine-sleep.png"
             alt="Sleep & Travel Optimization Services"
             fill
             className="object-cover"

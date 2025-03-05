@@ -9,7 +9,7 @@ export function PlasticSurgerySection() {
     <section className="relative h-screen">
       <div className="absolute inset-0">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Allure%20MD%20Plastic%20Surgery%20+%20Dermatology.jpg-F9audkfbyoMRm8Bj6ss2sCa26IEGeK.jpeg"
+          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133484/uncategorized/Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology.png"
           alt="Plastic Surgery at Allure MD"
           fill
           className="object-cover"
