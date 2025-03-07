@@ -1,133 +1,195 @@
-// app/api/chat/route.ts
-import { OpenAI } from 'openai';
-import { OpenAIStream, StreamingTextResponse } from 'ai';
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import openaiClient from '@/lib/openai-client';
+import { ZenotiService } from '@/lib/zenoti';
 
-interface Message {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
-
-interface ChatRequest {
-  messages: Message[];
-  model?: string;
-}
-
-interface ErrorResponse {
-  error: string;
-  details?: unknown;
-}
-
-export const runtime = 'edge';
+// Define function schema for OpenAI function calling
+const functions = [
+  {
+    name: 'get_services',
+    description: 'Get available services from the system',
+    parameters: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: 'Optional category to filter services by (e.g., "facial", "massage", "hair")',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_providers',
+    description: 'Get service providers/staff members',
+    parameters: {
+      type: 'object',
+      properties: {
+        specialty: {
+          type: 'string',
+          description: 'Optional specialty to filter providers by (e.g., "dermatology", "massage")',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'check_availability',
+    description: 'Check available time slots for a service',
+    parameters: {
+      type: 'object',
+      properties: {
+        service_id: {
+          type: 'string',
+          description: 'ID of the service to check availability for',
+        },
+        date: {
+          type: 'string',
+          description: 'Date to check availability for in YYYY-MM-DD format',
+        },
+        provider_id: {
+          type: 'string',
+          description: 'Optional ID of the specific provider to check availability for',
+        },
+      },
+      required: ['service_id', 'date'],
+    },
+  },
+  {
+    name: 'book_appointment',
+    description: 'Book an appointment with a provider',
+    parameters: {
+      type: 'object',
+      properties: {
+        service_id: {
+          type: 'string',
+          description: 'ID of the service to book',
+        },
+        provider_id: {
+          type: 'string',
+          description: 'ID of the provider to book with',
+        },
+        slot_id: {
+          type: 'string',
+          description: 'ID of the time slot to book',
+        },
+        guest_first_name: {
+          type: 'string',
+          description: 'First name of the guest',
+        },
+        guest_last_name: {
+          type: 'string',
+          description: 'Last name of the guest',
+        },
+        guest_email: {
+          type: 'string',
+          description: 'Email of the guest',
+        },
+        guest_phone: {
+          type: 'string',
+          description: 'Phone number of the guest',
+        },
+        notes: {
+          type: 'string',
+          description: 'Optional notes for the appointment',
+        },
+      },
+      required: ['service_id', 'provider_id', 'slot_id', 'guest_first_name', 'guest_last_name', 'guest_email', 'guest_phone'],
+    },
+  },
+];
 
 export async function POST(req: Request) {
   try {
-    // Get request body
-    const { messages, model } = await req.json();
-
-    // Check if deepseek model is requested
-    const isDeepSeek = model === 'deepseek-reasoner';
-    const apiKey = isDeepSeek 
-      ? process.env.DEEPSEEK_API_KEY 
-      : process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY;
+    const { messages, userId } = await req.json();
     
-    // Set up the proper client based on model type
-    let client;
-    let stream;
+    // Create a chat completion with function calling
+    const response = await openaiClient.chat.completions.create({
+      model: 'gpt-4-turbo-preview',
+      messages,
+      functions,
+      temperature: 0.7,
+    });
     
-    if (isDeepSeek) {
-      client = new OpenAI({
-        apiKey: apiKey,
-        baseURL: 'https://api.deepseek.com',
-      });
+    const message = response.choices[0].message;
+    
+    // Check if the model wants to call a function
+    if (message.function_call) {
+      const functionName = message.function_call.name;
+      const functionArgs = JSON.parse(message.function_call.arguments);
       
-      const response = await client.chat.completions.create({
-        model: 'deepseek-reasoner',
-        messages,
-        stream: true,
-      });
+      let functionResponse;
       
-      // Create a TransformStream to extract reasoning_content
-      const reasoningTransformer = new TransformStream({
-        start(controller) {
-          controller.enqueue('# Thinking Process\n\n');
-        },
-        transform(chunk, controller) {
-          // Only pass reasoning content to the transformer output
-          if (chunk.choices[0]?.delta?.reasoning_content) {
-            controller.enqueue(chunk.choices[0].delta.reasoning_content);
+      // Execute the appropriate function
+      switch (functionName) {
+        case 'get_services':
+          if (functionArgs.category) {
+            functionResponse = await ZenotiService.getServicesByCategory(functionArgs.category);
+          } else {
+            functionResponse = await ZenotiService.getServices();
           }
-        },
-        flush(controller) {
-          controller.enqueue('\n\n# Answer\n\n');
-        }
-      });
-      
-      // Create a TransformStream for the final content
-      const contentTransformer = new TransformStream({
-        transform(chunk, controller) {
-          // Only pass regular content to the transformer output
-          if (chunk.choices[0]?.delta?.content) {
-            controller.enqueue(chunk.choices[0].delta.content);
-          }
-        }
-      });
-      
-      // Split the response through both transformers
-      const [reasoningStream, contentStream] = response.toReadableStream().tee();
-      
-      // Connect the streams to their respective transformers
-      const processedReasoningStream = reasoningStream.pipeThrough(reasoningTransformer);
-      const processedContentStream = contentStream.pipeThrough(contentTransformer);
-      
-      // Merge the two streams into a single ReadableStream
-      const mergedStream = new ReadableStream({
-        async start(controller) {
-          const reasoningReader = processedReasoningStream.getReader();
-          const contentReader = processedContentStream.getReader();
+          break;
           
-          // First get all reasoning content
-          let reasoningDone = false;
-          while (!reasoningDone) {
-            const { done, value } = await reasoningReader.read();
-            reasoningDone = done;
-            if (!done && value) {
-              controller.enqueue(value);
-            }
+        case 'get_providers':
+          if (functionArgs.specialty) {
+            functionResponse = await ZenotiService.getProvidersBySpecialty(functionArgs.specialty);
+          } else {
+            functionResponse = await ZenotiService.getProviders();
           }
+          break;
           
-          // Then get all content
-          let contentDone = false;
-          while (!contentDone) {
-            const { done, value } = await contentReader.read();
-            contentDone = done;
-            if (!done && value) {
-              controller.enqueue(value);
-            }
-          }
+        case 'check_availability':
+          functionResponse = await ZenotiService.getAvailability(
+            functionArgs.service_id,
+            functionArgs.date,
+            functionArgs.provider_id
+          );
+          break;
           
-          controller.close();
-        }
+        case 'book_appointment':
+          functionResponse = await ZenotiService.bookAppointment({
+            booking_id: '', // Will be assigned by Zenoti
+            service_id: functionArgs.service_id,
+            provider_id: functionArgs.provider_id,
+            slot_id: functionArgs.slot_id,
+            guest: {
+              first_name: functionArgs.guest_first_name,
+              last_name: functionArgs.guest_last_name,
+              email: functionArgs.guest_email,
+              phone: functionArgs.guest_phone,
+            },
+            notes: functionArgs.notes,
+          });
+          break;
+          
+        default:
+          functionResponse = { error: `Function ${functionName} not implemented` };
+      }
+      
+      // Send the function result back to OpenAI to get a final response
+      const secondResponse = await openaiClient.chat.completions.create({
+        model: 'gpt-4-turbo-preview',
+        messages: [
+          ...messages,
+          message,
+          {
+            role: 'function',
+            name: functionName,
+            content: JSON.stringify(functionResponse),
+          },
+        ],
+        temperature: 0.7,
       });
       
-      return new StreamingTextResponse(mergedStream);
-    } else {
-      // Default to OpenAI or Anthropic
-      client = new OpenAI({
-        apiKey,
-      });
-      
-      const response = await client.chat.completions.create({
-        model: model || 'gpt-4',
-        messages,
-        stream: true,
-      });
-      
-      stream = OpenAIStream(response);
-      return new StreamingTextResponse(stream);
+      return NextResponse.json(secondResponse.choices[0].message);
     }
-  } catch (error) {
+    
+    // If no function call is needed, return the response directly
+    return NextResponse.json(message);
+  } catch (error: any) {
     console.error('Chat API error:', error);
-    return NextResponse.json({ error: 'Failed to generate response' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'An error occurred' },
+      { status: 500 }
+    );
   }
 }
