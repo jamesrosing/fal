@@ -1,0 +1,443 @@
+[
+  {
+    "id": "app",
+    "name": "App",
+    "path": "/app",
+    "sections": [
+      {
+        "id": "home",
+        "name": "Home",
+        "description": "Home page content and media assets",
+        "mediaPlaceholders": []
+      },
+      {
+        "id": "about",
+        "name": "About",
+        "description": "About page content and media assets",
+        "mediaPlaceholders": []
+      },
+      {
+        "id": "team",
+        "name": "Team",
+        "description": "Team page content and media assets",
+        "mediaPlaceholders": []
+      }
+    ]
+  },
+  {
+    "id": "components",
+    "name": "Components",
+    "path": "/components",
+    "sections": [
+      {
+        "id": "hero",
+        "name": "Hero",
+        "description": "Hero components and banners",
+        "mediaPlaceholders": []
+      },
+      {
+        "id": "general",
+        "name": "General",
+        "description": "General content for Components",
+        "mediaPlaceholders": [
+          {
+            "id": "Sleep & Travel Optimization Services",
+            "name": "Sleep & Travel Optimization Services",
+            "description": "Sleep & Travel Optimization Services",
+            "path": "app/services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
+            "area": "services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Neurocognitive Performance Services",
+            "name": "Neurocognitive Performance Services",
+            "description": "Neurocognitive Performance Services",
+            "path": "app/services\\functional-medicine\\neurocognitive-performance\\page.tsx",
+            "area": "services\\functional-medicine\\neurocognitive-performance\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Hormone Optimization Services",
+            "name": "Hormone Optimization Services",
+            "description": "Hormone Optimization Services",
+            "path": "app/services\\functional-medicine\\hormone-optimization\\page.tsx",
+            "area": "services\\functional-medicine\\hormone-optimization\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Hair Restoration Services",
+            "name": "Hair Restoration Services",
+            "description": "Hair Restoration Services",
+            "path": "app/services\\functional-medicine\\hair-restoration\\page.tsx",
+            "area": "services\\functional-medicine\\hair-restoration\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Epigenetic Optimization Services",
+            "name": "Epigenetic Optimization Services",
+            "description": "Epigenetic Optimization Services",
+            "path": "app/services\\functional-medicine\\epigenetic-optimization\\page.tsx",
+            "area": "services\\functional-medicine\\epigenetic-optimization\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Cardiometabolic Health Services",
+            "name": "Cardiometabolic Health Services",
+            "description": "Cardiometabolic Health Services",
+            "path": "app/services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
+            "area": "services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Skin Screening Services",
+            "name": "Skin Screening Services",
+            "description": "Skin Screening Services",
+            "path": "app/services\\dermatology\\skin-screening\\page.tsx",
+            "area": "services\\dermatology\\skin-screening\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Rosacea Treatment Services",
+            "name": "Rosacea Treatment Services",
+            "description": "Rosacea Treatment Services",
+            "path": "app/services\\dermatology\\rosacea\\page.tsx",
+            "area": "services\\dermatology\\rosacea\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Psoriasis Treatment Services",
+            "name": "Psoriasis Treatment Services",
+            "description": "Psoriasis Treatment Services",
+            "path": "app/services\\dermatology\\psoriasis\\page.tsx",
+            "area": "services\\dermatology\\psoriasis\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Eczema Treatment Services",
+            "name": "Eczema Treatment Services",
+            "description": "Eczema Treatment Services",
+            "path": "app/services\\dermatology\\eczema\\page.tsx",
+            "area": "services\\dermatology\\eczema\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Acne Treatment Services",
+            "name": "Acne Treatment Services",
+            "description": "Acne Treatment Services",
+            "path": "app/services\\dermatology\\acne\\page.tsx",
+            "area": "services\\dermatology\\acne\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Contact Allure MD",
+            "name": "Contact Allure MD",
+            "description": "Contact Allure MD",
+            "path": "app/contact\\page.tsx",
+            "area": "contact\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Mountain landscape",
+            "name": "Mountain landscape",
+            "description": "Mountain landscape",
+            "path": "app/cloudinary-demo\\page.tsx",
+            "area": "cloudinary-demo\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Team member",
+            "name": "Team member",
+            "description": "Team member",
+            "path": "app/cloudinary-demo\\page.tsx",
+            "area": "cloudinary-demo\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Cat",
+            "name": "Cat",
+            "description": "Cat",
+            "path": "app/cloudinary-demo\\page.tsx",
+            "area": "cloudinary-demo\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Uploaded image",
+            "name": "Uploaded image",
+            "description": "Uploaded image",
+            "path": "app/cloudinary-demo\\page.tsx",
+            "area": "cloudinary-demo\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Anna",
+            "name": "Anna",
+            "description": "Anna",
+            "path": "app/chat\\page.tsx",
+            "area": "chat\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Schedule an Appointment",
+            "name": "Schedule an Appointment",
+            "description": "Schedule an Appointment",
+            "path": "app/appointment\\page.tsx",
+            "area": "appointment\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Case image",
+            "name": "Case image",
+            "description": "Case image",
+            "path": "app/admin\\gallery\\[collection]\\[album]\\[caseId]\\page.tsx",
+            "area": "admin\\gallery\\[collection]\\[album]\\[caseId]\\page.tsx",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "ALLURE MD",
+            "name": "ALLURE MD",
+            "description": "ALLURE MD",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Preview",
+            "name": "Preview",
+            "description": "Preview",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Processed Image",
+            "name": "Processed Image",
+            "description": "Processed Image",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Processed Image",
+            "name": "Processed Image",
+            "description": "Processed Image",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Anna",
+            "name": "Anna",
+            "description": "Anna",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Anna",
+            "name": "Anna",
+            "description": "Anna",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Background",
+            "name": "Background",
+            "description": "Background",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Video poster",
+            "name": "Video poster",
+            "description": "Video poster",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Plastic Surgery at Allure MD",
+            "name": "Plastic Surgery at Allure MD",
+            "description": "Plastic Surgery at Allure MD",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Medical spa treatment",
+            "name": "Medical spa treatment",
+            "description": "Medical spa treatment",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Dr. Gidwani consulting with patient",
+            "name": "Dr. Gidwani consulting with patient",
+            "description": "Dr. Gidwani consulting with patient",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Dermatology examination",
+            "name": "Dermatology examination",
+            "description": "Dermatology examination",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Allure MD Medical Team",
+            "name": "Allure MD Medical Team",
+            "description": "Allure MD Medical Team",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          },
+          {
+            "id": "Allure MD Medical Team",
+            "name": "Allure MD Medical Team",
+            "description": "Allure MD Medical Team",
+            "path": "components/general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

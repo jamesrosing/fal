@@ -165,14 +165,26 @@ export const getCloudinaryUrl = (
   publicId: string,
   options: CloudinaryImageOptions = {}
 ) => {
+  // If publicId is already a full URL (starts with http or https), return it as is
+  if (publicId && (publicId.startsWith('http://') || publicId.startsWith('https://'))) {
+    console.log('URL already provided, skipping Cloudinary transformation:', publicId);
+    return publicId;
+  }
+
   const {
     width = 'auto',
     height = 'auto',
     quality = 90,
     format = 'auto',
     crop = 'scale',
-    gravity = 'auto'
+    gravity = 'auto',
+    simplifiedMode = false
   } = options;
+
+  // For simplified mode, use fewer transformations
+  if (simplifiedMode) {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  }
 
   return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}${height !== 'auto' ? `,h_${height}` : ''},c_${crop},g_${gravity}/${publicId}`;
 };

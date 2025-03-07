@@ -1,18 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { Database } from './database.types';
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
-}
+/**
+ * Supabase Client
+ * 
+ * This module provides a function to create a Supabase client
+ * for interacting with the Supabase database.
+ */
 
-if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
-}
+// Get the Supabase URL and key from environment variables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+/**
+ * Create a Supabase client
+ * @returns A Supabase client instance
+ */
+export function createClient() {
+  return createSupabaseClient(supabaseUrl, supabaseKey);
+}
 
 // Types for our database tables
 export interface Gallery {
@@ -101,7 +107,7 @@ export interface ArticleCategory {
 
 // Helper functions for database operations
 export async function getGalleries() {
-  const { data, error } = await supabase
+  const { data, error } = await createClient()
     .from('galleries')
     .select('*')
     .order('created_at', { ascending: false });
@@ -111,7 +117,7 @@ export async function getGalleries() {
 }
 
 export async function getGalleryByTitle(title: string) {
-  const { data, error } = await supabase
+  const { data, error } = await createClient()
     .from('galleries')
     .select('*')
     .eq('title', title)
@@ -123,7 +129,7 @@ export async function getGalleryByTitle(title: string) {
 
 export async function getAlbumsByGallery(galleryIdOrTitle: string) {
   // First try to get albums by gallery ID
-  let { data, error } = await supabase
+  let { data, error } = await createClient()
     .from('albums')
     .select('*')
     .eq('gallery_id', galleryIdOrTitle)
@@ -134,7 +140,7 @@ export async function getAlbumsByGallery(galleryIdOrTitle: string) {
     const gallery = await getGalleryByTitle(galleryIdOrTitle);
     if (!gallery) throw new Error('Gallery not found');
     
-    const result = await supabase
+    const result = await createClient()
       .from('albums')
       .select('*')
       .eq('gallery_id', gallery.id)
@@ -146,11 +152,16 @@ export async function getAlbumsByGallery(galleryIdOrTitle: string) {
     throw error;
   }
   
+  // Sort albums by order
+  data.sort((a: any, b: any) => {
+    return a.order - b.order;
+  });
+  
   return data as Album[];
 }
 
 export async function getCasesByAlbum(albumId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await createClient()
     .from('cases')
     .select('*, images(*)')
     .eq('album_id', albumId)
@@ -171,11 +182,16 @@ export async function getCasesByAlbum(albumId: string) {
     return caseItem;
   });
   
+  // Sort cases by order
+  casesWithSortedImages.sort((a: any, b: any) => {
+    return a.order - b.order;
+  });
+  
   return casesWithSortedImages as (Case & { images: Image[] })[];
 }
 
 export async function getCase(caseId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await createClient()
     .from('cases')
     .select('*, images(*)')
     .eq('id', caseId)

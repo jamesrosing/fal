@@ -144,4 +144,34 @@ export const ARTICLE_SUBCATEGORIES: Record<ArticleCategory, SubcategoryDefinitio
     { id: 'hormone', name: 'Hormone Therapy' },
     { id: 'wellness', name: 'Wellness' },
   ],
+};
+
+/**
+ * Media Placeholder Types
+ * 
+ * These types define the structure of media placeholders in the application.
+ */
+
+export type MediaPlaceholder = {
+  id: string;
+  type: 'image' | 'video';
+  page: string;
+  section?: string;
+  container?: string;
+  dimensions?: {
+    width: number;
+    height: number;
+    aspectRatio: number;
+  };
+  description?: string;
+};
+
+export type MediaAsset = {
+  id: string;
+  placeholder_id: string;
+  cloudinary_id: string;
+  type: 'image' | 'video';
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }; 

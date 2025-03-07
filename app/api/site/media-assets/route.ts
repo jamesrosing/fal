@@ -1,0 +1,112 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase';
+
+// Make the route work with Next.js App Router
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+/**
+ * GET handler for media assets API
+ * Returns a mapping of placeholder IDs to Cloudinary public IDs
+ */
+export async function GET() {
+  try {
+    const supabase = createClient();
+    
+    // Check if we have Supabase configured
+    if (supabase) {
+      // Try to get media assets from Supabase
+      const { data, error } = await supabase
+        .from('media_assets')
+        .select('placeholder_id, cloudinary_id, uploaded_at, uploaded_by, metadata');
+      
+      if (error) {
+        console.error('Error fetching media assets from Supabase:', error);
+        // Fall back to local data if there's an error
+      } else if (data && data.length > 0) {
+        // Transform the data into the expected format
+        const mediaAssets = data.reduce((acc: Record<string, any>, item: any) => {
+          acc[item.placeholder_id] = {
+            placeholderId: item.placeholder_id,
+            cloudinaryPublicId: item.cloudinary_id,
+            uploadedAt: item.uploaded_at,
+            uploadedBy: item.uploaded_by,
+            metadata: item.metadata
+          };
+          return acc;
+        }, {});
+        
+        return NextResponse.json(mediaAssets);
+      }
+    }
+    
+    // If we don't have Supabase data, return an empty object
+    // In a real implementation, you might have a fallback JSON file
+    return NextResponse.json({});
+  } catch (error) {
+    console.error('Error serving media assets:', error);
+    return NextResponse.json(
+      { error: 'Failed to load media assets' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST handler for media assets API
+ * Allows updating a media asset
+ */
+export async function POST(request: Request) {
+  try {
+    const supabase = createClient();
+    
+    // Check if we have Supabase configured
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Supabase not configured' },
+        { status: 500 }
+      );
+    }
+    
+    // Parse the request body
+    const body = await request.json();
+    const { placeholderId, cloudinaryPublicId, metadata } = body;
+    
+    // Validate required fields
+    if (!placeholderId || !cloudinaryPublicId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: placeholderId and cloudinaryPublicId' },
+        { status: 400 }
+      );
+    }
+    
+    // Upsert the media asset
+    const { data, error } = await supabase
+      .from('media_assets')
+      .upsert({
+        placeholder_id: placeholderId,
+        cloudinary_id: cloudinaryPublicId,
+        uploaded_at: new Date().toISOString(),
+        uploaded_by: 'system', // Replace with actual user ID in production
+        metadata: metadata || {}
+      }, {
+        onConflict: 'placeholder_id'
+      });
+    
+    if (error) {
+      console.error('Error upserting media asset:', error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error updating media asset:', error);
+    return NextResponse.json(
+      { error: 'Failed to update media asset' },
+      { status: 500 }
+    );
+  }
+} 

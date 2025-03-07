@@ -136,7 +136,7 @@ export default function ContactPage() {
       
       // Create map instance
       const mapOptions = {
-        center: BUSINESS_LOCATION,
+      center: BUSINESS_LOCATION,
         zoom: 15,
         mapTypeControl: false,
         fullscreenControl: false,
@@ -152,14 +152,14 @@ export default function ContactPage() {
       }
       
       const map = new google.maps.Map(mapRef.current, mapOptions);
-      currentMap.current = map;
+    currentMap.current = map;
       mapInitialized.current = true;
       setIsMapLoading(false);
-      
+
       console.log("Google Map initialized successfully");
-      
+
       // Create a Places Service instance
-      const service = new google.maps.places.PlacesService(map);
+    const service = new google.maps.places.PlacesService(map);
       
       // Use place_id if available (more reliable), otherwise search by name/address
       if (BUSINESS_LOCATION.place_id) {
@@ -248,9 +248,9 @@ export default function ContactPage() {
             ) || results[0];
             
             if (matchingPlace.place_id) {
-              service.getDetails({
+    service.getDetails({
                 placeId: matchingPlace.place_id,
-                fields: [
+      fields: [
                   'name', 'formatted_address', 'formatted_phone_number',
                   'opening_hours', 'website', 'url', 'geometry', 'rating', 
                   'reviews', 'photos', 'business_status', 'user_ratings_total',
@@ -280,15 +280,15 @@ export default function ContactPage() {
   // Display business details on the map with a marker and info window
   const displayBusinessDetails = (place: google.maps.places.PlaceResult, map: google.maps.Map) => {
     // Create a marker for the business
-    const marker = new google.maps.Marker({
-      map: map,
-      position: place.geometry?.location,
-      title: place.name,
-      animation: google.maps.Animation.DROP
-    });
-    
-    currentMarker.current = marker;
-    
+        const marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry?.location,
+          title: place.name,
+          animation: google.maps.Animation.DROP
+        });
+
+        currentMarker.current = marker;
+
     // Format opening hours
     let hoursHTML = '';
     if (place.opening_hours?.weekday_text) {
@@ -327,7 +327,7 @@ export default function ContactPage() {
         <div style="margin-top: 10px; display: flex; align-items: center;">
           <div style="font-size: 16px; line-height: 1; margin-right: 8px;">${starsHTML}</div>
           <div style="color: #333; font-size: 14px;">${place.rating.toFixed(1)} · ${place.user_ratings_total} reviews</div>
-        </div>
+                </div>
       `;
       
       // Add review details if available (limited to 3)
@@ -365,12 +365,12 @@ export default function ContactPage() {
                 </div>
               `;
             }).join('')}
-            ${place.url ? `
+                ${place.url ? `
               <a href="${place.url}#reviews" target="_blank" style="display: inline-block; color: #1a73e8; text-decoration: none; 
                 font-size: 13px; margin-top: 5px; font-weight: 500;">
                 See all reviews on Google
               </a>
-            ` : ''}
+                ` : ''}
           </div>
         `;
       }
@@ -409,7 +409,7 @@ export default function ContactPage() {
         ${reviewDetailsHTML}
         
         <div style="margin-top: 15px; display: flex; gap: 12px;">
-          ${place.website ? `
+                ${place.website ? `
             <a href="${place.website}" target="_blank" style="color: #1a73e8; text-decoration: none; 
               font-size: 14px; font-weight: 500;">
               Visit Website
@@ -420,26 +420,26 @@ export default function ContactPage() {
               font-size: 14px; font-weight: 500;">
               View on Google Maps
             </a>
-          ` : ''}
-        </div>
-      </div>
+                ` : ''}
+              </div>
+            </div>
     `;
     
     // Create and open the info window
     const infoWindow = new google.maps.InfoWindow({
       content: infoWindowContent,
       maxWidth: 350
-    });
-    
-    currentInfoWindow.current = infoWindow;
-    
-    // Add click listener to marker
+        });
+
+        currentInfoWindow.current = infoWindow;
+
+        // Add click listener to marker
     marker.addListener('click', () => {
-      infoWindow.open(map, marker);
-    });
-    
-    // Open info window by default
-    infoWindow.open(map, marker);
+          infoWindow.open(map, marker);
+        });
+
+        // Open info window by default
+        infoWindow.open(map, marker);
   };
   
   // Get relative time string (e.g., "2 days ago")
@@ -758,30 +758,30 @@ export default function ContactPage() {
                 Contact Methods
               </h2>
               <div className="space-y-6">
-                {contactMethods.map((method, index) => (
-                  <motion.div
-                    key={method.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className={cn(
-                      "p-8 rounded-lg border",
-                      method.isHighlighted 
-                        ? "bg-zinc-900 border-zinc-800" 
-                        : "bg-black border-zinc-900"
-                    )}
-                  >
-                    <method.icon className="w-6 h-6 text-white mb-6" />
-                    <h3 className="text-2xl font-serif text-white mb-4">{method.title}</h3>
-                    <p className="whitespace-pre-line text-gray-400 font-cerebri font-light mb-8">{method.description}</p>
-                    <LearnMoreButton href={method.href}>
-                      {method.action}
-                    </LearnMoreButton>
-                  </motion.div>
-                ))}
-              </div>
+              {contactMethods.map((method, index) => (
+                <motion.div
+                  key={method.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className={cn(
+                    "p-8 rounded-lg border",
+                    method.isHighlighted 
+                      ? "bg-zinc-900 border-zinc-800" 
+                      : "bg-black border-zinc-900"
+                  )}
+                >
+                  <method.icon className="w-6 h-6 text-white mb-6" />
+                  <h3 className="text-2xl font-serif text-white mb-4">{method.title}</h3>
+                  <p className="whitespace-pre-line text-gray-400 font-cerebri font-light mb-8">{method.description}</p>
+                  <LearnMoreButton href={method.href}>
+                    {method.action}
+                  </LearnMoreButton>
+                </motion.div>
+              ))}
             </div>
+          </div>
           </div>
         </section>
 
