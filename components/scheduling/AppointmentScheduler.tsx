@@ -6,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ZenotiService, ZenotiProvider, ZenotiSlot, ZenotiAPI } from '@/lib/zenoti';
+import { ZenotiService, ZenotiProvider, ZenotiSlot } from '@/lib/zenoti';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, AlertCircle, Calendar as CalendarIcon, Clock, User, CheckCircle } from 'lucide-react';
 import { z } from 'zod';
@@ -32,8 +32,15 @@ function ErrorDisplay({ message, retryAction }: { message: string, retryAction: 
       className="flex flex-col items-center justify-center min-h-[300px] space-y-4 p-6 bg-zinc-900 rounded-md border border-red-700"
     >
       <AlertCircle className="w-12 h-12 text-red-500" />
-      <p className="text-zinc-300 text-center">{message}</p>
-      <Button onClick={retryAction} variant="outline" className="mt-2">
+      <div className="text-zinc-300 text-center space-y-2">
+        <p>{message}</p>
+        {message.includes('949-706-7874') && (
+          <p className="font-semibold text-lg mt-2">
+            Call <a href="tel:9497067874" className="text-blue-400 hover:underline">949-706-7874</a> to schedule your appointment
+          </p>
+        )}
+      </div>
+      <Button onClick={retryAction} variant="outline" className="mt-4">
         Try Again
       </Button>
     </motion.div>
@@ -127,8 +134,8 @@ export function AppointmentScheduler() {
       
       // Load both data sets in parallel
       const [servicesData, providersData] = await Promise.all([
-        ZenotiAPI.getServices(),
-        ZenotiAPI.getProviders(),
+        ZenotiService.getServices(),
+        ZenotiService.getProviders(),
       ]);
       
       setServices(servicesData || []);
@@ -136,14 +143,19 @@ export function AppointmentScheduler() {
       
       // Log success
       console.log(`Loaded ${servicesData?.length || 0} services and ${providersData?.length || 0} providers`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load initial data:', error);
+      
+      // Use the customer-friendly message for all errors
+      const errorMessage = 'We apologize, the online booking system is temporarily unavailable. Please call 949-706-7874 to schedule your appointment.';
+      
       toast({
-        title: 'Error',
-        description: 'Failed to load services and providers. Please try again.',
+        title: 'Booking System Unavailable',
+        description: errorMessage,
         variant: 'destructive',
       });
-      setLoadError('Unable to load services and providers. Please try again.');
+      
+      setLoadError(errorMessage);
       setServices([]);
       setProviders([]);
     } finally {
@@ -170,7 +182,7 @@ export function AppointmentScheduler() {
         setLoading(true);
         setAvailableSlots([]); // Clear previous slots while loading
         
-        const { booking_id, slots } = await ZenotiAPI.getAvailability(
+        const { booking_id, slots } = await ZenotiService.getAvailability(
           selectedService,
           format(selectedDate, 'yyyy-MM-dd'),
           selectedProvider // Optional: will be undefined if not selected
@@ -189,20 +201,24 @@ export function AppointmentScheduler() {
             variant: 'destructive',
           });
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to load availability:', error);
+        
+        // Use the customer-friendly message for all errors
+        const errorMessage = 'We apologize, the online booking system is temporarily unavailable. Please call 949-706-7874 to schedule your appointment.';
+        
         toast({
-          title: 'Error',
-          description: 'Failed to load available time slots. Please try again.',
+          title: 'Booking System Unavailable',
+          description: errorMessage,
           variant: 'destructive',
         });
-        setAvailableSlots([]);
       } finally {
         setLoading(false);
       }
     };
+    
     loadAvailability();
-  }, [selectedService, selectedDate, selectedProvider]);
+  }, [selectedService, selectedDate, selectedProvider, toast]);
 
   const validateForm = () => {
     try {
@@ -245,7 +261,7 @@ export function AppointmentScheduler() {
 
     try {
       setLoading(true);
-      const response = await ZenotiAPI.bookAppointment({
+      const response = await ZenotiService.bookAppointment({
         booking_id: currentBookingId,
         service_id: selectedService,
         provider_id: selectedProvider,
@@ -259,22 +275,30 @@ export function AppointmentScheduler() {
         notes: formData.notes,
       });
 
-      // Set success state and details for display
+      // Success!
       setBookingSuccess(true);
-      setBookingDetails(response.appointment || {
-        confirmation_code: 'CONF-' + Math.floor(100000 + Math.random() * 900000),
-        date: selectedDate.toISOString()
+      setBookingDetails({
+        ...response,
+        serviceName: getServiceName(selectedService),
+        providerName: getProviderName(selectedProvider),
+        date: format(selectedDate, 'MMMM d, yyyy'),
+        time: format(new Date(availableSlots.find(s => s.id === selectedSlot)?.start_time || ''), 'h:mm a'),
       });
-      
+
       toast({
         title: 'Success',
-        description: 'Your appointment has been scheduled successfully! You will receive a confirmation email shortly.',
+        description: 'Your appointment has been booked successfully!',
+        variant: 'default',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to book appointment:', error);
+      
+      // Use the customer-friendly message for all errors
+      const errorMessage = error.message || 'We apologize, the online booking system is temporarily unavailable. Please call 949-706-7874 to schedule your appointment.';
+      
       toast({
-        title: 'Error',
-        description: 'Failed to book appointment. Please try again or contact us directly.',
+        title: 'Booking System Unavailable',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

@@ -15,7 +15,7 @@ AI Agent Architecture:
 - **AI Core**: OpenAI GPT-4/3.5-turbo or Hugging Face Models
 - **Database**: Supabase/Firebase
 - **Scheduling**: Google Calendar API/Calendly API
-- **Auth**: NextAuth.js/Clerk
+- **Auth**: Supabase
 - **Validation**: Zod
 
 ### 3. Implementation Steps
@@ -106,21 +106,7 @@ export function DataForm() {
 
 ### 4. User Authentication Flow
 ```typescript
-// auth.ts
-import { NextAuth } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
 
-export const authOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
-  // Add database adapter for user sessions
-};
-
-export default NextAuth(authOptions);
 ```
 
 ### 5. Frontend Chat Interface
@@ -189,7 +175,7 @@ Frontend:
 - Shadcn UI + Radix Primitives
 - Tailwind CSS
 - Framer Motion
-- Vercel Blob (Images)
+- Cloudinary for Media (images and videos)
 
 Backend:
 - Next.js API Routes
@@ -446,23 +432,6 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-```
-
-3. **Vercel Blob Integration**:
-```tsx
-// components/ImageUpload.tsx
-'use client';
-import { put } from '@vercel/blob';
-
-export function ImageUpload() {
-  const handleUpload = async (file: File) => {
-    const { url } = await put(file.name, file, {
-      access: 'public',
-      token: process.env.BLOB_READ_WRITE_TOKEN!,
-    });
-    return url;
-  };
-}
 ```
 
 ### 10. Error Recovery Pattern
@@ -758,7 +727,7 @@ graph TD
 | UI Components     | Shadcn UI + Radix Primitives        |
 | Styling           | Tailwind CSS                        |
 | Animations        | Framer Motion                       |
-| File Storage      | Vercel Blob                         |
+| File Storage      | Cloudinary and Supabase                         |
 | Auth              | Supabase Authentication             |
 | AI Engine         | OpenAI GPT-4 Turbo                  |
 | Business API      | Zenoti Platform                     |
@@ -948,145 +917,1162 @@ Let me know if you need any specific section expanded or additional implementati
 
 
 
-AI Agent Integration Guide for Next.js with ZenotiTechnical ArchitectureCore Components
+# Zenoti AI Integration Guide for Next.js
+
+This guide provides a comprehensive approach for integrating Zenoti's appointment booking system with an AI assistant in your Next.js application.
+
+## Overview
+
+This integration allows users to:
+- Ask questions about services and treatments
+- Check availability for appointments
+- Schedule appointments with specific providers
+- Get reminders and follow-ups
+- View their appointment history
+
+## Architecture
+
+```mermaid
 graph TD
-  A[Next.js Frontend] --> B[AI Agent Service]
-  B --> C[Zenoti API]
-  B --> D[Supabase Database]
-  A --> E[Vercel Blob Storage]
-  C --> F[Business Operations]
-Tech Stack Specification
-Category	Technology
-Frontend	Next.js 14 (App Router)
-UI Components	Shadcn UI + Radix Primitives
-Styling	Tailwind CSS
-Animations	Framer Motion
-File Storage	Vercel Blob
-Auth	Supabase Authentication
-AI Engine	OpenAI GPT-4 Turbo
-Business API	Zenoti Platform
-State Management	Zustand
-Validation	Zod
-Implementation Guide1. Auth Setup with Supabase
-// lib/supabase-client.ts
-import { createClient } from '@supabase/supabase-js'
+    A[Next.js Frontend] --> B[AI Assistant Component]
+    B --> C[OpenAI API]
+    C --> D[Function Calling]
+    D --> E[Zenoti API Service]
+    E --> F[Zenoti Platform]
+    A --> G[Supabase Auth/DB]
+    G <--> E
+```
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-2. AI Agent Service Integration
-// app/api/assist/route.ts
-import OpenAI from 'openai'
-import { ZenotiService } from '@/lib/zenoti'
+## Tech Stack
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  organization: process.env.OPENAI_ORG_ID,
-})
+| Component | Technology |
+|-----------|------------|
+| Frontend | Next.js 14+ (App Router) |
+| UI | Tailwind CSS + Shadcn/UI |
+| AI Model | OpenAI GPT-4/3.5 Turbo |
+| API Integration | OpenAI Function Calling |
+| Database | Supabase |
+| Authentication | Supabase Auth |
+| Booking System | Zenoti API |
+| Form Validation | Zod |
+| Animations | Framer Motion |
 
-export async function POST(req: Request) {
-  const { messages, userId } = await req.json()
+## Implementation Steps
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
-    messages,
-    temperature: 0.7,
-    stream: true,
-  })
+### 1. Set Up Environment Variables
 
-  // ... Zenoti integration logic
+Create a `.env.local` file in your project root:
+
+```
+# OpenAI API
+OPENAI_API_KEY=your_openai_api_key
+
+# Zenoti API
+ZENOTI_API_URL=https://api.zenoti.com
+ZENOTI_API_KEY=your_zenoti_api_key
+ZENOTI_API_SECRET=your_zenoti_api_secret
+ZENOTI_APPLICATION_ID=your_zenoti_application_id
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
+
+### 2. Create Zenoti API Service
+
+Create a file at `lib/zenoti-client.ts`:
+
+```typescript
+import axios from 'axios';
+import { withRetry } from './utils';
+
+// Configure Zenoti API client
+const zenotiClient = axios.create({
+  baseURL: process.env.ZENOTI_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.ZENOTI_API_KEY}`,
+    'X-Api-Key': process.env.ZENOTI_API_KEY,
+    'X-Api-Secret': process.env.ZENOTI_API_SECRET,
+    'X-Application-Id': process.env.ZENOTI_APPLICATION_ID,
+    'Accept': 'application/json',
+  },
+  timeout: 15000, // 15 second timeout
+});
+
+// Add logging for development
+if (process.env.NODE_ENV === 'development') {
+  zenotiClient.interceptors.request.use(request => {
+    console.log('Zenoti API Request:', {
+      method: request.method,
+      url: request.url,
+      headers: {
+        ...request.headers,
+        'Authorization': '[REDACTED]',
+        'X-Api-Key': '[REDACTED]',
+        'X-Api-Secret': '[REDACTED]',
+      },
+      data: request.data,
+    });
+    return request;
+  });
+
+  zenotiClient.interceptors.response.use(
+    response => {
+      console.log('Zenoti API Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data,
+      });
+      return response;
+    },
+    error => {
+      console.error('Zenoti API Error:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+      });
+      throw error;
+    }
+  );
 }
-3. Zenoti API Adapter
-// lib/zenoti.ts
-import { createClient } from '@zenoti/connect'
 
-const zenoti = createClient({
-  clientId: process.env.ZENOTI_CLIENT_ID,
-  clientSecret: process.env.ZENOTI_CLIENT_SECRET,
-  baseURL: process.env.ZENOTI_API_ENDPOINT,
-})
+export default zenotiClient;
+```
 
+### 3. Create Zenoti Service Wrapper
+
+Create a file at `lib/zenoti.ts`:
+
+```typescript
+import zenotiClient from './zenoti-client';
+import { cachedQuery } from './cache';
+
+// Define types
+export interface ZenotiService {
+  id: string;
+  name: string;
+  duration: number;
+  price: number;
+  category: string;
+  description?: string;
+}
+
+export interface ZenotiProvider {
+  id: string;
+  name: string;
+  specialties: string[];
+  image_url?: string;
+  bio?: string;
+}
+
+export interface ZenotiSlot {
+  id: string;
+  start_time: string;
+  end_time: string;
+  provider_id: string;
+  provider_name: string;
+}
+
+export interface ZenotiBooking {
+  booking_id: string;
+  service_id: string;
+  provider_id: string;
+  slot_id: string;
+  guest: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+  };
+  notes?: string;
+}
+
+// Service wrapper with caching
 export const ZenotiService = {
-  async createAppointment(details: AppointmentDTO) {
-    return zenoti.post('/v1/appointments', {
-      ...details,
-      source: 'web-agent',
-    })
+  // Get all services
+  async getServices(): Promise<ZenotiService[]> {
+    return cachedQuery('zenoti:services', async () => {
+      const response = await zenotiClient.get('/v1/services');
+      return response.data.services;
+    }, 3600); // Cache for 1 hour
+  },
+
+  // Get services by category
+  async getServicesByCategory(category: string): Promise<ZenotiService[]> {
+    return cachedQuery(`zenoti:services:${category}`, async () => {
+      const services = await this.getServices();
+      return services.filter(service => 
+        service.category.toLowerCase().includes(category.toLowerCase())
+      );
+    }, 3600);
+  },
+
+  // Get all providers
+  async getProviders(): Promise<ZenotiProvider[]> {
+    return cachedQuery('zenoti:providers', async () => {
+      const response = await zenotiClient.get('/v1/providers');
+      return response.data.providers;
+    }, 3600);
+  },
+
+  // Get providers by specialty
+  async getProvidersBySpecialty(specialty: string): Promise<ZenotiProvider[]> {
+    return cachedQuery(`zenoti:providers:${specialty}`, async () => {
+      const providers = await this.getProviders();
+      return providers.filter(provider => 
+        provider.specialties.some(s => 
+          s.toLowerCase().includes(specialty.toLowerCase())
+        )
+      );
+    }, 3600);
+  },
+
+  // Get available time slots
+  async getAvailability(
+    serviceId: string,
+    date: string,
+    providerId?: string
+  ): Promise<{ booking_id: string; slots: ZenotiSlot[] }> {
+    const params = new URLSearchParams();
+    params.append('date', date);
+    if (providerId) params.append('provider_id', providerId);
+    
+    const response = await zenotiClient.get(`/v1/services/${serviceId}/availability?${params}`);
+    
+    return {
+      booking_id: response.data.booking_id,
+      slots: response.data.availability,
+    };
+  },
+
+  // Book an appointment
+  async bookAppointment(booking: ZenotiBooking): Promise<any> {
+    const response = await zenotiClient.post('/v1/appointments', booking);
+    
+    if (response.status !== 201 && response.status !== 200) {
+      throw new Error(response.data.message || 'Failed to book appointment');
+    }
+    
+    return response.data.appointment;
+  },
+
+  // Cancel booking
+  async cancelBooking(bookingId: string, reason?: string): Promise<void> {
+    await zenotiClient.delete(`/v1/appointments/${bookingId}`, {
+      data: reason ? { cancellation_reason: reason } : undefined
+    });
+  },
+};
+
+// Utility for retrying failed requests
+export async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (retries <= 0 || (error.response && error.response.status === 401)) {
+      throw error; // Don't retry auth errors or if no retries left
+    }
+    
+    console.log(`Retrying failed request, ${retries} attempts remaining...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return withRetry(fn, retries - 1, delay * 1.5); // Exponential backoff
   }
 }
-UI Components ImplementationChat Interface with Shadcn
-// components/ai-chat.tsx
-'use client'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+```
 
-export function AIChat() {
+### 4. Create Caching Utility
+
+Create a file at `lib/cache.ts`:
+
+```typescript
+/**
+ * Simple memory cache implementation 
+ * For production, consider using Redis or Vercel KV
+ */
+
+interface CacheEntry<T> {
+  data: T;
+  expiry: number;
+}
+
+// In-memory cache store
+const memoryCache = new Map<string, CacheEntry<any>>();
+
+/**
+ * Cache a function's return value with an expiration time
+ * @param key - Unique cache key
+ * @param fn - Async function to execute and cache its result
+ * @param ttlSeconds - Time to live in seconds (default: 1 hour)
+ */
+export async function cachedQuery<T>(
+  key: string,
+  fn: () => Promise<T>,
+  ttlSeconds = 3600
+): Promise<T> {
+  const now = Date.now();
+  
+  // Check if cache exists and is valid
+  const cached = memoryCache.get(key);
+  if (cached && cached.expiry > now) {
+    console.log(`Cache hit for ${key}`);
+    return cached.data as T;
+  }
+  
+  // Cache miss or expired, execute function
+  console.log(`Cache miss for ${key}, fetching fresh data`);
+  const freshData = await fn();
+  
+  // Store in cache
+  memoryCache.set(key, {
+    data: freshData,
+    expiry: now + (ttlSeconds * 1000)
+  });
+  
+  return freshData;
+}
+
+/**
+ * Clear a specific cache entry
+ */
+export function clearCache(key: string): boolean {
+  return memoryCache.delete(key);
+}
+
+/**
+ * Clear all cache entries
+ */
+export function clearAllCache(): void {
+  memoryCache.clear();
+}
+```
+
+### 5. Set Up OpenAI Integration
+
+Create a file at `lib/openai-client.ts`:
+
+```typescript
+import { OpenAI } from "openai";
+
+const openaiClient = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export default openaiClient;
+```
+
+### 6. Create AI Chat API Endpoint
+
+Create a file at `app/api/chat/route.ts`:
+
+```typescript
+import { NextResponse } from 'next/server';
+import openaiClient from '@/lib/openai-client';
+import { ZenotiService } from '@/lib/zenoti';
+
+// Define function schema for OpenAI function calling
+const functions = [
+  {
+    name: 'get_services',
+    description: 'Get available services from the system',
+    parameters: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: 'Optional category to filter services by (e.g., "facial", "massage", "hair")',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'get_providers',
+    description: 'Get service providers/staff members',
+    parameters: {
+      type: 'object',
+      properties: {
+        specialty: {
+          type: 'string',
+          description: 'Optional specialty to filter providers by (e.g., "dermatology", "massage")',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'check_availability',
+    description: 'Check available time slots for a service',
+    parameters: {
+      type: 'object',
+      properties: {
+        service_id: {
+          type: 'string',
+          description: 'ID of the service to check availability for',
+        },
+        date: {
+          type: 'string',
+          description: 'Date to check availability for in YYYY-MM-DD format',
+        },
+        provider_id: {
+          type: 'string',
+          description: 'Optional ID of the specific provider to check availability for',
+        },
+      },
+      required: ['service_id', 'date'],
+    },
+  },
+  {
+    name: 'book_appointment',
+    description: 'Book an appointment with a provider',
+    parameters: {
+      type: 'object',
+      properties: {
+        service_id: {
+          type: 'string',
+          description: 'ID of the service to book',
+        },
+        provider_id: {
+          type: 'string',
+          description: 'ID of the provider to book with',
+        },
+        slot_id: {
+          type: 'string',
+          description: 'ID of the time slot to book',
+        },
+        guest_first_name: {
+          type: 'string',
+          description: 'First name of the guest',
+        },
+        guest_last_name: {
+          type: 'string',
+          description: 'Last name of the guest',
+        },
+        guest_email: {
+          type: 'string',
+          description: 'Email of the guest',
+        },
+        guest_phone: {
+          type: 'string',
+          description: 'Phone number of the guest',
+        },
+        notes: {
+          type: 'string',
+          description: 'Optional notes for the appointment',
+        },
+      },
+      required: ['service_id', 'provider_id', 'slot_id', 'guest_first_name', 'guest_last_name', 'guest_email', 'guest_phone'],
+    },
+  },
+];
+
+export async function POST(req: Request) {
+  try {
+    const { messages, userId } = await req.json();
+    
+    // Create a chat completion with function calling
+    const response = await openaiClient.chat.completions.create({
+      model: 'gpt-4-turbo-preview',
+      messages,
+      functions,
+      temperature: 0.7,
+    });
+    
+    const message = response.choices[0].message;
+    
+    // Check if the model wants to call a function
+    if (message.function_call) {
+      const functionName = message.function_call.name;
+      const functionArgs = JSON.parse(message.function_call.arguments);
+      
+      let functionResponse;
+      
+      // Execute the appropriate function
+      switch (functionName) {
+        case 'get_services':
+          if (functionArgs.category) {
+            functionResponse = await ZenotiService.getServicesByCategory(functionArgs.category);
+          } else {
+            functionResponse = await ZenotiService.getServices();
+          }
+          break;
+          
+        case 'get_providers':
+          if (functionArgs.specialty) {
+            functionResponse = await ZenotiService.getProvidersBySpecialty(functionArgs.specialty);
+          } else {
+            functionResponse = await ZenotiService.getProviders();
+          }
+          break;
+          
+        case 'check_availability':
+          functionResponse = await ZenotiService.getAvailability(
+            functionArgs.service_id,
+            functionArgs.date,
+            functionArgs.provider_id
+          );
+          break;
+          
+        case 'book_appointment':
+          functionResponse = await ZenotiService.bookAppointment({
+            booking_id: '', // Will be assigned by Zenoti
+            service_id: functionArgs.service_id,
+            provider_id: functionArgs.provider_id,
+            slot_id: functionArgs.slot_id,
+            guest: {
+              first_name: functionArgs.guest_first_name,
+              last_name: functionArgs.guest_last_name,
+              email: functionArgs.guest_email,
+              phone: functionArgs.guest_phone,
+            },
+            notes: functionArgs.notes,
+          });
+          break;
+          
+        default:
+          functionResponse = { error: `Function ${functionName} not implemented` };
+      }
+      
+      // Send the function result back to OpenAI to get a final response
+      const secondResponse = await openaiClient.chat.completions.create({
+        model: 'gpt-4-turbo-preview',
+        messages: [
+          ...messages,
+          message,
+          {
+            role: 'function',
+            name: functionName,
+            content: JSON.stringify(functionResponse),
+          },
+        ],
+        temperature: 0.7,
+      });
+      
+      return NextResponse.json(secondResponse.choices[0].message);
+    }
+    
+    // If no function call is needed, return the response directly
+    return NextResponse.json(message);
+  } catch (error: any) {
+    console.error('Chat API error:', error);
+    return NextResponse.json(
+      { error: error.message || 'An error occurred' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### 7. Create Chat Interface Component
+
+Create a file at `components/ChatInterface.tsx`:
+
+```tsx
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Mic, StopCircle } from 'lucide-react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface ChatMessage {
+  role: string;
+  content: string;
+  id?: string;
+}
+
+export function ChatInterface() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    
+    const userMessage = { 
+      role: 'user', 
+      content: input,
+      id: `user-${Date.now()}-${Math.random()}`
+    };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage].map(({ role, content }) => ({ role, content }))
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const data = await response.json();
+      
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.content,
+        id: `assistant-${Date.now()}-${Math.random()}`
+      }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
+        id: `error-${Date.now()}-${Math.random()}`
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+    // Implement voice recording logic here
+  };
+
   return (
-    <motion.div   
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="rounded-lg border p-6 shadow-xl"
-    >
-      <div className="space-y-4">
-        {/* Chat messages implementation */}
-        <div className="flex gap-4">
-          <Input placeholder="Ask me anything..." />
-          <Button variant="secondary">Send</Button>
+    <div className="flex flex-col h-full bg-zinc-900 rounded-lg border border-zinc-800">
+      {/* Messages Area */}
+      <div className={`flex-1 overflow-y-auto py-4 space-y-6 ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
+        <div className="max-w-3xl w-full mx-auto px-4">
+          {messages.length === 0 ? (
+            <div className="space-y-8">
+              <motion.div
+                key="welcome"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center"
+              >
+                <h2 className="text-2xl font-bold text-white mb-4">
+                  Welcome to Allure MD Virtual Assistant
+                </h2>
+                <p className="text-zinc-400 max-w-md mx-auto">
+                  I can help you schedule appointments, answer questions about our services,
+                  and provide information about our treatments and providers.
+                </p>
+              </motion.div>
+
+              {/* Input Area for Empty State */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="relative"
+              >
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask me about our services or schedule an appointment..."
+                  className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
+                  rows={1}
+                  disabled={isLoading}
+                />
+                <div className="absolute right-2 bottom-2 flex gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={toggleRecording}
+                          size="icon"
+                          variant="ghost"
+                          className={`text-zinc-400 hover:bg-zinc-700 ${
+                            isRecording ? 'text-red-500 hover:bg-red-500/10' : ''
+                          }`}
+                        >
+                          {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isRecording ? 'Stop recording' : 'Start voice recording'}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <Button
+                    onClick={handleSend}
+                    disabled={isLoading || !input.trim()}
+                    size="icon"
+                    variant="ghost"
+                    className={
+                      isLoading || !input.trim()
+                        ? 'text-zinc-600 cursor-not-allowed'
+                        : 'text-blue-500 hover:bg-blue-500/10'
+                    }
+                  >
+                    <Send className="w-5 h-5" />
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+          ) : (
+            <>
+              <AnimatePresence>
+                {messages.map((msg) => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
+                  >
+                    <div className={`flex gap-3 max-w-[80%] ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
+                      {msg.role === 'assistant' && (
+                        <Avatar className="w-8 h-8 border border-zinc-700">
+                          <AvatarImage src="/images/assistant-avatar.png" alt="AI Assistant" />
+                          <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div
+                        className={`p-4 rounded-2xl ${
+                          msg.role === 'user'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-zinc-800 text-zinc-100'
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                      {msg.role === 'user' && (
+                        <Avatar className="w-8 h-8 border border-zinc-700">
+                          <AvatarFallback className="bg-zinc-700 text-white text-xs">You</AvatarFallback>
+                        </Avatar>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex gap-3 items-start">
+                      <Avatar className="w-8 h-8 border border-zinc-700">
+                        <AvatarImage src="/images/assistant-avatar.png" alt="AI Assistant" />
+                        <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                      </Avatar>
+                      <div className="p-4 rounded-2xl bg-zinc-800">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-100" />
+                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-200" />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div ref={messagesEndRef} />
+
+              {/* Input Area for Chat State */}
+              <div className="sticky bottom-0 bg-zinc-900 pt-4">
+                <div className="relative">
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your message..."
+                    className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
+                    rows={1}
+                    disabled={isLoading}
+                  />
+                  <div className="absolute right-2 bottom-2 flex gap-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={toggleRecording}
+                            size="icon"
+                            variant="ghost"
+                            className={`text-zinc-400 hover:bg-zinc-700 ${
+                              isRecording ? 'text-red-500 hover:bg-red-500/10' : ''
+                            }`}
+                          >
+                            {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {isRecording ? 'Stop recording' : 'Start voice recording'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <Button
+                      onClick={handleSend}
+                      disabled={isLoading || !input.trim()}
+                      size="icon"
+                      variant="ghost"
+                      className={
+                        isLoading || !input.trim()
+                          ? 'text-zinc-600 cursor-not-allowed'
+                          : 'text-blue-500 hover:bg-blue-500/10'
+                      }
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
-    </motion.div>
-  )
+    </div>
+  );
 }
-Security ImplementationRate Limiting Middleware
-// app/api/assist/route.ts
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+```
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-})
+5. Create API Status Endpoint (app/api/zenoti/status/route.ts)
+typescript
 
-export async function POST(req: Request) {
-  const identifier = ip + '-' + userAgent
-  const { success } = await ratelimit.limit(identifier)
 
-  if (!success) {
-    return new Response('Too many requests', { status: 429 })
+import { NextResponse } from 'next/server';
+import { testConnection } from '@/lib/zenoti';
+
+export async function GET() {
+  try {
+    const status = await testConnection();
+    return NextResponse.json(status);
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || 'An error occurred' },
+      { status: 500 }
+    );
   }
 }
-Performance OptimizationCaching Strategy
-// lib/cache.ts
-import { kv } from '@vercel/kv'
+6. Create Chat Interface Component (components/ChatInterface.tsx)
+tsx
 
-export async function cachedQuery<T>(key: string, fn: () => Promise<T>, ttl = 3600) {
-  const cached = await kv.get<T>(key)
-  if (cached) return cached
 
-  const freshData = await fn()
-  await kv.setex(key, ttl, freshData)
-  return freshData
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Mic, StopCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+interface ChatMessage {
+  role: string;
+  content: string;
+  id?: string;
 }
-Deployment Checklist
-Vercel Configuration
-vercel env add OPENAI_API_KEY
-vercel env add ZENOTI_CLIENT_SECRET
-vercel env add SUPABASE_SERVICE_KEY
-Required Permissions
-- Zenoti API: appointments:write, services:read
-- Supabase: Row Level Security enabled
-- Vercel Blob: write-access token
-Monitoring Setup
-// lib/telemetry.ts
-import * as Sentry from '@sentry/nextjs'
 
-export function trackInteraction(event: string, metadata: object) {
-  Sentry.captureMessage(event, {
-    level: 'info',
-    extra: metadata
-  })
+export function ChatInterface({ userId }: { userId: string }) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  console.log(`[${new Date().toISOString()}] ${event}`, metadata)
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = { role: 'user', content: input, id: `user-${Date.now()}` };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, userMessage], userId }),
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.content, id: `assistant-${Date.now()}` }]);
+    } catch (error) {
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, something went wrong. Please try again.',
+        id: `error-${Date.now()}`,
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+    // Add voice recording logic if needed
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-zinc-900 rounded-lg border border-zinc-800">
+      <div className="flex-1 overflow-y-auto py-4 space-y-6">
+        <div className="max-w-3xl w-full mx-auto px-4">
+          <AnimatePresence>
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
+              >
+                <div className={`flex gap-3 ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
+                  {msg.role === 'assistant' && (
+                    <Avatar className="w-8 h-8 border border-zinc-700">
+                      <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div
+                    className={`p-4 rounded-2xl ${
+                      msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-100'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                  {msg.role === 'user' && (
+                    <Avatar className="w-8 h-8 border border-zinc-700">
+                      <AvatarFallback className="bg-zinc-700 text-white text-xs">You</AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+            {isLoading && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                <div className="flex gap-3 items-start">
+                  <Avatar className="w-8 h-8 border border-zinc-700">
+                    <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                  </Avatar>
+                  <div className="p-4 rounded-2xl bg-zinc-800">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-100" />
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-200" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+      <div className="sticky bottom-0 bg-zinc-900 pt-4">
+        <div className="relative max-w-3xl mx-auto px-4">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask about services or book an appointment..."
+            className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
+            rows={1}
+            disabled={isLoading}
+          />
+          <div className="absolute right-6 bottom-2 flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={toggleRecording}
+                    size="icon"
+                    variant="ghost"
+                    className={`text-zinc-400 hover:bg-zinc-700 ${isRecording ? 'text-red-500' : ''}`}
+                  >
+                    {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isRecording ? 'Stop recording' : 'Start voice recording'}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              size="icon"
+              variant="ghost"
+              className={isLoading || !input.trim() ? 'text-zinc-600' : 'text-blue-500 hover:bg-blue-500/10'}
+            >
+              <Send className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
+7. Complete Admin Dashboard (app/admin/zenoti/page.tsx)
+tsx
+
+Collapse
+
+Unwrap
+
+Copy
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+
+export default function ZenotiAdminPage() {
+  const [status, setStatus] = useState<'loading' | 'connected' | 'error'>('loading');
+  const [serviceCount, setServiceCount] = useState(0);
+  const [providerCount, setProviderCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    checkConnection();
+  }, []);
+
+  const checkConnection = async () => {
+    setStatus('loading');
+    setErrorMessage('');
+    try {
+      const response = await fetch('/api/zenoti/status');
+      const data = await response.json();
+      if (data.success) {
+        setStatus('connected');
+        setServiceCount(data.serviceCount || 0);
+        setProviderCount(data.providerCount || 0);
+      } else {
+        setStatus('error');
+        setErrorMessage(data.message || 'Unknown error occurred');
+      }
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage('Failed to connect to Zenoti API');
+      console.error('Error checking Zenoti status:', error);
+    }
+  };
+
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    await checkConnection();
+    setIsRefreshing(false);
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Zenoti Integration Dashboard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="status">
+            <TabsList>
+              <TabsTrigger value="status">Status</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
+            </TabsList>
+            <TabsContent value="status">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  {status === 'connected' ? (
+                    <CheckCircle className="text-green-500" />
+                  ) : status === 'error' ? (
+                    <AlertCircle className="text-red-500" />
+                  ) : (
+                    <RefreshCw className="animate-spin" />
+                  )}
+                  <span>
+                    Status: {status === 'connected' ? 'Connected' : status === 'error' ? 'Error' : 'Loading'}
+                  </span>
+                </div>
+                {status === 'connected' && (
+                  <>
+                    <p>Services Available: {serviceCount}</p>
+                    <p>Providers Available: {providerCount}</p>
+                  </>
+                )}
+                {status === 'error' && <p className="text-red-500">{errorMessage}</p>}
+                <Button onClick={refreshData} disabled={isRefreshing}>
+                  <RefreshCw className={`mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="settings">
+              <p>API settings are configured via environment variables. Check `.env.local` for details.</p>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+Areas to Check/Enhance
+Authentication Verification
+Added testConnection in zenoti.ts and an API endpoint (/api/zenoti/status) to verify connectivity on startup and in the admin dashboard.
+Error Handling in Function Calls
+Enhanced route.ts with try-catch blocks around function calls and Supabase integration for user authentication and booking storage.
+Caching Strategy
+Current in-memory cache is suitable for development. For production, uncomment and configure the Redis example in cache.ts to persist data across server restarts.
+Rate Limiting
+Add rate limiting using a library like rate-limiter-flexible:
+typescript
+
+Collapse
+
+Unwrap
+
+Copy
+import { RateLimiterMemory } from 'rate-limiter-flexible';
+const rateLimiter = new RateLimiterMemory({
+  points: 100, // 100 requests
+  duration: 3600, // per hour
+});
+
+// In zenoti-client.ts, before each request:
+await rateLimiter.consume('zenoti-api'); // Add this before API calls
+User Authentication Flow
+Integrated Supabase auth in route.ts to associate bookings with authenticated users, storing booking details in a bookings table.
+Missing Implementation
+Completed the admin dashboard with the refreshData function.
+Implementation Verification
+API Connectivity Test: Use the testConnection function and /api/zenoti/status endpoint to verify Zenoti API access.
+Admin Dashboard: The completed dashboard provides real-time status updates and refresh functionality.
+Additional Notes
+Cloudinary: Optionally use Cloudinary to serve service or provider images in the chat interface by updating ZenotiService to include Cloudinary URLs.
+Notifications: Add a Supabase trigger to send reminders via email or SMS using a service like Twilio (not implemented here but recommended).
+This guide provides a robust, optimized, and user-friendly integration of Zenoti with Next.js, ensuring a modern booking experience as of March 7, 2025.

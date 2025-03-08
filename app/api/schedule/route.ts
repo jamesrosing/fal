@@ -1,7 +1,7 @@
 // app/api/schedule/route.ts
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { ZenotiAPI } from '@/lib/zenoti';
+import { ZenotiService } from '@/lib/zenoti';
 
 const scheduleSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -25,7 +25,8 @@ export async function POST(req: Request): Promise<Response> {
       const [firstName, ...lastNameParts] = validatedData.name.split(' ');
       const lastName = lastNameParts.join(' ');
 
-      await ZenotiAPI.bookAppointment({
+      await ZenotiService.bookAppointment({
+        booking_id: '', // Will be assigned by Zenoti
         service_id: validatedData.service,
         provider_id: validatedData.therapist,
         slot_id: validatedData.slot_id,

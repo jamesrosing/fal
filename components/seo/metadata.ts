@@ -81,12 +81,5 @@ export function generateStructuredData(type: string, data: any) {
     ...data,
   }
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(baseStructuredData),
-      }}
-    />
-  )
-} 
+  return baseStructuredData;
+}

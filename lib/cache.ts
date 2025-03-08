@@ -1,6 +1,6 @@
 /**
- * Simple memory cache implementation for server-side caching
- * In production, consider using Redis or Vercel KV
+ * Simple memory cache implementation 
+ * For production, consider using Redis or Vercel KV
  */
 
 interface CacheEntry<T> {
@@ -23,21 +23,20 @@ export async function cachedQuery<T>(
   ttlSeconds = 3600
 ): Promise<T> {
   const now = Date.now();
-  const cacheKey = `zenoti:${key}`;
   
   // Check if cache exists and is valid
-  const cached = memoryCache.get(cacheKey);
+  const cached = memoryCache.get(key);
   if (cached && cached.expiry > now) {
-    console.log(`Cache hit for ${cacheKey}`);
+    console.log(`Cache hit for ${key}`);
     return cached.data as T;
   }
   
   // Cache miss or expired, execute function
-  console.log(`Cache miss for ${cacheKey}, fetching fresh data`);
+  console.log(`Cache miss for ${key}, fetching fresh data`);
   const freshData = await fn();
   
   // Store in cache
-  memoryCache.set(cacheKey, {
+  memoryCache.set(key, {
     data: freshData,
     expiry: now + (ttlSeconds * 1000)
   });
@@ -49,7 +48,7 @@ export async function cachedQuery<T>(
  * Clear a specific cache entry
  */
 export function clearCache(key: string): boolean {
-  return memoryCache.delete(`zenoti:${key}`);
+  return memoryCache.delete(key);
 }
 
 /**
@@ -60,24 +59,21 @@ export function clearAllCache(): void {
 }
 
 /**
- * Get cache statistics
+ * Clear all Zenoti-related cache entries
+ * @returns The number of cache entries cleared
  */
-export function getCacheStats() {
-  const now = Date.now();
-  let valid = 0;
-  let expired = 0;
+export function clearZenotiCache(): number {
+  let count = 0;
   
-  memoryCache.forEach(entry => {
-    if (entry.expiry > now) {
-      valid++;
-    } else {
-      expired++;
+  // Iterate through all cache keys and delete those starting with 'zenoti:'
+  // Using Array.from to convert the iterator to an array for compatibility
+  Array.from(memoryCache.keys()).forEach(key => {
+    if (key.startsWith('zenoti:')) {
+      memoryCache.delete(key);
+      count++;
     }
   });
   
-  return {
-    totalEntries: memoryCache.size,
-    validEntries: valid,
-    expiredEntries: expired
-  };
-} 
+  console.log(`Cleared ${count} Zenoti cache entries`);
+  return count;
+}

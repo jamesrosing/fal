@@ -43,19 +43,23 @@ function shouldRedirectPath(pathname: string, search: string): boolean {
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   
-  // Check if the current path is in the list of incomplete paths
-  const isIncompletePath = INCOMPLETE_PATHS.some(path => pathname.startsWith(path));
-  
-  // Check if the path with query parameters should be redirected
-  const shouldRedirectQueryPath = shouldRedirectPath(pathname, search);
-  
-  if (isIncompletePath || shouldRedirectQueryPath) {
-    // Create a new URL for the under-construction page
-    const url = request.nextUrl.clone();
-    url.pathname = '/under-construction';
-    // Clear any query parameters
-    url.search = '';
-    return NextResponse.redirect(url);
+  // Only apply under-construction redirects in production environment
+  // Skip redirects in development environment
+  if (process.env.NODE_ENV === 'production') {
+    // Check if the current path is in the list of incomplete paths
+    const isIncompletePath = INCOMPLETE_PATHS.some(path => pathname.startsWith(path));
+    
+    // Check if the path with query parameters should be redirected
+    const shouldRedirectQueryPath = shouldRedirectPath(pathname, search);
+    
+    if (isIncompletePath || shouldRedirectQueryPath) {
+      // Create a new URL for the under-construction page
+      const url = request.nextUrl.clone();
+      url.pathname = '/under-construction';
+      // Clear any query parameters
+      url.search = '';
+      return NextResponse.redirect(url);
+    }
   }
   
   return NextResponse.next();

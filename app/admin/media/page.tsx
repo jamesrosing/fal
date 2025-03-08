@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable, DroppableProvided, DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable, DroppableProvided, DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot, DropResult } from '@hello-pangea/dnd';
 import { CldUploadWidget, CldImage } from 'next-cloudinary';
 import Image from 'next/image';
 import { getCloudinaryUrl } from '@/lib/cloudinary';

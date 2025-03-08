@@ -35,10 +35,19 @@ const posterImage = getCloudinaryUrl("hero/hero-poster", {
   width: 1920,
   height: 1080,
   crop: 'fill',
-  gravity: 'auto'
+  gravity: 'auto',
+  format: 'auto',
+  quality: 'auto'
 });
 
-const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1/hero/hero-fallback.jpg";
+const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
+  width: 1920,
+  height: 1080,
+  crop: 'fill',
+  gravity: 'auto',
+  format: 'auto',
+  quality: 'auto'
+});
 
 export function Hero() {
   return (
@@ -118,7 +127,10 @@ export function PageHero({
   // Handle full URLs or just public IDs
   const imageUrl = image.path.includes('https://res.cloudinary.com') 
     ? image.path 
-    : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${image.path}`;
+    : getCloudinaryUrl(image.path, {
+        format: 'auto',
+        quality: 'auto'
+      });
 
   return (
     <section className="relative pt-20">

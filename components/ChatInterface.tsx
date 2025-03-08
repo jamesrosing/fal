@@ -1,59 +1,38 @@
-// components/ChatInterface.tsx
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, StopCircle } from 'lucide-react';
-import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-// Define the interface for the ChatInterface props
-interface ChatInterfaceProps {
-  model?: string;
-}
-
-// Define the chat message type
 interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: string;
   content: string;
   id?: string;
 }
 
-interface CodeProps {
-  node?: any;
-  inline?: boolean;
-  className?: string;
-  children?: React.ReactNode;
-  [key: string]: any;
-}
-
-export function ChatInterface({ model = 'gpt-4' }: ChatInterfaceProps) {
+export function ChatInterface({ userId }: { userId: string }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages]);
 
-  const sendMessage = async () => {
+  const handleSend = async () => {
     if (!input.trim() || isLoading) return;
-    
-    const userMessage: ChatMessage = { 
-      role: 'user', 
-      content: input,
-      id: `user-${Date.now()}-${Math.random()}`
-    };
-    setMessages(prev => [...prev, userMessage]);
+
+    const userMessage = { role: 'user', content: input, id: `user-${Date.now()}` };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
@@ -61,29 +40,18 @@ export function ChatInterface({ model = 'gpt-4' }: ChatInterfaceProps) {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          messages: [...messages, userMessage],
-          model: model
-        }),
+        body: JSON.stringify({ messages: [...messages, userMessage], userId }),
       });
 
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
+      if (!response.ok) throw new Error(await response.text());
 
-      const data = await response.text();
-      
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data,
-        id: `assistant-${Date.now()}-${Math.random()}`
-      }]);
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.content, id: `assistant-${Date.now()}` }]);
     } catch (error) {
-      console.error('Chat error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "I apologize, but I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
-        id: `error-${Date.now()}-${Math.random()}`
+      setMessages((prev) => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, something went wrong. Please try again.',
+        id: `error-${Date.now()}`,
       }]);
     } finally {
       setIsLoading(false);
@@ -93,224 +61,106 @@ export function ChatInterface({ model = 'gpt-4' }: ChatInterfaceProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      sendMessage();
+      handleSend();
     }
   };
 
   const toggleRecording = () => {
     setIsRecording(!isRecording);
-    // Implement voice recording logic here
+    // Add voice recording logic if needed
   };
 
   return (
-    <div className="flex flex-col h-full bg-zinc-900">
-      {/* Messages Area */}
-      <div className={`flex-1 overflow-y-auto py-4 space-y-6 ${messages.length === 0 ? 'flex items-center justify-center' : ''}`}>
+    <div className="flex flex-col h-full bg-zinc-900 rounded-lg border border-zinc-800">
+      <div className="flex-1 overflow-y-auto py-4 space-y-6">
         <div className="max-w-3xl w-full mx-auto px-4">
-          {messages.length === 0 ? (
-            <div className="space-y-8">
+          <AnimatePresence>
+            {messages.map((msg) => (
               <motion.div
-                key="welcome"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center"
-              >
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Welcome! I&apos;m Anna, your Allure MD Assistant
-                </h2>
-                <p className="text-zinc-400 max-w-md mx-auto">
-                  I can help you schedule appointments, answer questions about our services,
-                  and provide information about our treatments and providers.
-                </p>
-              </motion.div>
-
-              {/* Input Area for Empty State */}
-              <motion.div
+                key={msg.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="relative"
+                exit={{ opacity: 0, y: -20 }}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
               >
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Message Anna..."
-                  className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
-                  rows={1}
-                  disabled={isLoading}
-                />
-                <div className="absolute right-2 bottom-2 flex gap-2">
-                  <button
-                    onClick={toggleRecording}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isRecording 
-                        ? 'text-red-500 hover:bg-red-500/10' 
-                        : 'text-zinc-400 hover:bg-zinc-700'
+                <div className={`flex gap-3 ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
+                  {msg.role === 'assistant' && (
+                    <Avatar className="w-8 h-8 border border-zinc-700">
+                      <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div
+                    className={`p-4 rounded-2xl ${
+                      msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-100'
                     }`}
                   >
-                    {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                  </button>
-                  <button
-                    onClick={sendMessage}
-                    disabled={isLoading || !input.trim()}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isLoading || !input.trim()
-                        ? 'text-zinc-600 cursor-not-allowed'
-                        : 'text-blue-500 hover:bg-blue-500/10'
-                    }`}
-                  >
-                    <Send className="w-5 h-5" />
-                  </button>
+                    {msg.content}
+                  </div>
+                  {msg.role === 'user' && (
+                    <Avatar className="w-8 h-8 border border-zinc-700">
+                      <AvatarFallback className="bg-zinc-700 text-white text-xs">You</AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
               </motion.div>
-
-              <p className="text-xs text-center text-zinc-500">
-                AI Assistant may produce inaccurate information. Verify important details during your consultation.
-              </p>
-            </div>
-          ) : (
-            <>
-              <AnimatePresence>
-                {messages.map((msg) => (
-                  <motion.div
-                    key={msg.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mb-6`}
-                  >
-                    <div className={`flex gap-3 max-w-[80%] ${msg.role === 'assistant' ? 'items-start' : 'items-end'}`}>
-                      {msg.role === 'assistant' && (
-                        <div className="relative w-8 h-8 flex-shrink-0">
-                          <Image
-                            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png"
-                            alt="Anna"
-                            fill
-                            className="rounded-full object-cover"
-                            sizes="32px"
-                            priority
-                          />
-                        </div>
-                      )}
-                      <div
-                        className={`p-4 rounded-2xl ${
-                          msg.role === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-zinc-800 text-zinc-100'
-                        }`}
-                      >
-                        <div
-                          className={`text-sm whitespace-pre-wrap break-words ${
-                            msg.role === 'assistant' ? 'text-zinc-200' : 'text-white'
-                          }`}
-                        >
-                          {msg.role === 'assistant' ? (
-                            <ReactMarkdown components={{
-                              code: ({ node, inline, className, children, ...props }: CodeProps) => {
-                                const language = className ? className.replace(/language-/, '') : '';
-                                return !inline ? (
-                                  <SyntaxHighlighter
-                                    style={vscDarkPlus}
-                                    language={language}
-                                    PreTag="div"
-                                    {...props}
-                                  >
-                                    {String(children).replace(/\n$/, '')}
-                                  </SyntaxHighlighter>
-                                ) : (
-                                  <code className="bg-gray-800 px-1 rounded" {...props}>
-                                    {children}
-                                  </code>
-                                );
-                              }
-                            }}>
-                              {msg.content}
-                            </ReactMarkdown>
-                          ) : msg.content}
-                        </div>
-                      </div>
-                      {msg.role === 'user' && (
-                        <div className="relative w-8 h-8">
-                          <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center">
-                            <span className="text-white text-sm">You</span>
-                          </div>
-                        </div>
-                      )}
+            ))}
+            {isLoading && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                <div className="flex gap-3 items-start">
+                  <Avatar className="w-8 h-8 border border-zinc-700">
+                    <AvatarFallback className="bg-blue-600 text-white text-xs">AI</AvatarFallback>
+                  </Avatar>
+                  <div className="p-4 rounded-2xl bg-zinc-800">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-100" />
+                      <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-200" />
                     </div>
-                  </motion.div>
-                ))}
-                {isLoading && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex justify-start"
-                  >
-                    <div className="flex gap-3 items-start">
-                      <div className="relative w-8 h-8 flex-shrink-0">
-                        <Image
-                          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png"
-                          alt="Anna"
-                          fill
-                          className="rounded-full object-cover"
-                          sizes="32px"
-                        />
-                      </div>
-                      <div className="p-4 rounded-2xl bg-zinc-800">
-                        <div className="flex space-x-2">
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce" />
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-100" />
-                          <div className="w-2 h-2 bg-zinc-400 rounded-full animate-bounce delay-200" />
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <div ref={messagesEndRef} />
-
-              {/* Input Area for Chat State */}
-              <div className="sticky bottom-0 bg-zinc-900 pt-4">
-                <div className="relative">
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Message Anna..."
-                    className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
-                    rows={1}
-                    disabled={isLoading}
-                  />
-                  <div className="absolute right-2 bottom-2 flex gap-2">
-                    <button
-                      onClick={toggleRecording}
-                      className={`p-2 rounded-lg transition-colors ${
-                        isRecording 
-                          ? 'text-red-500 hover:bg-red-500/10' 
-                          : 'text-zinc-400 hover:bg-zinc-700'
-                      }`}
-                    >
-                      {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                    </button>
-                    <button
-                      onClick={sendMessage}
-                      disabled={isLoading || !input.trim()}
-                      className={`p-2 rounded-lg transition-colors ${
-                        isLoading || !input.trim()
-                          ? 'text-zinc-600 cursor-not-allowed'
-                          : 'text-blue-500 hover:bg-blue-500/10'
-                      }`}
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
-                <p className="text-xs text-center text-zinc-500 mt-2">
-                  AI Assistant may produce inaccurate information. Verify important details during your consultation.
-                </p>
-              </div>
-            </>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
+      <div className="sticky bottom-0 bg-zinc-900 pt-4">
+        <div className="relative max-w-3xl mx-auto px-4">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ask about services or book an appointment..."
+            className="w-full p-4 pr-24 bg-zinc-800 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
+            rows={1}
+            disabled={isLoading}
+          />
+          <div className="absolute right-6 bottom-2 flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={toggleRecording}
+                    size="icon"
+                    variant="ghost"
+                    className={`text-zinc-400 hover:bg-zinc-700 ${isRecording ? 'text-red-500' : ''}`}
+                  >
+                    {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{isRecording ? 'Stop recording' : 'Start voice recording'}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              size="icon"
+              variant="ghost"
+              className={isLoading || !input.trim() ? 'text-zinc-600' : 'text-blue-500 hover:bg-blue-500/10'}
+            >
+              <Send className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
