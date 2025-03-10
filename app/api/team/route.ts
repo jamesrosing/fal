@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 import { revalidatePath } from 'next/cache'
 
 // GET all team members
 export async function GET() {
   try {
-    const { data: teamMembers, error } = await supabase
+    const { data: teamMembers, error } = await createClient()
       .from('team_members')
       .select('*')
       .order('order', { ascending: true })
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     let result
     if (id) {
       // Update existing team member
-      const { data, error } = await supabase
+      const { data, error } = await createClient()
         .from('team_members')
         .update(teamMemberData)
         .eq('id', id)
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       result = data
     } else {
       // Create new team member
-      const { data, error } = await supabase
+      const { data, error } = await createClient()
         .from('team_members')
         .insert(teamMemberData)
         .select()
@@ -93,7 +93,7 @@ export async function PATCH(request: Request) {
     console.log('Starting team member update process:', { id, updates })
 
     // First, try to get all team members to verify connection
-    const { data: allMembers, error: listError } = await supabase
+    const { data: allMembers, error: listError } = await createClient()
       .from('team_members')
       .select('id, name, image_url')
 
@@ -105,14 +105,14 @@ export async function PATCH(request: Request) {
       )
     }
 
-    console.log('Available team members:', allMembers?.map(m => ({
+    console.log('Available team members:', allMembers?.map((m: { id: string; name: string; image_url?: string }) => ({
       id: m.id,
       name: m.name,
       image_url: m.image_url || '<empty>'
     })))
 
     // Check if member exists
-    const { data: existingMember, error: checkError } = await supabase
+    const { data: existingMember, error: checkError } = await createClient()
       .from('team_members')
       .select('*')
       .eq('id', id)
@@ -126,7 +126,7 @@ export async function PATCH(request: Request) {
     }
 
     if (!existingMember || existingMember.length === 0) {
-      console.error(`Team member not found. ID: ${id}. Available IDs:`, allMembers?.map(m => m.id))
+      console.error(`Team member not found. ID: ${id}. Available IDs:`, allMembers?.map((m: { id: string }) => m.id))
       return NextResponse.json(
         { error: `Team member not found with ID: ${id}` },
         { status: 404 }
@@ -136,7 +136,7 @@ export async function PATCH(request: Request) {
     console.log('Found existing member:', existingMember[0])
 
     // Perform the update
-    const { error: updateError } = await supabase
+    const { error: updateError } = await createClient()
       .from('team_members')
       .update({
         ...updates,
@@ -153,7 +153,7 @@ export async function PATCH(request: Request) {
     }
 
     // Fetch the updated record
-    const { data: updatedMember, error: getError } = await supabase
+    const { data: updatedMember, error: getError } = await createClient()
       .from('team_members')
       .select('*')
       .eq('id', id)
@@ -200,7 +200,7 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const { error } = await supabase
+    const { error } = await createClient()
       .from('team_members')
       .delete()
       .eq('id', id)

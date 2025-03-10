@@ -8,6 +8,10 @@ import { getCloudinaryUrl } from '@/lib/cloudinary';
 import { handleMediaUpload } from './actions';
 import { ChevronRight, ChevronDown, FolderIcon, ImageIcon, FileIcon } from 'lucide-react';
 
+// Get the upload preset from environment variables
+const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'emsculpt';
+console.log('Using Cloudinary upload preset:', UPLOAD_PRESET);
+
 /**
  * Admin Media Management Page
  * 
@@ -279,12 +283,18 @@ export default function AdminMediaPage() {
 
   // Handle successful upload
   const handleUploadSuccess = async (placeholderId: string, result: any) => {
+    console.log('Handling upload success for placeholder:', placeholderId);
+    console.log('Upload result info:', result.info);
+    
     try {
       // Get the public ID from the result
       const publicId = result.info.public_id;
+      console.log('Public ID:', publicId);
       
       // Update the media asset in the database
+      console.log('Updating media asset in database...');
       await handleMediaUpload(placeholderId, publicId);
+      console.log('Database update successful');
       
       // Update local state
       setMediaAssets(prev => ({
@@ -295,6 +305,7 @@ export default function AdminMediaPage() {
           uploadedAt: new Date().toISOString()
         }
       }));
+      console.log('Local state updated');
       
       // Add to available assets
       setAvailableAssets(prev => [
@@ -308,6 +319,7 @@ export default function AdminMediaPage() {
           preview: result.info.secure_url
         }
       ]);
+      console.log('Added to available assets');
       
       setMessage({
         text: `Successfully uploaded image for ${placeholderId}`,
@@ -490,7 +502,7 @@ export default function AdminMediaPage() {
             {hasAsset ? 'Replace Image:' : 'Upload Image:'}
           </p>
           <CldUploadWidget
-            uploadPreset="media_assets"
+            uploadPreset={UPLOAD_PRESET}
             options={{
               maxFiles: 1,
               resourceType: "image",
@@ -499,9 +511,17 @@ export default function AdminMediaPage() {
               sources: ["local", "url", "camera", "unsplash"],
             }}
             onSuccess={(result: any) => {
+              console.log('Upload result:', result);
               if (result.event === "success") {
                 handleUploadSuccess(placeholder.id, result);
               }
+            }}
+            onError={(error: any) => {
+              console.error('Upload error:', error);
+              setMessage({
+                text: `Upload failed: ${error.message || 'Unknown error'}`,
+                type: 'error'
+              });
             }}
           >
             {({ open }) => (
@@ -587,7 +607,7 @@ export default function AdminMediaPage() {
               {/* Upload new asset */}
               <div className="mb-4">
                 <CldUploadWidget
-                  uploadPreset="media_assets"
+                  uploadPreset={UPLOAD_PRESET}
                   options={{
                     maxFiles: 1,
                     resourceType: "image",
@@ -596,6 +616,7 @@ export default function AdminMediaPage() {
                     sources: ["local", "url", "camera", "unsplash"],
                   }}
                   onSuccess={(result: any) => {
+                    console.log('Upload result:', result);
                     if (result.event === "success") {
                       // Add to available assets
                       setAvailableAssets(prev => [
@@ -618,6 +639,13 @@ export default function AdminMediaPage() {
                       // Clear message after 3 seconds
                       setTimeout(() => setMessage(null), 3000);
                     }
+                  }}
+                  onError={(error: any) => {
+                    console.error('Upload error:', error);
+                    setMessage({
+                      text: `Upload failed: ${error.message || 'Unknown error'}`,
+                      type: 'error'
+                    });
                   }}
                 >
                   {({ open }) => (

@@ -46,6 +46,7 @@ export interface CloudinaryImageOptions {
   crop?: string;
   gravity?: string;
   simplifiedMode?: boolean;
+  resource_type?: 'image' | 'video' | 'auto' | 'raw';
 }
 
 export interface CloudinaryVideoOptions {
@@ -575,4 +576,25 @@ export async function verifyRequiredAssets() {
       console.log('---');
     }
   }
+}
+
+/**
+ * Determine the media type from a Cloudinary ID or URL
+ * @param cloudinaryId The Cloudinary public ID or URL
+ * @returns The media type ('image' or 'video')
+ */
+export function getMediaType(cloudinaryId: string): 'image' | 'video' {
+  if (!cloudinaryId) return 'image';
+  
+  // Check for common video extensions
+  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv'];
+  const hasVideoExtension = videoExtensions.some(ext => 
+    cloudinaryId.toLowerCase().endsWith(ext)
+  );
+  
+  // Check for video folders in the path
+  const isInVideoFolder = cloudinaryId.includes('/video/') || 
+                          cloudinaryId.includes('/videos/');
+  
+  return (hasVideoExtension || isInVideoFolder) ? 'video' : 'image';
 } 

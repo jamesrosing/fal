@@ -26,8 +26,27 @@ const componentsDir = path.join(rootDir, 'components');
 const outputFile = path.join(rootDir, 'app/api/site/media-map/data.json');
 
 // Media placeholder patterns to look for
-const MEDIA_COMPONENT_NAMES = ['CldImage', 'Image', 'img', 'CloudinaryImage'];
-const MEDIA_PROP_PATTERNS = ['image', 'img', 'photo', 'picture', 'banner', 'hero', 'background', 'logo', 'icon', 'avatar'];
+const MEDIA_COMPONENT_NAMES = [
+  'CldImage', 
+  'Image', 
+  'img', 
+  'CloudinaryImage',
+  'video',
+  'BackgroundVideo',  // Add the BackgroundVideo component
+  'source'           // Add source element to detect video sources
+];
+const MEDIA_PROP_PATTERNS = [
+  'image', 'img', 'photo', 'picture', 'banner', 'hero', 'background', 
+  'logo', 'icon', 'avatar', 
+  'video', 'poster', 'fallbackImage', 'sources'  // Add video-related properties
+];
+
+// Add a section for identifying specific component types
+const COMPONENT_TYPES = {
+  IMAGE: 'image',
+  VIDEO: 'video',
+  BACKGROUND_VIDEO: 'background-video'
+};
 
 // Structure to hold our sitemap
 const sitemap = [
@@ -104,6 +123,53 @@ const extractMediaPlaceholders = (filePath, fileType, relativePath) => {
       JSXOpeningElement(path) {
         const elementName = path.node.name.name || 
                            (path.node.name.property && path.node.name.property.name);
+        
+        // Determine component type
+        let componentType = COMPONENT_TYPES.IMAGE;
+        if (elementName === 'video' || elementName === 'source') {
+          componentType = COMPONENT_TYPES.VIDEO;
+        } else if (elementName === 'BackgroundVideo') {
+          componentType = COMPONENT_TYPES.BACKGROUND_VIDEO;
+        }
+        
+        // Special handling for BackgroundVideo component
+        if (componentType === COMPONENT_TYPES.BACKGROUND_VIDEO) {
+          const props = path.node.attributes;
+          let sources = [];
+          let poster = '';
+          let fallbackImage = '';
+          
+          // Extract props from BackgroundVideo
+          for (const prop of props) {
+            if (prop.type !== 'JSXAttribute') continue;
+            
+            const propName = prop.name.name;
+            if (propName === 'poster') {
+              poster = extractStringValue(prop.value);
+            } else if (propName === 'fallbackImage') {
+              fallbackImage = extractStringValue(prop.value);
+            } else if (propName === 'sources') {
+              // This would need to parse the sources array
+              sources = ['video_sources_detected'];
+            }
+          }
+          
+          // If we found a BackgroundVideo, create a placeholder for it
+          if (poster || fallbackImage || sources.length > 0) {
+            const placeholder = {
+              id: `hero-background-video`,
+              name: 'Hero Background Video',
+              description: 'Background video for the hero section',
+              path: 'home',
+              area: 'hero',
+              mediaType: 'video',
+              dimensions: { width: 1920, height: 1080, aspectRatio: 16/9 }
+            };
+            
+            // Add to placeholders
+            placeholders.push(placeholder);
+          }
+        }
         
         // Check if this is a media component
         if (MEDIA_COMPONENT_NAMES.includes(elementName)) {
@@ -300,4 +366,18 @@ const main = async () => {
 main().catch(error => {
   console.error('Error:', error);
   process.exit(1);
-}); 
+});
+
+// Helper function to extract string value
+function extractStringValue(node) {
+  if (!node) return '';
+  
+  if (node.type === 'StringLiteral') {
+    return node.value;
+  } else if (node.type === 'JSXExpressionContainer') {
+    // This would need more logic to handle variables
+    return 'expression_detected';
+  }
+  
+  return '';
+} 

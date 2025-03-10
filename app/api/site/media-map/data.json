@@ -17,9 +17,15 @@
         "mediaPlaceholders": []
       },
       {
-        "id": "team",
-        "name": "Team",
-        "description": "Team page content and media assets",
+        "id": "services",
+        "name": "Services",
+        "description": "Services page content and media assets",
+        "mediaPlaceholders": []
+      },
+      {
+        "id": "contact",
+        "name": "Contact",
+        "description": "Contact page content and media assets",
         "mediaPlaceholders": []
       }
     ]
@@ -29,6 +35,12 @@
     "name": "Components",
     "path": "/components",
     "sections": [
+      {
+        "id": "sections",
+        "name": "Sections",
+        "description": "Section components",
+        "mediaPlaceholders": []
+      },
       {
         "id": "hero",
         "name": "Hero",
@@ -41,400 +53,2734 @@
         "description": "General content for Components",
         "mediaPlaceholders": [
           {
-            "id": "Sleep & Travel Optimization Services",
-            "name": "Sleep & Travel Optimization Services",
-            "description": "Sleep & Travel Optimization Services",
-            "path": "app/services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
-            "area": "services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Neurocognitive Performance Services",
-            "name": "Neurocognitive Performance Services",
-            "description": "Neurocognitive Performance Services",
-            "path": "app/services\\functional-medicine\\neurocognitive-performance\\page.tsx",
-            "area": "services\\functional-medicine\\neurocognitive-performance\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Hormone Optimization Services",
-            "name": "Hormone Optimization Services",
-            "description": "Hormone Optimization Services",
-            "path": "app/services\\functional-medicine\\hormone-optimization\\page.tsx",
-            "area": "services\\functional-medicine\\hormone-optimization\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Hair Restoration Services",
-            "name": "Hair Restoration Services",
-            "description": "Hair Restoration Services",
-            "path": "app/services\\functional-medicine\\hair-restoration\\page.tsx",
-            "area": "services\\functional-medicine\\hair-restoration\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Epigenetic Optimization Services",
-            "name": "Epigenetic Optimization Services",
-            "description": "Epigenetic Optimization Services",
-            "path": "app/services\\functional-medicine\\epigenetic-optimization\\page.tsx",
-            "area": "services\\functional-medicine\\epigenetic-optimization\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Cardiometabolic Health Services",
-            "name": "Cardiometabolic Health Services",
-            "description": "Cardiometabolic Health Services",
-            "path": "app/services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
-            "area": "services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Skin Screening Services",
-            "name": "Skin Screening Services",
-            "description": "Skin Screening Services",
-            "path": "app/services\\dermatology\\skin-screening\\page.tsx",
-            "area": "services\\dermatology\\skin-screening\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Rosacea Treatment Services",
-            "name": "Rosacea Treatment Services",
-            "description": "Rosacea Treatment Services",
-            "path": "app/services\\dermatology\\rosacea\\page.tsx",
-            "area": "services\\dermatology\\rosacea\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Psoriasis Treatment Services",
-            "name": "Psoriasis Treatment Services",
-            "description": "Psoriasis Treatment Services",
-            "path": "app/services\\dermatology\\psoriasis\\page.tsx",
-            "area": "services\\dermatology\\psoriasis\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Eczema Treatment Services",
-            "name": "Eczema Treatment Services",
-            "description": "Eczema Treatment Services",
-            "path": "app/services\\dermatology\\eczema\\page.tsx",
-            "area": "services\\dermatology\\eczema\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Acne Treatment Services",
-            "name": "Acne Treatment Services",
-            "description": "Acne Treatment Services",
-            "path": "app/services\\dermatology\\acne\\page.tsx",
-            "area": "services\\dermatology\\acne\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Contact Allure MD",
-            "name": "Contact Allure MD",
-            "description": "Contact Allure MD",
-            "path": "app/contact\\page.tsx",
-            "area": "contact\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Mountain landscape",
-            "name": "Mountain landscape",
-            "description": "Mountain landscape",
-            "path": "app/cloudinary-demo\\page.tsx",
-            "area": "cloudinary-demo\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Team member",
-            "name": "Team member",
-            "description": "Team member",
-            "path": "app/cloudinary-demo\\page.tsx",
-            "area": "cloudinary-demo\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Cat",
-            "name": "Cat",
-            "description": "Cat",
-            "path": "app/cloudinary-demo\\page.tsx",
-            "area": "cloudinary-demo\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Uploaded image",
-            "name": "Uploaded image",
-            "description": "Uploaded image",
-            "path": "app/cloudinary-demo\\page.tsx",
-            "area": "cloudinary-demo\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Anna",
-            "name": "Anna",
-            "description": "Anna",
-            "path": "app/chat\\page.tsx",
-            "area": "chat\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Schedule an Appointment",
-            "name": "Schedule an Appointment",
-            "description": "Schedule an Appointment",
-            "path": "app/appointment\\page.tsx",
-            "area": "appointment\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Case image",
-            "name": "Case image",
-            "description": "Case image",
-            "path": "app/admin\\gallery\\[collection]\\[album]\\[caseId]\\page.tsx",
-            "area": "admin\\gallery\\[collection]\\[album]\\[caseId]\\page.tsx",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "ALLURE MD",
-            "name": "ALLURE MD",
-            "description": "ALLURE MD",
-            "path": "components/general",
+            "id": "general-Image-1",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
           },
           {
-            "id": "Preview",
-            "name": "Preview",
-            "description": "Preview",
-            "path": "components/general",
+            "id": "Our Team",
+            "name": "Our Team",
+            "description": "Our Team",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
           },
           {
-            "id": "Processed Image",
-            "name": "Processed Image",
-            "description": "Processed Image",
-            "path": "components/general",
+            "id": "general-Image-1-components-general-1",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
           },
           {
-            "id": "Processed Image",
-            "name": "Processed Image",
-            "description": "Processed Image",
-            "path": "components/general",
+            "id": "general-direct-1",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Anna",
-            "name": "Anna",
-            "description": "Anna",
-            "path": "components/general",
-            "area": "general",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Anna",
-            "name": "Anna",
-            "description": "Anna",
-            "path": "components/general",
-            "area": "general",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Background",
-            "name": "Background",
-            "description": "Background",
-            "path": "components/general",
-            "area": "general",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
-          },
-          {
-            "id": "Video poster",
-            "name": "Video poster",
-            "description": "Video poster",
-            "path": "components/general",
-            "area": "general",
-            "dimensions": {
-              "width": 0,
-              "height": 0,
-              "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "hero-services"
           },
           {
             "id": "Plastic Surgery at Allure MD",
             "name": "Plastic Surgery at Allure MD",
             "description": "Plastic Surgery at Allure MD",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "plastic-surgery-hero"
+          },
+          {
+            "id": "general-Image-2",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-1",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "plastic-surgery-face-neck-procedures"
+          },
+          {
+            "id": "general-direct-2",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "plastic-surgery-breast-procedures"
+          },
+          {
+            "id": "general-direct-3",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "plastic-surgery-body-procedures"
+          },
+          {
+            "id": "Head and Neck Procedures",
+            "name": "Head and Neck Procedures",
+            "description": "Head and Neck Procedures",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "head-and-neck-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-1",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-2",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "eyelids"
+          },
+          {
+            "id": "general-direct-2-components-general-1",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "ears"
+          },
+          {
+            "id": "general-direct-3-components-general-1",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "face"
+          },
+          {
+            "id": "general-direct-4",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "neck"
+          },
+          {
+            "id": "general-direct-5",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "nose"
+          },
+          {
+            "id": "Breast Procedures",
+            "name": "Breast Procedures",
+            "description": "Breast Procedures",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "breast-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-2",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-3",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "breast-augmentation"
+          },
+          {
+            "id": "general-direct-2-components-general-2",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "breast-lift"
+          },
+          {
+            "id": "general-direct-3-components-general-2",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "breast-reduction"
+          },
+          {
+            "id": "general-direct-4-components-general-1",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "breast-revision"
+          },
+          {
+            "id": "general-direct-5-components-general-1",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "nipple-areola"
+          },
+          {
+            "id": "Body Procedures",
+            "name": "Body Procedures",
+            "description": "Body Procedures",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "body-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-3",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-4",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "tummy-tuck"
+          },
+          {
+            "id": "general-direct-2-components-general-3",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "liposuction"
+          },
+          {
+            "id": "general-direct-3-components-general-3",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "body-lift"
+          },
+          {
+            "id": "general-direct-4-components-general-2",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "bbl"
+          },
+          {
+            "id": "general-direct-5-components-general-2",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "arm-lift"
+          },
+          {
+            "id": "Medical Spa at Allure MD",
+            "name": "Medical Spa at Allure MD",
+            "description": "Medical Spa at Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-4",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-5",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-emsculpt"
+          },
+          {
+            "id": "general-direct-2-components-general-4",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-shapescale"
+          },
+          {
+            "id": "general-direct-3-components-general-4",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-rf-microneedling"
+          },
+          {
+            "id": "general-direct-4-components-general-3",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-injections"
+          },
+          {
+            "id": "general-direct-5-components-general-3",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-lasers"
+          },
+          {
+            "id": "general-direct-6",
+            "name": "General Direct 6",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "medical-spa-facials"
+          },
+          {
+            "id": "Skin Rejuvenation Treatments",
+            "name": "Skin Rejuvenation Treatments",
+            "description": "Skin Rejuvenation Treatments",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "skin-rejuvenation-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-5",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-6",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "chemical-peels"
+          },
+          {
+            "id": "general-direct-2-components-general-5",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "microdermabrasion"
+          },
+          {
+            "id": "general-direct-3-components-general-5",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "prp-therapy"
+          },
+          {
+            "id": "general-direct-4-components-general-4",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "led-therapy"
+          },
+          {
+            "id": "Laser Treatments",
+            "name": "Laser Treatments",
+            "description": "Laser Treatments",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "laser-treatments-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-6",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-7",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "laser-hair-removal"
+          },
+          {
+            "id": "general-direct-2-components-general-6",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "laser-resurfacing"
+          },
+          {
+            "id": "general-direct-3-components-general-6",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "ipl-photofacial"
+          },
+          {
+            "id": "general-direct-4-components-general-5",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "laser-vein"
+          },
+          {
+            "id": "Injectable Treatments",
+            "name": "Injectable Treatments",
+            "description": "Injectable Treatments",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "injectables-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-7",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-8",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "neuromodulators"
+          },
+          {
+            "id": "general-direct-2-components-general-7",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermal-fillers"
+          },
+          {
+            "id": "general-direct-3-components-general-7",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "lip-enhancement"
+          },
+          {
+            "id": "general-direct-4-components-general-6",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "liquid-facelift"
+          },
+          {
+            "id": "Facial Treatments",
+            "name": "Facial Treatments",
+            "description": "Facial Treatments",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "facial-treatments-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-8",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-9",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "signature-facial"
+          },
+          {
+            "id": "general-direct-2-components-general-8",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "hydrafacial"
+          },
+          {
+            "id": "general-direct-3-components-general-8",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "microneedling"
+          },
+          {
+            "id": "general-direct-4-components-general-7",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "oxygen-facial"
+          },
+          {
+            "id": "Body Analysis Services",
+            "name": "Body Analysis Services",
+            "description": "Body Analysis Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "body-analysis-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-9",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-10",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "3d-body-scanning"
+          },
+          {
+            "id": "general-direct-2-components-general-9",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "body-composition"
+          },
+          {
+            "id": "general-direct-3-components-general-9",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "treatment-planning"
+          },
+          {
+            "id": "Functional Medicine at Allure MD",
+            "name": "Functional Medicine at Allure MD",
+            "description": "Functional Medicine at Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-10",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-11",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-cardio"
+          },
+          {
+            "id": "general-direct-2-components-general-10",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-epigenetic"
+          },
+          {
+            "id": "general-direct-3-components-general-10",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-hair"
+          },
+          {
+            "id": "general-direct-4-components-general-8",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-hormone"
+          },
+          {
+            "id": "general-direct-5-components-general-4",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-neuro"
+          },
+          {
+            "id": "general-direct-6-components-general-1",
+            "name": "General Direct 6",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-sleep"
+          },
+          {
+            "id": "Sleep & Travel Optimization Services",
+            "name": "Sleep & Travel Optimization Services",
+            "description": "Sleep & Travel Optimization Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-sleep"
+          },
+          {
+            "id": "Neurocognitive Performance Services",
+            "name": "Neurocognitive Performance Services",
+            "description": "Neurocognitive Performance Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-neuro"
+          },
+          {
+            "id": "Hormone Optimization Services",
+            "name": "Hormone Optimization Services",
+            "description": "Hormone Optimization Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-hormone"
+          },
+          {
+            "id": "Hair Restoration Services",
+            "name": "Hair Restoration Services",
+            "description": "Hair Restoration Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-hair"
+          },
+          {
+            "id": "Epigenetic Optimization Services",
+            "name": "Epigenetic Optimization Services",
+            "description": "Epigenetic Optimization Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-epigenetic"
+          },
+          {
+            "id": "Cardiometabolic Health Services",
+            "name": "Cardiometabolic Health Services",
+            "description": "Cardiometabolic Health Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "functional-medicine-cardio"
+          },
+          {
+            "id": "Dermatology at Allure MD",
+            "name": "Dermatology at Allure MD",
+            "description": "Dermatology at Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-11",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-12",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-skin-health"
+          },
+          {
+            "id": "general-direct-2-components-general-11",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-acne"
+          },
+          {
+            "id": "general-direct-3-components-general-11",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-eczema"
+          },
+          {
+            "id": "general-direct-4-components-general-9",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-rosacea"
+          },
+          {
+            "id": "general-direct-5-components-general-5",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-psoriasis"
+          },
+          {
+            "id": "Skin Screening Services",
+            "name": "Skin Screening Services",
+            "description": "Skin Screening Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-skin-health"
+          },
+          {
+            "id": "Rosacea Treatment Services",
+            "name": "Rosacea Treatment Services",
+            "description": "Rosacea Treatment Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-rosacea"
+          },
+          {
+            "id": "Psoriasis Treatment Services",
+            "name": "Psoriasis Treatment Services",
+            "description": "Psoriasis Treatment Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-psoriasis"
+          },
+          {
+            "id": "Eczema Treatment Services",
+            "name": "Eczema Treatment Services",
+            "description": "Eczema Treatment Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-eczema"
+          },
+          {
+            "id": "Acne Treatment Services",
+            "name": "Acne Treatment Services",
+            "description": "Acne Treatment Services",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dermatology-acne"
+          },
+          {
+            "id": "Patient Reviews",
+            "name": "Patient Reviews",
+            "description": "Patient Reviews",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "reviews-hero"
+          },
+          {
+            "id": "general-Image-2-components-general-12",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Out of Town Patients",
+            "name": "Out of Town Patients",
+            "description": "Out of Town Patients",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-13",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Gallery Hero",
+            "name": "Gallery Hero",
+            "description": "Gallery Hero",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-14",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-2",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-15",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-3",
+            "name": "General Image 3",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Financing Options",
+            "name": "Financing Options",
+            "description": "Financing Options",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "hero"
+          },
+          {
+            "id": "general-Image-2-components-general-16",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-13",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "carecredit-logo"
+          },
+          {
+            "id": "general-direct-2-components-general-12",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "alphaeon-logo"
+          },
+          {
+            "id": "general-direct-3-components-general-12",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "patientfi-logo"
+          },
+          {
+            "id": "Contact Allure MD",
+            "name": "Contact Allure MD",
+            "description": "Contact Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "1441-1401-avocado-avenue"
+          },
+          {
+            "id": "Mountain landscape",
+            "name": "Mountain landscape",
+            "description": "Mountain landscape",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Team member",
+            "name": "Team member",
+            "description": "Team member",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Cat",
+            "name": "Cat",
+            "description": "Cat",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Uploaded image",
+            "name": "Uploaded image",
+            "description": "Uploaded image",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Anna",
+            "name": "Anna",
+            "description": "Anna",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "Sophie-at-Allure-MD"
+          },
+          {
+            "id": "general-direct-1-components-general-14",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "hero-articles"
+          },
+          {
+            "id": "general-Image-1-components-general-3",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-15",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "${article"
+          },
+          {
+            "id": "general-Image-1-components-general-4",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-17",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 800,
+              "height": 450,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-3-components-general-1",
+            "name": "General Image 3",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Schedule an Appointment",
+            "name": "Schedule an Appointment",
+            "description": "Schedule an Appointment",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "appointment-hero"
+          },
+          {
+            "id": "Uploaded ...",
+            "name": "Uploaded ...",
+            "description": "Uploaded ...",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-img-1",
+            "name": "General Img 1",
+            "description": "img media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-5",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-18",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-16",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "sample"
+          },
+          {
+            "id": "general-Image-1-components-general-6",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-7",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Case image",
+            "name": "Case image",
+            "description": "Case image",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "... Before & After",
+            "name": "... Before & After",
+            "description": "... Before & After",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "About Allure MD",
+            "name": "About Allure MD",
+            "description": "About Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "hero-about"
+          },
+          {
+            "id": "general-Image-2-components-general-19",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 48,
+              "height": 48,
+              "aspectRatio": 1
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-3-components-general-2",
+            "name": "General Image 3",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-17",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "excellence"
+          },
+          {
+            "id": "general-direct-2-components-general-13",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "innovation"
+          },
+          {
+            "id": "general-direct-3-components-general-13",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "safety"
+          },
+          {
+            "id": "general-direct-4-components-general-10",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "personalization"
+          },
+          {
+            "id": "general-direct-5-components-general-6",
+            "name": "General Direct 5",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "operating-room"
+          },
+          {
+            "id": "general-direct-6-components-general-2",
+            "name": "General Direct 6",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "recovery-suite"
+          },
+          {
+            "id": "general-direct-7",
+            "name": "General Direct 7",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "treatment-room"
+          },
+          {
+            "id": "general-Image-1-components-general-8",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-2",
+            "name": "General Video 2",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CldImage-3",
+            "name": "General CldImage 3",
+            "description": "CldImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 320,
+              "height": 180,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-1",
+            "name": "General Video 1",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CloudinaryImage-1",
+            "name": "General CloudinaryImage 1",
+            "description": "CloudinaryImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "ALLURE MD",
+            "name": "ALLURE MD",
+            "description": "ALLURE MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "allure_md_plastic_surgery_dermatology_white_logo"
+          },
+          {
+            "id": "general-CloudinaryImage-1-components-general-1",
+            "name": "General CloudinaryImage 1",
+            "description": "CloudinaryImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CloudinaryImage-2",
+            "name": "General CloudinaryImage 2",
+            "description": "CloudinaryImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CloudinaryImage-3",
+            "name": "General CloudinaryImage 3",
+            "description": "CloudinaryImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Duplicate ...",
+            "name": "Duplicate ...",
+            "description": "Duplicate ...",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Preview",
+            "name": "Preview",
+            "description": "Preview",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Processed Image",
+            "name": "Processed Image",
+            "description": "Processed Image",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Processed Image-components-general-1",
+            "name": "Processed Image",
+            "description": "Processed Image",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-BackgroundVideo-1",
+            "name": "General BackgroundVideo 1",
+            "description": "BackgroundVideo media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-20",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-1-components-general-1",
+            "name": "General Video 1",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-2-components-general-1",
+            "name": "General Video 2",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-3",
+            "name": "General Video 3",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-source-4",
+            "name": "General Source 4",
+            "description": "source media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-9",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-21",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-3-components-general-3",
+            "name": "General Image 3",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Case image ...",
+            "name": "Case image ...",
+            "description": "Case image ...",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Thumbnail ...",
+            "name": "Thumbnail ...",
+            "description": "Thumbnail ...",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CloudinaryImage-1-components-general-2",
+            "name": "General CloudinaryImage 1",
+            "description": "CloudinaryImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Featured image",
+            "name": "Featured image",
+            "description": "Featured image",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-10",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-22",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-18",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": " Generate structured data for the article\n  const structuredData = {\n    type: "
+          },
+          {
+            "id": "general-direct-2-components-general-14",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "logo`\n        }\n      },\n      mainEntityOfPage: {\n        "
+          },
+          {
+            "id": "general-direct-3-components-general-14",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "${relatedArticle"
+          },
+          {
+            "id": "Background",
+            "name": "Background",
+            "description": "Background",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-video-2-components-general-2",
+            "name": "General Video 2",
+            "description": "video media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "video",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-source-3",
+            "name": "General Source 3",
+            "description": "source media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "Video poster",
+            "name": "Video poster",
+            "description": "Video poster",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-11",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CldImage-1",
+            "name": "General CldImage 1",
+            "description": "CldImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-CldImage-2",
+            "name": "General CldImage 2",
+            "description": "CldImage media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-12",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-23",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-3-components-general-4",
+            "name": "General Image 3",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-direct-1-components-general-19",
+            "name": "General Direct 1",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ"
+          },
+          {
+            "id": "general-direct-2-components-general-15",
+            "name": "General Direct 2",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "susan%2520pearose%2520dermatology%2520headshot%25201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL"
+          },
+          {
+            "id": "general-direct-3-components-general-15",
+            "name": "General Direct 3",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "julia%2520medical%2520esthetican%2520headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ"
+          },
+          {
+            "id": "general-direct-4-components-general-11",
+            "name": "General Direct 4",
+            "description": "Component media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "pooja%2520gidwani%2520md%2520functional%2520medince%2520headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR"
+          },
+          {
+            "id": "Plastic Surgery at Allure MD-components-general-1",
+            "name": "Plastic Surgery at Allure MD",
+            "description": "Plastic Surgery at Allure MD",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": "Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology"
+          },
+          {
+            "id": "general-Image-1-components-general-13",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
           },
           {
             "id": "Medical spa treatment",
             "name": "Medical spa treatment",
             "description": "Medical spa treatment",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "julia%2520oxygeneo%2520facial%2520procedure-ZQLNbwBjHKNSxmLHpiRZgHKb4X2zwm"
           },
           {
             "id": "Dr. Gidwani consulting with patient",
             "name": "Dr. Gidwani consulting with patient",
             "description": "Dr. Gidwani consulting with patient",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "dr"
           },
           {
             "id": "Dermatology examination",
             "name": "Dermatology examination",
             "description": "Dermatology examination",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3"
           },
           {
             "id": "Allure MD Medical Team",
             "name": "Allure MD Medical Team",
             "description": "Allure MD Medical Team",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6"
           },
           {
-            "id": "Allure MD Medical Team",
+            "id": "Allure MD Medical Team-components-general-1",
             "name": "Allure MD Medical Team",
             "description": "Allure MD Medical Team",
-            "path": "components/general",
+            "path": "general",
             "area": "general",
             "dimensions": {
               "width": 0,
               "height": 0,
               "aspectRatio": 1.7777777777777777
-            }
+            },
+            "mediaType": "image",
+            "cloudinaryId": "allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6"
+          },
+          {
+            "id": "general-Image-1-components-general-14",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-2-components-general-24",
+            "name": "General Image 2",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-15",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 1200,
+              "height": 630,
+              "aspectRatio": 1.9047619047619047
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
+          },
+          {
+            "id": "general-Image-1-components-general-16",
+            "name": "General Image 1",
+            "description": "Image media",
+            "path": "general",
+            "area": "general",
+            "dimensions": {
+              "width": 0,
+              "height": 0,
+              "aspectRatio": 1.7777777777777777
+            },
+            "mediaType": "image",
+            "cloudinaryId": null
           }
         ]
       }

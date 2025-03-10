@@ -39,6 +39,7 @@ export interface CloudinaryUploaderProps {
   uploadPreset?: string;
   showAdvancedOptions?: boolean;
   sources?: Array<'local' | 'url' | 'camera' | 'google_drive' | 'dropbox' | 'instagram' | 'shutterstock'>;
+  mediaType?: 'image' | 'video';
 }
 
 /**
@@ -87,7 +88,8 @@ export function CloudinaryUploader({
   useUploadPreset = false,
   uploadPreset,
   showAdvancedOptions = false,
-  sources = ['local', 'url', 'camera', 'google_drive', 'dropbox']
+  sources = ['local', 'url', 'camera', 'google_drive', 'dropbox'],
+  mediaType = 'image'
 }: CloudinaryUploaderProps) {
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -220,7 +222,7 @@ export function CloudinaryUploader({
       folder: folderPath,
       tags: combinedTags,
       context: contextString || undefined,
-      resourceType,
+      resourceType: mediaType,
       multiple,
       maxFiles,
       cropping,
@@ -229,7 +231,11 @@ export function CloudinaryUploader({
       defaultSource: 'local',
       showAdvancedOptions,
       // If upload preset specified, use it instead of unsigned
-      ...(useUploadPreset ? { uploadPreset, useUploadPreset: true } : { useUploadPreset: false })
+      ...(useUploadPreset ? { uploadPreset, useUploadPreset: true } : { useUploadPreset: false }),
+      // Allow only appropriate file types
+      allowedFormats: mediaType === 'video' 
+        ? ['mp4', 'webm', 'mov'] 
+        : ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     };
 
     console.log('Widget configuration:', {
@@ -252,7 +258,7 @@ export function CloudinaryUploader({
   }, [
     isScriptLoaded, area, folder, tags, context, resourceType, 
     multiple, maxFiles, cropping, croppingAspectRatio, processResults,
-    useUploadPreset, uploadPreset, showAdvancedOptions, sources, onFailure
+    useUploadPreset, uploadPreset, showAdvancedOptions, sources, onFailure, mediaType
   ]);
 
   return (
@@ -283,7 +289,7 @@ export function CloudinaryUploader({
           className={buttonClassName}
           disabled={!isScriptLoaded}
         >
-          {buttonLabel}
+          {buttonLabel || `Upload ${mediaType === 'video' ? 'Video' : 'Image'}`}
         </Button>
       )}
     </div>

@@ -46,6 +46,11 @@ const menuItems = [
     icon: ImageIcon,
   },
   {
+    title: 'Visual Editor',
+    href: '/admin/visual-editor',
+    icon: ImageIcon,
+  },
+  {
     title: 'Settings',
     href: '/admin/settings',
     icon: Settings,
