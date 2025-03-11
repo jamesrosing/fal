@@ -1,7 +1,0 @@
-{
-  "name": "scripts",
-  "version": "1.0.0",
-  "description": "Utility scripts",
-  "type": "module",
-  "private": true
-} 

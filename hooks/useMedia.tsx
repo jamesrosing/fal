@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getCloudinaryUrl } from '@/lib/cloudinary';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 
 // Types for media assets
 export interface MediaAsset {
@@ -44,7 +44,8 @@ export function useMediaAsset(
     async function fetchMediaAsset() {
       try {
         // First try to get the asset from Supabase if available
-        if (supabase) {
+        try {
+          const supabase = createClient();
           const { data, error } = await supabase
             .from('media_assets')
             .select('cloudinary_id')
@@ -67,6 +68,9 @@ export function useMediaAsset(
             }
             return;
           }
+        } catch (supabaseError) {
+          // If there's an error with Supabase, log it and continue to the fallback
+          console.warn('Error accessing Supabase:', supabaseError);
         }
 
         // Fallback to the media map API
@@ -134,7 +138,8 @@ export async function getMediaAsset(
 ): Promise<string | null> {
   try {
     // First try to get the asset from Supabase if available
-    if (supabase) {
+    try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('media_assets')
         .select('cloudinary_id')
@@ -144,6 +149,9 @@ export async function getMediaAsset(
       if (!error && data && data.cloudinary_id) {
         return getCloudinaryUrl(data.cloudinary_id, options);
       }
+    } catch (supabaseError) {
+      // If there's an error with Supabase, log it and continue to the fallback
+      console.warn('Error accessing Supabase:', supabaseError);
     }
 
     // Fallback to the media map API

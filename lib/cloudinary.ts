@@ -21,6 +21,7 @@ declare global {
   interface Window {
     cloudinary?: {
       createUploadWidget: (options: any, callback: (error: any, result: any) => void) => any;
+      createMediaLibrary: (options: any, callbacks?: any) => any;
     };
   }
 }
@@ -172,6 +173,12 @@ export const getCloudinaryUrl = (
     return publicId;
   }
 
+  // If publicId is empty or undefined, return a placeholder image
+  if (!publicId) {
+    console.warn('Empty publicId provided, returning placeholder image');
+    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+  }
+
   const {
     width = 'auto',
     height = 'auto',
@@ -187,7 +194,13 @@ export const getCloudinaryUrl = (
     return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
   }
 
-  return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}${height !== 'auto' ? `,h_${height}` : ''},c_${crop},g_${gravity}/${publicId}`;
+  try {
+    // Use a more conservative set of transformations to reduce the chance of errors
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}/${publicId}`;
+  } catch (error) {
+    console.error('Error generating Cloudinary URL:', error);
+    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+  }
 };
 
 // Helper function for video URLs

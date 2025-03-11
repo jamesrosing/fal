@@ -1,724 +1,946 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable, DroppableProvided, DroppableStateSnapshot, DraggableProvided, DraggableStateSnapshot, DropResult } from '@hello-pangea/dnd';
-import { CldUploadWidget, CldImage } from 'next-cloudinary';
-import Image from 'next/image';
-import { getCloudinaryUrl } from '@/lib/cloudinary';
-import { handleMediaUpload } from './actions';
-import { ChevronRight, ChevronDown, FolderIcon, ImageIcon, FileIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Script from 'next/script';
 
-// Get the upload preset from environment variables
-const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'emsculpt';
-console.log('Using Cloudinary upload preset:', UPLOAD_PRESET);
+// Style for the directory structure
+const directoryStyles = {
+  container: "border border-gray-700 rounded-md overflow-hidden mb-4",
+  header: "bg-gray-900 px-4 py-3 font-medium flex items-center justify-between text-white border-b border-gray-700",
+  folderIcon: "mr-2 text-yellow-500",
+  content: "pl-0 bg-gray-950 text-white",
+  item: "border-t border-gray-800 px-4 py-2 flex items-center",
+  folderItem: "text-white hover:bg-gray-800 cursor-pointer",
+  placeholder: "flex items-center justify-between w-full py-1.5",
+  indentedContent: "pl-6",
+  fileIcon: "mr-2 text-gray-400",
+  fileText: "text-sm font-mono text-white",
+  cloudinaryId: "ml-2 text-xs text-gray-400",
+  replaceButton: "ml-auto px-3 py-1 text-xs bg-gray-800 text-white rounded-md border border-gray-600 hover:bg-gray-700"
+};
 
-/**
- * Admin Media Management Page
- * 
- * This page provides an interface for managing media assets across the site.
- * It uses the SiteMediaManager component to display and manage media placeholders.
- * 
- * Features:
- * - View all media placeholders organized by section and area
- * - Upload new media assets for each placeholder
- * - Preview media assets with optimized delivery
- * 
- * @see https://next.cloudinary.dev/ for Next Cloudinary documentation
- */
+// Add these FolderIcon and FileIcon components inside the component but before the return
+const FolderIcon = () => (
+  <svg className={directoryStyles.folderIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22 19C22 19.5304 21.7893 20.0391 21.4142 20.4142C21.0391 20.7893 20.5304 21 20 21H4C3.46957 21 2.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H9L11 6H20C20.5304 6 21.0391 6.21071 21.4142 6.58579C21.7893 6.96086 22 7.46957 22 8V19Z" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
-// Types for site structure
-interface MediaPlaceholder {
-  id: string;
-  name: string;
-  description: string;
-  path: string;
-  area: string;
-  dimensions: {
-    width: number;
-    height: number;
-    aspectRatio: number;
-  };
-}
+const FileIcon = () => (
+  <svg className={directoryStyles.fileIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
 
-interface PageSection {
-  id: string;
-  name: string;
-  description?: string;
-  mediaPlaceholders: MediaPlaceholder[];
-}
-
-interface SitePage {
-  id: string;
-  name: string;
-  path: string;
-  sections: PageSection[];
-}
-
+// Add MediaAsset interface
 interface MediaAsset {
-  id: string;
-  publicId: string;
-  name: string;
-  uploadedAt: string;
-  type: 'image' | 'video';
-  preview: string;
+  placeholder_id: string;
+  cloudinary_id: string;
+  uploaded_at: string;
+  uploaded_by: string;
+  metadata: Record<string, any>;
 }
 
-// File tree node structure
-interface TreeNode {
-  id: string;
-  name: string;
-  type: 'directory' | 'page' | 'section' | 'placeholder';
-  path: string;
-  children: TreeNode[];
-  data?: any; // Original data object
-}
-
-export default function AdminMediaPage() {
-  const [mediaMap, setMediaMap] = useState<SitePage[]>([]);
-  const [mediaAssets, setMediaAssets] = useState<Record<string, any>>({});
-  const [availableAssets, setAvailableAssets] = useState<MediaAsset[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
-  const [searchQuery, setSearchQuery] = useState('');
-  const [message, setMessage] = useState<{text: string, type: 'success' | 'error' | 'info'} | null>(null);
-  const [fileTree, setFileTree] = useState<TreeNode[]>([]);
-  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
-
-  // Fetch media map and assets
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        
-        // Fetch media map
-        const mapResponse = await fetch('/api/site/media-map');
-        if (!mapResponse.ok) {
-          throw new Error(`Failed to fetch media map: ${mapResponse.status} ${mapResponse.statusText}`);
-        }
-        const mapData = await mapResponse.json();
-        
-        // Fetch media assets
-        const assetsResponse = await fetch('/api/site/media-assets');
-        if (!assetsResponse.ok) {
-          throw new Error(`Failed to fetch media assets: ${assetsResponse.status} ${assetsResponse.statusText}`);
-        }
-        const assetsData = await assetsResponse.json();
-        
-        // Build file tree from media map
-        const tree = buildFileTree(mapData);
-        
-        // Initialize expanded state for all nodes
-        const initialExpandedNodes: Record<string, boolean> = {};
-        // Expand root nodes by default
-        tree.forEach(node => {
-          initialExpandedNodes[node.id] = true;
-        });
-        
-        setMediaMap(mapData);
-        setMediaAssets(assetsData || {});
-        setFileTree(tree);
-        setExpandedNodes(initialExpandedNodes);
-        
-        // Fetch available assets from Cloudinary (mock for now)
-        // In a real implementation, you would fetch this from Cloudinary or your database
-        setAvailableAssets([
-          {
-            id: 'asset1',
-            publicId: 'sample',
-            name: 'Sample Image',
-            uploadedAt: new Date().toISOString(),
-            type: 'image',
-            preview: 'https://res.cloudinary.com/demo/image/upload/sample'
-          },
-          {
-            id: 'asset2',
-            publicId: 'sample2',
-            name: 'Sample Image 2',
-            uploadedAt: new Date().toISOString(),
-            type: 'image',
-            preview: 'https://res.cloudinary.com/demo/image/upload/sample'
-          }
-        ]);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setMessage({
-          text: 'Failed to load media data. Please try refreshing the page.',
-          type: 'error'
-        });
-      } finally {
-        setLoading(false);
+export default function MediaLibraryAdmin() {
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
+  
+  // Add form state and creation function
+  const [newPlaceholder, setNewPlaceholder] = useState({
+    page: "global",
+    section: "",
+    element: ""
+  });
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  
+  // Add search state near the top of the component
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Add a state variable for migration mode
+  const [showMigrationTool, setShowMigrationTool] = useState(false);
+  const [migrationPlan, setMigrationPlan] = useState<{original: string, proposed: string, cloudinary_id: string}[]>([]);
+  const [migrationInProgress, setMigrationInProgress] = useState(false);
+  
+  // Move fetchMediaAssets outside of useEffect to make it accessible
+  async function fetchMediaAssets() {
+    try {
+      const response = await fetch('/api/media/assets');
+      const data = await response.json();
+      
+      if (data.mediaAssets) {
+        setMediaAssets(data.mediaAssets);
+      } else {
+        setError('No media assets found');
       }
+    } catch (error: any) {
+      console.error('Error fetching media assets:', error);
+      setError(`Error fetching media assets: ${error.message}`);
+    }
+  }
+
+  // Add useEffect to fetch media assets on component mount
+  useEffect(() => {
+    fetchMediaAssets();
+  }, []);
+  
+  // Handle Media Library selection with better error handling and feedback
+  const handleMediaLibrarySelection = async (data: any) => {
+    if (!data || !data.assets || data.assets.length === 0) {
+      console.error('No assets selected from Media Library');
+      return;
+    }
+
+    try {
+      // Get the first selected asset
+      const asset = data.assets[0];
+      console.log('Selected asset from Media Library:', asset);
+
+      // Create a modal to let users select which placeholder to assign this to
+      // For now, we'll just show a dialog where user can select from a dropdown
+      const placeholderId = prompt(
+        `Assign "${asset.public_id}" to which placeholder location?`,
+        ""
+      );
+
+      if (!placeholderId) {
+        console.log('Assignment canceled');
+        return;
+      }
+
+      // Update database mapping
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          placeholderId,
+          publicId: asset.public_id,
+          metadata: {
+            format: asset.format,
+            resource_type: asset.resource_type,
+            secure_url: asset.secure_url,
+            width: asset.width,
+            height: asset.height,
+            bytes: asset.bytes,
+            created_at: asset.created_at || new Date().toISOString(),
+            tags: asset.tags || []
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update media asset: ${response.statusText}`);
+      }
+
+      // Show success message
+      alert(`Successfully assigned "${asset.public_id}" to ${placeholderId}`);
+      
+      // Refresh the page or update state as needed
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Error updating media assignment:', error);
+      alert(`Error assigning media: ${error.message}`);
+    }
+  };
+  
+  // Function to initialize the Cloudinary Media Library widget
+  const openMediaLibrary = () => {
+    if (typeof window === 'undefined' || !window.cloudinary) {
+      setError('Cloudinary script not loaded');
+      return;
     }
     
-    fetchData();
-  }, []);
-
-  // Build file tree from media map
-  const buildFileTree = (mediaMap: SitePage[]): TreeNode[] => {
-    // Create root node for app directory
-    const appNode: TreeNode = {
-      id: 'app',
-      name: 'app',
-      type: 'directory',
-      path: '/app',
-      children: []
-    };
-    
-    // Create root node for components directory
-    const componentsNode: TreeNode = {
-      id: 'components',
-      name: 'components',
-      type: 'directory',
-      path: '/components',
-      children: []
-    };
-    
-    // Process each page in the media map
-    mediaMap.forEach(page => {
-      // Determine which root node to add to
-      const parentNode = page.id === 'app' ? appNode : componentsNode;
+    try {
+      // Get environment variables
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
       
-      // Create page node
-      const pageNode: TreeNode = {
-        id: page.id,
-        name: page.name,
-        type: 'page',
-        path: page.path,
-        children: [],
-        data: page
-      };
+      if (!cloudName || !apiKey) {
+        setError('Missing Cloudinary credentials. Check your .env.local file.');
+        console.error('Missing Cloudinary credentials. Make sure NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_API_KEY are set in .env.local');
+        return;
+      }
       
-      // Process sections for this page
-      page.sections.forEach(section => {
-        // Create section node
-        const sectionNode: TreeNode = {
-          id: `${page.id}-${section.id}`,
-          name: section.name,
-          type: 'section',
-          path: `${page.path}/${section.id}`,
-          children: [],
-          data: section
-        };
-        
-        // Process media placeholders for this section
-        section.mediaPlaceholders.forEach(placeholder => {
-          // Create placeholder node
-          const placeholderNode: TreeNode = {
-            id: placeholder.id,
-            name: placeholder.name,
-            type: 'placeholder',
-            path: placeholder.path,
-            children: [],
-            data: placeholder
-          };
-          
-          // Add placeholder to section
-          sectionNode.children.push(placeholderNode);
-        });
-        
-        // Add section to page if it has placeholders or we're not filtering
-        if (sectionNode.children.length > 0) {
-          pageNode.children.push(sectionNode);
+      // Configure and open the Media Library widget
+      const mediaLibrary = window.cloudinary.createMediaLibrary(
+        {
+          cloud_name: cloudName,
+          api_key: apiKey,
+          folder_mode: true, // Show folder hierarchy
+          multiple: false,
+          insert_caption: 'Select',
+          default_transformations: [
+            [{ quality: 'auto', fetch_format: 'auto' }]
+          ],
+          styles: {
+            palette: {
+              window: '#FFFFFF',
+              windowBorder: '#90A0B3',
+              tabIcon: '#0078FF',
+              menuIcons: '#5A616A',
+              textDark: '#000000',
+              textLight: '#FFFFFF',
+              link: '#0078FF',
+              action: '#FF620C',
+              inactiveTabIcon: '#0E2F5A',
+              error: '#F44235',
+              inProgress: '#0078FF',
+              complete: '#20B832',
+              sourceBg: '#E4EBF1'
+            }
+          }
+        },
+        {
+          // Updated insertHandler to use our new function
+          insertHandler: handleMediaLibrarySelection,
+          showHandler: () => console.log('Media Library opened'),
+          hideHandler: () => console.log('Media Library closed')
         }
+      );
+      
+      // Open the widget
+      mediaLibrary.show();
+      
+    } catch (err) {
+      console.error('Error opening Media Library:', err);
+      setError('Error opening Media Library. See console for details.');
+    }
+  };
+  
+  // Once the script is loaded
+  useEffect(() => {
+    if (scriptLoaded) {
+      console.log('Cloudinary Media Library script loaded');
+    }
+  }, [scriptLoaded]);
+  
+  // Add function to open Media Library for a specific placeholder
+  const openMediaLibraryForPlaceholder = (placeholderId: string) => {
+    if (typeof window === 'undefined' || !window.cloudinary) {
+      setError('Cloudinary script not loaded');
+      return;
+    }
+    
+    try {
+      // Get environment variables
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+      
+      if (!cloudName || !apiKey) {
+        setError('Missing Cloudinary credentials. Check your .env.local file.');
+        console.error('Missing Cloudinary credentials. Make sure NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_API_KEY are set in .env.local');
+        return;
+      }
+      
+      // Configure and open the Media Library widget for a specific placeholder
+      const mediaLibrary = window.cloudinary.createMediaLibrary(
+        {
+          cloud_name: cloudName,
+          api_key: apiKey,
+          folder_mode: true,
+          multiple: false,
+          insert_caption: 'Select',
+          default_transformations: [
+            [{ quality: 'auto', fetch_format: 'auto' }]
+          ],
+          // Same styles as before
+        },
+        {
+          insertHandler: (data: any) => {
+            if (!data || !data.assets || data.assets.length === 0) {
+              console.error('No assets selected from Media Library');
+              return;
+            }
+            
+            try {
+              // Get the first selected asset
+              const asset = data.assets[0];
+              console.log('Selected asset from Media Library:', asset);
+              
+              // Here we already know which placeholder to assign to
+              updateMediaAssignment(placeholderId, asset);
+            } catch (error: any) {
+              console.error('Error handling Media Library selection:', error);
+              alert(`Error: ${error.message}`);
+            }
+          },
+          showHandler: () => console.log('Media Library opened for placeholder:', placeholderId),
+          hideHandler: () => console.log('Media Library closed')
+        }
+      );
+      
+      // Open the widget
+      mediaLibrary.show();
+      
+    } catch (err: any) {
+      console.error('Error opening Media Library:', err);
+      setError(`Error opening Media Library: ${err.message}`);
+    }
+  };
+  
+  // Add helper function to update media assignment
+  const updateMediaAssignment = async (placeholderId: string, asset: any) => {
+    try {
+      // Update database mapping
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          placeholderId,
+          publicId: asset.public_id,
+          metadata: {
+            format: asset.format,
+            resource_type: asset.resource_type,
+            secure_url: asset.secure_url,
+            width: asset.width,
+            height: asset.height,
+            bytes: asset.bytes,
+            created_at: asset.created_at || new Date().toISOString(),
+            tags: asset.tags || []
+          }
+        }),
       });
       
-      // Add page to parent node if it has sections
-      if (pageNode.children.length > 0) {
-        parentNode.children.push(pageNode);
+      if (!response.ok) {
+        throw new Error(`Failed to update media asset: ${response.statusText}`);
+      }
+      
+      // Show success message
+      alert(`Successfully assigned "${asset.public_id}" to ${placeholderId}`);
+      
+      // Refresh the page
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Error updating media assignment:', error);
+      alert(`Error assigning media: ${error.message}`);
+    }
+  };
+  
+  // Add a function to organize media assets by page structure
+  const organizeMediaAssets = (assets: MediaAsset[]) => {
+    // Define the main categories based on site structure
+    const categories = {
+      "global": {
+        label: "Global Elements",
+        items: [] as MediaAsset[]
+      },
+      "home": {
+        label: "Homepage",
+        items: [] as MediaAsset[]
+      },
+      "about": {
+        label: "About Pages",
+        items: [] as MediaAsset[]
+      },
+      "services": {
+        label: "Services",
+        items: [] as MediaAsset[]
+      },
+      "services-plastic-surgery": {
+        label: "Plastic Surgery",
+        items: [] as MediaAsset[]
+      },
+      "services-dermatology": {
+        label: "Dermatology",
+        items: [] as MediaAsset[]
+      },
+      "services-medical-spa": {
+        label: "Medical Spa",
+        items: [] as MediaAsset[]
+      },
+      "services-functional-medicine": {
+        label: "Functional Medicine",
+        items: [] as MediaAsset[]
+      },
+      "team": {
+        label: "Team",
+        items: [] as MediaAsset[]
+      },
+      "gallery": {
+        label: "Gallery",
+        items: [] as MediaAsset[]
+      },
+      "reviews": {
+        label: "Reviews",
+        items: [] as MediaAsset[]
+      },
+      "out-of-town": {
+        label: "Out of Town",
+        items: [] as MediaAsset[]
+      },
+      "financing": {
+        label: "Financing",
+        items: [] as MediaAsset[]
+      },
+      "contact": {
+        label: "Contact",
+        items: [] as MediaAsset[]
+      },
+      "articles": {
+        label: "Articles",
+        items: [] as MediaAsset[]
+      },
+      "appointment": {
+        label: "Appointment",
+        items: [] as MediaAsset[]
+      },
+      "misc": {
+        label: "Miscellaneous",
+        items: [] as MediaAsset[]
+      }
+    };
+
+    // Place each asset in the appropriate category
+    assets.forEach(asset => {
+      const id = asset.placeholder_id.toLowerCase();
+      
+      if (id.includes('global') || id.includes('general') || id.includes('logo') || id.includes('background')) {
+        categories.global.items.push(asset);
+      } else if (id.includes('home') || id === 'hero-home' || id === 'featured-image') {
+        categories.home.items.push(asset);
+      } else if (id.includes('about')) {
+        categories.about.items.push(asset);
+      } else if (id.includes('plastic-surgery')) {
+        categories["services-plastic-surgery"].items.push(asset);
+      } else if (id.includes('dermatology')) {
+        categories["services-dermatology"].items.push(asset);
+      } else if (id.includes('medical-spa') || id.includes('injectables') || id.includes('facial') || id.includes('skin')) {
+        categories["services-medical-spa"].items.push(asset);
+      } else if (id.includes('functional-medicine')) {
+        categories["services-functional-medicine"].items.push(asset);
+      } else if (id.includes('services')) {
+        categories.services.items.push(asset);
+      } else if (id.includes('team')) {
+        categories.team.items.push(asset);
+      } else if (id.includes('gallery')) {
+        categories.gallery.items.push(asset);
+      } else if (id.includes('reviews')) {
+        categories.reviews.items.push(asset);
+      } else if (id.includes('out-of-town')) {
+        categories["out-of-town"].items.push(asset);
+      } else if (id.includes('financing')) {
+        categories.financing.items.push(asset);
+      } else if (id.includes('contact')) {
+        categories.contact.items.push(asset);
+      } else if (id.includes('article')) {
+        categories.articles.items.push(asset);
+      } else if (id.includes('appointment')) {
+        categories.appointment.items.push(asset);
+      } else {
+        categories.misc.items.push(asset);
+      }
+    });
+
+    return categories;
+  };
+  
+  // Function to create a new placeholder
+  const createNewPlaceholder = async () => {
+    if (!newPlaceholder.element) {
+      alert("Please enter an element name");
+      return;
+    }
+    
+    // Generate placeholder ID
+    const placeholderId = newPlaceholder.section 
+      ? `${newPlaceholder.page}-${newPlaceholder.section}-${newPlaceholder.element}` 
+      : `${newPlaceholder.page}-${newPlaceholder.element}`;
+    
+    try {
+      // Check if placeholder already exists
+      const exists = mediaAssets.some(asset => asset.placeholder_id === placeholderId);
+      if (exists) {
+        alert(`A placeholder with ID "${placeholderId}" already exists.`);
+        return;
+      }
+      
+      // Create new placeholder in database
+      const response = await fetch('/api/media/assets/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          placeholder_id: placeholderId,
+          cloudinary_id: '',
+          metadata: {
+            page: newPlaceholder.page,
+            section: newPlaceholder.section,
+            element: newPlaceholder.element,
+            created_at: new Date().toISOString()
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create placeholder: ${response.statusText}`);
+      }
+      
+      // Refresh media assets
+      const mediaResponse = await fetch('/api/media/assets');
+      const data = await mediaResponse.json();
+      
+      if (data.mediaAssets) {
+        setMediaAssets(data.mediaAssets);
+      }
+      
+      // Reset form
+      setNewPlaceholder({
+        page: "global",
+        section: "",
+        element: ""
+      });
+      setShowCreateForm(false);
+      
+      alert(`Successfully created placeholder: ${placeholderId}`);
+    } catch (error: any) {
+      console.error('Error creating placeholder:', error);
+      alert(`Error creating placeholder: ${error.message}`);
+    }
+  };
+  
+  // Add function to analyze placeholders and suggest renames
+  const analyzePlaceholders = () => {
+    const suggestions: {original: string, proposed: string, cloudinary_id: string}[] = [];
+    
+    mediaAssets.forEach(asset => {
+      const id = asset.placeholder_id.toLowerCase();
+      
+      // Skip already well-formatted IDs
+      if (id.match(/^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$/)) {
+        return; // Already follows convention
+      }
+      
+      let proposed = id;
+      
+      // Some common patterns to fix
+      if (id.includes('general-') || id.includes('general_')) {
+        proposed = id.replace('general-', 'global-').replace('general_', 'global-');
+      }
+      
+      // Replace underscores with hyphens
+      proposed = proposed.replace(/_/g, '-');
+      
+      // Add section name if missing
+      if (proposed.split('-').length < 3) {
+        if (proposed.startsWith('global-') || proposed.startsWith('home-')) {
+          proposed = proposed.replace(/(global|home)-/, '$1-general-');
+        } else if (proposed.includes('background')) {
+          proposed = proposed.replace(/([a-z0-9]+)-(background.*)/, '$1-section-$2');
+        } else if (proposed.includes('image') || proposed.includes('img')) {
+          proposed = proposed.replace(/([a-z0-9]+)-(image.*|img.*)/, '$1-content-$2');
+        }
+      }
+      
+      // Check if we made any changes and add to suggestions
+      if (proposed !== id) {
+        suggestions.push({
+          original: id,
+          proposed: proposed,
+          cloudinary_id: asset.cloudinary_id
+        });
       }
     });
     
-    // Return root nodes that have children
-    return [appNode, componentsNode].filter(node => node.children.length > 0);
+    setMigrationPlan(suggestions);
+    setShowMigrationTool(true);
   };
-
-  // Handle drag and drop
-  const handleDragEnd = async (result: DropResult) => {
-    const { source, destination, draggableId } = result;
+  
+  // Add function to execute the migrations
+  const executeMigration = async () => {
+    setMigrationInProgress(true);
     
-    // Dropped outside a droppable area
-    if (!destination) return;
+    const results = [];
     
-    // Dropped in the same place
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    ) return;
-    
-    // Handle dropping an asset onto a placeholder
-    if (source.droppableId === 'available-assets' && destination.droppableId.startsWith('placeholder-')) {
-      const placeholderId = destination.droppableId.replace('placeholder-', '');
-      const assetPublicId = draggableId;
-      
+    for (const item of migrationPlan) {
       try {
-        // Update the media asset in the database
-        await handleMediaUpload(placeholderId, assetPublicId);
-        
-        // Update local state
-        setMediaAssets(prev => ({
-          ...prev,
-          [placeholderId]: {
-            placeholderId,
-            cloudinaryPublicId: assetPublicId,
-            uploadedAt: new Date().toISOString()
-          }
-        }));
-        
-        setMessage({
-          text: `Successfully assigned image to ${placeholderId}`,
-          type: 'success'
+        // Create new placeholder with the new ID
+        const createResponse = await fetch('/api/media/assets/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            placeholder_id: item.proposed,
+            cloudinary_id: item.cloudinary_id,
+            metadata: {
+              migrated_from: item.original,
+              migrated_at: new Date().toISOString()
+            }
+          }),
         });
         
-        // Clear message after 3 seconds
-        setTimeout(() => setMessage(null), 3000);
-      } catch (error) {
-        console.error('Error assigning media asset:', error);
-        setMessage({
-          text: 'Failed to assign media asset. Please try again.',
-          type: 'error'
+        if (!createResponse.ok) {
+          throw new Error(`Failed to create new placeholder: ${createResponse.statusText}`);
+        }
+        
+        // TODO: Implement API to delete old placeholder if needed
+        
+        results.push({
+          original: item.original,
+          proposed: item.proposed,
+          success: true
+        });
+      } catch (error: any) {
+        results.push({
+          original: item.original,
+          proposed: item.proposed,
+          success: false,
+          error: error.message
         });
       }
     }
+    
+    // Refresh media assets by calling the existing function
+    await fetchMediaAssets();
+    setMigrationInProgress(false);
+    setShowMigrationTool(false);
+    
+    alert(`Migration completed. ${results.filter(r => r.success).length} placeholders migrated successfully.`);
   };
-
-  // Handle successful upload
-  const handleUploadSuccess = async (placeholderId: string, result: any) => {
-    console.log('Handling upload success for placeholder:', placeholderId);
-    console.log('Upload result info:', result.info);
-    
-    try {
-      // Get the public ID from the result
-      const publicId = result.info.public_id;
-      console.log('Public ID:', publicId);
-      
-      // Update the media asset in the database
-      console.log('Updating media asset in database...');
-      await handleMediaUpload(placeholderId, publicId);
-      console.log('Database update successful');
-      
-      // Update local state
-      setMediaAssets(prev => ({
-        ...prev,
-        [placeholderId]: {
-          placeholderId,
-          cloudinaryPublicId: publicId,
-          uploadedAt: new Date().toISOString()
-        }
-      }));
-      console.log('Local state updated');
-      
-      // Add to available assets
-      setAvailableAssets(prev => [
-        ...prev,
-        {
-          id: publicId,
-          publicId,
-          name: result.info.original_filename,
-          uploadedAt: new Date().toISOString(),
-          type: 'image',
-          preview: result.info.secure_url
-        }
-      ]);
-      console.log('Added to available assets');
-      
-      setMessage({
-        text: `Successfully uploaded image for ${placeholderId}`,
-        type: 'success'
-      });
-      
-      // Clear message after 3 seconds
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      console.error('Error handling upload:', error);
-      setMessage({
-        text: 'Failed to save media asset. Please try again.',
-        type: 'error'
-      });
-    }
-  };
-
-  // Toggle expanded state for a node
-  const toggleNodeExpanded = (nodeId: string) => {
-    setExpandedNodes(prev => ({
-      ...prev,
-      [nodeId]: !prev[nodeId]
-    }));
-  };
-
-  // Select a node
-  const handleNodeSelect = (node: TreeNode) => {
-    setSelectedNode(node);
-  };
-
-  // Filter nodes by search query
-  const filterNodes = (node: TreeNode): boolean => {
-    if (!searchQuery) return true;
-    
-    const query = searchQuery.toLowerCase();
-    const nameMatch = node.name.toLowerCase().includes(query);
-    const pathMatch = node.path.toLowerCase().includes(query);
-    
-    // For placeholder nodes, also check description
-    const descriptionMatch = node.type === 'placeholder' && 
-      node.data?.description?.toLowerCase().includes(query);
-    
-    // If this node matches, return true
-    if (nameMatch || pathMatch || descriptionMatch) return true;
-    
-    // If any children match, return true
-    if (node.children.length > 0) {
-      const hasMatchingChild = node.children.some(child => filterNodes(child));
-      return hasMatchingChild;
-    }
-    
-    return false;
-  };
-
-  // Render a tree node
-  const renderTreeNode = (node: TreeNode, level: number = 0) => {
-    // Skip nodes that don't match the search query
-    if (searchQuery && !filterNodes(node)) return null;
-    
-    const isExpanded = expandedNodes[node.id] || false;
-    const hasChildren = node.children.length > 0;
-    const isPlaceholder = node.type === 'placeholder';
-    const asset = isPlaceholder ? mediaAssets[node.id] : null;
-    const hasAsset = asset && asset.cloudinaryPublicId;
-    
-    return (
-      <div key={node.id} className="select-none">
-        <div 
-          className={`flex items-center py-1 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer ${
-            selectedNode?.id === node.id ? 'bg-blue-50 dark:bg-blue-900' : ''
-          }`}
-          style={{ paddingLeft: `${level * 16 + 8}px` }}
-          onClick={() => {
-            if (hasChildren) {
-              toggleNodeExpanded(node.id);
-            }
-            handleNodeSelect(node);
-          }}
-        >
-          {/* Expand/collapse icon or placeholder */}
-          <span className="w-5 h-5 flex items-center justify-center mr-1">
-            {hasChildren ? (
-              isExpanded ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              )
-            ) : (
-              <span className="w-4"></span>
-            )}
-          </span>
-          
-          {/* Node icon */}
-          <span className="mr-2">
-            {node.type === 'directory' ? (
-              <FolderIcon className="w-4 h-4 text-yellow-500" />
-            ) : node.type === 'page' ? (
-              <FileIcon className="w-4 h-4 text-blue-500" />
-            ) : node.type === 'section' ? (
-              <FolderIcon className="w-4 h-4 text-green-500" />
-            ) : (
-              <ImageIcon className="w-4 h-4 text-purple-500" />
-            )}
-          </span>
-          
-          {/* Node name */}
-          <span className="flex-grow truncate">{node.name}</span>
-          
-          {/* Status indicator for placeholders */}
-          {isPlaceholder && (
-            <span className={`w-3 h-3 rounded-full ${hasAsset ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-          )}
-        </div>
-        
-        {/* Children */}
-        {isExpanded && hasChildren && (
-          <div className="ml-4">
-            {node.children.map(child => renderTreeNode(child, level + 1))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Render placeholder details
-  const renderPlaceholderDetails = (placeholder: MediaPlaceholder) => {
-    const asset = mediaAssets[placeholder.id];
-    const hasAsset = asset && asset.cloudinaryPublicId;
-    
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-lg font-bold">{placeholder.name}</h3>
-        </div>
-        
-        <div className="mb-4">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {placeholder.description}
-          </p>
-          <div className="mt-2 text-xs text-gray-400">
-            <p>ID: {placeholder.id}</p>
-            <p>Path: {placeholder.path}</p>
-            <p>Dimensions: {placeholder.dimensions.width}×{placeholder.dimensions.height}</p>
-          </div>
-        </div>
-        
-        {/* Droppable area for placeholder */}
-        <Droppable droppableId={`placeholder-${placeholder.id}`}>
-          {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className={`p-4 border-2 border-dashed rounded-lg mb-4 transition-colors ${
-                snapshot.isDraggingOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-600'
-              }`}
-            >
-              {/* Current image preview */}
-              {hasAsset ? (
-                <div className="relative aspect-video bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
-                  <Image
-                    src={getCloudinaryUrl(asset.cloudinaryPublicId)}
-                    alt={placeholder.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
-                  <span className="text-gray-400">Drop an image here or upload a new one</span>
-                </div>
-              )}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-        
-        {/* Upload widget */}
-        <div>
-          <p className="text-sm font-medium mb-2">
-            {hasAsset ? 'Replace Image:' : 'Upload Image:'}
-          </p>
-          <CldUploadWidget
-            uploadPreset={UPLOAD_PRESET}
-            options={{
-              maxFiles: 1,
-              resourceType: "image",
-              folder: `site/${placeholder.path}`,
-              clientAllowedFormats: ["png", "jpeg", "jpg", "webp"],
-              sources: ["local", "url", "camera", "unsplash"],
-            }}
-            onSuccess={(result: any) => {
-              console.log('Upload result:', result);
-              if (result.event === "success") {
-                handleUploadSuccess(placeholder.id, result);
-              }
-            }}
-            onError={(error: any) => {
-              console.error('Upload error:', error);
-              setMessage({
-                text: `Upload failed: ${error.message || 'Unknown error'}`,
-                type: 'error'
-              });
-            }}
-          >
-            {({ open }) => (
-              <button
-                onClick={() => open()}
-                className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                {hasAsset ? 'Replace Image' : 'Upload Image'}
-              </button>
-            )}
-          </CldUploadWidget>
-          
-          <div className="mt-2 text-xs text-gray-500">
-            Recommended size: {placeholder.dimensions.width}×{placeholder.dimensions.height}px
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">Site Media Manager</h1>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
-  }
-
+  
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-4">Site Media Manager</h1>
+    <div className="container mx-auto px-4 py-8 bg-gray-950 text-white min-h-screen">
+      <Script 
+        src="https://media-library.cloudinary.com/global/all.js"
+        onLoad={() => setScriptLoaded(true)}
+        strategy="afterInteractive"
+      />
+      
+      <h1 className="text-3xl font-bold mb-6 text-white">Cloudinary Media Library</h1>
+      
+      <div className="mb-6 p-4 bg-gray-900 border border-gray-700 rounded">
+        <h2 className="text-lg font-semibold text-white mb-2">About This Page</h2>
+        <p className="text-gray-300 mb-4">
+          This page provides access to your Cloudinary Media Library, where you can browse, search, and manage all of your 
+          media assets. Use the button below to open the Media Library.
+        </p>
+        <p className="text-sm text-gray-400">
+          <strong>Note:</strong> Make sure you have configured your Cloudinary credentials in the .env.local file.
+          You need to set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_API_KEY.
+        </p>
+      </div>
+      
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded text-red-700">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+      
+      <button
+        onClick={openMediaLibrary}
+        className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 border border-gray-600"
+        disabled={!scriptLoaded}
+      >
+        Open Cloudinary Media Library
+      </button>
+      
+      {!scriptLoaded && (
+        <p className="mt-2 text-gray-500">
+          Loading Cloudinary script...
+        </p>
+      )}
+      
+      <div id="cloudinary-media-library-container" className="mt-8"></div>
+      
+      <div className="mt-8 mb-6 p-4 bg-gray-900 border border-gray-700 rounded">
+        <h2 className="text-lg font-semibold text-white mb-2">How to Assign Media to Locations</h2>
+        <ol className="list-decimal list-inside text-gray-300 space-y-2">
+          <li>Click the <strong>Browse Cloudinary Media Library</strong> button above</li>
+          <li>Browse and select an image or video from your Cloudinary library</li>
+          <li>You'll be prompted to specify which placeholder to assign it to</li>
+          <li>Enter one of the available placeholder IDs listed below</li>
+          <li>The assignment will be saved and the page will refresh</li>
+        </ol>
+      </div>
+      
+      <div className="mt-8 bg-gray-950 rounded-md border border-gray-700">
+        <h2 className="text-2xl font-bold mb-4 text-white">Media Assets by Page</h2>
+        <p className="mb-4 text-gray-400">Media assets are organized by page structure for easier management.</p>
         
-        {message && (
-          <div className={`p-4 mb-4 rounded ${
-            message.type === 'success' ? 'bg-green-100 text-green-800' : 
-            message.type === 'error' ? 'bg-red-100 text-red-800' : 
-            'bg-blue-100 text-blue-800'
-          }`}>
-            {message.text}
+        <div className="mb-6">
+          <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
+            Search Media Placeholders
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <input
+              id="search"
+              name="search"
+              type="text"
+              className="focus:ring-gray-500 focus:border-gray-500 block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-900 text-white placeholder-gray-400"
+              placeholder="Search by placeholder ID or Cloudinary ID"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-        )}
+        </div>
         
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Left panel: File tree */}
-          <div className="w-full md:w-1/3 lg:w-1/4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-              <div className="mb-4">
+        {Object.entries(organizeMediaAssets(mediaAssets.filter(asset => 
+          asset.placeholder_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (asset.cloudinary_id && asset.cloudinary_id.toLowerCase().includes(searchTerm.toLowerCase()))
+        ))).map(([key, category]) => (
+          category.items.length > 0 ? (
+            <div key={key} className={directoryStyles.container}>
+              <div 
+                className={directoryStyles.header}
+                onClick={() => {
+                  const content = document.getElementById(`content-${key}`);
+                  if (content) {
+                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+                  }
+                }}
+              >
+                <div className="flex items-center">
+                  <FolderIcon />
+                  <span className="text-lg font-medium">{category.label} ({category.items.length})</span>
+                </div>
+                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              
+              <div id={`content-${key}`} className={directoryStyles.content} style={{display: 'none'}}>
+                {category.items.map((asset) => {
+                  // Split the placeholder_id into parts
+                  const parts = asset.placeholder_id.split('/').length > 1 
+                    ? asset.placeholder_id.split('/') 
+                    : asset.placeholder_id.split('-');
+                  
+                  return (
+                    <div key={asset.placeholder_id} className={directoryStyles.item}>
+                      <div className={directoryStyles.placeholder}>
+                        <div className="flex items-center">
+                          <FileIcon />
+                          <span className={directoryStyles.fileText}>
+                            {parts.join('/')}
+                          </span>
+                          {asset.cloudinary_id && 
+                            <span className={directoryStyles.cloudinaryId}>
+                              ({asset.cloudinary_id.split('/').pop()})
+                            </span>
+                          }
+                        </div>
+                        <button
+                          onClick={() => openMediaLibraryForPlaceholder(asset.placeholder_id)}
+                          className={directoryStyles.replaceButton}
+                        >
+                          {asset.cloudinary_id ? 'Replace' : 'Assign'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null
+        ))}
+        
+        <div className="mt-8 p-4 bg-gray-900 border border-gray-700 rounded">
+          <h3 className="text-lg font-semibold text-white mb-2">About Page Structure Organization</h3>
+          <p className="text-gray-300 mb-2">
+            Media assets are now organized based on your site's page structure, making it easier to identify and manage media for specific sections of your website.
+          </p>
+          <p className="text-gray-300 mb-2">
+            To maintain consistency, consider adopting a naming convention for new placeholders that follows this pattern:
+          </p>
+          <code className="block bg-gray-800 p-2 rounded text-gray-300">
+            [page]-[section]-[element]
+          </code>
+          
+          <div className="mt-2 text-gray-300">
+            <span className="block">Examples:</span>
+            <ul className="list-disc ml-6 mt-1">
+              <li>home-hero</li>
+              <li>about-team-section</li>
+              <li>services-plastic-surgery-banner</li>
+              <li>global-logo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-8 border border-gray-700 rounded-lg overflow-hidden">
+        <div className="bg-gray-800 px-6 py-3 flex items-center justify-between cursor-pointer"
+             onClick={() => setShowCreateForm(!showCreateForm)}>
+          <h3 className="font-medium text-lg text-white">Create New Placeholder</h3>
+          <span className="text-gray-400">{showCreateForm ? '▲' : '▼'}</span>
+        </div>
+        
+        {showCreateForm && (
+          <div className="p-6 bg-gray-800">
+            <p className="mb-4 text-gray-300">
+              Create a new media placeholder using our structured naming convention. This will help maintain organization 
+              and ensure that media assets are properly categorized.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Page</label>
+                <select
+                  value={newPlaceholder.page}
+                  onChange={(e) => setNewPlaceholder({...newPlaceholder, page: e.target.value})}
+                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white"
+                >
+                  <option value="global">Global</option>
+                  <option value="home">Homepage</option>
+                  <option value="about">About</option>
+                  <option value="services">Services</option>
+                  <option value="services-plastic-surgery">Plastic Surgery</option>
+                  <option value="services-dermatology">Dermatology</option>
+                  <option value="services-medical-spa">Medical Spa</option>
+                  <option value="services-functional-medicine">Functional Medicine</option>
+                  <option value="team">Team</option>
+                  <option value="gallery">Gallery</option>
+                  <option value="reviews">Reviews</option>
+                  <option value="out-of-town">Out of Town</option>
+                  <option value="financing">Financing</option>
+                  <option value="contact">Contact</option>
+                  <option value="articles">Articles</option>
+                  <option value="appointment">Appointment</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Section (Optional)</label>
                 <input
                   type="text"
-                  placeholder="Search media placeholders..."
-                  className="w-full p-2 border rounded"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="e.g., hero, banner, testimonials"
+                  value={newPlaceholder.section}
+                  onChange={(e) => setNewPlaceholder({...newPlaceholder, section: e.target.value})}
+                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white placeholder-gray-400"
                 />
               </div>
               
-              <div className="overflow-auto max-h-[calc(100vh-240px)]">
-                {fileTree.map(node => renderTreeNode(node))}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Element <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  placeholder="e.g., background, image, video"
+                  value={newPlaceholder.element}
+                  onChange={(e) => setNewPlaceholder({...newPlaceholder, element: e.target.value})}
+                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white placeholder-gray-400"
+                  required
+                />
               </div>
             </div>
-          </div>
-          
-          {/* Middle panel: Selected placeholder details */}
-          <div className="w-full md:w-1/3">
-            {selectedNode?.type === 'placeholder' ? (
-              renderPlaceholderDetails(selectedNode.data)
-            ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center justify-center h-64">
-                <p className="text-gray-500">Select a media placeholder from the file tree</p>
-              </div>
-            )}
-          </div>
-          
-          {/* Right panel: Available assets */}
-          <div className="w-full md:w-1/3">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold mb-4">Available Assets</h2>
+            
+            <div className="mt-4">
+              <p className="text-sm text-gray-300 mb-2">
+                Preview: <span className="font-mono bg-gray-700 px-2 py-1 rounded">
+                  {newPlaceholder.section 
+                    ? `${newPlaceholder.page}-${newPlaceholder.section}-${newPlaceholder.element}` 
+                    : `${newPlaceholder.page}-${newPlaceholder.element}`}
+                </span>
+              </p>
+            </div>
+            
+            <div className="mt-4 p-3 bg-gray-700 rounded">
+              <h4 className="font-medium mb-2">Naming Convention Guidelines:</h4>
+              <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">
+                <li><strong>Page:</strong> Corresponds to site pages (about, services, etc)</li>
+                <li><strong>Section:</strong> A specific area within a page (hero, testimonials, etc)</li>
+                <li><strong>Element:</strong> The specific media item (background, profile, logo, etc)</li>
+              </ul>
+              <p className="mt-2 text-sm text-gray-300">
+                Example: <code className="bg-gray-800 px-1">services-medical-spa-banner</code> for a banner on the Medical Spa services page.
+              </p>
+            </div>
+            
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={createNewPlaceholder}
+                className="py-2 px-4 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Create Placeholder
+              </button>
               
-              {/* Upload new asset */}
-              <div className="mb-4">
-                <CldUploadWidget
-                  uploadPreset={UPLOAD_PRESET}
-                  options={{
-                    maxFiles: 1,
-                    resourceType: "image",
-                    folder: "site/assets",
-                    clientAllowedFormats: ["png", "jpeg", "jpg", "webp"],
-                    sources: ["local", "url", "camera", "unsplash"],
-                  }}
-                  onSuccess={(result: any) => {
-                    console.log('Upload result:', result);
-                    if (result.event === "success") {
-                      // Add to available assets
-                      setAvailableAssets(prev => [
-                        ...prev,
-                        {
-                          id: result.info.public_id,
-                          publicId: result.info.public_id,
-                          name: result.info.original_filename,
-                          uploadedAt: new Date().toISOString(),
-                          type: 'image',
-                          preview: result.info.secure_url
-                        }
-                      ]);
-                      
-                      setMessage({
-                        text: 'Successfully uploaded new asset',
-                        type: 'success'
-                      });
-                      
-                      // Clear message after 3 seconds
-                      setTimeout(() => setMessage(null), 3000);
-                    }
-                  }}
-                  onError={(error: any) => {
-                    console.error('Upload error:', error);
-                    setMessage({
-                      text: `Upload failed: ${error.message || 'Unknown error'}`,
-                      type: 'error'
-                    });
-                  }}
-                >
-                  {({ open }) => (
-                    <button
-                      onClick={() => open()}
-                      className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    >
-                      Upload New Asset
-                    </button>
-                  )}
-                </CldUploadWidget>
-              </div>
-              
-              {/* Draggable assets */}
-              <Droppable droppableId="available-assets">
-                {(provided: DroppableProvided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="space-y-3 overflow-auto max-h-[calc(100vh-320px)]"
-                  >
-                    {availableAssets.map((asset, index) => (
-                      <Draggable
-                        key={asset.id}
-                        draggableId={asset.publicId}
-                        index={index}
-                      >
-                        {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`p-2 border rounded-lg ${
-                              snapshot.isDragging ? 'bg-blue-50 dark:bg-blue-900' : 'bg-white dark:bg-gray-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-16 h-16 relative rounded overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                <Image
-                                  src={asset.preview}
-                                  alt={asset.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              <div className="flex-grow">
-                                <h5 className="font-medium text-sm">{asset.name}</h5>
-                                <p className="text-xs text-gray-500">
-                                  {new Date(asset.uploadedAt).toLocaleDateString()}
-                                </p>
-                                <p className="text-xs text-gray-400 truncate">
-                                  {asset.publicId}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-              
-              {availableAssets.length === 0 && (
-                <div className="text-center p-4 text-gray-500">
-                  No assets available. Upload some assets to get started.
-                </div>
-              )}
+              <button
+                onClick={() => setShowCreateForm(false)}
+                className="py-2 px-4 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
-    </DragDropContext>
+      
+      <div className="mt-8 flex justify-end">
+        <button
+          onClick={analyzePlaceholders}
+          className="text-white bg-gray-800 border border-gray-600 px-3 py-1 rounded hover:bg-gray-700"
+        >
+          Analyze naming conventions
+        </button>
+      </div>
+      
+      {showMigrationTool && (
+        <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-white">Placeholder Migration Tool</h3>
+            <button 
+              onClick={() => setShowMigrationTool(false)}
+              className="text-gray-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          
+          {migrationPlan.length > 0 ? (
+            <>
+              <p className="mb-4 text-gray-300">
+                Found {migrationPlan.length} placeholders that don't follow the recommended naming convention.
+                Review the proposed changes below:
+              </p>
+              
+              <div className="max-h-60 overflow-y-auto mb-4">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-700">
+                      <th className="text-left p-2 text-gray-200">Original ID</th>
+                      <th className="text-left p-2 text-gray-200">Proposed ID</th>
+                      <th className="text-left p-2 text-gray-200">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {migrationPlan.map((item, index) => (
+                      <tr key={index} className="border-b border-gray-700">
+                        <td className="p-2 font-mono text-gray-300">{item.original}</td>
+                        <td className="p-2 font-mono text-gray-300">{item.proposed}</td>
+                        <td className="p-2 text-gray-300">{item.cloudinary_id ? 'Has media' : 'Empty'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  onClick={executeMigration}
+                  disabled={migrationInProgress}
+                  className="py-2 px-4 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 border border-gray-600 disabled:bg-gray-600 disabled:text-gray-400"
+                >
+                  {migrationInProgress ? 'Migrating...' : 'Execute Migration'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="text-gray-300">
+              All placeholders appear to follow the recommended naming convention. Great job!
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 } 

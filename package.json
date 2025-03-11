@@ -22,7 +22,8 @@
     "test-zenoti-direct": "node scripts/zenoti-direct-api-test.js",
     "test-zenoti-formats": "node scripts/zenoti-apikey-formats.js",
     "zenoti-token": "node scripts/zenoti-token-generator.js",
-    "test-zenoti": "node --loader ts-node/esm scripts/test-zenoti-integration.js"
+    "test-zenoti": "node --loader ts-node/esm scripts/test-zenoti-integration.js",
+    "seed-media": "ts-node scripts/seed-media-assets.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.38.0",

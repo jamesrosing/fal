@@ -5,7 +5,7 @@ import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { MapPin, Plane, Hotel, Car, Phone, Calendar } from "lucide-react"
-import { getImageUrl } from "@/lib/image-config"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 const services = [
   {
@@ -63,7 +63,7 @@ const locations = [
     name: "Pendry Newport Beach",
     distance: "0.5 miles",
     description: "Luxury accommodations with recovery-friendly amenities",
-    image: getImageUrl('pendry')
+    placeholder: "out-of-town-accommodations-pendry"
   },
   {
     name: "The Resort at Pelican Hill",
@@ -88,15 +88,45 @@ const locations = [
       ],
       specialRate: "15% off the best-available rate, 50% off the resort fee for AllureMD VIP clients"
     },
-    image: getImageUrl('pelican-hill')
+    placeholder: "out-of-town-accommodations-pelican-hill"
   },
   {
     name: "Lido House, Autograph Collection",
     distance: "2.1 miles",
-    description: "Boutique hotel with personalized service and coastal charm",
-    image: getImageUrl('lido-house')
+    description: "Refined, beach house-inspired luxury accommodations",
+    placeholder: "out-of-town-accommodations-lido-house"
   }
 ]
+
+function HeroImage({ placeholderId }: { placeholderId: string }) {
+  const { url: heroImageUrl, isLoading, error } = useMediaAsset(placeholderId);
+  
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+        <p className="text-white">Loading image...</p>
+      </div>
+    );
+  }
+  
+  if (error || !heroImageUrl) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+        <p className="text-white">Error loading image: {error || 'No image found for this placeholder'}</p>
+      </div>
+    );
+  }
+  
+  return (
+    <Image
+      src={heroImageUrl}
+      alt="Out of Town Patients" 
+      className="object-cover"
+      priority
+      fill
+    />
+  );
+}
 
 export default function OutOfTownPage() {
   return (
@@ -106,13 +136,7 @@ export default function OutOfTownPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <Image
-            src={getImageUrl('hero-out-of-town', { width: 1920, quality: 85 })}
-            alt="Out of Town Patients"
-            fill
-            className="object-cover"
-            priority
-          />
+          <HeroImage placeholderId="out-of-town-hero-Arial-Allure-MD-Office" />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
@@ -207,83 +231,87 @@ export default function OutOfTownPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {locations.map((location) => (
-              <motion.div
-                key={location.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="bg-black rounded-lg overflow-hidden"
-              >
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={location.image}
-                    alt={location.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center text-gray-400 mb-2">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-cerebri">{location.distance}</span>
+            {locations.map((location) => {
+              const { url: imageUrl, isLoading } = useMediaAsset(location.placeholder);
+              
+              return (
+                <motion.div
+                  key={location.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true }}
+                  className="bg-black rounded-lg overflow-hidden"
+                >
+                  <div className="relative aspect-[4/3]">
+                    <Image
+                      src={imageUrl || "/images/placeholder.jpg"}
+                      alt={location.name}
+                      className="object-cover"
+                      fill
+                    />
                   </div>
-                  <h4 className="text-xl font-serif text-white mb-2">{location.name}</h4>
-                  <p className="text-gray-400 font-cerebri font-light mb-4">{location.description}</p>
-                  
-                  {location.details && (
-                    <div className="space-y-4">
-                      <div>
-                        <h5 className="text-white font-cerebri text-lg mb-2">Accommodations</h5>
-                        <p className="text-gray-400 font-cerebri font-light">{location.details.accommodations}</p>
-                      </div>
-                      
-                      <div>
-                        <h5 className="text-white font-cerebri text-lg mb-2">Comfort</h5>
-                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                          {location.details.comfort.map((item, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h5 className="text-white font-cerebri text-lg mb-2">Care</h5>
-                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                          {location.details.care.map((item, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h5 className="text-white font-cerebri text-lg mb-2">Cuisine</h5>
-                        <ul className="text-gray-400 font-cerebri font-light space-y-1">
-                          {location.details.cuisine.map((item, index) => (
-                            <li key={index} className="flex items-center">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h5 className="text-white font-cerebri text-lg mb-2">Special Rate</h5>
-                        <p className="text-gray-400 font-cerebri font-light">{location.details.specialRate}</p>
-                      </div>
+                  <div className="p-6">
+                    <div className="flex items-center text-gray-400 mb-2">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      <span className="text-sm font-cerebri">{location.distance}</span>
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                    <h4 className="text-xl font-serif text-white mb-2">{location.name}</h4>
+                    <p className="text-gray-400 font-cerebri font-light mb-4">{location.description}</p>
+                    
+                    {location.details && (
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-white font-cerebri text-lg mb-2">Accommodations</h5>
+                          <p className="text-gray-400 font-cerebri font-light">{location.details.accommodations}</p>
+                        </div>
+                        
+                        <div>
+                          <h5 className="text-white font-cerebri text-lg mb-2">Comfort</h5>
+                          <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                            {location.details.comfort.map((item, index) => (
+                              <li key={index} className="flex items-center">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h5 className="text-white font-cerebri text-lg mb-2">Care</h5>
+                          <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                            {location.details.care.map((item, index) => (
+                              <li key={index} className="flex items-center">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h5 className="text-white font-cerebri text-lg mb-2">Cuisine</h5>
+                          <ul className="text-gray-400 font-cerebri font-light space-y-1">
+                            {location.details.cuisine.map((item, index) => (
+                              <li key={index} className="flex items-center">
+                                <span className="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h5 className="text-white font-cerebri text-lg mb-2">Special Rate</h5>
+                          <p className="text-gray-400 font-cerebri font-light">{location.details.specialRate}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
