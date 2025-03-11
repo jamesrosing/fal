@@ -3,8 +3,11 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { useMediaAsset } from '@/hooks/useMedia'
 
 export function AboutSection() {
+  const { url: teamImageUrl } = useMediaAsset('allure-md-team-components-general-1')
+
   return (
     <section className="relative min-h-screen bg-[#f5f5f5] dark:bg-black">
       {/* Desktop Layout */}
@@ -12,7 +15,7 @@ export function AboutSection() {
         {/* Desktop Background Image */}
         <div className="absolute inset-0 group">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133481/team/headshots/allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.png"
+            src={teamImageUrl || "/images/fallback-team.jpg"}
             alt="Allure MD Medical Team"
             fill
             className="object-cover object-[center_15%]"
@@ -86,7 +89,7 @@ export function AboutSection() {
         {/* Mobile Image */}
         <div className="relative h-[40vh] group">
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133481/team/headshots/allure%2520md%2520team-6TUXPQwPjawHW8XhzAkP2rYJ0mtpt6.png"
+            src={teamImageUrl || "/images/fallback-team.jpg"}
             alt="Allure MD Medical Team"
             fill
             className="object-cover object-[center_15%]"

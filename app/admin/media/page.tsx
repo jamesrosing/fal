@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
+import { CloudinaryUploader } from '@/components/CloudinaryUploader';
+import { 
+  CloudinaryAsset 
+} from '@/lib/cloudinary';
 
 // Style for the directory structure
 const directoryStyles = {
@@ -21,15 +25,24 @@ const directoryStyles = {
 
 // Add these FolderIcon and FileIcon components inside the component but before the return
 const FolderIcon = () => (
-  <svg className={directoryStyles.folderIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M22 19C22 19.5304 21.7893 20.0391 21.4142 20.4142C21.0391 20.7893 20.5304 21 20 21H4C3.46957 21 2.96086 20.7893 2.58579 20.4142C2.21071 20.0391 2 19.5304 2 19V5C2 4.46957 2.21071 3.96086 2.58579 3.58579C2.96086 3.21071 3.46957 3 4 3H9L11 6H20C20.5304 6 21.0391 6.21071 21.4142 6.58579C21.7893 6.96086 22 7.46957 22 8V19Z" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" 
+    />
   </svg>
 );
 
 const FileIcon = () => (
-  <svg className={directoryStyles.fileIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+    />
   </svg>
 );
 
@@ -63,6 +76,66 @@ export default function MediaLibraryAdmin() {
   const [migrationPlan, setMigrationPlan] = useState<{original: string, proposed: string, cloudinary_id: string}[]>([]);
   const [migrationInProgress, setMigrationInProgress] = useState(false);
   
+  // Cloudinary modal state
+  const [cloudinaryModalOpen, setCloudinaryModalOpen] = useState(false);
+  const [selectedPlaceholderId, setSelectedPlaceholderId] = useState<string | null>(null);
+  
+  // Add state for sidebar and content view
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+
+  // Auto-expand categories when searching
+  useEffect(() => {
+    if (searchTerm && mediaAssets.length > 0) {
+      // Get all category keys from the structure
+      const allCategories: Record<string, boolean> = {};
+      const addCategories = (obj: any, prefix = '') => {
+        Object.keys(obj).forEach(key => {
+          const fullKey = prefix ? `${prefix}-${key}` : key;
+          allCategories[fullKey] = true;
+          if (obj[key].children) {
+            addCategories(obj[key].children, fullKey);
+          }
+        });
+      };
+      
+      addCategories(organizeMediaAssets(mediaAssets));
+      setExpandedCategories(allCategories);
+    }
+  }, [searchTerm, mediaAssets]);
+
+  // Function to handle media selection from Cloudinary
+  const handleMediaSelect = async (cloudinaryId: string) => {
+    if (!selectedPlaceholderId) return;
+    
+    try {
+      const response = await fetch('/api/site/media-assets', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          placeholder_id: selectedPlaceholderId,
+          cloudinary_id: cloudinaryId,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // Refresh the media assets list
+      fetchMediaAssets();
+      
+      // Close the modal
+      setCloudinaryModalOpen(false);
+      setSelectedPlaceholderId(null);
+    } catch (err) {
+      setError(`Error updating media asset: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
   // Move fetchMediaAssets outside of useEffect to make it accessible
   async function fetchMediaAssets() {
     try {
@@ -321,57 +394,257 @@ export default function MediaLibraryAdmin() {
     }
   };
   
-  // Add a function to organize media assets by page structure
+  // Add a function to organize media assets by actual application structure
   const organizeMediaAssets = (assets: MediaAsset[]) => {
-    // Define the main categories based on site structure
-    const categories = {
-      "global": {
-        label: "Global Elements",
-        items: [] as MediaAsset[]
-      },
-      "home": {
+    // Create a hierarchical structure that mimics the file system
+    const structure = {
+      "homepage": {
         label: "Homepage",
-        items: [] as MediaAsset[]
+        items: [] as MediaAsset[],
+        children: {
+          "hero": {
+            label: "Hero",
+            items: [] as MediaAsset[]
+          },
+          "mission-section": {
+            label: "Mission Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "plastic-surgery-section": {
+            label: "Plastic Surgery Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "dermatology-section": {
+            label: "Dermatology Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "medical-spa-section": {
+            label: "Medical Spa Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "functional-medicine-section": {
+            label: "Functional Medicine Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "team-section": {
+            label: "Team Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "about-section": {
+            label: "About Section",
+            items: [] as MediaAsset[],
+            children: {
+              "background": {
+                label: "Background",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "articles-section": {
+            label: "Articles Section",
+            items: [] as MediaAsset[]
+          }
+        }
       },
       "about": {
         label: "About Pages",
-        items: [] as MediaAsset[]
+        items: [] as MediaAsset[],
+        children: {
+          "hero": {
+            label: "Hero",
+            items: [] as MediaAsset[]
+          },
+          "mission": {
+            label: "Mission",
+            items: [] as MediaAsset[]
+          },
+          "team": {
+            label: "Team",
+            items: [] as MediaAsset[]
+          }
+        }
       },
       "services": {
         label: "Services",
-        items: [] as MediaAsset[]
+        items: [] as MediaAsset[],
+        children: {
+          "plastic-surgery": {
+            label: "Plastic Surgery",
+            items: [] as MediaAsset[],
+            children: {
+              "hero": {
+                label: "Hero",
+                items: [] as MediaAsset[]
+              },
+              "procedures": {
+                label: "Procedures",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "dermatology": {
+            label: "Dermatology",
+            items: [] as MediaAsset[],
+            children: {
+              "hero": {
+                label: "Hero",
+                items: [] as MediaAsset[]
+              },
+              "treatments": {
+                label: "Treatments",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "medical-spa": {
+            label: "Medical Spa",
+            items: [] as MediaAsset[],
+            children: {
+              "hero": {
+                label: "Hero",
+                items: [] as MediaAsset[]
+              },
+              "treatments": {
+                label: "Treatments",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "functional-medicine": {
+            label: "Functional Medicine",
+            items: [] as MediaAsset[],
+            children: {
+              "hero": {
+                label: "Hero",
+                items: [] as MediaAsset[]
+              },
+              "treatments": {
+                label: "Treatments",
+                items: [] as MediaAsset[]
+              }
+            }
+          }
+        }
       },
-      "services-plastic-surgery": {
-        label: "Plastic Surgery",
-        items: [] as MediaAsset[]
-      },
-      "services-dermatology": {
-        label: "Dermatology",
-        items: [] as MediaAsset[]
-      },
-      "services-medical-spa": {
-        label: "Medical Spa",
-        items: [] as MediaAsset[]
-      },
-      "services-functional-medicine": {
-        label: "Functional Medicine",
-        items: [] as MediaAsset[]
+      "components": {
+        label: "Shared Components",
+        items: [] as MediaAsset[],
+        children: {
+          "sections": {
+            label: "Sections",
+            items: [] as MediaAsset[],
+            children: {
+              "about-section": {
+                label: "About Section",
+                items: [] as MediaAsset[]
+              },
+              "team-section": {
+                label: "Team Section",
+                items: [] as MediaAsset[]
+              },
+              "dermatology-section": {
+                label: "Dermatology Section",
+                items: [] as MediaAsset[]
+              },
+              "plastic-surgery-section": {
+                label: "Plastic Surgery Section",
+                items: [] as MediaAsset[]
+              },
+              "medical-spa-section": {
+                label: "Medical Spa Section",
+                items: [] as MediaAsset[]
+              },
+              "functional-medicine-section": {
+                label: "Functional Medicine Section",
+                items: [] as MediaAsset[]
+              }
+            }
+          },
+          "ui": {
+            label: "UI Elements",
+            items: [] as MediaAsset[]
+          },
+          "layout": {
+            label: "Layout",
+            items: [] as MediaAsset[]
+          }
+        }
       },
       "team": {
         label: "Team",
+        items: [] as MediaAsset[]
+      },
+      "articles": {
+        label: "Articles",
         items: [] as MediaAsset[]
       },
       "gallery": {
         label: "Gallery",
         items: [] as MediaAsset[]
       },
-      "reviews": {
-        label: "Reviews",
-        items: [] as MediaAsset[]
-      },
       "out-of-town": {
         label: "Out of Town",
-        items: [] as MediaAsset[]
+        items: [] as MediaAsset[],
+        children: {
+          "hero": {
+            label: "Hero",
+            items: [] as MediaAsset[]
+          },
+          "accommodations": {
+            label: "Accommodations",
+            items: [] as MediaAsset[],
+            children: {
+              "pendry": {
+                label: "Pendry",
+                items: [] as MediaAsset[]
+              },
+              "pelican-hill": {
+                label: "Pelican Hill",
+                items: [] as MediaAsset[]
+              },
+              "lido-house": {
+                label: "Lido House",
+                items: [] as MediaAsset[]
+              }
+            }
+          }
+        }
       },
       "financing": {
         label: "Financing",
@@ -381,13 +654,23 @@ export default function MediaLibraryAdmin() {
         label: "Contact",
         items: [] as MediaAsset[]
       },
-      "articles": {
-        label: "Articles",
-        items: [] as MediaAsset[]
-      },
-      "appointment": {
-        label: "Appointment",
-        items: [] as MediaAsset[]
+      "global": {
+        label: "Global Elements",
+        items: [] as MediaAsset[],
+        children: {
+          "logo": {
+            label: "Logo",
+            items: [] as MediaAsset[]
+          },
+          "icons": {
+            label: "Icons",
+            items: [] as MediaAsset[]
+          },
+          "backgrounds": {
+            label: "Backgrounds",
+            items: [] as MediaAsset[]
+          }
+        }
       },
       "misc": {
         label: "Miscellaneous",
@@ -395,48 +678,206 @@ export default function MediaLibraryAdmin() {
       }
     };
 
-    // Place each asset in the appropriate category
-    assets.forEach(asset => {
+    // Function to place an asset in the structure
+    const placeAsset = (asset: MediaAsset) => {
       const id = asset.placeholder_id.toLowerCase();
+      const parts = id.split('-');
       
-      if (id.includes('global') || id.includes('general') || id.includes('logo') || id.includes('background')) {
-        categories.global.items.push(asset);
-      } else if (id.includes('home') || id === 'hero-home' || id === 'featured-image') {
-        categories.home.items.push(asset);
-      } else if (id.includes('about')) {
-        categories.about.items.push(asset);
-      } else if (id.includes('plastic-surgery')) {
-        categories["services-plastic-surgery"].items.push(asset);
-      } else if (id.includes('dermatology')) {
-        categories["services-dermatology"].items.push(asset);
-      } else if (id.includes('medical-spa') || id.includes('injectables') || id.includes('facial') || id.includes('skin')) {
-        categories["services-medical-spa"].items.push(asset);
-      } else if (id.includes('functional-medicine')) {
-        categories["services-functional-medicine"].items.push(asset);
-      } else if (id.includes('services')) {
-        categories.services.items.push(asset);
-      } else if (id.includes('team')) {
-        categories.team.items.push(asset);
-      } else if (id.includes('gallery')) {
-        categories.gallery.items.push(asset);
-      } else if (id.includes('reviews')) {
-        categories.reviews.items.push(asset);
-      } else if (id.includes('out-of-town')) {
-        categories["out-of-town"].items.push(asset);
-      } else if (id.includes('financing')) {
-        categories.financing.items.push(asset);
-      } else if (id.includes('contact')) {
-        categories.contact.items.push(asset);
-      } else if (id.includes('article')) {
-        categories.articles.items.push(asset);
-      } else if (id.includes('appointment')) {
-        categories.appointment.items.push(asset);
-      } else {
-        categories.misc.items.push(asset);
+      // Try to match by specific patterns and place in the structure
+      // Homepage sections
+      if (id.match(/^home-hero/) || id === 'hero-home') {
+        structure.homepage.children.hero.items.push(asset);
       }
-    });
+      else if (id.match(/^home-mission/) || id.match(/^mission-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["mission-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["mission-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-plastic-surgery/) || id.match(/^plastic-surgery-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["plastic-surgery-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["plastic-surgery-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-dermatology/) || id.match(/^dermatology-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["dermatology-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["dermatology-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-medical-spa/) || id.match(/^medical-spa-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["medical-spa-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["medical-spa-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-functional-medicine/) || id.match(/^functional-medicine-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["functional-medicine-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["functional-medicine-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-team/) || id.match(/^team-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["team-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["team-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-about/) || id.match(/^about-section/)) {
+        if (id.includes('background')) {
+          structure.homepage.children["about-section"].children.background.items.push(asset);
+        } else {
+          structure.homepage.children["about-section"].items.push(asset);
+        }
+      }
+      else if (id.match(/^home-articles/) || id.match(/^articles-section/)) {
+        structure.homepage.children["articles-section"].items.push(asset);
+      }
+      // About page
+      else if (id.match(/^about-hero/)) {
+        structure.about.children.hero.items.push(asset);
+      }
+      else if (id.match(/^about-mission/)) {
+        structure.about.children.mission.items.push(asset);
+      }
+      else if (id.match(/^about-team/)) {
+        structure.about.children.team.items.push(asset);
+      }
+      else if (id.match(/^about/)) {
+        structure.about.items.push(asset);
+      }
+      // Services and sub-pages
+      else if (id.match(/^services-plastic-surgery-hero/)) {
+        structure.services.children["plastic-surgery"].children.hero.items.push(asset);
+      }
+      else if (id.match(/^services-plastic-surgery-procedures/)) {
+        structure.services.children["plastic-surgery"].children.procedures.items.push(asset);
+      }
+      else if (id.match(/^services-plastic-surgery/)) {
+        structure.services.children["plastic-surgery"].items.push(asset);
+      }
+      else if (id.match(/^services-dermatology-hero/)) {
+        structure.services.children.dermatology.children.hero.items.push(asset);
+      }
+      else if (id.match(/^services-dermatology-treatments/)) {
+        structure.services.children.dermatology.children.treatments.items.push(asset);
+      }
+      else if (id.match(/^services-dermatology/)) {
+        structure.services.children.dermatology.items.push(asset);
+      }
+      else if (id.match(/^services-medical-spa-hero/)) {
+        structure.services.children["medical-spa"].children.hero.items.push(asset);
+      }
+      else if (id.match(/^services-medical-spa-treatments/)) {
+        structure.services.children["medical-spa"].children.treatments.items.push(asset);
+      }
+      else if (id.match(/^services-medical-spa/)) {
+        structure.services.children["medical-spa"].items.push(asset);
+      }
+      else if (id.match(/^services-functional-medicine-hero/)) {
+        structure.services.children["functional-medicine"].children.hero.items.push(asset);
+      }
+      else if (id.match(/^services-functional-medicine-treatments/)) {
+        structure.services.children["functional-medicine"].children.treatments.items.push(asset);
+      }
+      else if (id.match(/^services-functional-medicine/)) {
+        structure.services.children["functional-medicine"].items.push(asset);
+      }
+      else if (id.match(/^services/)) {
+        structure.services.items.push(asset);
+      }
+      // Components
+      else if (id.includes('about-section')) {
+        structure.components.children.sections.children["about-section"].items.push(asset);
+      }
+      else if (id.includes('team-section')) {
+        structure.components.children.sections.children["team-section"].items.push(asset);
+      }
+      else if (id.includes('dermatology-section')) {
+        structure.components.children.sections.children["dermatology-section"].items.push(asset);
+      }
+      else if (id.includes('plastic-surgery-section')) {
+        structure.components.children.sections.children["plastic-surgery-section"].items.push(asset);
+      }
+      else if (id.includes('medical-spa-section')) {
+        structure.components.children.sections.children["medical-spa-section"].items.push(asset);
+      }
+      else if (id.includes('functional-medicine-section')) {
+        structure.components.children.sections.children["functional-medicine-section"].items.push(asset);
+      }
+      else if (id.includes('ui/')) {
+        structure.components.children.ui.items.push(asset);
+      }
+      else if (id.includes('layout/')) {
+        structure.components.children.layout.items.push(asset);
+      }
+      // Out of town
+      else if (id.match(/^out-of-town-hero/)) {
+        structure["out-of-town"].children.hero.items.push(asset);
+      }
+      else if (id.match(/^out-of-town-accommodations-pendry/)) {
+        structure["out-of-town"].children.accommodations.children.pendry.items.push(asset);
+      }
+      else if (id.match(/^out-of-town-accommodations-pelican/)) {
+        structure["out-of-town"].children.accommodations.children["pelican-hill"].items.push(asset);
+      }
+      else if (id.match(/^out-of-town-accommodations-lido/)) {
+        structure["out-of-town"].children.accommodations.children["lido-house"].items.push(asset);
+      }
+      else if (id.match(/^out-of-town-accommodations/)) {
+        structure["out-of-town"].children.accommodations.items.push(asset);
+      }
+      else if (id.match(/^out-of-town/)) {
+        structure["out-of-town"].items.push(asset);
+      }
+      // Other top-level sections
+      else if (id.match(/^team/)) {
+        structure.team.items.push(asset);
+      }
+      else if (id.match(/^articles/)) {
+        structure.articles.items.push(asset);
+      }
+      else if (id.match(/^gallery/)) {
+        structure.gallery.items.push(asset);
+      }
+      else if (id.match(/^financing/)) {
+        structure.financing.items.push(asset);
+      }
+      else if (id.match(/^contact/)) {
+        structure.contact.items.push(asset);
+      }
+      // Global elements
+      else if (id.match(/^global-logo/) || id.match(/^logo/)) {
+        structure.global.children.logo.items.push(asset);
+      }
+      else if (id.match(/^global-icon/) || id.match(/^icon/)) {
+        structure.global.children.icons.items.push(asset);
+      }
+      else if (id.match(/^global-background/) || id.match(/^background/)) {
+        structure.global.children.backgrounds.items.push(asset);
+      }
+      else if (id.match(/^global/) || id.match(/^general/)) {
+        structure.global.items.push(asset);
+      }
+      // Fallback for any other assets
+      else {
+        structure.misc.items.push(asset);
+      }
+    };
 
-    return categories;
+    // Place all assets in the structure
+    assets.forEach(placeAsset);
+
+    // Convert structure to a flattened format for rendering
+    // (We'll handle nesting in the rendering logic)
+    return structure;
   };
   
   // Function to create a new placeholder
@@ -604,343 +1045,467 @@ export default function MediaLibraryAdmin() {
     alert(`Migration completed. ${results.filter(r => r.success).length} placeholders migrated successfully.`);
   };
   
-  return (
-    <div className="container mx-auto px-4 py-8 bg-gray-950 text-white min-h-screen">
-      <Script 
-        src="https://media-library.cloudinary.com/global/all.js"
-        onLoad={() => setScriptLoaded(true)}
-        strategy="afterInteractive"
-      />
+  // Toggle a category in the sidebar
+  const toggleCategory = (categoryKey: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryKey]: !prev[categoryKey]
+    }));
+  };
+
+  // Select a category to display in main content
+  const selectCategory = (categoryKey: string, subcategoryKey?: string) => {
+    setSelectedCategory(categoryKey);
+    setSelectedSubcategory(subcategoryKey || null);
+  };
+
+  // Upload button for a specific section
+  const handleUploadToSection = (sectionKey: string, parentKey?: string) => {
+    // Generate a placeholder ID for this section
+    let placeholderId;
+    if (parentKey) {
+      placeholderId = `${parentKey}-${sectionKey}-new`;
+    } else {
+      placeholderId = `${sectionKey}-new`;
+    }
+    setSelectedPlaceholderId(placeholderId);
+    setCloudinaryModalOpen(true);
+  };
+
+  // Sidebar component that looks like VS Code file explorer
+  const Sidebar = ({ structure }: { structure: any }) => {
+    // Filter structure based on search term
+    const filteredStructure = React.useMemo(() => {
+      if (!searchTerm) return structure;
       
-      <h1 className="text-3xl font-bold mb-6 text-white">Cloudinary Media Library</h1>
+      // Deep clone the structure to avoid modifying the original
+      const filtered = JSON.parse(JSON.stringify(structure));
       
-      <div className="mb-6 p-4 bg-gray-900 border border-gray-700 rounded">
-        <h2 className="text-lg font-semibold text-white mb-2">About This Page</h2>
-        <p className="text-gray-300 mb-4">
-          This page provides access to your Cloudinary Media Library, where you can browse, search, and manage all of your 
-          media assets. Use the button below to open the Media Library.
-        </p>
-        <p className="text-sm text-gray-400">
-          <strong>Note:</strong> Make sure you have configured your Cloudinary credentials in the .env.local file.
-          You need to set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_API_KEY.
-        </p>
-      </div>
-      
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded text-red-700">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
-      
-      <button
-        onClick={openMediaLibrary}
-        className="bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 border border-gray-600"
-        disabled={!scriptLoaded}
-      >
-        Open Cloudinary Media Library
-      </button>
-      
-      {!scriptLoaded && (
-        <p className="mt-2 text-gray-500">
-          Loading Cloudinary script...
-        </p>
-      )}
-      
-      <div id="cloudinary-media-library-container" className="mt-8"></div>
-      
-      <div className="mt-8 mb-6 p-4 bg-gray-900 border border-gray-700 rounded">
-        <h2 className="text-lg font-semibold text-white mb-2">How to Assign Media to Locations</h2>
-        <ol className="list-decimal list-inside text-gray-300 space-y-2">
-          <li>Click the <strong>Browse Cloudinary Media Library</strong> button above</li>
-          <li>Browse and select an image or video from your Cloudinary library</li>
-          <li>You'll be prompted to specify which placeholder to assign it to</li>
-          <li>Enter one of the available placeholder IDs listed below</li>
-          <li>The assignment will be saved and the page will refresh</li>
-        </ol>
-      </div>
-      
-      <div className="mt-8 bg-gray-950 rounded-md border border-gray-700">
-        <h2 className="text-2xl font-bold mb-4 text-white">Media Assets by Page</h2>
-        <p className="mb-4 text-gray-400">Media assets are organized by page structure for easier management.</p>
+      // Function to filter items in a category and its children
+      const filterCategory = (category: any): boolean => {
+        // Filter items in this category
+        if (category.items && category.items.length > 0) {
+          category.items = category.items.filter((asset: MediaAsset) => 
+            asset.placeholder_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (asset.cloudinary_id && asset.cloudinary_id.toLowerCase().includes(searchTerm.toLowerCase()))
+          );
+        }
         
-        <div className="mb-6">
-          <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-1">
-            Search Media Placeholders
-          </label>
-          <div className="relative">
+        // Filter children
+        let hasMatchingChildren = false;
+        if (category.children) {
+          Object.entries(category.children).forEach(([key, childCategory]: [string, any]) => {
+            // Recursively filter child category
+            const childHasMatches = filterCategory(childCategory);
+            if (!childHasMatches) {
+              delete category.children[key];
+            } else {
+              hasMatchingChildren = true;
+            }
+          });
+        }
+        
+        // Category should be kept if it has matching items or children
+        return category.items.length > 0 || hasMatchingChildren;
+      };
+      
+      // Filter each top-level category
+      Object.entries(filtered).forEach(([key, category]: [string, any]) => {
+        const keepCategory = filterCategory(category);
+        if (!keepCategory) {
+          delete filtered[key];
+        }
+      });
+      
+      return filtered;
+    }, [structure, searchTerm]);
+
+    return (
+      <div className="w-64 h-full overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-3 font-medium text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          Media Explorer
+          {searchTerm && (
+            <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+              Filtered
+            </span>
+          )}
+        </div>
+        <div className="space-y-1">
+          {Object.entries(filteredStructure).map(([key, category]: [string, any]) => (
+            <DirectoryItem 
+              key={key} 
+              categoryKey={key}
+              category={category}
+              level={0}
+              onSelect={selectCategory}
+              onToggle={toggleCategory}
+              isExpanded={expandedCategories[key] || false}
+            />
+          ))}
+          {Object.keys(filteredStructure).length === 0 && (
+            <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+              No matching assets found
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Directory item component for sidebar
+  const DirectoryItem = ({ 
+    categoryKey,
+    category, 
+    level = 0,
+    onSelect,
+    onToggle,
+    isExpanded
+  }: { 
+    categoryKey: string,
+    category: any, 
+    level?: number,
+    onSelect: (key: string, subKey?: string) => void,
+    onToggle: (key: string) => void,
+    isExpanded: boolean
+  }) => {
+    const hasChildren = category.children && Object.keys(category.children).length > 0;
+    const hasItems = category.items && category.items.length > 0;
+    const itemCount = hasItems ? category.items.length : 0;
+    const paddingLeft = `${(level * 12) + 12}px`;
+    const isActive = selectedCategory === categoryKey;
+    
+    return (
+      <div>
+        <div 
+          className={`flex items-center group hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer ${isActive ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}
+          onClick={() => {
+            onSelect(categoryKey);
+            if (hasChildren) {
+              onToggle(categoryKey);
+            }
+          }}
+        >
+          <div 
+            className="flex items-center py-1 text-gray-700 dark:text-gray-300"
+            style={{ paddingLeft }}
+          >
+            {hasChildren ? (
+              <svg 
+                className={`h-3.5 w-3.5 mr-1 text-gray-500 dark:text-gray-400 transition-transform ${isExpanded ? 'transform rotate-90' : ''}`}
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            ) : (
+              <span className="w-3.5 mr-1"></span>
+            )}
+            
+            {hasChildren ? (
+              <FolderIcon />
+            ) : (
+              <FileIcon />
+            )}
+            
+            <span className="ml-1.5 text-sm">
+              {category.label} {itemCount > 0 && <span className="text-xs text-gray-400 dark:text-gray-500">({itemCount})</span>}
+            </span>
+          </div>
+        </div>
+        
+        {hasChildren && isExpanded && (
+          <div>
+            {Object.entries(category.children).map(([childKey, childCategory]: [string, any]) => (
+              <DirectoryItem 
+                key={childKey}
+                categoryKey={`${categoryKey}-${childKey}`}
+                category={childCategory}
+                level={level + 1}
+                onSelect={(key) => onSelect(categoryKey, childKey)}
+                onToggle={onToggle}
+                isExpanded={expandedCategories[`${categoryKey}-${childKey}`] || false}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Main content area component
+  const MainContent = ({ structure }: { structure: any }) => {
+    if (!selectedCategory) {
+      return (
+        <div className="flex-1 p-6 flex items-center justify-center text-gray-400 dark:text-gray-600">
+          <div className="text-center">
+            <svg className="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p className="text-lg">Select a category from the sidebar</p>
+            <p className="mt-2 text-sm">Or use the search to find specific media assets</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Navigate structure to find selected category
+    let currentCategory = structure[selectedCategory];
+    
+    // If there's a subcategory, navigate to it
+    if (selectedSubcategory && currentCategory.children && currentCategory.children[selectedSubcategory]) {
+      currentCategory = currentCategory.children[selectedSubcategory];
+    }
+    
+    // If category doesn't exist or has no items
+    if (!currentCategory || !currentCategory.items) {
+      return (
+        <div className="flex-1 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold dark:text-white">
+              {currentCategory?.label || 'Unknown Category'}
+            </h2>
+            <button
+              onClick={() => handleUploadToSection(selectedCategory, selectedSubcategory || undefined)}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center text-sm"
+            >
+              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Upload
+            </button>
+          </div>
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-md">
+            No media assets in this section
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="flex-1 p-6 overflow-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold dark:text-white">
+            {currentCategory.label}
+          </h2>
+          <button
+            onClick={() => handleUploadToSection(selectedCategory, selectedSubcategory || undefined)}
+            className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center text-sm"
+          >
+            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Upload
+          </button>
+        </div>
+        
+        {currentCategory.items.length === 0 ? (
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-md">
+            No media assets in this section
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {currentCategory.items.map((asset: MediaAsset) => (
+              <div 
+                key={asset.placeholder_id} 
+                className="border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden bg-white dark:bg-gray-800"
+              >
+                <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <div className="truncate text-sm font-medium">
+                    {asset.placeholder_id.split('-').pop() || asset.placeholder_id}
+                  </div>
+                  <button
+                    onClick={() => openMediaLibraryForPlaceholder(asset.placeholder_id)}
+                    className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    {asset.cloudinary_id ? "Replace" : "Assign"}
+                  </button>
+                </div>
+                <div className="p-3 h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                  {asset.cloudinary_id ? (
+                    <img 
+                      src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${asset.cloudinary_id}`}
+                      alt={asset.placeholder_id}
+                      className="max-h-full max-w-full object-contain"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
+                      }}
+                    />
+                  ) : (
+                    <div className="text-center text-gray-400 dark:text-gray-600">
+                      <svg className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <p>No image assigned</p>
+                    </div>
+                  )}
+                </div>
+                <div className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400 truncate">
+                  ID: {asset.placeholder_id}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-white dark:bg-gray-950">
+      <div className="border-b border-gray-200 dark:border-gray-800 p-4">
+        <h1 className="text-xl font-bold dark:text-white">Media Library</h1>
+        <div className="flex items-center mt-2">
+          <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <input
-              id="search"
-              name="search"
               type="text"
-              className="focus:ring-gray-500 focus:border-gray-500 block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-900 text-white placeholder-gray-400"
-              placeholder="Search by placeholder ID or Cloudinary ID"
+              placeholder="Search media assets..."
+              className="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-800 rounded text-sm bg-white dark:bg-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-        </div>
-        
-        {Object.entries(organizeMediaAssets(mediaAssets.filter(asset => 
-          asset.placeholder_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (asset.cloudinary_id && asset.cloudinary_id.toLowerCase().includes(searchTerm.toLowerCase()))
-        ))).map(([key, category]) => (
-          category.items.length > 0 ? (
-            <div key={key} className={directoryStyles.container}>
-              <div 
-                className={directoryStyles.header}
-                onClick={() => {
-                  const content = document.getElementById(`content-${key}`);
-                  if (content) {
-                    content.style.display = content.style.display === 'none' ? 'block' : 'none';
-                  }
-                }}
-              >
-                <div className="flex items-center">
-                  <FolderIcon />
-                  <span className="text-lg font-medium">{category.label} ({category.items.length})</span>
-                </div>
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              
-              <div id={`content-${key}`} className={directoryStyles.content} style={{display: 'none'}}>
-                {category.items.map((asset) => {
-                  // Split the placeholder_id into parts
-                  const parts = asset.placeholder_id.split('/').length > 1 
-                    ? asset.placeholder_id.split('/') 
-                    : asset.placeholder_id.split('-');
-                  
-                  return (
-                    <div key={asset.placeholder_id} className={directoryStyles.item}>
-                      <div className={directoryStyles.placeholder}>
-                        <div className="flex items-center">
-                          <FileIcon />
-                          <span className={directoryStyles.fileText}>
-                            {parts.join('/')}
-                          </span>
-                          {asset.cloudinary_id && 
-                            <span className={directoryStyles.cloudinaryId}>
-                              ({asset.cloudinary_id.split('/').pop()})
-                            </span>
-                          }
-                        </div>
-                        <button
-                          onClick={() => openMediaLibraryForPlaceholder(asset.placeholder_id)}
-                          className={directoryStyles.replaceButton}
-                        >
-                          {asset.cloudinary_id ? 'Replace' : 'Assign'}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null
-        ))}
-        
-        <div className="mt-8 p-4 bg-gray-900 border border-gray-700 rounded">
-          <h3 className="text-lg font-semibold text-white mb-2">About Page Structure Organization</h3>
-          <p className="text-gray-300 mb-2">
-            Media assets are now organized based on your site's page structure, making it easier to identify and manage media for specific sections of your website.
-          </p>
-          <p className="text-gray-300 mb-2">
-            To maintain consistency, consider adopting a naming convention for new placeholders that follows this pattern:
-          </p>
-          <code className="block bg-gray-800 p-2 rounded text-gray-300">
-            [page]-[section]-[element]
-          </code>
-          
-          <div className="mt-2 text-gray-300">
-            <span className="block">Examples:</span>
-            <ul className="list-disc ml-6 mt-1">
-              <li>home-hero</li>
-              <li>about-team-section</li>
-              <li>services-plastic-surgery-banner</li>
-              <li>global-logo</li>
-            </ul>
-          </div>
+          <button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="ml-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            New Placeholder
+          </button>
         </div>
       </div>
       
-      <div className="mt-8 border border-gray-700 rounded-lg overflow-hidden">
-        <div className="bg-gray-800 px-6 py-3 flex items-center justify-between cursor-pointer"
-             onClick={() => setShowCreateForm(!showCreateForm)}>
-          <h3 className="font-medium text-lg text-white">Create New Placeholder</h3>
-          <span className="text-gray-400">{showCreateForm ? '▲' : '▼'}</span>
-        </div>
-        
-        {showCreateForm && (
-          <div className="p-6 bg-gray-800">
-            <p className="mb-4 text-gray-300">
-              Create a new media placeholder using our structured naming convention. This will help maintain organization 
-              and ensure that media assets are properly categorized.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Page</label>
-                <select
-                  value={newPlaceholder.page}
-                  onChange={(e) => setNewPlaceholder({...newPlaceholder, page: e.target.value})}
-                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white"
-                >
-                  <option value="global">Global</option>
-                  <option value="home">Homepage</option>
-                  <option value="about">About</option>
-                  <option value="services">Services</option>
-                  <option value="services-plastic-surgery">Plastic Surgery</option>
-                  <option value="services-dermatology">Dermatology</option>
-                  <option value="services-medical-spa">Medical Spa</option>
-                  <option value="services-functional-medicine">Functional Medicine</option>
-                  <option value="team">Team</option>
-                  <option value="gallery">Gallery</option>
-                  <option value="reviews">Reviews</option>
-                  <option value="out-of-town">Out of Town</option>
-                  <option value="financing">Financing</option>
-                  <option value="contact">Contact</option>
-                  <option value="articles">Articles</option>
-                  <option value="appointment">Appointment</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Section (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="e.g., hero, banner, testimonials"
-                  value={newPlaceholder.section}
-                  onChange={(e) => setNewPlaceholder({...newPlaceholder, section: e.target.value})}
-                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white placeholder-gray-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Element <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  placeholder="e.g., background, image, video"
-                  value={newPlaceholder.element}
-                  onChange={(e) => setNewPlaceholder({...newPlaceholder, element: e.target.value})}
-                  className="w-full p-2 border border-gray-600 rounded focus:ring-gray-500 focus:border-gray-500 bg-gray-800 text-white placeholder-gray-400"
-                  required
-                />
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <p className="text-sm text-gray-300 mb-2">
-                Preview: <span className="font-mono bg-gray-700 px-2 py-1 rounded">
-                  {newPlaceholder.section 
-                    ? `${newPlaceholder.page}-${newPlaceholder.section}-${newPlaceholder.element}` 
-                    : `${newPlaceholder.page}-${newPlaceholder.element}`}
-                </span>
-              </p>
-            </div>
-            
-            <div className="mt-4 p-3 bg-gray-700 rounded">
-              <h4 className="font-medium mb-2">Naming Convention Guidelines:</h4>
-              <ul className="list-disc list-inside text-sm text-gray-300 space-y-1">
-                <li><strong>Page:</strong> Corresponds to site pages (about, services, etc)</li>
-                <li><strong>Section:</strong> A specific area within a page (hero, testimonials, etc)</li>
-                <li><strong>Element:</strong> The specific media item (background, profile, logo, etc)</li>
-              </ul>
-              <p className="mt-2 text-sm text-gray-300">
-                Example: <code className="bg-gray-800 px-1">services-medical-spa-banner</code> for a banner on the Medical Spa services page.
-              </p>
-            </div>
-            
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={createNewPlaceholder}
-                className="py-2 px-4 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+      {showCreateForm && (
+        <div className="border-b border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Page *
+              </label>
+              <select
+                value={newPlaceholder.page}
+                onChange={(e) => setNewPlaceholder({...newPlaceholder, page: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
               >
-                Create Placeholder
-              </button>
-              
+                <option value="global">Global</option>
+                <option value="homepage">Homepage</option>
+                <option value="about">About</option>
+                <option value="services">Services</option>
+                <option value="services-plastic-surgery">Plastic Surgery</option>
+                <option value="services-dermatology">Dermatology</option>
+                <option value="services-medical-spa">Medical Spa</option>
+                <option value="services-functional-medicine">Functional Medicine</option>
+                <option value="team">Team</option>
+                <option value="gallery">Gallery</option>
+                <option value="out-of-town">Out of Town</option>
+                <option value="financing">Financing</option>
+                <option value="contact">Contact</option>
+                <option value="articles">Articles</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Section (optional)
+              </label>
+              <input
+                type="text"
+                value={newPlaceholder.section}
+                onChange={(e) => setNewPlaceholder({...newPlaceholder, section: e.target.value})}
+                placeholder="e.g. hero, mission, team"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Element *
+              </label>
+              <input
+                type="text"
+                value={newPlaceholder.element}
+                onChange={(e) => setNewPlaceholder({...newPlaceholder, element: e.target.value})}
+                placeholder="e.g. background, logo, image-1"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
+              />
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-700 dark:text-gray-300">
+              <strong>Preview:</strong> {newPlaceholder.page}
+              {newPlaceholder.section ? `-${newPlaceholder.section}` : ""}
+              {newPlaceholder.element ? `-${newPlaceholder.element}` : ""}
+            </div>
+            
+            <div className="flex space-x-2">
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="py-2 px-4 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md dark:border-gray-700"
               >
                 Cancel
               </button>
+              <button
+                onClick={createNewPlaceholder}
+                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Create
+              </button>
             </div>
           </div>
+        </div>
+      )}
+      
+      {error && (
+        <div className="p-3 m-4 text-red-700 bg-red-50 dark:bg-red-900/30 dark:text-red-200 rounded">
+          {error}
+        </div>
+      )}
+      
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar structure={organizeMediaAssets(mediaAssets)} />
+        <MainContent structure={organizeMediaAssets(mediaAssets)} />
+      </div>
+      
+      {/* Cloudinary Media Library Modal */}
+      <div id="cloudinaryLibraryContainer" className="hidden">
+        {cloudinaryModalOpen && selectedPlaceholderId && (
+          <CloudinaryUploader
+            onSuccess={(result) => {
+              // Extract the public_id from the result as cloudinaryId
+              const cloudinaryId = typeof result === 'object' && 'publicId' in result 
+                ? result.publicId 
+                : Array.isArray(result) && result.length > 0 && 'publicId' in result[0]
+                  ? result[0].publicId
+                  : null;
+              
+              if (cloudinaryId) {
+                handleMediaSelect(cloudinaryId);
+              }
+            }}
+            onClose={() => {
+              setCloudinaryModalOpen(false);
+              setSelectedPlaceholderId(null);
+            }}
+            autoOpen={true}
+            multiple={false}
+            folder="site-assets"
+            tags={["site-content"]}
+            context={{ placeholder_id: selectedPlaceholderId }}
+          />
         )}
       </div>
       
-      <div className="mt-8 flex justify-end">
-        <button
-          onClick={analyzePlaceholders}
-          className="text-white bg-gray-800 border border-gray-600 px-3 py-1 rounded hover:bg-gray-700"
-        >
-          Analyze naming conventions
-        </button>
-      </div>
-      
-      {showMigrationTool && (
-        <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-white">Placeholder Migration Tool</h3>
-            <button 
-              onClick={() => setShowMigrationTool(false)}
-              className="text-gray-400 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-          
-          {migrationPlan.length > 0 ? (
-            <>
-              <p className="mb-4 text-gray-300">
-                Found {migrationPlan.length} placeholders that don't follow the recommended naming convention.
-                Review the proposed changes below:
-              </p>
-              
-              <div className="max-h-60 overflow-y-auto mb-4">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-700">
-                      <th className="text-left p-2 text-gray-200">Original ID</th>
-                      <th className="text-left p-2 text-gray-200">Proposed ID</th>
-                      <th className="text-left p-2 text-gray-200">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {migrationPlan.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-700">
-                        <td className="p-2 font-mono text-gray-300">{item.original}</td>
-                        <td className="p-2 font-mono text-gray-300">{item.proposed}</td>
-                        <td className="p-2 text-gray-300">{item.cloudinary_id ? 'Has media' : 'Empty'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              <div className="flex justify-end">
-                <button
-                  onClick={executeMigration}
-                  disabled={migrationInProgress}
-                  className="py-2 px-4 bg-gray-800 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 border border-gray-600 disabled:bg-gray-600 disabled:text-gray-400"
-                >
-                  {migrationInProgress ? 'Migrating...' : 'Execute Migration'}
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="text-gray-300">
-              All placeholders appear to follow the recommended naming convention. Great job!
-            </p>
-          )}
-        </div>
-      )}
+      {/* Cloudinary Widget Script */}
+      <Script
+        src="https://widget.cloudinary.com/v2.0/global/all.js"
+        onLoad={() => console.log('Cloudinary widget loaded')}
+      />
     </div>
   );
 } 
