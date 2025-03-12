@@ -3,76 +3,128 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
+import { useMediaAsset } from "@/hooks/useMedia"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function FunctionalMedicineSection() {
-  return (
-    <section className="relative min-h-screen bg-black text-white">
-      <div className="relative flex flex-col lg:flex-row">
-        {/* Text Content - Mobile */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="lg:hidden w-full px-4 py-12 bg-black"
-        >
-          <div className="max-w-3xl">
-            <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Functional Medicine</h2>
-            <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+  const isMobile = useIsMobile();
+  
+  // Use the useMediaAsset hook to get the media url
+  const { url: backgroundUrl, isVideo } = useMediaAsset('homepage-functional-medicine-background', {
+    width: 1920,
+    quality: 80,
+    format: 'auto',
+    responsive: true
+  });
+
+  // Mobile Layout: Image on top, text below
+  if (isMobile) {
+    return (
+      <section className="bg-black text-white">
+        {/* Media container with preserved aspect ratio */}
+        <div className="relative w-full aspect-[16/9]">
+          {isVideo ? (
+            <video
+              src={backgroundUrl || ""}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image 
+              src={backgroundUrl || ""} 
+              alt="Dr. Gidwani consulting with patient" 
+              fill 
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+          )}
+          {/* Subtle overlay for readability */}
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+        
+        {/* Text content below image */}
+        <div className="px-4 py-12 bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto"
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Functional Medicine</h2>
+            <h3 className="text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight font-serif text-white mb-8">
               Optimize your health from within
             </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light">
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
               <p>
                 Led by Dr. Pooja Gidwani, our functional medicine approach addresses the root causes of health concerns,
                 optimizing everything from hormone balance to cognitive performance.
               </p>
-              <div className="space-y-4">
-                <LearnMoreButton href="/functional-medicine">Learn Functional Medicine</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-              </div>
             </div>
-          </div>
-        </motion.div>
+            <div className="mt-8 space-y-4">
+              <LearnMoreButton href="/functional-medicine">Learn Functional Medicine</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
 
-        {/* Image Container */}
-        <div className="w-full h-[40vh] lg:h-screen relative overflow-hidden">
+  // Desktop Layout
+  return (
+    <section className="relative min-h-screen bg-black text-white">
+      <div className="absolute inset-0">
+        {isVideo ? (
+          <video
+            src={backgroundUrl || ""}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center"
+          />
+        ) : (
           <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133483/uncategorized/dr.png"
+            src={backgroundUrl || ""}
             alt="Dr. Gidwani consulting with patient"
             fill
             className="object-cover object-center"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="100vw"
             priority
           />
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
+        )}
+        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+      </div>
 
-        {/* Text Content - Desktop */}
+      {/* Text Content - Desktop */}
+      <div className="relative container mx-auto px-4 py-24 lg:px-8 min-h-screen flex items-end">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="hidden lg:flex w-full lg:w-1/2 absolute inset-y-0 left-0 bg-black/70 flex-col justify-center"
+          className="max-w-3xl"
         >
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="max-w-3xl lg:pl-[8.33%]">
-              <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Functional Medicine</h2>
-              <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
-                Optimize your health from within
-              </h3>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  Led by Dr. Pooja Gidwani, our functional medicine approach addresses the root causes of health concerns,
-                  optimizing everything from hormone balance to cognitive performance.
-                </p>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/functional-medicine">Learn Functional Medicine</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                </div>
-              </div>
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Functional Medicine</h2>
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
+            Optimize your health from within
+          </h3>
+          <div className="space-y-6 text-lg font-cerebri font-light">
+            <p>
+              Led by Dr. Pooja Gidwani, our functional medicine approach addresses the root causes of health concerns,
+              optimizing everything from hormone balance to cognitive performance.
+            </p>
+            <div className="space-y-4">
+              <LearnMoreButton href="/functional-medicine">Learn Functional Medicine</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
             </div>
           </div>
         </motion.div>

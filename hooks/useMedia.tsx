@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getCloudinaryUrl } from '@/lib/cloudinary';
+import { getCloudinaryUrl, getCloudinaryVideoUrl, getCloudinaryImageSrcSet } from '@/lib/cloudinary';
 import { createClient } from '@/lib/supabase';
 
 // Types for media assets
@@ -16,8 +16,24 @@ export interface MediaAsset {
 export interface MediaHookResult {
   url: string | null;
   publicId: string | null;
+  srcSet?: string;
   isLoading: boolean;
   error: string | null;
+  isVideo: boolean;
+}
+
+/**
+ * Helper function to detect if an asset is a video
+ */
+export function isVideoAsset(publicId: string): boolean {
+  // Check for common video formats in the public ID or metadata
+  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv', '.flv', '.mkv'];
+  const hasVideoExtension = videoExtensions.some(ext => publicId.toLowerCase().includes(ext));
+  
+  // Check for Cloudinary resource_type indicators
+  const isVideoResource = publicId.includes('/video/') || publicId.includes('resource_type=video');
+  
+  return hasVideoExtension || isVideoResource;
 }
 
 /**
@@ -25,7 +41,7 @@ export interface MediaHookResult {
  * 
  * @param placeholderId The ID of the media placeholder
  * @param options Optional Cloudinary transformation options
- * @returns Object with url, publicId, loading state, and error
+ * @returns Object with url, publicId, srcSet, loading state, and error
  */
 export function useMediaAsset(
   placeholderId: string,
@@ -35,7 +51,8 @@ export function useMediaAsset(
     url: null,
     publicId: null,
     isLoading: true,
-    error: null
+    error: null,
+    isVideo: false
   });
 
   useEffect(() => {
@@ -48,7 +65,7 @@ export function useMediaAsset(
           const supabase = createClient();
           const { data, error } = await supabase
             .from('media_assets')
-            .select('cloudinary_id')
+            .select('cloudinary_id, metadata')
             .eq('placeholder_id', placeholderId)
             .single();
 
@@ -58,12 +75,31 @@ export function useMediaAsset(
           } else if (data && data.cloudinary_id) {
             // We found the asset in Supabase
             const publicId = data.cloudinary_id;
+            const isVideo = isVideoAsset(publicId) || 
+                           (data.metadata && data.metadata.resource_type === 'video');
+            
+            let url;
+            let srcSet;
+            
+            if (isVideo) {
+              url = getCloudinaryVideoUrl(publicId, options);
+              // Video formats don't use srcSet the same way
+            } else {
+              url = getCloudinaryUrl(publicId, options);
+              // Generate srcSet for responsive images if needed
+              srcSet = options.responsive !== false ? 
+                getCloudinaryImageSrcSet(publicId, options) : 
+                undefined;
+            }
+            
             if (isMounted) {
               setResult({
-                url: getCloudinaryUrl(publicId, options),
+                url,
                 publicId,
+                srcSet,
                 isLoading: false,
-                error: null
+                error: null,
+                isVideo
               });
             }
             return;
@@ -84,12 +120,31 @@ export function useMediaAsset(
         const asset = mediaAssets[placeholderId];
         
         if (asset && asset.cloudinaryPublicId) {
+          const isVideo = isVideoAsset(asset.cloudinaryPublicId) || 
+                         (asset.metadata && asset.metadata.resource_type === 'video');
+                         
+          let url;
+          let srcSet;
+          
+          if (isVideo) {
+            url = getCloudinaryVideoUrl(asset.cloudinaryPublicId, options);
+            // Video formats don't use srcSet the same way
+          } else {
+            url = getCloudinaryUrl(asset.cloudinaryPublicId, options);
+            // Generate srcSet for responsive images if needed
+            srcSet = options.responsive !== false ? 
+              getCloudinaryImageSrcSet(asset.cloudinaryPublicId, options) : 
+              undefined;
+          }
+            
           if (isMounted) {
             setResult({
-              url: getCloudinaryUrl(asset.cloudinaryPublicId, options),
+              url,
               publicId: asset.cloudinaryPublicId,
+              srcSet,
               isLoading: false,
-              error: null
+              error: null,
+              isVideo
             });
           }
         } else {
@@ -98,7 +153,8 @@ export function useMediaAsset(
               url: null,
               publicId: null,
               isLoading: false,
-              error: `Media asset not found for placeholder: ${placeholderId}`
+              error: `Media asset not found for placeholder: ${placeholderId}`,
+              isVideo: false
             });
           }
         }
@@ -108,7 +164,8 @@ export function useMediaAsset(
             url: null,
             publicId: null,
             isLoading: false,
-            error: error instanceof Error ? error.message : 'Unknown error fetching media asset'
+            error: error instanceof Error ? error.message : 'Unknown error fetching media asset',
+            isVideo: false
           });
         }
       }

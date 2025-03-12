@@ -4,25 +4,108 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function PlasticSurgerySection() {
-  // Use the useMediaAsset hook to get the image url
-  const { url: backgroundImageUrl, isLoading } = useMediaAsset('homepage-plastic-surgery-background', {
+  const isMobile = useIsMobile();
+  
+  // Use the useMediaAsset hook to get the media url with responsive options
+  const { url: backgroundUrl, srcSet, isVideo, isLoading } = useMediaAsset('homepage-plastic-surgery-background', {
     width: 1920,
-    quality: 80
+    quality: 80,
+    format: 'auto',
+    responsive: true
   });
 
+  // Mobile Layout: Image on top, text below
+  if (isMobile) {
+    return (
+      <section className="bg-black text-white">
+        {/* Media container with preserved aspect ratio */}
+        <div className="relative w-full aspect-[16/9]">
+          {isVideo ? (
+            <video
+              src={backgroundUrl || ""}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image 
+              src={backgroundUrl || ""} 
+              alt="Plastic Surgery at Allure MD" 
+              fill 
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+          )}
+          {/* Subtle overlay for readability */}
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+        
+        {/* Text content below image */}
+        <div className="px-4 py-12 bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto"
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Plastic Surgery</h2>
+            <h3 className="text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              Trusted expertise in aesthetic medicine
+            </h3>
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+              <p>
+                Our team of board-certified physicians and licensed medical professionals brings decades of combined
+                experience in aesthetic medicine. We stay at the forefront of medical advances to provide you with the
+                safest, most effective treatments available.
+              </p>
+            </div>
+            <div className="mt-8 space-y-4">
+              <LearnMoreButton href="/team">Meet Dr. James Rosing</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
+  // Desktop Layout
   return (
-    <section className="relative h-screen">
+    <section className="relative h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <Image
-          src={backgroundImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133484/uncategorized/Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology.png"}
-          alt="Plastic Surgery at Allure MD"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/30" />
+        {isVideo ? (
+          // Render video background when the asset is a video
+          <video
+            src={backgroundUrl || ""}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          // Render image background when the asset is an image
+          <Image
+            src={backgroundUrl || ""}
+            alt="Plastic Surgery at Allure MD"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+        )}
+        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>
       
       <div className="relative h-full flex items-end">

@@ -4,26 +4,108 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function DermatologySection() {
-  // Use the useMediaAsset hook to get the image url
-  const { url: backgroundImageUrl } = useMediaAsset('homepage-dermatology-background', {
+  const isMobile = useIsMobile();
+  
+  // Use the useMediaAsset hook to get the media url
+  const { url: backgroundUrl, isVideo } = useMediaAsset('homepage-dermatology-background', {
     width: 1920,
-    quality: 80
+    quality: 80,
+    format: 'auto',
+    responsive: true
   });
 
+  // Mobile Layout: Image on top, text below
+  if (isMobile) {
+    return (
+      <section className="bg-black text-white">
+        {/* Media container with preserved aspect ratio */}
+        <div className="relative w-full aspect-[16/9]">
+          {isVideo ? (
+            <video
+              src={backgroundUrl || ""}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image 
+              src={backgroundUrl || ""} 
+              alt="Dermatology examination" 
+              fill 
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+          )}
+          {/* Subtle overlay for readability */}
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+        
+        {/* Text content below image */}
+        <div className="px-4 py-12 bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto"
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Dermatology</h2>
+            <h3 className="text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              Advanced skincare solutions for lasting results
+            </h3>
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+              <p>
+                Our comprehensive dermatology services combine medical expertise with aesthetic precision. From skin cancer
+                screenings to advanced treatments for acne, eczema, and other conditions, we provide personalized care for
+                all your skin health needs.
+              </p>
+            </div>
+            <div className="mt-8 space-y-4">
+              <LearnMoreButton href="/team">Meet Susan Pearose</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/dermatology">Explore Dermatology Services</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
+  // Desktop Layout: Text over background with gradient
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <Image
-          src={backgroundImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133482/uncategorized/susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.png"}
-          alt="Dermatology examination"
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/30" />
+        {isVideo ? (
+          // Render video background when the asset is a video
+          <video
+            src={backgroundUrl || ""}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          // Render image background when the asset is an image
+          <Image
+            src={backgroundUrl || ""}
+            alt="Dermatology examination"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        )}
+        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>
       <div className="relative container mx-auto px-4 py-24 lg:px-8">
         <motion.div

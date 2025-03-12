@@ -610,4 +610,19 @@ export function getMediaType(cloudinaryId: string): 'image' | 'video' {
                           cloudinaryId.includes('/videos/');
   
   return (hasVideoExtension || isInVideoFolder) ? 'video' : 'image';
-} 
+}
+
+// Add a utility function to detect if a Cloudinary asset is a video
+export const isCloudinaryVideo = (publicId: string): boolean => {
+  if (!publicId) return false;
+  
+  // Check common video extensions
+  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv', '.flv', '.mkv'];
+  const hasVideoExtension = videoExtensions.some(ext => publicId.toLowerCase().includes(ext));
+  
+  // Check for video resource type indicators in the URL
+  const isVideoResource = publicId.includes('/video/') || 
+                          publicId.includes('resource_type=video');
+  
+  return hasVideoExtension || isVideoResource;
+}; 

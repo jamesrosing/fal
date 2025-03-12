@@ -129,7 +129,7 @@ export default function AlbumPage() {
       <div>
         <Link 
           href={`/admin/gallery/${collectionId}`} 
-          className="inline-flex items-center text-zinc-500 hover:text-white mb-4"
+          className="inline-flex items-center text-zinc-200 hover:text-white mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to {collection.title}

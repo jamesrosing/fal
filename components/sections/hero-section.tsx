@@ -7,23 +7,37 @@ import { useMediaAsset } from "@/hooks/useMedia"
 
 export function HeroSection() {
   // Use useMediaAsset hook for hero background
-  const { url: heroBackgroundUrl } = useMediaAsset('homepage-hero-background', {
+  const { url: heroBackgroundUrl, isVideo } = useMediaAsset('homepage-hero-background', {
     width: 1920,
     quality: 90,
-    format: 'auto'
+    format: 'auto',
+    responsive: true
   });
 
   return (
     <section className="relative min-h-screen bg-black">
       <div className="absolute inset-0">
-        <Image
-          src={heroBackgroundUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133488/homepage/hero/hero%2520background%2520image-QKLNbwBjHKNSxmLHpiRZgHKb4X2zwm.png"}
-          alt="Allure MD Hero Background"
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
+        {isVideo ? (
+          // Render video background when the asset is a video
+          <video
+            src={heroBackgroundUrl || ""}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          // Render image background when the asset is an image
+          <Image
+            src={heroBackgroundUrl || ""}
+            alt="Allure MD Hero Background"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
+        )}
         <div className="absolute inset-0 bg-black/30" />
       </div>
       <div className="relative container mx-auto px-4 min-h-screen flex flex-col justify-center lg:px-8">

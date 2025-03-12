@@ -436,7 +436,7 @@ export default function CasePage() {
       <div className="flex justify-between items-center mb-8">
         <Link 
           href={`/admin/gallery/${collectionId}/${albumId}`} 
-          className="inline-flex items-center text-zinc-400 hover:text-white"
+          className="inline-flex items-center text-zinc-200 hover:text-white"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to {album.title}

@@ -83,7 +83,7 @@ export default function GalleryLayout({
         <ScrollArea className="h-full">
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Gallery</h2>
+              <h2 className="text-lg font-semibold text-white">Gallery</h2>
               <Link href="/admin/gallery/new">
                 <Button variant="outline" size="sm">
                   New Case
@@ -101,10 +101,10 @@ export default function GalleryLayout({
                         activeCollection === id && "bg-zinc-800"
                       )}
                     >
-                      <FolderOpen className="w-4 h-4" />
-                      <span>{collection.title}</span>
+                      <FolderOpen className="w-4 h-4 text-zinc-200" />
+                      <span className="text-zinc-200">{collection.title}</span>
                       <ChevronRight className={cn(
-                        "w-4 h-4 ml-auto transition-transform",
+                        "w-4 h-4 ml-auto transition-transform text-zinc-200",
                         activeCollection === id && "rotate-90"
                       )} />
                     </div>
@@ -123,8 +123,8 @@ export default function GalleryLayout({
                               activeAlbum === albumId && "bg-zinc-800"
                             )}
                           >
-                            <ImageIcon className="w-4 h-4" />
-                            <span>{album.title}</span>
+                            <ImageIcon className="w-4 h-4 text-zinc-200" />
+                            <span className="text-zinc-200">{album.title}</span>
                           </div>
                         </Link>
                       ))}

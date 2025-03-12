@@ -200,7 +200,7 @@ export default function CollectionPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <Link href="/admin/gallery" className="inline-flex items-center text-zinc-500 hover:text-white mb-4">
+        <Link href="/admin/gallery" className="inline-flex items-center text-zinc-200 hover:text-white mb-4">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Collections
         </Link>

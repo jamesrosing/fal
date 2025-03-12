@@ -5,21 +5,24 @@ import Script from 'next/script';
 import { 
   CloudinaryAsset 
 } from '@/lib/cloudinary';
+import { toast } from '@/components/ui/use-toast';
 
 // Style for the directory structure
 const directoryStyles = {
-  container: "border border-gray-700 rounded-md overflow-hidden mb-4",
-  header: "bg-gray-900 px-4 py-3 font-medium flex items-center justify-between text-white border-b border-gray-700",
+  container: "border border-zinc-700 rounded-md overflow-hidden mb-4 bg-zinc-950",
+  header: "bg-zinc-900 px-4 py-3 font-medium flex items-center justify-between text-white border-b border-zinc-700",
   folderIcon: "mr-2 text-yellow-500",
-  content: "pl-0 bg-gray-950 text-white",
-  item: "border-t border-gray-800 px-4 py-2 flex items-center",
-  folderItem: "text-white hover:bg-gray-800 cursor-pointer",
+  content: "pl-0 bg-zinc-950 text-white",
+  item: "border-t border-zinc-800 px-4 py-2 flex items-center",
+  folderItem: "text-white hover:bg-zinc-800 cursor-pointer",
   placeholder: "flex items-center justify-between w-full py-1.5",
   indentedContent: "pl-6",
   fileIcon: "mr-2 text-gray-400",
   fileText: "text-sm font-mono text-white",
   cloudinaryId: "ml-2 text-xs text-gray-400",
-  replaceButton: "ml-auto px-3 py-1 text-xs bg-gray-800 text-white rounded-md border border-gray-600 hover:bg-gray-700"
+  replaceButton: "ml-auto px-3 py-1 text-xs bg-zinc-800 text-white rounded-md border border-zinc-700 hover:bg-zinc-700",
+  deleteButton: "ml-2 px-3 py-1 text-xs bg-red-900 text-white rounded-md border border-red-800 hover:bg-red-800",
+  actionButtons: "flex ml-auto"
 };
 
 // Add these FolderIcon and FileIcon components inside the component but before the return
@@ -1061,11 +1064,11 @@ export default function MediaLibraryAdmin() {
     }, [structure, searchTerm]);
 
     return (
-      <div className="w-64 h-full overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black">
-        <div className="p-3 font-medium text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      <div className="w-64 h-full overflow-y-auto border-r border-zinc-800 bg-zinc-950">
+        <div className="p-3 font-medium text-sm text-zinc-400 uppercase tracking-wider">
           Media Explorer
           {searchTerm && (
-            <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+            <span className="ml-2 text-xs bg-blue-900 text-blue-300 px-2 py-0.5 rounded">
               Filtered
             </span>
           )}
@@ -1177,7 +1180,7 @@ export default function MediaLibraryAdmin() {
   const MainContent = ({ structure }: { structure: any }) => {
     if (!selectedCategory) {
       return (
-        <div className="flex-1 p-6 flex items-center justify-center text-gray-400 dark:text-gray-600 bg-white dark:bg-black">
+        <div className="flex-1 p-6 flex items-center justify-center text-zinc-600 bg-zinc-950">
           <div className="text-center">
             <svg className="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1200,9 +1203,9 @@ export default function MediaLibraryAdmin() {
     // If category doesn't exist or has no items
     if (!currentCategory || !currentCategory.items) {
       return (
-        <div className="flex-1 p-6 bg-white dark:bg-black">
+        <div className="flex-1 p-6 bg-zinc-950">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-white">
               {currentCategory?.label || 'Unknown Category'}
             </h2>
             <button
@@ -1215,7 +1218,7 @@ export default function MediaLibraryAdmin() {
               Upload
             </button>
           </div>
-          <div className="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-md">
+          <div className="p-4 text-center text-zinc-400 bg-zinc-900 rounded-md">
             No media assets in this section
           </div>
         </div>
@@ -1223,9 +1226,9 @@ export default function MediaLibraryAdmin() {
     }
     
     return (
-      <div className="flex-1 p-6 overflow-auto bg-white dark:bg-black">
+      <div className="flex-1 p-6 overflow-auto bg-zinc-950">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-white">
             {currentCategory.label}
           </h2>
           <button
@@ -1240,7 +1243,7 @@ export default function MediaLibraryAdmin() {
         </div>
         
         {currentCategory.items.length === 0 ? (
-          <div className="p-4 text-center text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded-md">
+          <div className="p-4 text-center text-zinc-400 bg-zinc-900 rounded-md">
             No media assets in this section
           </div>
         ) : (
@@ -1248,36 +1251,62 @@ export default function MediaLibraryAdmin() {
             {currentCategory.items.map((asset: MediaAsset) => (
               <div 
                 key={asset.placeholder_id} 
-                className="border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden bg-white dark:bg-gray-800"
+                className="border border-zinc-800 rounded-md overflow-hidden bg-zinc-800"
               >
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                  <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                <div className="p-3 border-b border-zinc-700 flex items-center justify-between">
+                  <div className="truncate text-sm font-medium text-white">
                     {asset.placeholder_id.split('-').pop() || asset.placeholder_id}
                   </div>
-                  <button
-                    onClick={() => openMediaLibraryForPlaceholder(asset.placeholder_id)}
-                    className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  >
-                    {asset.cloudinary_id ? "Replace" : "Assign"}
-                  </button>
+                  <div className={directoryStyles.actionButtons}>
+                    <button
+                      className={directoryStyles.replaceButton}
+                      onClick={() => openMediaLibraryForPlaceholder(asset.placeholder_id)}
+                    >
+                      Replace
+                    </button>
+                    <button
+                      className={directoryStyles.deleteButton}
+                      onClick={() => deleteMediaAsset(asset.placeholder_id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-                <div className="p-3 h-48 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                <div className="p-3 h-48 flex items-center justify-center bg-zinc-900">
                   {asset.cloudinary_id ? (
-                    <img 
-                      src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${asset.cloudinary_id}`}
-                      alt={asset.placeholder_id}
-                      className="max-h-full max-w-full object-contain"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
-                      }}
-                    />
+                    isVideoAsset(asset.cloudinary_id) ? (
+                      <video 
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/${asset.cloudinary_id}`}
+                        className="max-h-full max-w-full object-contain"
+                        controls
+                        muted
+                        playsInline
+                        onError={(e) => {
+                          const target = e.target as HTMLVideoElement;
+                          target.style.display = 'none';
+                          const fallback = document.createElement('div');
+                          fallback.textContent = 'Video Not Found';
+                          fallback.className = 'text-zinc-400';
+                          target.parentNode?.appendChild(fallback);
+                        }}
+                      />
+                    ) : (
+                      <img 
+                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${asset.cloudinary_id}`}
+                        alt={asset.placeholder_id}
+                        className="max-h-full max-w-full object-contain"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://placehold.co/400x300?text=Image+Not+Found';
+                        }}
+                      />
+                    )
                   ) : (
-                    <div className="text-center text-gray-400 dark:text-gray-600">
+                    <div className="text-center text-zinc-400">
                       <svg className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      <p>No image assigned</p>
+                      <p>No media assigned</p>
                     </div>
                   )}
                 </div>
@@ -1292,10 +1321,54 @@ export default function MediaLibraryAdmin() {
     );
   };
 
+  // Add this function to handle media asset deletion
+  const deleteMediaAsset = async (placeholderId: string) => {
+    if (!confirm(`Are you sure you want to delete the image assigned to ${placeholderId}?`)) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/media/${encodeURIComponent(placeholderId)}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to delete media asset: ${response.statusText}`);
+      }
+      
+      toast({
+        title: 'Success',
+        description: `Media asset for ${placeholderId} was deleted successfully.`,
+      });
+      
+      // Refresh the media assets list
+      fetchMediaAssets();
+    } catch (error) {
+      console.error('Error deleting media asset:', error);
+      toast({
+        title: 'Error',
+        description: `Failed to delete media asset: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Add the isVideoAsset helper function at the top of the file
+  function isVideoAsset(publicId: string): boolean {
+    // Check for common video formats in the public ID or metadata
+    const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv', '.flv', '.mkv'];
+    const hasVideoExtension = videoExtensions.some(ext => publicId.toLowerCase().includes(ext));
+    
+    // Check for Cloudinary resource_type indicators
+    const isVideoResource = publicId.includes('/video/') || publicId.includes('resource_type=video');
+    
+    return hasVideoExtension || isVideoResource;
+  }
+
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-black">
-      <div className="border-b border-gray-200 dark:border-gray-800 p-4">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Media Library</h1>
+    <div className="h-full flex flex-col bg-zinc-950">
+      <div className="border-b border-zinc-800 p-4">
+        <h1 className="text-xl font-bold text-white">Media Library</h1>
         <div className="flex items-center mt-2">
           <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1306,14 +1379,14 @@ export default function MediaLibraryAdmin() {
             <input
               type="text"
               placeholder="Search media assets..."
-              className="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-800 rounded text-sm text-gray-900 bg-white dark:text-white dark:bg-gray-900"
+              className="w-full pl-10 pr-3 py-2 border border-zinc-800 rounded text-sm text-white bg-zinc-900"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="ml-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="ml-2 px-3 py-2 text-sm bg-zinc-800 border border-zinc-700 rounded text-white hover:bg-zinc-700"
           >
             New Placeholder
           </button>
@@ -1327,16 +1400,16 @@ export default function MediaLibraryAdmin() {
       </div>
       
       {showCreateForm && (
-        <div className="border-b border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900">
+        <div className="border-b border-zinc-800 p-4 bg-zinc-900">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-zinc-300 mb-1">
                 Page *
               </label>
               <select
                 value={newPlaceholder.page}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, page: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-zinc-700 rounded-md text-white bg-zinc-800"
               >
                 <option value="global">Global</option>
                 <option value="homepage">Homepage</option>
@@ -1356,7 +1429,7 @@ export default function MediaLibraryAdmin() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-zinc-300 mb-1">
                 Section (optional)
               </label>
               <input
@@ -1364,12 +1437,12 @@ export default function MediaLibraryAdmin() {
                 value={newPlaceholder.section}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, section: e.target.value})}
                 placeholder="e.g. hero, mission, team"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-zinc-700 rounded-md text-white bg-zinc-800"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-zinc-300 mb-1">
                 Element *
               </label>
               <input
@@ -1377,13 +1450,13 @@ export default function MediaLibraryAdmin() {
                 value={newPlaceholder.element}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, element: e.target.value})}
                 placeholder="e.g. background, logo, image-1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
+                className="w-full px-3 py-2 border border-zinc-700 rounded-md text-white bg-zinc-800"
               />
             </div>
           </div>
           
           <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="text-sm text-zinc-300">
               <strong>Preview:</strong> {newPlaceholder.page}
               {newPlaceholder.section ? `-${newPlaceholder.section}` : ""}
               {newPlaceholder.element ? `-${newPlaceholder.element}` : ""}
@@ -1392,7 +1465,7 @@ export default function MediaLibraryAdmin() {
             <div className="flex space-x-2">
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="px-3 py-1.5 text-sm border border-zinc-700 rounded-md text-zinc-300 bg-zinc-800 hover:bg-zinc-700"
               >
                 Cancel
               </button>

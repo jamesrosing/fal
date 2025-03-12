@@ -8,7 +8,7 @@ import { articles } from "@/lib/articles"
 
 export function ArticlesSection() {
   return (
-    <section className="relative py-24 bg-[#f5f5f5] dark:bg-black">
+    <section className="relative py-24 bg-black text-white">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -17,10 +17,10 @@ export function ArticlesSection() {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center mb-16"
         >
-          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-300">
             Latest Articles
           </h2>
-          <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
             Stay informed with Allure MD
           </h3>
         </motion.div>
