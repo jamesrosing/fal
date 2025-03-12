@@ -12,7 +12,7 @@ export function ChatBubble() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 1 }}
-      className="fixed bottom-8 right-8 z-50"
+      className="fixed bottom-32 right-8 z-50"
     >
       <button
         onClick={() => router.push('/chat')}

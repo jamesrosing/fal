@@ -69,14 +69,16 @@ export function Footer() {
             <div className="flex items-center space-x-2">
               <span className="font-['lorimer-no-2-condensed'] font-semibold text-2xl">ALLURE MD</span>
             </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-400">
-              <Link href="/privacy" className="hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="hover:text-white transition-colors">
-                Terms
-              </Link>
-              <span>© 2024 Allure MD. All rights reserved.</span>
+            <div className="flex flex-col items-center text-sm text-gray-400">
+              <span>© 2025 Allure MD Plastic Surgery + Dermatology All Rights Reserved.</span>
+              <div className="flex items-center space-x-6 mt-2">
+                <Link href="/privacy" className="hover:text-white transition-colors">
+                  Privacy
+                </Link>
+                <Link href="/terms" className="hover:text-white transition-colors">
+                  Terms
+                </Link>
+              </div>
             </div>
           </div>
         </div>

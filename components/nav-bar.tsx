@@ -271,44 +271,44 @@ export function NavBar() {
   const MobileNavItem = ({ item }: { item: (typeof navItems)[0] }) => (
     <div className="border-b border-gray-800">
       <button
-        className="flex w-full items-center justify-between py-6 text-2xl font-serif"
+        className="flex w-full items-center justify-between py-6 text-2xl font-serif text-white"
         onClick={() => toggleExpanded(item.title)}
       >
         {item.title}
         {item.items.length > 0 &&
           (expandedItems.includes(item.title) ? (
-            <Minus className="h-5 w-5" />
+            <Minus className="h-5 w-5 text-white" />
           ) : (
-            <Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5 text-white" />
           ))}
       </button>
       {expandedItems.includes(item.title) && item.items.length > 0 && (
-        <div className="pb-6">
+        <div className="pb-4">
           {item.items.map((subItem, index) => (
-            <div key={index} className="py-3">
+            <div key={index} className="py-1.5">
               {subItem.subItems ? (
                 <div>
                   <Link
                     href={subItem.href || "#"}
                     className={cn(
-                      "flex w-full items-center justify-between text-xl font-cerebri font-normal text-gray-300 hover:text-white"
+                      "flex w-full items-center justify-between text-lg font-cerebri font-normal text-gray-300 hover:text-white"
                     )}
                     onClick={handleLinkClick}
                   >
                     {subItem.name}
                     {expandedItems.includes(`${item.title}-${subItem.name}`) ? (
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-4 w-4 text-gray-300" />
                     ) : (
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-gray-300" />
                     )}
                   </Link>
                   {expandedItems.includes(`${item.title}-${subItem.name}`) && (
-                    <div className="ml-4 mt-3 space-y-3">
+                    <div className="ml-4 mt-2 space-y-1.5">
                       {subItem.subItems.map((nestedItem, nestedIndex) => (
                         <Link
                           key={nestedIndex}
                           href={subItem.href || "#"}
-                          className="block text-lg font-cerebri font-light text-gray-400 hover:text-white"
+                          className="block text-base font-cerebri font-light text-gray-400 hover:text-white"
                           onClick={handleLinkClick}
                         >
                           {nestedItem.toUpperCase()}
@@ -320,7 +320,7 @@ export function NavBar() {
               ) : (
                 <Link
                   href={subItem.href || "#"}
-                  className="block text-xl font-cerebri font-light text-gray-300 hover:text-white"
+                  className="block text-base font-cerebri font-light text-gray-300 hover:text-white"
                   onClick={handleLinkClick}
                 >
                   {subItem.name.toUpperCase()}
@@ -363,10 +363,10 @@ export function NavBar() {
                 <div className="relative group border-r flex items-center">
                   <button
                     className={cn(
-                      "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
+                      "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none text-white",
                       isScrolled
-                        ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
-                        : "text-white hover:text-gray-200",
+                        ? "hover:text-gray-300"
+                        : "hover:text-gray-200",
                     )}
                     onMouseEnter={() => {
                       setActiveItem(item.title)
@@ -384,10 +384,10 @@ export function NavBar() {
             <a
               href="tel:9497067874"
               className={cn(
-                "hidden md:flex items-center h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
+                "hidden md:flex items-center h-16 px-4 text-sm font-cerebri font-normal focus:outline-none text-white",
                 isScrolled
-                  ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
-                  : "text-white hover:text-gray-200"
+                  ? "hover:text-gray-300"
+                  : "hover:text-gray-200"
               )}
             >
               949-706-7874
@@ -395,10 +395,10 @@ export function NavBar() {
             <div className="relative group border-l flex items-center h-16 hidden md:flex">
               <button
                 className={cn(
-                  "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none",
+                  "h-16 px-4 text-sm font-cerebri font-normal focus:outline-none text-white",
                   isScrolled
-                    ? "text-gray-900 hover:text-gray-600 dark:text-white dark:hover:text-gray-300"
-                    : "text-white hover:text-gray-200",
+                    ? "hover:text-gray-300"
+                    : "hover:text-gray-200",
                 )}
                 onMouseEnter={() => {
                   setActiveItem("RESOURCES")
@@ -415,17 +415,17 @@ export function NavBar() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "md:hidden h-16 px-4",
-                    isScrolled ? "text-gray-900 dark:text-white" : "text-white hover:text-gray-200"
+                    "md:hidden h-16 px-4 text-white",
+                    isScrolled ? "hover:text-gray-300" : "hover:text-gray-200"
                   )}
                 >
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-full p-0 sm:max-w-sm bg-black">
+              <DialogContent className="w-full h-screen max-h-screen p-0 sm:max-w-full bg-black border border-gray-800">
                 <DialogTitle className="sr-only">Navigation Menu</DialogTitle>
-                <div className="px-6 py-8">
+                <div className="px-6 py-8 h-full overflow-y-auto">
                   {navItems.map((item) => (
                     <MobileNavItem key={item.title} item={item} />
                   ))}
