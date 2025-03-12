@@ -10,22 +10,22 @@ const values = [
   {
     title: "Excellence",
     description: "Commitment to the highest standards of medical care and aesthetic results.",
-    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/icons/excellence.svg"
+    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1734100329/icons/excellence-icon_wgbnap.png"
   },
   {
     title: "Innovation",
     description: "Utilizing the latest technologies and techniques in aesthetic medicine.",
-    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/icons/innovation.svg"
+    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1734100329/icons/innovation-icon_jdajrg.png"
   },
   {
     title: "Safety",
     description: "Prioritizing patient safety and well-being in every procedure.",
-    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/icons/safety.svg"
+    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1734100329/icons/safety-icon_qpwl4v.png"
   },
   {
     title: "Personalization",
     description: "Tailoring treatments to each patient's unique goals and anatomy.",
-    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/icons/personalization.svg"
+    icon: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1734100329/icons/personalization-icon_rgyipk.png"
   }
 ]
 
@@ -139,13 +139,13 @@ export default function AboutPage() {
                 viewport={{ once: true }}
                 className="text-center text-white"
               >
-                <div className="mb-6">
+                <div className="mb-6 p-4 bg-zinc-800 rounded-full inline-block mx-auto">
                   <Image
                     src={value.icon}
                     alt={value.title}
-                    width={48}
-                    height={48}
-                    className="mx-auto"
+                    width={80}
+                    height={80}
+                    className="mx-auto object-contain"
                   />
                 </div>
                 <h4 className="text-xl font-serif mb-4">{value.title}</h4>

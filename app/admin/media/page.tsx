@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
-import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import { 
   CloudinaryAsset 
 } from '@/lib/cloudinary';
@@ -76,10 +75,6 @@ export default function MediaLibraryAdmin() {
   const [migrationPlan, setMigrationPlan] = useState<{original: string, proposed: string, cloudinary_id: string}[]>([]);
   const [migrationInProgress, setMigrationInProgress] = useState(false);
   
-  // Cloudinary modal state
-  const [cloudinaryModalOpen, setCloudinaryModalOpen] = useState(false);
-  const [selectedPlaceholderId, setSelectedPlaceholderId] = useState<string | null>(null);
-  
   // Add state for sidebar and content view
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -106,8 +101,8 @@ export default function MediaLibraryAdmin() {
   }, [searchTerm, mediaAssets]);
 
   // Function to handle media selection from Cloudinary
-  const handleMediaSelect = async (cloudinaryId: string) => {
-    if (!selectedPlaceholderId) return;
+  const handleMediaSelect = async (cloudinaryId: string, placeholderId: string) => {
+    if (!placeholderId) return;
     
     try {
       const response = await fetch('/api/site/media-assets', {
@@ -116,7 +111,7 @@ export default function MediaLibraryAdmin() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          placeholder_id: selectedPlaceholderId,
+          placeholder_id: placeholderId,
           cloudinary_id: cloudinaryId,
         }),
       });
@@ -128,9 +123,6 @@ export default function MediaLibraryAdmin() {
       // Refresh the media assets list
       fetchMediaAssets();
       
-      // Close the modal
-      setCloudinaryModalOpen(false);
-      setSelectedPlaceholderId(null);
     } catch (err) {
       setError(`Error updating media asset: ${err instanceof Error ? err.message : String(err)}`);
     }
@@ -333,7 +325,7 @@ export default function MediaLibraryAdmin() {
               const asset = data.assets[0];
               console.log('Selected asset from Media Library:', asset);
               
-              // Here we already know which placeholder to assign to
+              // Use the updated handleMediaSelect function with placeholderId
               updateMediaAssignment(placeholderId, asset);
             } catch (error: any) {
               console.error('Error handling Media Library selection:', error);
@@ -396,85 +388,44 @@ export default function MediaLibraryAdmin() {
   
   // Add a function to organize media assets by actual application structure
   const organizeMediaAssets = (assets: MediaAsset[]) => {
-    // Create a hierarchical structure that mimics the file system
+    // Create a hierarchical structure based on front-end pages
     const structure = {
+      // Root pages
       "homepage": {
         label: "Homepage",
         items: [] as MediaAsset[],
         children: {
           "hero": {
-            label: "Hero",
+            label: "Hero Section",
             items: [] as MediaAsset[]
           },
           "mission-section": {
             label: "Mission Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "plastic-surgery-section": {
             label: "Plastic Surgery Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "dermatology-section": {
             label: "Dermatology Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "medical-spa-section": {
             label: "Medical Spa Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "functional-medicine-section": {
             label: "Functional Medicine Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "team-section": {
             label: "Team Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "about-section": {
             label: "About Section",
-            items: [] as MediaAsset[],
-            children: {
-              "background": {
-                label: "Background",
-                items: [] as MediaAsset[]
-              }
-            }
+            items: [] as MediaAsset[]
           },
           "articles-section": {
             label: "Articles Section",
@@ -483,25 +434,29 @@ export default function MediaLibraryAdmin() {
         }
       },
       "about": {
-        label: "About Pages",
+        label: "About Page",
         items: [] as MediaAsset[],
         children: {
           "hero": {
-            label: "Hero",
+            label: "Hero Section",
             items: [] as MediaAsset[]
           },
           "mission": {
-            label: "Mission",
+            label: "Mission Section",
             items: [] as MediaAsset[]
           },
           "team": {
-            label: "Team",
+            label: "Team Section",
+            items: [] as MediaAsset[]
+          },
+          "values": {
+            label: "Values Section",
             items: [] as MediaAsset[]
           }
         }
       },
       "services": {
-        label: "Services",
+        label: "Services Pages",
         items: [] as MediaAsset[],
         children: {
           "plastic-surgery": {
@@ -509,11 +464,11 @@ export default function MediaLibraryAdmin() {
             items: [] as MediaAsset[],
             children: {
               "hero": {
-                label: "Hero",
+                label: "Hero Section",
                 items: [] as MediaAsset[]
               },
               "procedures": {
-                label: "Procedures",
+                label: "Procedures Section",
                 items: [] as MediaAsset[]
               }
             }
@@ -523,11 +478,11 @@ export default function MediaLibraryAdmin() {
             items: [] as MediaAsset[],
             children: {
               "hero": {
-                label: "Hero",
+                label: "Hero Section",
                 items: [] as MediaAsset[]
               },
               "treatments": {
-                label: "Treatments",
+                label: "Treatments Section",
                 items: [] as MediaAsset[]
               }
             }
@@ -537,11 +492,11 @@ export default function MediaLibraryAdmin() {
             items: [] as MediaAsset[],
             children: {
               "hero": {
-                label: "Hero",
+                label: "Hero Section",
                 items: [] as MediaAsset[]
               },
-              "treatments": {
-                label: "Treatments",
+              "services": {
+                label: "Services Section",
                 items: [] as MediaAsset[]
               }
             }
@@ -551,83 +506,63 @@ export default function MediaLibraryAdmin() {
             items: [] as MediaAsset[],
             children: {
               "hero": {
-                label: "Hero",
+                label: "Hero Section",
                 items: [] as MediaAsset[]
               },
-              "treatments": {
-                label: "Treatments",
+              "therapies": {
+                label: "Therapies Section",
                 items: [] as MediaAsset[]
               }
             }
-          }
-        }
-      },
-      "components": {
-        label: "Shared Components",
-        items: [] as MediaAsset[],
-        children: {
-          "sections": {
-            label: "Sections",
-            items: [] as MediaAsset[],
-            children: {
-              "about-section": {
-                label: "About Section",
-                items: [] as MediaAsset[]
-              },
-              "team-section": {
-                label: "Team Section",
-                items: [] as MediaAsset[]
-              },
-              "dermatology-section": {
-                label: "Dermatology Section",
-                items: [] as MediaAsset[]
-              },
-              "plastic-surgery-section": {
-                label: "Plastic Surgery Section",
-                items: [] as MediaAsset[]
-              },
-              "medical-spa-section": {
-                label: "Medical Spa Section",
-                items: [] as MediaAsset[]
-              },
-              "functional-medicine-section": {
-                label: "Functional Medicine Section",
-                items: [] as MediaAsset[]
-              }
-            }
-          },
-          "ui": {
-            label: "UI Elements",
-            items: [] as MediaAsset[]
-          },
-          "layout": {
-            label: "Layout",
-            items: [] as MediaAsset[]
           }
         }
       },
       "team": {
-        label: "Team",
-        items: [] as MediaAsset[]
-      },
-      "articles": {
-        label: "Articles",
-        items: [] as MediaAsset[]
-      },
-      "gallery": {
-        label: "Gallery",
-        items: [] as MediaAsset[]
-      },
-      "out-of-town": {
-        label: "Out of Town",
+        label: "Team Page",
         items: [] as MediaAsset[],
         children: {
           "hero": {
-            label: "Hero",
+            label: "Hero Section",
+            items: [] as MediaAsset[]
+          },
+          "doctors": {
+            label: "Doctors Section",
+            items: [] as MediaAsset[]
+          },
+          "staff": {
+            label: "Staff Section",
+            items: [] as MediaAsset[]
+          }
+        }
+      },
+      "gallery": {
+        label: "Gallery Page",
+        items: [] as MediaAsset[],
+        children: {
+          "plastic-surgery": {
+            label: "Plastic Surgery",
+            items: [] as MediaAsset[]
+          },
+          "dermatology": {
+            label: "Dermatology",
+            items: [] as MediaAsset[]
+          },
+          "medical-spa": {
+            label: "Medical Spa",
+            items: [] as MediaAsset[]
+          }
+        }
+      },
+      "out-of-town": {
+        label: "Out of Town Page",
+        items: [] as MediaAsset[],
+        children: {
+          "hero": {
+            label: "Hero Section",
             items: [] as MediaAsset[]
           },
           "accommodations": {
-            label: "Accommodations",
+            label: "Accommodations Section",
             items: [] as MediaAsset[],
             children: {
               "pendry": {
@@ -646,12 +581,16 @@ export default function MediaLibraryAdmin() {
           }
         }
       },
-      "financing": {
-        label: "Financing",
+      "articles": {
+        label: "Articles Pages",
         items: [] as MediaAsset[]
       },
       "contact": {
-        label: "Contact",
+        label: "Contact Page",
+        items: [] as MediaAsset[]
+      },
+      "financing": {
+        label: "Financing Page",
         items: [] as MediaAsset[]
       },
       "global": {
@@ -669,6 +608,10 @@ export default function MediaLibraryAdmin() {
           "backgrounds": {
             label: "Backgrounds",
             items: [] as MediaAsset[]
+          },
+          "ui": {
+            label: "UI Elements",
+            items: [] as MediaAsset[]
           }
         }
       },
@@ -677,195 +620,194 @@ export default function MediaLibraryAdmin() {
         items: [] as MediaAsset[]
       }
     };
-
+    
     // Function to place an asset in the structure
     const placeAsset = (asset: MediaAsset) => {
       const id = asset.placeholder_id.toLowerCase();
-      const parts = id.split('-');
       
-      // Try to match by specific patterns and place in the structure
       // Homepage sections
-      if (id.match(/^home-hero/) || id === 'hero-home') {
+      if (id.startsWith('homepage-hero') || id.startsWith('home-hero')) {
         structure.homepage.children.hero.items.push(asset);
       }
-      else if (id.match(/^home-mission/) || id.match(/^mission-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["mission-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["mission-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-mission') || id.includes('home-mission')) {
+        structure.homepage.children["mission-section"].items.push(asset);
       }
-      else if (id.match(/^home-plastic-surgery/) || id.match(/^plastic-surgery-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["plastic-surgery-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["plastic-surgery-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-plastic-surgery') || id.includes('home-plastic-surgery')) {
+        structure.homepage.children["plastic-surgery-section"].items.push(asset);
       }
-      else if (id.match(/^home-dermatology/) || id.match(/^dermatology-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["dermatology-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["dermatology-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-dermatology') || id.includes('home-dermatology')) {
+        structure.homepage.children["dermatology-section"].items.push(asset);
       }
-      else if (id.match(/^home-medical-spa/) || id.match(/^medical-spa-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["medical-spa-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["medical-spa-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-medical-spa') || id.includes('home-medical-spa')) {
+        structure.homepage.children["medical-spa-section"].items.push(asset);
       }
-      else if (id.match(/^home-functional-medicine/) || id.match(/^functional-medicine-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["functional-medicine-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["functional-medicine-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-functional-medicine') || id.includes('home-functional-medicine')) {
+        structure.homepage.children["functional-medicine-section"].items.push(asset);
       }
-      else if (id.match(/^home-team/) || id.match(/^team-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["team-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["team-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-team') || id.includes('home-team')) {
+        structure.homepage.children["team-section"].items.push(asset);
       }
-      else if (id.match(/^home-about/) || id.match(/^about-section/)) {
-        if (id.includes('background')) {
-          structure.homepage.children["about-section"].children.background.items.push(asset);
-        } else {
-          structure.homepage.children["about-section"].items.push(asset);
-        }
+      else if (id.includes('homepage-about') || id.includes('home-about')) {
+        structure.homepage.children["about-section"].items.push(asset);
       }
-      else if (id.match(/^home-articles/) || id.match(/^articles-section/)) {
+      else if (id.includes('homepage-articles') || id.includes('home-articles')) {
         structure.homepage.children["articles-section"].items.push(asset);
       }
+      else if (id.startsWith('homepage-') || id.startsWith('home-')) {
+        structure.homepage.items.push(asset);
+      }
+      
       // About page
-      else if (id.match(/^about-hero/)) {
+      else if (id.startsWith('about-hero')) {
         structure.about.children.hero.items.push(asset);
       }
-      else if (id.match(/^about-mission/)) {
+      else if (id.includes('about-mission')) {
         structure.about.children.mission.items.push(asset);
       }
-      else if (id.match(/^about-team/)) {
+      else if (id.includes('about-team')) {
         structure.about.children.team.items.push(asset);
       }
-      else if (id.match(/^about/)) {
+      else if (id.includes('about-values')) {
+        structure.about.children.values.items.push(asset);
+      }
+      else if (id.startsWith('about-')) {
         structure.about.items.push(asset);
       }
-      // Services and sub-pages
-      else if (id.match(/^services-plastic-surgery-hero/)) {
+      
+      // Services pages (including sub-pages)
+      else if (id.startsWith('services-plastic-surgery-hero')) {
         structure.services.children["plastic-surgery"].children.hero.items.push(asset);
       }
-      else if (id.match(/^services-plastic-surgery-procedures/)) {
+      else if (id.includes('services-plastic-surgery-procedures')) {
         structure.services.children["plastic-surgery"].children.procedures.items.push(asset);
       }
-      else if (id.match(/^services-plastic-surgery/)) {
+      else if (id.startsWith('services-plastic-surgery')) {
         structure.services.children["plastic-surgery"].items.push(asset);
       }
-      else if (id.match(/^services-dermatology-hero/)) {
+      else if (id.startsWith('services-dermatology-hero')) {
         structure.services.children.dermatology.children.hero.items.push(asset);
       }
-      else if (id.match(/^services-dermatology-treatments/)) {
+      else if (id.includes('services-dermatology-treatments')) {
         structure.services.children.dermatology.children.treatments.items.push(asset);
       }
-      else if (id.match(/^services-dermatology/)) {
+      else if (id.startsWith('services-dermatology')) {
         structure.services.children.dermatology.items.push(asset);
       }
-      else if (id.match(/^services-medical-spa-hero/)) {
+      else if (id.startsWith('services-medical-spa-hero')) {
         structure.services.children["medical-spa"].children.hero.items.push(asset);
       }
-      else if (id.match(/^services-medical-spa-treatments/)) {
-        structure.services.children["medical-spa"].children.treatments.items.push(asset);
+      else if (id.includes('services-medical-spa-services')) {
+        structure.services.children["medical-spa"].children.services.items.push(asset);
       }
-      else if (id.match(/^services-medical-spa/)) {
+      else if (id.startsWith('services-medical-spa')) {
         structure.services.children["medical-spa"].items.push(asset);
       }
-      else if (id.match(/^services-functional-medicine-hero/)) {
+      else if (id.startsWith('services-functional-medicine-hero')) {
         structure.services.children["functional-medicine"].children.hero.items.push(asset);
       }
-      else if (id.match(/^services-functional-medicine-treatments/)) {
-        structure.services.children["functional-medicine"].children.treatments.items.push(asset);
+      else if (id.includes('services-functional-medicine-therapies')) {
+        structure.services.children["functional-medicine"].children.therapies.items.push(asset);
       }
-      else if (id.match(/^services-functional-medicine/)) {
+      else if (id.startsWith('services-functional-medicine')) {
         structure.services.children["functional-medicine"].items.push(asset);
       }
-      else if (id.match(/^services/)) {
+      else if (id.startsWith('services-')) {
         structure.services.items.push(asset);
       }
-      // Components
-      else if (id.includes('about-section')) {
-        structure.components.children.sections.children["about-section"].items.push(asset);
+      
+      // Team page
+      else if (id.startsWith('team-hero')) {
+        structure.team.children.hero.items.push(asset);
       }
-      else if (id.includes('team-section')) {
-        structure.components.children.sections.children["team-section"].items.push(asset);
+      else if (id.includes('team-doctors')) {
+        structure.team.children.doctors.items.push(asset);
       }
-      else if (id.includes('dermatology-section')) {
-        structure.components.children.sections.children["dermatology-section"].items.push(asset);
+      else if (id.includes('team-staff')) {
+        structure.team.children.staff.items.push(asset);
       }
-      else if (id.includes('plastic-surgery-section')) {
-        structure.components.children.sections.children["plastic-surgery-section"].items.push(asset);
-      }
-      else if (id.includes('medical-spa-section')) {
-        structure.components.children.sections.children["medical-spa-section"].items.push(asset);
-      }
-      else if (id.includes('functional-medicine-section')) {
-        structure.components.children.sections.children["functional-medicine-section"].items.push(asset);
-      }
-      else if (id.includes('ui/')) {
-        structure.components.children.ui.items.push(asset);
-      }
-      else if (id.includes('layout/')) {
-        structure.components.children.layout.items.push(asset);
-      }
-      // Out of town
-      else if (id.match(/^out-of-town-hero/)) {
-        structure["out-of-town"].children.hero.items.push(asset);
-      }
-      else if (id.match(/^out-of-town-accommodations-pendry/)) {
-        structure["out-of-town"].children.accommodations.children.pendry.items.push(asset);
-      }
-      else if (id.match(/^out-of-town-accommodations-pelican/)) {
-        structure["out-of-town"].children.accommodations.children["pelican-hill"].items.push(asset);
-      }
-      else if (id.match(/^out-of-town-accommodations-lido/)) {
-        structure["out-of-town"].children.accommodations.children["lido-house"].items.push(asset);
-      }
-      else if (id.match(/^out-of-town-accommodations/)) {
-        structure["out-of-town"].children.accommodations.items.push(asset);
-      }
-      else if (id.match(/^out-of-town/)) {
-        structure["out-of-town"].items.push(asset);
-      }
-      // Other top-level sections
-      else if (id.match(/^team/)) {
+      else if (id.startsWith('team-')) {
         structure.team.items.push(asset);
       }
-      else if (id.match(/^articles/)) {
-        structure.articles.items.push(asset);
+      
+      // Gallery
+      else if (id.startsWith('gallery-plastic-surgery')) {
+        structure.gallery.children["plastic-surgery"].items.push(asset);
       }
-      else if (id.match(/^gallery/)) {
+      else if (id.startsWith('gallery-dermatology')) {
+        structure.gallery.children.dermatology.items.push(asset);
+      }
+      else if (id.startsWith('gallery-medical-spa')) {
+        structure.gallery.children["medical-spa"].items.push(asset);
+      }
+      else if (id.startsWith('gallery-')) {
         structure.gallery.items.push(asset);
       }
-      else if (id.match(/^financing/)) {
-        structure.financing.items.push(asset);
+      
+      // Out of town
+      else if (id.startsWith('out-of-town-hero')) {
+        structure["out-of-town"].children.hero.items.push(asset);
       }
-      else if (id.match(/^contact/)) {
+      else if (id.startsWith('out-of-town-accommodations-pendry')) {
+        structure["out-of-town"].children.accommodations.children.pendry.items.push(asset);
+      }
+      else if (id.startsWith('out-of-town-accommodations-pelican')) {
+        structure["out-of-town"].children.accommodations.children["pelican-hill"].items.push(asset);
+      }
+      else if (id.startsWith('out-of-town-accommodations-lido')) {
+        structure["out-of-town"].children.accommodations.children["lido-house"].items.push(asset);
+      }
+      else if (id.startsWith('out-of-town-accommodations')) {
+        structure["out-of-town"].children.accommodations.items.push(asset);
+      }
+      else if (id.startsWith('out-of-town')) {
+        structure["out-of-town"].items.push(asset);
+      }
+      
+      // Other simple pages
+      else if (id.startsWith('articles')) {
+        structure.articles.items.push(asset);
+      }
+      else if (id.startsWith('contact')) {
         structure.contact.items.push(asset);
       }
+      else if (id.startsWith('financing')) {
+        structure.financing.items.push(asset);
+      }
+      
       // Global elements
-      else if (id.match(/^global-logo/) || id.match(/^logo/)) {
+      else if (id.startsWith('global-logo') || id.startsWith('logo')) {
         structure.global.children.logo.items.push(asset);
       }
-      else if (id.match(/^global-icon/) || id.match(/^icon/)) {
+      else if (id.startsWith('global-icon') || id.startsWith('icon')) {
         structure.global.children.icons.items.push(asset);
       }
-      else if (id.match(/^global-background/) || id.match(/^background/)) {
+      else if (id.startsWith('global-background') || id.startsWith('background')) {
         structure.global.children.backgrounds.items.push(asset);
       }
-      else if (id.match(/^global/) || id.match(/^general/)) {
+      else if (id.startsWith('global-ui') || id.includes('button') || id.includes('form') || id.includes('input')) {
+        structure.global.children.ui.items.push(asset);
+      }
+      else if (id.startsWith('global')) {
         structure.global.items.push(asset);
       }
+      
+      // Handle any specific section components that might be mixed in
+      else if (id.includes('mission-section')) {
+        structure.homepage.children["mission-section"].items.push(asset);
+      }
+      else if (id.includes('plastic-surgery-section')) {
+        structure.homepage.children["plastic-surgery-section"].items.push(asset);
+      }
+      else if (id.includes('dermatology-section')) {
+        structure.homepage.children["dermatology-section"].items.push(asset);
+      }
+      else if (id.includes('medical-spa-section')) {
+        structure.homepage.children["medical-spa-section"].items.push(asset);
+      }
+      else if (id.includes('functional-medicine-section')) {
+        structure.homepage.children["functional-medicine-section"].items.push(asset);
+      }
+      
       // Fallback for any other assets
       else {
         structure.misc.items.push(asset);
@@ -875,8 +817,6 @@ export default function MediaLibraryAdmin() {
     // Place all assets in the structure
     assets.forEach(placeAsset);
 
-    // Convert structure to a flattened format for rendering
-    // (We'll handle nesting in the rendering logic)
     return structure;
   };
   
@@ -1068,8 +1008,8 @@ export default function MediaLibraryAdmin() {
     } else {
       placeholderId = `${sectionKey}-new`;
     }
-    setSelectedPlaceholderId(placeholderId);
-    setCloudinaryModalOpen(true);
+    // Instead of opening the CloudinaryUploader component, use the Media Library widget
+    openMediaLibraryForPlaceholder(placeholderId);
   };
 
   // Sidebar component that looks like VS Code file explorer
@@ -1121,7 +1061,7 @@ export default function MediaLibraryAdmin() {
     }, [structure, searchTerm]);
 
     return (
-      <div className="w-64 h-full overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+      <div className="w-64 h-full overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black">
         <div className="p-3 font-medium text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Media Explorer
           {searchTerm && (
@@ -1237,7 +1177,7 @@ export default function MediaLibraryAdmin() {
   const MainContent = ({ structure }: { structure: any }) => {
     if (!selectedCategory) {
       return (
-        <div className="flex-1 p-6 flex items-center justify-center text-gray-400 dark:text-gray-600">
+        <div className="flex-1 p-6 flex items-center justify-center text-gray-400 dark:text-gray-600 bg-white dark:bg-black">
           <div className="text-center">
             <svg className="h-16 w-16 mx-auto mb-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -1260,9 +1200,9 @@ export default function MediaLibraryAdmin() {
     // If category doesn't exist or has no items
     if (!currentCategory || !currentCategory.items) {
       return (
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 bg-white dark:bg-black">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold dark:text-white">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {currentCategory?.label || 'Unknown Category'}
             </h2>
             <button
@@ -1283,9 +1223,9 @@ export default function MediaLibraryAdmin() {
     }
     
     return (
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6 overflow-auto bg-white dark:bg-black">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold dark:text-white">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {currentCategory.label}
           </h2>
           <button
@@ -1311,7 +1251,7 @@ export default function MediaLibraryAdmin() {
                 className="border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden bg-white dark:bg-gray-800"
               >
                 <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                  <div className="truncate text-sm font-medium">
+                  <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
                     {asset.placeholder_id.split('-').pop() || asset.placeholder_id}
                   </div>
                   <button
@@ -1353,9 +1293,9 @@ export default function MediaLibraryAdmin() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-950">
+    <div className="h-full flex flex-col bg-white dark:bg-black">
       <div className="border-b border-gray-200 dark:border-gray-800 p-4">
-        <h1 className="text-xl font-bold dark:text-white">Media Library</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Media Library</h1>
         <div className="flex items-center mt-2">
           <div className="relative flex-1 max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1366,16 +1306,22 @@ export default function MediaLibraryAdmin() {
             <input
               type="text"
               placeholder="Search media assets..."
-              className="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-800 rounded text-sm bg-white dark:bg-black"
+              className="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-800 rounded text-sm text-gray-900 bg-white dark:text-white dark:bg-gray-900"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="ml-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="ml-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             New Placeholder
+          </button>
+          <button
+            onClick={openMediaLibrary}
+            className="ml-2 px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Browse All Media
           </button>
         </div>
       </div>
@@ -1390,7 +1336,7 @@ export default function MediaLibraryAdmin() {
               <select
                 value={newPlaceholder.page}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, page: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
               >
                 <option value="global">Global</option>
                 <option value="homepage">Homepage</option>
@@ -1418,7 +1364,7 @@ export default function MediaLibraryAdmin() {
                 value={newPlaceholder.section}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, section: e.target.value})}
                 placeholder="e.g. hero, mission, team"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
               />
             </div>
             
@@ -1431,7 +1377,7 @@ export default function MediaLibraryAdmin() {
                 value={newPlaceholder.element}
                 onChange={(e) => setNewPlaceholder({...newPlaceholder, element: e.target.value})}
                 placeholder="e.g. background, logo, image-1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 dark:bg-black"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-700 text-gray-900 dark:text-white bg-white dark:bg-gray-900"
               />
             </div>
           </div>
@@ -1446,7 +1392,7 @@ export default function MediaLibraryAdmin() {
             <div className="flex space-x-2">
               <button
                 onClick={() => setShowCreateForm(false)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md dark:border-gray-700"
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
@@ -1474,37 +1420,24 @@ export default function MediaLibraryAdmin() {
       
       {/* Cloudinary Media Library Modal */}
       <div id="cloudinaryLibraryContainer" className="hidden">
-        {cloudinaryModalOpen && selectedPlaceholderId && (
-          <CloudinaryUploader
-            onSuccess={(result) => {
-              // Extract the public_id from the result as cloudinaryId
-              const cloudinaryId = typeof result === 'object' && 'publicId' in result 
-                ? result.publicId 
-                : Array.isArray(result) && result.length > 0 && 'publicId' in result[0]
-                  ? result[0].publicId
-                  : null;
-              
-              if (cloudinaryId) {
-                handleMediaSelect(cloudinaryId);
-              }
-            }}
-            onClose={() => {
-              setCloudinaryModalOpen(false);
-              setSelectedPlaceholderId(null);
-            }}
-            autoOpen={true}
-            multiple={false}
-            folder="site-assets"
-            tags={["site-content"]}
-            context={{ placeholder_id: selectedPlaceholderId }}
-          />
-        )}
+        {/* Remove the CloudinaryUploader component as we're using the Media Library widget directly */}
       </div>
       
       {/* Cloudinary Widget Script */}
       <Script
         src="https://widget.cloudinary.com/v2.0/global/all.js"
-        onLoad={() => console.log('Cloudinary widget loaded')}
+        onLoad={() => {
+          console.log('Cloudinary widget loaded');
+          setScriptLoaded(true);
+        }}
+      />
+      {/* Cloudinary Media Library Script */}
+      <Script
+        src="https://media-library.cloudinary.com/global/all.js"
+        onLoad={() => {
+          console.log('Cloudinary media library loaded');
+          setScriptLoaded(true);
+        }}
       />
     </div>
   );

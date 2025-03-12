@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { organizeAssets, createCollection } from '@/lib/cloudinary-server-actions';
 import type { OrganizeOptions } from '@/lib/cloudinary';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {

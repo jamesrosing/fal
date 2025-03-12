@@ -6,14 +6,16 @@ This document provides a comprehensive guide to the unified Cloudinary integrati
 
 1. [Overview](#overview)
 2. [Environment Configuration](#environment-configuration)
-3. [Utility Functions](#utility-functions)
-4. [Components](#components)
-5. [API Routes](#api-routes)
-6. [Image Areas and Placements](#image-areas-and-placements)
-7. [Best Practices](#best-practices)
-8. [Media Management System](#media-management-system)
-9. [Testing Your Implementation](#testing-your-implementation)
-10. [Migration Guide](#migration-guide)
+3. [Runtime Considerations](#runtime-considerations)
+4. [Utility Functions](#utility-functions)
+5. [Components](#components)
+6. [API Routes](#api-routes)
+7. [Image Areas and Placements](#image-areas-and-placements)
+8. [Best Practices](#best-practices)
+9. [Media Management System](#media-management-system)
+10. [Testing Your Implementation](#testing-your-implementation)
+11. [Troubleshooting](#troubleshooting)
+12. [Cloudinary Folder Organization](#cloudinary-folder-organization)
 
 ## Overview
 
@@ -34,7 +36,7 @@ To use Cloudinary in your application, you need to set up the proper environment
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-CLOUDINARY_UPLOAD_PRESET=your_unsigned_upload_preset  # Optional, for client-side uploads
+CLOUDINARY_UPLOAD_PRESET=preset
 ```
 
 ### Required Variables
@@ -46,17 +48,33 @@ CLOUDINARY_UPLOAD_PRESET=your_unsigned_upload_preset  # Optional, for client-sid
 
 ### Configuration in the Application
 
-The application loads these environment variables in `lib/cloudinary.ts`:
+The main Cloudinary configuration files in our application:
 
-```typescript
-// Client-side configuration
-export const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '';
-export const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '';
-export const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fal_uploads';
+1. **Client-side configurations** (`lib/cloudinary.ts`):
+   ```typescript
+   const cloudinaryConfig = {
+     cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+     apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+     uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+   };
+   ```
 
-// Server-side configuration (only used in server components/API routes)
-export const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
-```
+2. **Server-side configurations** (`lib/cloudinary-server.ts`):
+   ```typescript
+   import { v2 as cloudinary } from 'cloudinary';
+
+   // Only configure if we're on the server side
+   if (typeof window === 'undefined') {
+     cloudinary.config({
+       cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+       api_key: process.env.CLOUDINARY_API_KEY,
+       api_secret: process.env.CLOUDINARY_API_SECRET,
+       secure: true,
+     });
+   }
+
+   export default cloudinary;
+   ```
 
 ### Troubleshooting Environment Issues
 
@@ -64,11 +82,60 @@ export const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
 - For upload failures, verify your API key, secret, and upload preset.
 - For production deployments, ensure all environment variables are properly configured in your hosting platform.
 
-Remember to keep your local development environment in sync with your production Cloudinary setup by using consistent folder structures across environments.
+## Runtime Considerations
+
+When working with Cloudinary in Next.js, be aware of runtime differences between client, server, and edge environments:
+
+### Node.js Runtime vs Edge Runtime
+
+- **Node.js Runtime**: Provides full access to Node.js built-in modules like `http`, `https`, `crypto`, `stream`, etc.
+- **Edge Runtime**: Lightweight runtime that doesn't support Node.js built-in modules.
+
+### Considerations for API Routes
+
+- **Node.js-dependent operations**: Use Node.js runtime for operations that require the Cloudinary SDK
+- **Simple operations**: Use Edge runtime for lightweight operations that don't require Node.js modules
+
+### Runtime Configuration
+
+Configure the runtime for API routes using the `runtime` export:
+
+```typescript
+// For routes that use Cloudinary SDK features:
+export const runtime = 'nodejs';
+
+// For lightweight routes:
+export const runtime = 'edge';
+```
+
+### Webpack Configuration
+
+Our application includes necessary webpack configuration to handle Node.js modules in the browser:
+
+```typescript
+// next.config.ts
+webpack: (config, { isServer }) => {
+  // Handle Cloudinary Node.js dependencies
+  if (!isServer) {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+      crypto: false,
+      stream: false,
+      os: false,
+      http: false,
+      https: false,
+      zlib: false,
+    };
+  }
+  return config;
+}
+```
 
 ## Utility Functions
 
-All Cloudinary utility functions are centralized in the `lib/cloudinary.ts` file. This file provides:
+All Cloudinary utility functions are centralized in the `lib/cloudinary.ts` file. Here are the main utility functions:
 
 ### URL Generation
 
@@ -126,6 +193,8 @@ initUploadWidget({
 ```
 
 ### Server-side Operations
+
+Our server-side operations are defined in `lib/cloudinary-server-actions.ts` as server actions:
 
 ```typescript
 // Organize assets with tags, folders, and context
@@ -254,31 +323,9 @@ Key features:
 
 We provide API routes for server-side Cloudinary operations:
 
-### `/api/upload`
-
-Handles file uploads and deletions:
-
-```typescript
-// Upload a file
-const formData = new FormData();
-formData.append('file', file);
-formData.append('area', 'hero');
-const response = await fetch('/api/upload', {
-  method: 'POST',
-  body: formData
-});
-
-// Delete a file
-const response = await fetch('/api/upload', {
-  method: 'DELETE',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ public_id: 'public-id' })
-});
-```
-
 ### `/api/cloudinary/organize`
 
-Manages asset organization:
+Handles asset organization with tags, folders, and collections. Uses Node.js runtime for Cloudinary SDK compatibility:
 
 ```typescript
 // Organize assets
@@ -327,6 +374,53 @@ const data = await response.json();
 // data.tags - array of tag names
 ```
 
+### `/api/cloudinary/asset-usage`
+
+Tracks and retrieves asset usage across the site:
+
+```typescript
+// Get usage information for an asset
+const response = await fetch(`/api/cloudinary/asset-usage?publicId=${publicId}`);
+const usageData = await response.json();
+```
+
+### `/api/cloudinary/folders`
+
+Manages folder structure:
+
+```typescript
+// Get folder structure
+const response = await fetch('/api/cloudinary/folders');
+const folders = await response.json();
+```
+
+### `/api/cloudinary/duplicates`
+
+Identifies and manages duplicate assets:
+
+```typescript
+// Find duplicate assets
+const response = await fetch('/api/cloudinary/duplicates');
+const duplicates = await response.json();
+```
+
+### `/api/cloudinary/signed-upload`
+
+Generates signed upload parameters for secure client-side uploads:
+
+```typescript
+// Get signed upload parameters
+const response = await fetch('/api/cloudinary/signed-upload', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    folder: 'uploads',
+    tags: ['user-generated']
+  })
+});
+const signatureData = await response.json();
+```
+
 ## Image Areas and Placements
 
 We've defined standard image areas with recommended dimensions and transformations:
@@ -357,11 +451,17 @@ We've defined standard image areas with recommended dimensions and transformatio
 
 7. **Fallbacks**: Provide fallback images for error handling.
 
-8. **Upload Widget**: Use the CloudinaryUploader component for consistent upload experiences.
+8. **Consider Runtime Environment**: Remember which runtime your API routes are using:
+   - For operations needing the full Cloudinary SDK, use `export const runtime = 'nodejs'`
+   - For lightweight operations, use `export const runtime = 'edge'`
 
 9. **Limit Client-side API Calls**: Use the API routes for all operations that require authentication.
 
 10. **Optimize for Performance**: Use format `auto` and quality `auto` for optimal compression.
+
+11. **Bundle Size Optimization**: Use dynamic imports for Cloudinary-related code when possible.
+
+12. **Use Next Cloudinary Library**: Consider using the `next-cloudinary` library for enhanced integration with Next.js Image component.
 
 ## Media Management System
 
@@ -376,13 +476,54 @@ The `MediaManagement` component provides a user-friendly interface for:
 - Editing asset metadata
 - Performing bulk operations (delete, tag, organize)
 
-### 2. API Endpoints
+### 2. Cloudinary Media Library Widget Integration
+
+We've integrated the official Cloudinary Media Library widget in our `/admin/media` page. This widget offers a comprehensive interface for:
+- Browsing and searching your Cloudinary media assets
+- Uploading new assets directly to Cloudinary
+- Organizing assets with folders, tags, and collections
+- Managing metadata and transformations
+- Performing bulk operations
+
+To integrate the Media Library widget, we use Cloudinary's official JavaScript SDK:
+
+```javascript
+// Initialize the Media Library widget
+const mediaLibrary = cloudinary.createMediaLibrary({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  multiple: true,
+  max_files: 10,
+  folder: {
+    path: 'folder/path',  // Optional starting folder
+    resource_type: 'image' // Optional filter by resource type
+  }
+}, {
+  insertHandler: function(data) {
+    // Handle selected assets
+    console.log('Selected assets:', data.assets);
+  }
+});
+
+// Open the Media Library widget
+mediaLibrary.show();
+```
+
+Configuration options include:
+- Selection mode (single/multiple)
+- Resource filtering
+- Custom folder navigation
+- UI customization
+- Upload presets
+- Authentication and access control
+
+### 3. API Endpoints
 
 - `/api/cloudinary/assets` - Fetches assets with filtering, search, and pagination
 - `/api/cloudinary/organizers` - Gets available folders and tags
-- `/api/cloudinary/organize` - Handles asset organization
+- `/api/cloudinary/organize` - Handles asset organization (uses Node.js runtime)
 
-### 3. Admin Integration
+### 4. Admin Integration
 
 The media management system is integrated into the admin dashboard at `/admin/media`, providing a complete solution for managing media assets.
 
@@ -480,75 +621,104 @@ You can test the API endpoints using your browser's developer tools or a tool li
 2. **Missing Images**: Verify the public ID is correct and the asset exists in your Cloudinary account.
 3. **Performance Issues**: Ensure you're using appropriate transformations and optimizations.
 4. **CORS Errors**: Check your Cloudinary CORS configuration if you encounter cross-origin issues.
+5. **Runtime Errors**: If you encounter errors related to missing Node.js modules, check the runtime configuration of your API routes.
 
-## Migration Guide
+## Troubleshooting
 
-If you're migrating from the old approach to our unified Cloudinary integration:
+Here are solutions for common issues you might encounter when working with Cloudinary:
 
-1. Replace direct Cloudinary URL references with the CloudinaryImage component:
+### Image Loading Issues
 
-   ```tsx
-   // Before
-   <Image 
-     src="https://res.cloudinary.com/yourcloud/image/upload/v1234/example" 
-     alt="Example" 
-     width={800} 
-     height={600} 
-   />
+1. **Images Not Loading**
+   - Check your `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is correctly set
+   - Verify the publicId is correct (including folder structure)
+   - Ensure you're using the correct format (e.g., `publicId="services/dermatology/image"` not `publicId="services-dermatology-image"`)
+   - Check the browser console for errors
 
-   // After
-   <CloudinaryImage 
-     publicId="example" 
-     alt="Example" 
-     options={{ width: 800, height: 600 }} 
-   />
-   ```
+2. **Broken Images After Migration**
+   - Make sure you've run the migration scripts completely
+   - Check for typos in folder paths or publicIds
+   - Use the `CloudinaryImage` component with proper error handling
 
-2. Replace video embeds with the CloudinaryVideo component:
+3. **Slow Loading Images**
+   - Ensure you're using appropriate transformations (width/height)
+   - Add format and quality parameters (f_auto, q_auto)
+   - Consider implementing responsive sizing with srcset
 
-   ```tsx
-   // Before
-   <video controls>
-     <source src="https://res.cloudinary.com/yourcloud/video/upload/v1234/example.mp4" type="video/mp4" />
-   </video>
+### Upload Issues
 
-   // After
-   <CloudinaryVideo 
-     publicId="example" 
-     controls 
-   />
-   ```
+1. **Upload Failures**
+   - Verify your API key and secret are correct
+   - Check that your upload preset exists and is properly configured
+   - Ensure the file size is within limits
+   - Look for CORS issues if uploading from the browser
 
-3. Replace upload forms with the CloudinaryUploader component:
+2. **Wrong Folder Uploads**
+   - Confirm folder paths in upload configuration
+   - Ensure folders exist in Cloudinary before uploading
 
-   ```tsx
-   // Before (using custom upload form)
-   // ... complex upload form logic ...
+3. **Duplicate Assets**
+   - Use the `use_filename` parameter to maintain original filenames
+   - Consider enabling `unique_filename: false` for more predictable names
 
-   // After
-   <CloudinaryUploader 
-     area="team" 
-     onSuccess={handleUploadSuccess} 
-   />
-   ```
+### Component Issues
 
-4. Update API calls to use the consolidated API routes.
+1. **CloudinaryImage Errors**
+   - Check for missing required props (publicId, alt)
+   - Verify the import path is correct (`import { CloudinaryImage } from '@/components/CloudinaryImage'`)
+   - Ensure you're passing options correctly
 
-5. Remove imports from the deprecated files:
-   - `lib/cloudinary-client.ts`
-   - `lib/cloudinary-upload.ts`
-   - `lib/cloudinaryLoader.ts`
+2. **Placeholder/Blur Issues**
+   - Verify that blurDataURL is being generated
+   - Check that placeholder="blur" is correctly set
 
-6. Update imports to use the consolidated module:
+### API Route Issues
 
-   ```typescript
-   // Before
-   import { uploadToCloudinary } from '@/lib/cloudinary-upload';
-   import { getCloudinaryUrl } from '@/lib/cloudinary-client';
+1. **Module Not Found Errors**
+   - Check if the API route is using the correct runtime (`nodejs` vs `edge`)
+   - For routes using Cloudinary SDK features, ensure `export const runtime = 'nodejs'`
+   - Verify webpack config includes proper fallbacks for client-side
 
-   // After
-   import { uploadToCloudinary, getCloudinaryUrl } from '@/lib/cloudinary';
-   ```
+2. **Authentication Errors**
+   - Ensure your Cloudinary credentials are properly set in environment variables
+   - Check that the server-side configuration is loading correctly
+
+### Common Error Messages
+
+1. **"Resource not found"**
+   - The publicId doesn't exist in your Cloudinary account
+   - Check for typos in the publicId
+   - Verify the asset exists in the specified folder
+
+2. **"Invalid transformation"**
+   - Review your transformation parameters
+   - Ensure you have access to the specified transformations in your plan
+
+3. **"Missing required parameter"**
+   - Check that all required props are provided to components
+   - Verify API calls include necessary parameters
+
+4. **"Cannot find module 'http', 'https', 'crypto', etc."**
+   - Change the API route runtime from 'edge' to 'nodejs'
+   - These errors occur when trying to use Node.js built-in modules in Edge Runtime
+
+### Debugging Tips
+
+1. **Use the Cloudinary URL Debugger**
+   - Log the full URL being generated (`console.log(getCloudinaryUrl(publicId, options))`)
+   - Test the URL directly in the browser
+
+2. **Check Network Requests**
+   - Use browser dev tools to inspect image requests
+   - Look for 4xx or 5xx errors in the Network tab
+
+3. **Component Debugging**
+   - Add console logs to component lifecycle methods
+   - Use the React DevTools to inspect props and state
+
+4. **API Route Debugging**
+   - Add logging to your API routes
+   - Check the runtime environment variables are available
 
 ## Cloudinary Folder Organization
 
@@ -628,86 +798,4 @@ If you need to reorganize your Cloudinary folders:
 4. Update references in your code to the new public IDs
 5. Use the migration scripts to ensure all references are updated
 
-Remember to keep your local development environment in sync with your production Cloudinary setup by using consistent folder structures across environments.
-
-## Troubleshooting
-
-Here are solutions for common issues you might encounter when working with Cloudinary:
-
-### Image Loading Issues
-
-1. **Images Not Loading**
-   - Check your `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` is correctly set
-   - Verify the publicId is correct (including folder structure)
-   - Ensure you're using the correct format (e.g., `publicId="services/dermatology/image"` not `publicId="services-dermatology-image"`)
-   - Check the browser console for errors
-
-2. **Broken Images After Migration**
-   - Make sure you've run the migration scripts completely
-   - Check for typos in folder paths or publicIds
-   - Use the `CloudinaryImage` component with proper error handling
-
-3. **Slow Loading Images**
-   - Ensure you're using appropriate transformations (width/height)
-   - Add format and quality parameters (f_auto, q_auto)
-   - Consider implementing responsive sizing with srcset
-
-### Upload Issues
-
-1. **Upload Failures**
-   - Verify your API key and secret are correct
-   - Check that your upload preset exists and is properly configured
-   - Ensure the file size is within limits
-   - Look for CORS issues if uploading from the browser
-
-2. **Wrong Folder Uploads**
-   - Confirm folder paths in upload configuration
-   - Ensure folders exist in Cloudinary before uploading
-
-3. **Duplicate Assets**
-   - Use the `use_filename` parameter to maintain original filenames
-   - Consider enabling `unique_filename: false` for more predictable names
-
-### Component Issues
-
-1. **CloudinaryImage Errors**
-   - Check for missing required props (publicId, alt)
-   - Verify the import path is correct (`import { CloudinaryImage } from '@/components/CloudinaryImage'`)
-   - Ensure you're passing options correctly
-
-2. **Placeholder/Blur Issues**
-   - Verify that blurDataURL is being generated
-   - Check that placeholder="blur" is correctly set
-
-### Common Error Messages
-
-1. **"Resource not found"**
-   - The publicId doesn't exist in your Cloudinary account
-   - Check for typos in the publicId
-   - Verify the asset exists in the specified folder
-
-2. **"Invalid transformation"**
-   - Review your transformation parameters
-   - Ensure you have access to the specified transformations in your plan
-
-3. **"Missing required parameter"**
-   - Check that all required props are provided to components
-   - Verify API calls include necessary parameters
-
-### Debugging Tips
-
-1. **Use the Cloudinary URL Debugger**
-   - Log the full URL being generated (`console.log(getCloudinaryUrl(publicId, options))`)
-   - Test the URL directly in the browser
-
-2. **Check Network Requests**
-   - Use browser dev tools to inspect image requests
-   - Look for 4xx or 5xx errors in the Network tab
-
-3. **Component Debugging**
-   - Add console logs to component lifecycle methods
-   - Use the React DevTools to inspect props and state
-
-## Testing Your Implementation
-
-// ... existing code ... 
+Remember to keep your local development environment in sync with your production Cloudinary setup by using consistent folder structures across environments. 

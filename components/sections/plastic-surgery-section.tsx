@@ -3,13 +3,20 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 export function PlasticSurgerySection() {
+  // Use the useMediaAsset hook to get the image url
+  const { url: backgroundImageUrl, isLoading } = useMediaAsset('homepage-plastic-surgery-background', {
+    width: 1920,
+    quality: 80
+  });
+
   return (
     <section className="relative h-screen">
       <div className="absolute inset-0">
         <Image
-          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133484/uncategorized/Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology.png"
+          src={backgroundImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133484/uncategorized/Allure%2520MD%2520Plastic%2520Surgery%2520%2B%2520Dermatology.png"}
           alt="Plastic Surgery at Allure MD"
           fill
           className="object-cover"

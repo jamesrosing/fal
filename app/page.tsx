@@ -7,7 +7,7 @@ import { MedicalSpaSection } from "@/components/sections/medical-spa-section"
 import { FunctionalMedicineSection } from "@/components/sections/functional-medicine-section"
 import { TeamSection } from "@/components/sections/team-section"
 import { AboutSection } from "@/components/sections/about-section"
-import { NewsSection } from "@/components/sections/news-section"
+import { ArticlesSection } from "@/components/sections/articles-section"
 
 export default function Home() {
   return (
@@ -21,7 +21,7 @@ export default function Home() {
       <FunctionalMedicineSection />
       <TeamSection />
       <AboutSection />
-      <NewsSection />
+      <ArticlesSection />
     </main>
   )
 }

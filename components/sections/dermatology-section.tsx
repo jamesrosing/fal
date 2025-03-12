@@ -3,13 +3,20 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 export function DermatologySection() {
+  // Use the useMediaAsset hook to get the image url
+  const { url: backgroundImageUrl } = useMediaAsset('homepage-dermatology-background', {
+    width: 1920,
+    quality: 80
+  });
+
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
         <Image
-          src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133482/uncategorized/susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.png"
+          src={backgroundImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133482/uncategorized/susan%2520pearose%2520skin%2520examination-Jdk8aLXVjRXYUUjqB525YpkY7dPtI3.png"}
           alt="Dermatology examination"
           fill
           className="object-cover"
@@ -37,7 +44,7 @@ export function DermatologySection() {
               all your skin health needs.
             </p>
             <div className="space-y-4">
-              <LearnMoreButton href="/team">Meet Dr. Susan Pearose</LearnMoreButton>
+              <LearnMoreButton href="/team">Meet Susan Pearose</LearnMoreButton>
               <br />
               <LearnMoreButton href="/dermatology">Explore Dermatology Services</LearnMoreButton>
               <br />

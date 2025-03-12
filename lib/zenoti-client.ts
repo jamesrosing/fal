@@ -126,22 +126,24 @@ export class ZenotiClient {
     }
 
     // Add request interceptor for logging
-    instance.interceptors.request.use((config: AxiosRequestConfig) => {
+    instance.interceptors.request.use((config) => {
+      // Type-safe handling of headers
+      const headersToLog: Record<string, string> = {};
+      if (config.headers) {
+        Object.entries(config.headers).forEach(([key, value]) => {
+          if (['authorization', 'x-api-key', 'x-api-secret'].includes(key.toLowerCase())) {
+            headersToLog[key] = '[REDACTED]';
+          } else {
+            headersToLog[key] = value as string;
+          }
+        });
+      }
+
       console.log('Zenoti API Request:', {
         method: config.method,
         url: config.url,
         baseURL: config.baseURL,
-        headers: {
-          ...Object.keys(config.headers || {}).reduce((acc: Record<string, string>, key: string) => {
-            if (['authorization', 'x-api-key', 'x-api-secret'].includes(key.toLowerCase())) {
-              acc[key] = '[REDACTED]';
-            } else if (config.headers && typeof config.headers === 'object') {
-              const headers = config.headers as Record<string, any>;
-              acc[key] = headers[key];
-            }
-            return acc;
-          }, {}),
-        },
+        headers: headersToLog,
         data: config.data,
         timeout: config.timeout,
       });
@@ -195,19 +197,26 @@ export class ZenotiClient {
     }
 
     try {
+      console.log('No valid token found, attempting authentication with Zenoti API...');
+      
       // Try refreshing with refresh token if available
       if (this.refreshToken && this.refreshTokenExpiry && new Date() < this.refreshTokenExpiry) {
         try {
+          console.log('Attempting to refresh token...');
           await this.refreshWithToken();
-          if (this.token) return this.token;
+          if (this.token) {
+            console.log('Token successfully refreshed.');
+            return this.token;
+          }
         } catch (error) {
-          console.log('Refresh token failed, generating new token:', error);
+          console.log('Refresh token failed, will try other authentication methods:', error);
         }
       }
 
       // Try generating a new token with password grant
       if (this.config.userName && this.config.password) {
         try {
+          console.log('Attempting password authentication...');
           const response = await this.axiosInstance.post('/v1/tokens', {
             account_name: this.config.accountName,
             user_name: this.config.userName,
@@ -240,33 +249,60 @@ export class ZenotiClient {
               this.tokenExpiry.setHours(this.tokenExpiry.getHours() + 23, this.tokenExpiry.getMinutes() + 55);
             }
 
-            console.log('Token generated successfully:', {
+            console.log('Password authentication successful:', {
               userType: this.userType,
               tokenType: this.tokenType,
               expiresAt: this.tokenExpiry.toISOString(),
             });
 
             return this.token;
+          } else {
+            console.warn('Password authentication response did not contain access_token:', response.data);
           }
-        } catch (error) {
-          console.log('Password authentication failed, trying API key:', error);
+        } catch (error: any) {
+          console.warn('Password authentication failed:', 
+            error.response?.data || error.message || 'Unknown error');
         }
+      } else {
+        console.warn('Password authentication skipped - missing username or password');
       }
 
       // Try with API key authentication
       if (this.config.apiKey) {
-        console.log('Using API key authentication');
-        return this.config.apiKey; // We'll use 'apikey' prefix in the request
+        console.log('Attempting API key authentication...');
+        // Validate the API key format
+        if (this.config.apiKey.length < 20) {
+          console.warn('API key appears invalid (too short)');
+        } else {
+          console.log('Using API key authentication');
+          return this.config.apiKey; // We'll use 'apikey' prefix in the request
+        }
+      } else {
+        console.warn('API key authentication skipped - missing API key');
       }
 
+      // If we got here, all authentication methods failed
+      console.error('All authentication methods failed. Configuration status:', {
+        hasUsername: !!this.config.userName,
+        hasPassword: !!this.config.password,
+        hasApiKey: !!this.config.apiKey,
+        hasAppId: !!this.config.appId,
+        hasAppSecret: !!this.config.appSecret,
+        accountName: this.config.accountName,
+        apiUrl: this.config.apiUrl,
+        centerId: this.config.centerId,
+      });
+      
       throw new Error('All authentication methods failed');
     } catch (error: any) {
       console.error('Failed to get Zenoti authentication token:', error.message);
       if (error.response) {
         console.error('Status:', error.response.status);
         console.error('Data:', error.response.data);
+        // Add more context to the error message
+        throw new Error(`Failed to authenticate with Zenoti API: ${error.response.status} ${JSON.stringify(error.response.data)}`);
       }
-      throw new Error('Failed to authenticate with Zenoti API');
+      throw error;
     }
   }
 
@@ -331,10 +367,14 @@ export class ZenotiClient {
         'Accept': 'application/json',
       };
 
+      // Set authorization header based on token type
       if (token === this.config.apiKey) {
         headers['Authorization'] = `apikey ${token}`;
-      } else {
+      } else if (this.tokenType && token) {
         headers['Authorization'] = `${this.tokenType} ${token}`;
+      } else {
+        // Fallback to Bearer if tokenType is not set but we have a token
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
       const config: AxiosRequestConfig = {
@@ -407,6 +447,13 @@ export class ZenotiClient {
     }
 
     try {
+      // Validate centerId
+      if (!centerId) {
+        console.error('Center ID is missing in getServices call');
+        throw new Error('Center ID is required to fetch services');
+      }
+      
+      console.log(`Fetching services for center ID: ${centerId}`);
       const response = await this.request<any>('GET', `/v1/centers/${centerId}/services`);
       const services = response.services || [];
 
@@ -438,6 +485,13 @@ export class ZenotiClient {
     }
 
     try {
+      // Validate centerId
+      if (!centerId) {
+        console.error('Center ID is missing in getProviders call');
+        throw new Error('Center ID is required to fetch providers');
+      }
+      
+      console.log(`Fetching providers for center ID: ${centerId}`);
       const response = await this.request<any>('GET', `/v1/centers/${centerId}/therapists`);
       const providers = response.therapists || [];
 

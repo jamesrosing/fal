@@ -3,23 +3,58 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 export function TeamSection() {
+  // Use useMediaAsset hook for each team member image
+  const { url: drRosingImageUrl } = useMediaAsset('team-provider-rosing', {
+    width: 600,
+    height: 800,
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90
+  });
+  
+  const { url: drPearoseImageUrl } = useMediaAsset('team-provider-pearose', {
+    width: 600,
+    height: 800,
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90
+  });
+  
+  const { url: juliaImageUrl } = useMediaAsset('team-staff-julia', {
+    width: 600,
+    height: 800,
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90
+  });
+  
+  const { url: drGidwaniImageUrl } = useMediaAsset('team-provider-gidwani', {
+    width: 600,
+    height: 800,
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90
+  });
+
+  // Define team images with fallback URLs
   const teamImages = [
     {
-      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133485/uncategorized/Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ.png",
+      src: drRosingImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133485/uncategorized/Dr_James_Rosing_white_bg-5w4lH8VlTQFJUoq0ggd5Y9dFbESMHJ.png",
       alt: "Dr. James Rosing"
     },
     {
-      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/services/dermatology/susan%2520pearose%2520dermatology%2520headshot%25201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL.png",
+      src: drPearoseImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/services/dermatology/susan%2520pearose%2520dermatology%2520headshot%25201-Jsjg50FwPodXo3xuTN7sv0WlGo63gL.png",
       alt: "Dr. Susan Pearose"
     },
     {
-      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/team/headshots/julia%2520medical%2520esthetican%2520headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ.png",
+      src: juliaImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133486/team/headshots/julia%2520medical%2520esthetican%2520headshot-ogGKpiWSQrqW5Z4sv9pf1kiyuctPTJ.png",
       alt: "Julia, Medical Esthetician"
     },
     {
-      src: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133487/team/headshots/pooja%2520gidwani%2520md%2520functional%2520medince%2520headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR.png",
+      src: drGidwaniImageUrl || "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133487/team/headshots/pooja%2520gidwani%2520md%2520functional%2520medince%2520headshot-yNLxeL8rTQtSRlD1g9kR6ZZFgiZoKR.png",
       alt: "Dr. Pooja Gidwani"
     }
   ];

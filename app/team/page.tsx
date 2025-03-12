@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Copy, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 function TeamMemberCard({ member, isPhysician = false }: { 
   member: TeamMember
@@ -17,24 +18,28 @@ function TeamMemberCard({ member, isPhysician = false }: {
 }) {
   const { toast } = useToast()
   const isDevelopment = process.env.NODE_ENV === 'development'
-  const assetId = `team/headshots/team-${member.id}`
+  const assetId = `team-${member.name.toLowerCase().replace(/\s+/g, '-')}`
+  const placeholderId = `team-${member.is_provider ? 'provider' : 'staff'}-${member.id}`
 
-  const copyAssetId = () => {
-    navigator.clipboard.writeText(assetId)
-    toast({
-      title: "Asset ID copied",
-      description: `Copied "${assetId}" to clipboard. Use this ID when uploading the image in the admin panel.`
-    })
-  }
-
-  // Get the Cloudinary URL for the team member's image
-  const imageUrl = member.image_url ? getCloudinaryUrl(assetId, {
+  // Use the useMediaAsset hook to get the image URL
+  const { url: memberImageUrl, isLoading } = useMediaAsset(placeholderId, {
     width: 600,
     height: 800,
     crop: 'fill',
     gravity: 'face',
     quality: 90
-  }) : '/images/placeholder-team.jpg'
+  });
+
+  const copyAssetId = () => {
+    navigator.clipboard.writeText(placeholderId)
+    toast({
+      title: "Placeholder ID copied",
+      description: `Copied "${placeholderId}" to clipboard. Use this ID when uploading the image in the media library.`
+    })
+  }
+
+  // Use either the media asset URL or the direct image URL from the member
+  const imageUrl = memberImageUrl || member.image_url || '/images/placeholder-team.jpg'
 
   return (
     <motion.div
@@ -62,7 +67,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
               className="bg-black/50 hover:bg-black/70"
               onClick={() => {
                 copyAssetId()
-                window.open('/admin/images', '_blank')
+                window.open('/admin/media', '_blank')
               }}
             >
               <Upload className="w-4 h-4 mr-2" />
@@ -88,7 +93,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
         <p className="mt-1 text-sm text-zinc-300">{member.role}</p>
         {isDevelopment && (
           <div className="mt-2 text-xs text-zinc-400">
-            <p>Asset ID: {assetId}</p>
+            <p>Placeholder ID: {placeholderId}</p>
           </div>
         )}
       </div>

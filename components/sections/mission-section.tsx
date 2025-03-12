@@ -1,12 +1,34 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
+import { useMediaAsset } from "@/hooks/useMedia"
 
 export function MissionSection() {
+  // Use the useMediaAsset hook to fetch the image
+  const { url: backgroundImageUrl, isLoading } = useMediaAsset('homepage-mission-background', {
+    width: 1920,
+    quality: 80
+  });
+
   return (
     <section className="relative bg-[#f5f5f5] dark:bg-black">
-      <div className="container mx-auto px-4 py-24 lg:px-8">
+      {/* Add background image */}
+      {backgroundImageUrl && (
+        <div className="absolute inset-0 z-0 opacity-20">
+          <Image 
+            src={backgroundImageUrl} 
+            alt="Mission background" 
+            fill 
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+        </div>
+      )}
+      
+      <div className="container mx-auto px-4 py-24 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

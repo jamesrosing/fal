@@ -6,7 +6,7 @@ import Link from "next/link"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { articles } from "@/lib/articles"
 
-export function NewsSection() {
+export function ArticlesSection() {
   return (
     <section className="relative py-24 bg-[#f5f5f5] dark:bg-black">
       <div className="container mx-auto px-4">
@@ -78,5 +78,4 @@ export function NewsSection() {
       </div>
     </section>
   )
-}
-
+} 
