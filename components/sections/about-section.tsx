@@ -10,13 +10,27 @@ export function AboutSection() {
   const isMobile = useIsMobile();
   
   // Use the useMediaAsset hook for both team image and background
-  const { url: teamImageUrl } = useMediaAsset('allure-md-team-components-general-1')
-  const { url: backgroundUrl, isVideo } = useMediaAsset('homepage-about-background', {
+  const { url: teamImageUrl, isLoading: isLoadingTeamImage } = useMediaAsset('allure-md-team-components-general-1')
+  const { url: backgroundUrl, isVideo, isLoading: isLoadingBackground } = useMediaAsset('homepage-about-background', {
     width: 1920,
     quality: 90,
     format: 'auto',
     responsive: true
   });
+  
+  // Check if any media is still loading
+  const isLoading = isLoadingTeamImage || isLoadingBackground;
+  
+  // Display loading placeholder if media is still loading
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   // Mobile Layout: Text above, image below
   if (isMobile) {

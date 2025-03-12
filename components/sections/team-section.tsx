@@ -6,11 +6,18 @@ import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
 import { useIsMobile } from "@/hooks/use-mobile"
 
+type TeamMember = {
+  src: string;
+  alt: string;
+  name: string;
+  title: string;
+};
+
 export function TeamSection() {
   const isMobile = useIsMobile();
   
   // Use useMediaAsset hook for each team member image
-  const { url: drRosingImageUrl } = useMediaAsset('team-provider-rosing', {
+  const { url: drRosingImageUrl, isLoading: isLoadingRosing } = useMediaAsset('team-provider-rosing', {
     width: 600,
     height: 800,
     crop: 'fill',
@@ -18,7 +25,7 @@ export function TeamSection() {
     quality: 90
   });
   
-  const { url: drPearoseImageUrl } = useMediaAsset('team-provider-pearose', {
+  const { url: drPearoseImageUrl, isLoading: isLoadingPearose } = useMediaAsset('team-provider-pearose', {
     width: 600,
     height: 800,
     crop: 'fill',
@@ -26,7 +33,7 @@ export function TeamSection() {
     quality: 90
   });
   
-  const { url: juliaImageUrl } = useMediaAsset('team-provider-julia', {
+  const { url: juliaImageUrl, isLoading: isLoadingJulia } = useMediaAsset('team-provider-julia', {
     width: 600,
     height: 800,
     crop: 'fill',
@@ -34,7 +41,7 @@ export function TeamSection() {
     quality: 90
   });
   
-  const { url: drGidwaniImageUrl } = useMediaAsset('team-provider-gidwani', {
+  const { url: drGidwaniImageUrl, isLoading: isLoadingGidwani } = useMediaAsset('team-provider-gidwani', {
     width: 600,
     height: 800,
     crop: 'fill',
@@ -43,15 +50,18 @@ export function TeamSection() {
   });
 
   // Get a background image for the team section
-  const { url: teamBackgroundUrl, isVideo } = useMediaAsset('homepage-team-background', {
+  const { url: teamBackgroundUrl, isVideo, isLoading: isLoadingBackground } = useMediaAsset('homepage-team-background', {
     width: 1920,
     quality: 80,
     format: 'auto',
     responsive: true
   });
 
+  // Check if any images are still loading
+  const isLoading = isLoadingRosing || isLoadingPearose || isLoadingJulia || isLoadingGidwani || isLoadingBackground;
+
   // Define team images
-  const teamImages = [
+  const teamImages: TeamMember[] = [
     {
       src: drRosingImageUrl || "",
       alt: "Dr. James Rosing",
@@ -77,6 +87,17 @@ export function TeamSection() {
       title: "Functional Medicine"
     }
   ];
+
+  // Display loading placeholder if media is still loading
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">Loading team profiles...</div>
+        </div>
+      </section>
+    );
+  }
 
   // Mobile Layout
   if (isMobile) {

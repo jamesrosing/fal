@@ -8,13 +8,18 @@ import { useState } from "react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 
+type TabItem = {
+  name: string;
+  link: string;
+};
+
 export function MedicalSpaSection() {
   // State for active tab
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const isMobile = useIsMobile();
   
   // Use the useMediaAsset hook to get the media url
-  const { url: backgroundUrl, isVideo } = useMediaAsset('homepage-medical-spa-background', {
+  const { url: backgroundUrl, isVideo, isLoading } = useMediaAsset('homepage-medical-spa-background', {
     width: 1920,
     quality: 80,
     format: 'auto',
@@ -22,7 +27,7 @@ export function MedicalSpaSection() {
   });
 
   // Tab data
-  const tabs = [
+  const tabs: TabItem[] = [
     { name: "Facial Treatments", link: "/medical-spa/facial-treatments" },
     { name: "Body Contouring", link: "/medical-spa/body-contouring" },
     { name: "Cosmetic Injections", link: "/medical-spa/cosmetic-injections" }
@@ -64,6 +69,17 @@ export function MedicalSpaSection() {
       ))}
     </div>
   );
+
+  // Display loading placeholder if media is still loading
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   // Mobile Layout: Image on top, text below
   if (isMobile) {

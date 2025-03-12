@@ -17,6 +17,17 @@ export function PlasticSurgerySection() {
     responsive: true
   });
 
+  // Display loading placeholder if media is still loading
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      </section>
+    );
+  }
+
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (

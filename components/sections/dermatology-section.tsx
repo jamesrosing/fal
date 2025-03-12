@@ -10,12 +10,23 @@ export function DermatologySection() {
   const isMobile = useIsMobile();
   
   // Use the useMediaAsset hook to get the media url
-  const { url: backgroundUrl, isVideo } = useMediaAsset('homepage-dermatology-background', {
+  const { url: backgroundUrl, isVideo, isLoading } = useMediaAsset('homepage-dermatology-background', {
     width: 1920,
     quality: 80,
     format: 'auto',
     responsive: true
   });
+
+  // Display loading placeholder if media is still loading
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">Loading...</div>
+        </div>
+      </section>
+    );
+  }
 
   // Mobile Layout: Image on top, text below
   if (isMobile) {
