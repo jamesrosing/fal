@@ -21,17 +21,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface ArticleEditorProps {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default function ArticleEditor({
-  params,
+// Client component wrapped by the async Server Component
+function ArticleEditorClient({
+  id,
   searchParams = {}
-}: ArticleEditorProps) {
+}: {
+  id: string;
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -42,10 +39,10 @@ export default function ArticleEditor({
 
   useEffect(() => {
     Promise.all([
-      params.id !== 'new' ? loadArticle() : Promise.resolve(),
+      id !== 'new' ? loadArticle() : Promise.resolve(),
       loadCategories()
     ]).finally(() => {
-      if (params.id === 'new') {
+      if (id === 'new') {
         setArticle({
           id: '',
           title: '',
@@ -62,11 +59,11 @@ export default function ArticleEditor({
       }
       setLoading(false);
     });
-  }, [params.id]);
+  }, [id]);
 
   async function loadArticle() {
     try {
-      const response = await fetch(`/api/articles/${params.id}`);
+      const response = await fetch(`/api/articles/${id}`);
       if (!response.ok) throw new Error('Failed to load article');
       const data = await response.json();
       setArticle(data);
@@ -101,8 +98,8 @@ export default function ArticleEditor({
 
     try {
       setSaving(true);
-      const response = await fetch(`/api/articles/${params.id === 'new' ? '' : params.id}`, {
-        method: params.id === 'new' ? 'POST' : 'PUT',
+      const response = await fetch(`/api/articles/${id === 'new' ? '' : id}`, {
+        method: id === 'new' ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -116,7 +113,7 @@ export default function ArticleEditor({
         description: 'Article saved successfully',
       });
 
-      if (params.id === 'new') {
+      if (id === 'new') {
         const data = await response.json();
         router.push(`/admin/articles/${data.id}/edit`);
       }
@@ -193,7 +190,7 @@ export default function ArticleEditor({
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">
-            {params.id === 'new' ? 'New Article' : 'Edit Article'}
+            {id === 'new' ? 'New Article' : 'Edit Article'}
           </h1>
           <p className="text-zinc-500">Create and edit your article content</p>
         </div>
@@ -415,4 +412,16 @@ export default function ArticleEditor({
       </div>
     </div>
   );
+}
+
+// Server component that wraps the client component
+export default async function ArticleEditor({ 
+  params,
+  searchParams 
+}: {
+  params: { id: string },
+  searchParams?: { [key: string]: string | string[] | undefined }
+}) {
+  // Extract the ID from params and pass it to the client component
+  return <ArticleEditorClient id={params.id} searchParams={searchParams} />;
 } 
