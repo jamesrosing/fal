@@ -16,6 +16,11 @@ const __dirname = dirname(__filename)
 
 const execAsync = promisify(exec)
 
+// Get command line arguments
+const args = process.argv.slice(2)
+const videoName = args[0] || "background" // Default to "background" if no argument provided
+const outputPrefix = args[1] || "hero" // Default prefix for output files
+
 // Validate Cloudinary configuration
 if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 
     !process.env.CLOUDINARY_API_KEY || 
@@ -123,7 +128,7 @@ async function checkVideoExists(videoPath: string) {
     console.error(`\n❌ Video file not found: ${videoPath}`)
     console.log("\nPlease ensure you have placed your video file at:")
     console.log(videoPath)
-    console.log("\nThe video should be named 'background.mp4'")
+    console.log(`\nThe video should be named '${videoName}.mp4'`)
     return false
   }
 }
@@ -132,7 +137,7 @@ async function generateImages() {
   const rootDir = join(__dirname, "..")
   const videoDir = join(rootDir, "public", "video")
   const imagesDir = join(rootDir, "public", "images")
-  const videoPath = join(videoDir, "background.mp4")
+  const videoPath = join(videoDir, `${videoName}.mp4`)
   
   await ensureDirectoryExists(imagesDir)
 
@@ -155,7 +160,7 @@ async function generateImages() {
         quality: 80,
         progressive: true
       })
-      .toFile(join(imagesDir, "hero-poster.jpg"))
+      .toFile(join(imagesDir, `${outputPrefix}-${videoName}-poster.jpg`))
 
     // Create fallback image (slightly different crop/processing)
     await sharp(join(imagesDir, "temp-poster.jpg"))
@@ -167,7 +172,7 @@ async function generateImages() {
         quality: 85,
         progressive: true
       })
-      .toFile(join(imagesDir, "hero-fallback.jpg"))
+      .toFile(join(imagesDir, `${outputPrefix}-${videoName}-fallback.jpg`))
 
     // Clean up
     await fs.unlink(join(imagesDir, "temp-poster.jpg"))
@@ -184,7 +189,7 @@ async function optimizeVideo() {
   const rootDir = join(__dirname, "..")
   const sourceDir = join(rootDir, "public", "video")
   const targetDir = join(rootDir, "public", "videos")
-  const videoPath = join(sourceDir, "background.mp4")
+  const videoPath = join(sourceDir, `${videoName}.mp4`)
   
   await ensureDirectoryExists(targetDir)
 
@@ -201,7 +206,7 @@ async function optimizeVideo() {
       
       // Convert to WebM with VP9 codec
       console.log(`- Creating WebM version...`)
-      const webmPath = join(targetDir, `hero-${config.name}.webm`)
+      const webmPath = join(targetDir, `${outputPrefix}-${videoName}-${config.name}.webm`)
       await execAsync(
         `ffmpeg -i "${normalizePath(videoPath)}" -c:v libvpx-vp9 -crf ${config.crf.webm} -b:v 0 ` +
         `-vf scale=${config.width}:${config.height} -c:a libopus ` +
@@ -211,12 +216,12 @@ async function optimizeVideo() {
       // Upload WebM to Cloudinary
       uploadedUrls[`webm-${config.name}`] = await uploadToCloudinary(
         webmPath,
-        `hero-${config.name}-webm`
+        `${outputPrefix}-${videoName}-${config.name}-webm`
       )
       
       // Convert to MP4 with H.264 codec
       console.log(`- Creating MP4 version...`)
-      const mp4Path = join(targetDir, `hero-${config.name}.mp4`)
+      const mp4Path = join(targetDir, `${outputPrefix}-${videoName}-${config.name}.mp4`)
       await execAsync(
         `ffmpeg -i "${normalizePath(videoPath)}" -c:v libx264 -crf ${config.crf.mp4} ` +
         `-vf scale=${config.width}:${config.height} -movflags +faststart ` +
@@ -226,7 +231,7 @@ async function optimizeVideo() {
       // Upload MP4 to Cloudinary
       uploadedUrls[`mp4-${config.name}`] = await uploadToCloudinary(
         mp4Path,
-        `hero-${config.name}-mp4`
+        `${outputPrefix}-${videoName}-${config.name}-mp4`
       )
     }
     
@@ -243,7 +248,7 @@ async function optimizeVideo() {
 }
 
 async function main() {
-  console.log("🎥 Starting video optimization process...")
+  console.log(`🎥 Starting video optimization process for '${videoName}.mp4'...`)
   
   if (!(await checkFfmpeg())) {
     return
@@ -254,9 +259,12 @@ async function main() {
 
   if (imagesSuccess && optimizeSuccess) {
     console.log("\n✨ All done! Your video has been optimized and uploaded to Cloudinary.")
+    console.log("\nGenerated files:")
+    console.log(`1. Images: ${outputPrefix}-${videoName}-poster.jpg and ${outputPrefix}-${videoName}-fallback.jpg`)
+    console.log(`2. Videos: ${outputPrefix}-${videoName}-720p.mp4, ${outputPrefix}-${videoName}-720p.webm, etc.`)
     console.log("\nNext steps:")
-    console.log("1. Update the videoSources array in components/hero.tsx with the Cloudinary URLs")
-    console.log("2. Update next.config.ts to include the Cloudinary domain")
+    console.log("1. Update your component with the Cloudinary URLs")
+    console.log("2. Update next.config.ts to include the Cloudinary domain (if not already done)")
   } else {
     console.log("\n⚠️ Some operations failed. Please check the errors above.")
   }
