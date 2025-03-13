@@ -25,9 +25,13 @@ interface ArticleEditorProps {
   params: {
     id: string;
   };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default function ArticleEditor({ params }: ArticleEditorProps) {
+export default function ArticleEditor({
+  params,
+  searchParams = {}
+}: ArticleEditorProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);

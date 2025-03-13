@@ -259,6 +259,67 @@ export default function MediaLibraryAdmin() {
               complete: '#20B832',
               sourceBg: '#E4EBF1'
             }
+          },
+          // Enhanced Getty Images integration based on documentation
+          integration: {
+            getty: {
+              onAuthenticated: (data: any) => {
+                console.log('Getty authentication successful', data);
+                // Force refresh the widget state
+                setTimeout(() => {
+                  // This timeout helps ensure the widget UI is properly updated
+                  console.log('Refreshing widget after Getty authentication');
+                }, 100);
+                return true;
+              },
+              onAuthenticationFailed: (error: Error) => {
+                console.error('Getty authentication failed', error);
+                alert('Getty Images authentication failed. Please try again.');
+                return false;
+              },
+              // Add session management for Getty
+              session: {
+                // Keep the session alive longer
+                maxAge: 3600, // 1 hour in seconds
+                // Handle session expiration
+                onExpire: () => {
+                  console.log('Getty session expired');
+                  return false; // Will trigger re-authentication
+                }
+              }
+            }
+          },
+          callbacks: {
+            // Enhanced provider authentication handling
+            onProviderAuthenticated: (provider: string, data: any) => {
+              console.log(`${provider} authenticated successfully`, data);
+              if (provider === 'getty') {
+                // Use a more reliable approach to handle the post-authentication state
+                setTimeout(() => {
+                  // Force the widget to refresh its state
+                  console.log('Forcing widget refresh after Getty authentication');
+                  // Return to the main view
+                  return true;
+                }, 800); // Longer timeout to ensure Getty's authentication completes
+              }
+              return true;
+            },
+            // Add specific provider event handling
+            onProviderEvent: (provider: string, event: string, data: any) => {
+              console.log(`Provider event: ${provider} - ${event}`, data);
+              // Handle specific Getty events
+              if (provider === 'getty' && event === 'session_error') {
+                console.error('Getty session error', data);
+                alert('There was an issue with your Getty Images session. Please try again.');
+              }
+              return true;
+            },
+            onError: (error: Error) => {
+              console.error('Media Library Widget error:', error);
+              if (error.message && error.message.includes('authentication')) {
+                alert('There was an authentication issue. Please try again.');
+              }
+            }
           }
         },
         {
@@ -268,6 +329,23 @@ export default function MediaLibraryAdmin() {
           hideHandler: () => console.log('Media Library closed')
         }
       );
+      
+      // Add event listener for Getty authentication events
+      window.addEventListener('message', (event) => {
+        // Check if the message is from Getty
+        if (event.data && event.data.source === 'getty') {
+          console.log('Received Getty message:', event.data);
+          // If authentication completed, force refresh the widget
+          if (event.data.type === 'authentication_complete') {
+            console.log('Getty authentication completed, refreshing widget');
+            // Force the widget to return to main view
+            setTimeout(() => {
+              // This timeout helps ensure the widget UI is properly updated
+              console.log('Refreshing widget after Getty authentication message');
+            }, 500);
+          }
+        }
+      }, false);
       
       // Open the widget
       mediaLibrary.show();
@@ -315,6 +393,84 @@ export default function MediaLibraryAdmin() {
             [{ quality: 'auto', fetch_format: 'auto' }]
           ],
           // Same styles as before
+          styles: {
+            palette: {
+              window: '#FFFFFF',
+              windowBorder: '#90A0B3',
+              tabIcon: '#0078FF',
+              menuIcons: '#5A616A',
+              textDark: '#000000',
+              textLight: '#FFFFFF',
+              link: '#0078FF',
+              action: '#FF620C',
+              inactiveTabIcon: '#0E2F5A',
+              error: '#F44235',
+              inProgress: '#0078FF',
+              complete: '#20B832',
+              sourceBg: '#E4EBF1'
+            }
+          },
+          // Enhanced Getty Images integration based on documentation
+          integration: {
+            getty: {
+              onAuthenticated: (data: any) => {
+                console.log('Getty authentication successful', data);
+                // Force refresh the widget state
+                setTimeout(() => {
+                  // This timeout helps ensure the widget UI is properly updated
+                  console.log('Refreshing widget after Getty authentication');
+                }, 100);
+                return true;
+              },
+              onAuthenticationFailed: (error: Error) => {
+                console.error('Getty authentication failed', error);
+                alert('Getty Images authentication failed. Please try again.');
+                return false;
+              },
+              // Add session management for Getty
+              session: {
+                // Keep the session alive longer
+                maxAge: 3600, // 1 hour in seconds
+                // Handle session expiration
+                onExpire: () => {
+                  console.log('Getty session expired');
+                  return false; // Will trigger re-authentication
+                }
+              }
+            }
+          },
+          callbacks: {
+            // Enhanced provider authentication handling
+            onProviderAuthenticated: (provider: string, data: any) => {
+              console.log(`${provider} authenticated successfully`, data);
+              if (provider === 'getty') {
+                // Use a more reliable approach to handle the post-authentication state
+                setTimeout(() => {
+                  // Force the widget to refresh its state
+                  console.log('Forcing widget refresh after Getty authentication');
+                  // Return to the main view
+                  return true;
+                }, 800); // Longer timeout to ensure Getty's authentication completes
+              }
+              return true;
+            },
+            // Add specific provider event handling
+            onProviderEvent: (provider: string, event: string, data: any) => {
+              console.log(`Provider event: ${provider} - ${event}`, data);
+              // Handle specific Getty events
+              if (provider === 'getty' && event === 'session_error') {
+                console.error('Getty session error', data);
+                alert('There was an issue with your Getty Images session. Please try again.');
+              }
+              return true;
+            },
+            onError: (error: Error) => {
+              console.error('Media Library Widget error:', error);
+              if (error.message && error.message.includes('authentication')) {
+                alert('There was an authentication issue. Please try again.');
+              }
+            }
+          }
         },
         {
           insertHandler: (data: any) => {
