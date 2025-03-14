@@ -77,6 +77,7 @@ export interface Article {
   excerpt: string;
   author_id: string;
   category_id: string;
+  subcategory?: string;
   status: 'draft' | 'published' | 'archived';
   featured_image?: string;
   featured_video?: string;

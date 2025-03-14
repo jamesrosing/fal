@@ -11,6 +11,12 @@ import * as dotenv from "dotenv"
 // Load environment variables from .env.local
 dotenv.config({ path: '.env.local' })
 
+// Debug environment variables
+console.log("Environment variables loaded:")
+console.log(`NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ? "✓ Set" : "❌ Not set"}`)
+console.log(`CLOUDINARY_API_KEY: ${process.env.CLOUDINARY_API_KEY ? "✓ Set" : "❌ Not set"}`)
+console.log(`CLOUDINARY_API_SECRET: ${process.env.CLOUDINARY_API_SECRET ? "✓ Set" : "❌ Not set"}`)
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 

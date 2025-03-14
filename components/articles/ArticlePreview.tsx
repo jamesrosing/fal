@@ -10,6 +10,11 @@ interface ArticlePreviewProps {
   categoryName?: string;
 }
 
+const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+};
+
 export function ArticlePreview({ article, categoryName }: ArticlePreviewProps) {
   return (
     <article className="max-w-4xl mx-auto">
@@ -19,9 +24,11 @@ export function ArticlePreview({ article, categoryName }: ArticlePreviewProps) {
           {categoryName && (
             <Badge variant="outline">{categoryName}</Badge>
           )}
-          <span className="text-sm text-zinc-500">
-            {format(new Date(article.created_at), 'MMMM d, yyyy')}
-          </span>
+          <div className="mt-2 text-sm text-muted-foreground">
+            {article.created_at && isValidDate(article.created_at)
+              ? format(new Date(article.created_at), 'MMMM d, yyyy')
+              : 'No date'}
+          </div>
           {article.reading_time && (
             <>
               <span className="text-zinc-500">•</span>

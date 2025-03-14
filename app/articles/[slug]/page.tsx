@@ -1,83 +1,194 @@
 import { notFound } from "next/navigation"
-import { articles, getRelatedArticles } from "@/lib/articles"
 import { Metadata } from "next"
 import { NavBar } from "@/components/nav-bar"
-import { Section } from "@/components/ui/section"
 import Image from "next/image"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { createClient } from '@supabase/supabase-js'
+import { Article } from "@/lib/types"
 
 type Props = {
   params: { slug: string }
 }
 
-// Generate metadata for the article page
+// Get article from database
+async function getArticle(slug: string): Promise<Article | null> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase environment variables");
+      return null;
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    const { data, error } = await supabase
+      .from('articles')
+      .select(`
+        *,
+        category:article_categories(name, slug)
+      `)
+      .eq('slug', slug)
+      .eq('status', 'published')
+      .single();
+    
+    if (error) {
+      console.error("Error fetching article:", error);
+      return null;
+    }
+    
+    // Transform data to match Article interface if needed
+    if (data) {
+      return {
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        subtitle: data.subtitle,
+        excerpt: data.excerpt,
+        content: data.content,
+        image: data.featured_image,
+        featured_image: data.featured_image,
+        category: data.category?.slug,
+        categoryName: data.category?.name,
+        category_id: data.category_id,
+        date: data.published_at || data.created_at,
+        publishedAt: data.published_at,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        readTime: data.reading_time ? `${data.reading_time} min` : undefined,
+        author: data.author_id,  // Will need to be extended with author lookup
+        status: data.status,
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error in getArticle:", error);
+    return null;
+  }
+}
+
+// Get related articles
+async function getRelatedArticles(article: Article): Promise<Article[]> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase environment variables");
+      return [];
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Find by category_id if available, otherwise by category
+    let query = supabase
+      .from('articles')
+      .select(`
+        *,
+        category:article_categories(name, slug)
+      `)
+      .eq('status', 'published')
+      .neq('id', article.id)
+      .order('published_at', { ascending: false })
+      .limit(3);
+    
+    if (article.category_id) {
+      query = query.eq('category_id', article.category_id);
+    } else if (article.category) {
+      // Lookup the category_id first
+      const { data: categoryData } = await supabase
+        .from('article_categories')
+        .select('id')
+        .eq('slug', article.category)
+        .single();
+      
+      if (categoryData?.id) {
+        query = query.eq('category_id', categoryData.id);
+      }
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error("Error fetching related articles:", error);
+      return [];
+    }
+    
+    // Transform data to match Article interface
+    return data.map(item => ({
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      excerpt: item.excerpt,
+      image: item.featured_image,
+      featured_image: item.featured_image,
+      category: item.category?.slug,
+      categoryName: item.category?.name,
+      date: item.published_at || item.created_at,
+      readTime: item.reading_time ? `${item.reading_time} min` : undefined,
+    }));
+  } catch (error) {
+    console.error("Error in getRelatedArticles:", error);
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // Get the article by slug
-  const article = articles.find(article => article.slug === params.slug);
+  const article = await getArticle(params.slug);
   
   if (!article) {
     return {
-      title: 'Article Not Found | Allure MD',
-      description: 'The requested article could not be found.',
-      robots: {
-        index: false,
-        follow: false
-      }
+      title: 'Article Not Found',
+      description: 'The requested article could not be found.'
     };
   }
   
-  // Ensure the image URL is valid
-  const imageUrl = getCloudinaryUrl(article.image, {
-    width: 1200,
-    height: 630,
-    crop: 'fill',
-    gravity: 'auto'
-  });
-  
   return {
-    title: `${article.title} | Allure MD`,
+    title: article.title,
     description: article.excerpt,
     openGraph: {
       title: article.title,
       description: article.excerpt,
       type: 'article',
       publishedTime: article.publishedAt || article.date,
+      modifiedTime: article.updatedAt,
       authors: article.author ? [article.author] : undefined,
-      images: [
+      images: article.image ? [
         {
-          url: imageUrl,
+          url: article.image.includes('https://') 
+            ? article.image 
+            : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`,
           width: 1200,
           height: 630,
           alt: article.title
         }
-      ]
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.title,
-      description: article.excerpt,
-      images: [imageUrl]
+      ] : undefined
     }
   };
 }
 
-export default function ArticlePage({ params }: Props) {
-  // Find the article directly from the articles array
-  const article = articles.find(article => article.slug === params.slug);
+export default async function ArticlePage({ params }: Props) {
+  const article = await getArticle(params.slug);
   
   if (!article) {
     notFound();
   }
 
-  const relatedArticles = getRelatedArticles(article);
-  const imageUrl = getCloudinaryUrl(article.image, {
-    width: 1200,
-    height: 675,
-    crop: 'fill',
-    gravity: 'auto'
-  });
+  const relatedArticles = await getRelatedArticles(article);
+  
+  // Prepare the image URL
+  const imageUrl = article.image 
+    ? (article.image.includes('https://') 
+      ? article.image 
+      : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`) 
+    : '/placeholder-image.jpg';
+  
+  // Get the article category display name
+  const categoryName = article.categoryName || article.category;
   
   return (
     <main className="flex min-h-screen flex-col bg-black text-white">
@@ -97,46 +208,44 @@ export default function ArticlePage({ params }: Props) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         
-        <div className="lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl text-white"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium uppercase tracking-wider">
-                {article.category.replace('-', ' ')}
-              </span>
-              {article.subcategory && (
-                <>
-                  <span className="text-zinc-400">•</span>
-                  <span className="text-sm text-zinc-400">
-                    {article.subcategory.replace('-', ' ')}
-                  </span>
-                </>
-              )}
-            </div>
-            <h1 className="mb-4 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-              {article.title}
-            </h1>
-            <div className="flex items-center gap-4 mb-6">
-              {article.author && (
-                <span className="text-zinc-300">By {article.author}</span>
-              )}
-              <span className="text-zinc-400">
-                {new Date(article.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </span>
-              {article.readTime && (
-                <span className="text-zinc-400">{article.readTime} read</span>
-              )}
-            </div>
-            <p className="text-xl text-zinc-300">{article.excerpt}</p>
-          </motion.div>
+        {/* Category Badge */}
+        <div className="absolute top-24 left-0 z-10 p-8">
+          <div className="container mx-auto px-4">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="inline-block px-4 py-2 text-sm font-cerebri font-normal uppercase tracking-wide text-white bg-black/50 backdrop-blur-sm"
+            >
+              {categoryName}
+            </motion.span>
+          </div>
+        </div>
+        
+        {/* Article Title */}
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-semibold text-white max-w-4xl mb-4">
+                {article.title}
+              </h1>
+              <div className="text-gray-300 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm md:text-base font-cerebri">
+                <span>{article.author || 'Allure MD'}</span>
+                <span className="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span>{new Date(article.date || article.createdAt || '').toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+                <span className="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span>{article.readTime || '5 min'} read</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
       
@@ -207,12 +316,11 @@ export default function ArticlePage({ params }: Props) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {relatedArticles.map((relatedArticle) => {
-                const relatedImageUrl = getCloudinaryUrl(relatedArticle.image, {
-                  width: 400,
-                  height: 250,
-                  crop: 'fill',
-                  gravity: 'auto'
-                });
+                const relatedImageUrl = relatedArticle.image ? 
+                  (relatedArticle.image.includes('https://') 
+                    ? relatedArticle.image 
+                    : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${relatedArticle.image}`) 
+                  : '/placeholder-image.jpg';
                 
                 return (
                   <motion.div

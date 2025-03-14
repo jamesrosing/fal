@@ -112,13 +112,19 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
     )
   }
 
+  // Only render preload links if we have valid URLs
+  const hasValidPoster = poster && poster.trim() !== '';
+  const validSources = sources?.filter(source => source.src && source.src.trim() !== '') || [];
+
   return (
     <>
-      {poster && sources && sources.length > 0 && (
+      {isMounted && (
         <Head>
-          <link rel="preload" as="image" href={poster} />
-          {sources.map((source, index) => (
-            <link key={index} rel="preload" as="video" href={source.src} />
+          {hasValidPoster && (
+            <link rel="preload" as="image" href={poster} />
+          )}
+          {validSources.map((source, index) => (
+            source.src && <link key={index} rel="preload" as="video" href={source.src} />
           ))}
         </Head>
       )}
@@ -136,7 +142,7 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
           aria-hidden="true"
         >
           {sources.map((source, index) => (
-            <source key={index} {...source} />
+            source.src && <source key={index} {...source} />
           ))}
           Your browser does not support the video tag.
         </video>

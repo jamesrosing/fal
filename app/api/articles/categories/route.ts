@@ -8,148 +8,82 @@ export async function GET() {
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      return new NextResponse(
-        JSON.stringify({ 
-          error: 'Missing Supabase environment variables',
-          details: {
-            hasUrl: !!supabaseUrl,
-            hasKey: !!supabaseKey,
-            required: {
-              url: 'NEXT_PUBLIC_SUPABASE_URL',
-              key: 'SUPABASE_SERVICE_ROLE_KEY'
-            }
-          }
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+      return NextResponse.json(
+        { error: 'Missing Supabase environment variables' },
+        { status: 500 }
       );
     }
 
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Fetch categories
+
+    // Fetch all categories
     const { data, error } = await supabase
       .from('article_categories')
       .select('*')
-      .order('order_position', { ascending: true });
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Supabase query error:', error);
-      return new NextResponse(
-        JSON.stringify({ 
-          error: 'Database query failed',
-          details: error.message
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
+      return NextResponse.json(
+        { error: 'Database query failed' },
+        { status: 500 }
       );
     }
 
-    // Return the categories
-    return new NextResponse(
-      JSON.stringify(data || []),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    return NextResponse.json(data || []);
   } catch (error) {
     console.error('Categories API error:', error);
-    return new NextResponse(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error occurred',
-        timestamp: new Date().toISOString()
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }
 
 // Create a new category
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Missing Supabase environment variables' }),
+      return NextResponse.json(
+        { error: 'Missing Supabase environment variables' },
         { status: 500 }
       );
     }
 
-    // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Parse request body
-    const category = await request.json();
+    const body = await req.json();
     
     // Generate slug from name if not provided
-    if (!category.slug && category.name) {
-      category.slug = category.name
+    if (!body.slug && body.name) {
+      body.slug = body.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
     }
     
-    // Get the highest order position and add 1 for the new category
-    if (category.order_position === undefined) {
-      const { data: maxOrderData } = await supabase
-        .from('article_categories')
-        .select('order_position')
-        .order('order_position', { ascending: false })
-        .limit(1);
-      
-      const maxOrder = maxOrderData && maxOrderData.length > 0 
-        ? maxOrderData[0].order_position 
-        : 0;
-        
-      category.order_position = maxOrder + 1;
-    }
-    
-    // Insert the new category
     const { data, error } = await supabase
       .from('article_categories')
-      .insert([category])
+      .insert([body])
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating category:', error);
-      return new NextResponse(
-        JSON.stringify({ error: 'Failed to create category', details: error.message }),
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: 'Failed to create category' },
         { status: 500 }
       );
     }
 
-    return new NextResponse(
-      JSON.stringify(data),
-      { status: 201 }
-    );
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error in POST /api/articles/categories:', error);
-    return new NextResponse(
-      JSON.stringify({ 
-        error: 'Failed to create category',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }),
+    console.error('Categories API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

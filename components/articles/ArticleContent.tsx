@@ -4,6 +4,11 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { getCloudinaryUrl } from '@/lib/cloudinary'
 
+const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+};
+
 export default function ArticleContent({ article }: { article: Article }) {
   // Convert the article image to a proper Cloudinary URL
   const imageUrl = article.image ? 
@@ -29,9 +34,11 @@ export default function ArticleContent({ article }: { article: Article }) {
       <article className="max-w-3xl mx-auto px-4 py-8 font-sans" itemScope itemType="http://schema.org/Article">
         <header className="mb-8">
           <h1 className="text-4xl font-bold font-serif mb-4 text-foreground" itemProp="headline">{article.title}</h1>
-          <p className="text-sm text-muted-foreground">
-            Published on <time dateTime={article.created_at}>{format(new Date(article.created_at), 'MMMM d, yyyy')}</time>
-          </p>
+          <div className="mt-2 text-sm text-muted-foreground">
+            Published on {article.created_at && isValidDate(article.created_at) 
+              ? <time dateTime={article.created_at}>{format(new Date(article.created_at), 'MMMM d, yyyy')}</time>
+              : <span>unknown date</span>}
+          </div>
           {imageUrl && (
             <div className="mt-6">
               <Image 

@@ -72,13 +72,31 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 
+// Function to check if a date string is valid
+const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+};
+
 // Main categories for articles
 const MAIN_CATEGORIES = [
   "plastic-surgery",
   "dermatology", 
   "functional-medicine",
-  "medical-spa"
+  "medical-spa",
+  "trending-topics",
+  "educational",
+  "niche-focus"
 ];
+
+// Add interface for subcategories
+interface ArticleSubcategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  category_id: string;
+}
 
 interface ArticleManagerProps {
   initialCategoryId?: string;
@@ -89,8 +107,10 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
   const { toast } = useToast();
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<ArticleCategory[]>([]);
+  const [subcategories, setSubcategories] = useState<ArticleSubcategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategoryId, setActiveCategoryId] = useState<string>(initialCategoryId || 'all');
+  const [activeSubcategoryId, setActiveSubcategoryId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft' | 'archived'>('all');
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
@@ -104,6 +124,9 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
   const [aiGenerated, setAiGenerated] = useState<Partial<Article> | null>(null);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<Partial<ArticleCategory> | null>(null);
+  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
+  const [isSubcategoryDialogOpen, setIsSubcategoryDialogOpen] = useState(false);
+  const [currentSubcategory, setCurrentSubcategory] = useState<Partial<ArticleSubcategory> | null>(null);
 
   // Fetch articles and categories
   useEffect(() => {
@@ -125,6 +148,16 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
 
     fetchData();
   }, [toast]);
+
+  // Fetch subcategories when active category changes
+  useEffect(() => {
+    if (activeCategoryId && activeCategoryId !== 'all') {
+      fetchSubcategories(activeCategoryId);
+    } else {
+      setSubcategories([]);
+      setActiveSubcategoryId('all');
+    }
+  }, [activeCategoryId]);
 
   // Fetch articles
   const fetchArticles = async () => {
@@ -149,14 +182,58 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
         throw new Error(`API error: ${response.status}`);
       }
       const data = await response.json();
-      setCategories(data);
+      
+      // Filter to only include main categories
+      const mainCategories = data.filter((cat: ArticleCategory) => 
+        MAIN_CATEGORIES.includes(cat.slug)
+      );
+      
+      setCategories(mainCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
       throw error;
     }
   };
 
-  // Filter articles based on search query, category, and status
+  // Fetch subcategories
+  const fetchSubcategories = async (categoryId: string) => {
+    try {
+      setLoadingSubcategories(true);
+      
+      // Find the category by ID to get its slug
+      const category = categories.find(cat => cat.id === categoryId);
+      if (!category) {
+        console.error('Category not found:', { categoryId, categories });
+        return;
+      }
+      
+      console.log('Fetching subcategories for:', { 
+        categoryId, 
+        categorySlug: category.slug, 
+        categoryName: category.name 
+      });
+      
+      const response = await fetch(`/api/articles/subcategories?category=${category.slug}`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Subcategories fetched:', data);
+      setSubcategories(data);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load subcategories',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingSubcategories(false);
+    }
+  };
+
+  // Filter articles based on search query, category, subcategory, and status
   const filteredArticles = articles.filter(article => {
     // Check if article matches the search query
     const matchesSearch = 
@@ -169,12 +246,17 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
       activeCategoryId === 'all' || 
       article.category_id === activeCategoryId;
     
+    // Check if article matches the selected subcategory
+    const matchesSubcategory = 
+      activeSubcategoryId === 'all' || 
+      article.subcategory === activeSubcategoryId;
+    
     // Check if article matches the selected status
     const matchesStatus = 
       statusFilter === 'all' || 
       article.status === statusFilter;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
   });
 
   // Generate article content with AI
@@ -457,6 +539,98 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
     setIsCategoryDialogOpen(true);
   };
 
+  // Handle category change
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategoryId(categoryId);
+    setActiveSubcategoryId('all'); // Reset subcategory filter when category changes
+    
+    // If we're in article edit mode, update the current article's category
+    if (currentArticle) {
+      setCurrentArticle({
+        ...currentArticle,
+        category_id: categoryId,
+        subcategory: undefined // Clear subcategory when category changes
+      });
+    }
+  };
+
+  // Create new subcategory handler
+  const handleCreateSubcategory = () => {
+    // Default to the active category if one is selected
+    const defaultCategoryId = activeCategoryId !== 'all' ? activeCategoryId : '';
+    
+    setCurrentSubcategory({
+      name: '',
+      slug: '',
+      description: '',
+      category_id: defaultCategoryId
+    });
+    setIsSubcategoryDialogOpen(true);
+  };
+
+  // Create or update subcategory
+  const saveSubcategory = async (subcategory: Partial<ArticleSubcategory>) => {
+    try {
+      // Validate required fields
+      if (!subcategory.name || !subcategory.category_id) {
+        toast({
+          title: 'Missing fields',
+          description: 'Name and category are required',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      const url = subcategory.id 
+        ? `/api/articles/subcategories/${subcategory.id}` 
+        : '/api/articles/subcategories';
+      const method = subcategory.id ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(subcategory),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Update local state if we're in the same category
+      if (subcategory.category_id === activeCategoryId) {
+        if (subcategory.id) {
+          setSubcategories(prev => prev.map(s => s.id === subcategory.id ? data : s));
+        } else {
+          setSubcategories(prev => [...prev, data]);
+        }
+      }
+      
+      toast({
+        title: subcategory.id ? 'Subcategory updated' : 'Subcategory created',
+        description: `The subcategory has been successfully ${subcategory.id ? 'updated' : 'created'}`,
+      });
+      
+      setIsSubcategoryDialogOpen(false);
+      setCurrentSubcategory(null);
+      
+      // Refresh subcategories if needed
+      if (activeCategoryId && activeCategoryId !== 'all') {
+        fetchSubcategories(activeCategoryId);
+      }
+    } catch (error) {
+      console.error('Error saving subcategory:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save subcategory',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Initial skeleton UI while loading
   if (loading) {
     return (
@@ -500,6 +674,14 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
               <Plus className="w-4 h-4 mr-2" />
               New Category
             </Button>
+            <Button 
+              variant="outline"
+              onClick={handleCreateSubcategory}
+              disabled={categories.length === 0}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Subcategory
+            </Button>
             <Button onClick={handleCreateArticle}>
               <Plus className="w-4 h-4 mr-2" />
               New Article
@@ -524,7 +706,7 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
           <div className="flex gap-2">
             <Select 
               value={activeCategoryId} 
-              onValueChange={setActiveCategoryId}
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Category" />
@@ -536,6 +718,35 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                     {category.name}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+
+            <Select 
+              value={activeSubcategoryId} 
+              onValueChange={setActiveSubcategoryId}
+              disabled={activeCategoryId === 'all' || loadingSubcategories}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={loadingSubcategories ? "Loading..." : "Subcategory"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Subcategories</SelectItem>
+                {loadingSubcategories ? (
+                  <SelectItem value="loading" disabled>
+                    <span className="flex items-center">
+                      <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                      Loading...
+                    </span>
+                  </SelectItem>
+                ) : subcategories.length > 0 ? (
+                  subcategories.map((subcategory) => (
+                    <SelectItem key={subcategory.id} value={subcategory.slug}>
+                      {subcategory.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>No subcategories found</SelectItem>
+                )}
               </SelectContent>
             </Select>
 
@@ -557,13 +768,30 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
         </div>
 
         {/* Main Categories Filter Tabs */}
-        <Tabs defaultValue="all" className="mb-6">
+        <Tabs defaultValue="all" className="mb-6" onValueChange={(value) => {
+          if (value === 'all') {
+            setActiveCategoryId('all');
+          } else {
+            // Find the category ID for this slug
+            const category = categories.find(cat => cat.slug === value);
+            if (category) {
+              setActiveCategoryId(category.id);
+            }
+          }
+        }}>
           <TabsList className="mb-2">
             <TabsTrigger value="all">All Categories</TabsTrigger>
-            <TabsTrigger value="plastic-surgery">Plastic Surgery</TabsTrigger>
-            <TabsTrigger value="dermatology">Dermatology</TabsTrigger>
-            <TabsTrigger value="functional-medicine">Functional Medicine</TabsTrigger>
-            <TabsTrigger value="medical-spa">Medical Spa</TabsTrigger>
+            {MAIN_CATEGORIES.map(slug => {
+              // Find the matching category to get its proper name
+              const category = categories.find(cat => cat.slug === slug);
+              if (!category) return null;
+              
+              return (
+                <TabsTrigger key={slug} value={slug}>
+                  {category.name}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
         </Tabs>
 
@@ -680,7 +908,9 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                       <span className="capitalize">{article.status}</span>
                     </div>
                     <div>
-                      {format(new Date(article.created_at), 'MMM d, yyyy')}
+                      {article.created_at && isValidDate(article.created_at) 
+                        ? format(new Date(article.created_at), 'MMM d, yyyy')
+                        : 'No date'}
                     </div>
                   </CardFooter>
                 </Card>
@@ -743,7 +973,17 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                       <Label htmlFor="category">Category</Label>
                       <Select
                         value={currentArticle.category_id || ''}
-                        onValueChange={(value) => setCurrentArticle({ ...currentArticle, category_id: value })}
+                        onValueChange={(value) => {
+                          const updatedArticle = { ...currentArticle, category_id: value, subcategory: undefined };
+                          setCurrentArticle(updatedArticle);
+                          
+                          // Fetch subcategories for the selected category
+                          if (value) {
+                            fetchSubcategories(value);
+                          } else {
+                            setSubcategories([]);
+                          }
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
@@ -758,6 +998,39 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                       </Select>
                     </div>
 
+                    <div>
+                      <Label htmlFor="subcategory">Subcategory</Label>
+                      <Select
+                        value={currentArticle.subcategory || 'none'}
+                        onValueChange={(value) => setCurrentArticle({ ...currentArticle, subcategory: value === 'none' ? undefined : value })}
+                        disabled={!currentArticle.category_id || loadingSubcategories}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subcategory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {subcategories.length > 0 ? (
+                            subcategories.map((subcategory) => (
+                              <SelectItem key={subcategory.id} value={subcategory.slug}>
+                                {subcategory.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-subcategories" disabled>No subcategories available</SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {loadingSubcategories && (
+                        <div className="flex items-center mt-1 text-xs text-muted-foreground">
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                          Loading subcategories...
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="status">Status</Label>
                       <Select
@@ -1087,6 +1360,71 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                   {currentCategory?.id ? 'Save Changes' : 'Create Category'}
                 </Button>
               </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Subcategory Dialog */}
+        <Dialog open={isSubcategoryDialogOpen} onOpenChange={setIsSubcategoryDialogOpen}>
+          <DialogContent className="sm:max-w-[525px]">
+            <DialogHeader>
+              <DialogTitle>
+                {currentSubcategory?.id ? 'Edit Subcategory' : 'Create Subcategory'}
+              </DialogTitle>
+              <DialogDescription>
+                {currentSubcategory?.id 
+                  ? 'Update the details of your subcategory.'
+                  : 'Create a new subcategory for your articles.'
+                }
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="subcategory-name">Name</Label>
+                <Input
+                  id="subcategory-name"
+                  placeholder="Enter subcategory name"
+                  value={currentSubcategory?.name || ''}
+                  onChange={(e) => setCurrentSubcategory({ ...currentSubcategory, name: e.target.value })}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="subcategory-category">Category</Label>
+                <Select
+                  value={currentSubcategory?.category_id || ''}
+                  onValueChange={(value) => setCurrentSubcategory({ ...currentSubcategory, category_id: value })}
+                >
+                  <SelectTrigger id="subcategory-category">
+                    <SelectValue placeholder="Select parent category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="subcategory-description">Description (optional)</Label>
+                <Textarea
+                  id="subcategory-description"
+                  placeholder="Enter subcategory description"
+                  value={currentSubcategory?.description || ''}
+                  onChange={(e) => setCurrentSubcategory({ ...currentSubcategory, description: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsSubcategoryDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => saveSubcategory(currentSubcategory!)}>
+                {currentSubcategory?.id ? 'Update' : 'Create'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

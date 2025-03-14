@@ -188,8 +188,84 @@ export function TeamSection() {
 
   // Desktop Layout
   return (
-    <section className="relative min-h-screen bg-black text-white">
-      <div className="absolute inset-0">
+    <section className="bg-black text-white">
+      {/* Content section with text and team grid */}
+      <div className="bg-black">
+        <div className="container mx-auto px-4 py-16">
+          <div className="flex flex-col lg:flex-row w-full gap-12">
+            {/* Left side - Text content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="flex flex-col justify-center lg:w-1/2"
+            >
+              <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">OUR TEAM</h2>
+              <h3 className="text-[clamp(2rem,4vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
+                Expert care from trusted professionals
+              </h3>
+              <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+                <p>
+                  Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
+                  decades of combined experience in aesthetic medicine. We are committed to delivering exceptional results
+                  while ensuring your comfort and safety.
+                </p>
+              </div>
+              <div className="mt-8 space-y-4">
+                <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+              </div>
+            </motion.div>
+
+            {/* Right side - Team photos in 2x2 grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="lg:w-1/2"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                {teamImages.map((member, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="relative"
+                  >
+                    <div className="relative aspect-[3/4] overflow-hidden">
+                      <Image
+                        src={member.src}
+                        alt={member.alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 50vw, 25vw"
+                      />
+                      {/* Gradient overlay for text legibility */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                      
+                      {/* Name and title positioned at bottom */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                        <h4 className="text-base font-medium">{member.name}</h4>
+                        <p className="text-sm text-gray-300">{member.title}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Background image/video section - moved to bottom */}
+      <div className="relative w-full h-[40vh] md:h-[50vh]">
         {isVideo ? (
           <video
             src={teamBackgroundUrl || ""}
@@ -197,87 +273,20 @@ export function TeamSection() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
           />
         ) : (
           <Image 
             src={teamBackgroundUrl || ""} 
             alt="Our Medical Team" 
             fill 
-            className="object-cover"
+            className="object-cover object-top"
             sizes="100vw"
             priority
           />
         )}
-        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-      </div>
-      
-      <div className="relative container mx-auto px-4 py-24 min-h-screen flex items-center">
-        <div className="flex flex-col lg:flex-row w-full gap-12">
-          {/* Left side - Text content */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="flex flex-col justify-center text-white lg:w-1/2"
-          >
-            <motion.div className="max-w-3xl">
-              <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Our Team</h2>
-              <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
-                Expert care from trusted professionals
-              </h3>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
-                  decades of combined experience in aesthetic medicine. We are committed to delivering exceptional results
-                  while ensuring your comfort and safety.
-                </p>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Right side - Team photos grid */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="relative grid grid-cols-2 gap-4 py-8 lg:w-1/2"
-          >
-            {teamImages.map((image, index) => (
-              <motion.div
-                key={index}
-                className="relative h-full py-4"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 1, delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  className="object-cover"
-                  sizes="25vw"
-                  priority={index === 0}
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
-                  <h4 className="text-sm font-cerebri font-medium text-white">{image.name}</h4>
-                  <p className="text-xs text-gray-300">{image.title}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
+        {/* Subtle overlay */}
+        <div className="absolute inset-0 bg-black/30" />
       </div>
     </section>
   )

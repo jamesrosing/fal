@@ -3,8 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 import { Article } from '@/lib/supabase';
 
 // Move initialization into the handler to prevent top-level errors
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url);
+    const categoryId = url.searchParams.get('category');
+    const subcategory = url.searchParams.get('subcategory');
+    const limit = parseInt(url.searchParams.get('limit') || '100', 10);
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const offset = (page - 1) * limit;
+    
     // Environment check
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -46,36 +53,30 @@ export async function GET() {
     // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Test connection
-    const { data: testData, error: testError } = await supabase
-      .from('articles')
-      .select('count')
-      .limit(1);
-
-    if (testError) {
-      console.error('Supabase connection test failed:', testError);
-      return new NextResponse(
-        JSON.stringify({ 
-          error: 'Failed to connect to database',
-          details: testError.message
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-    }
-
-    // Fetch articles
-    const { data, error } = await supabase
+    // Build the query
+    let query = supabase
       .from('articles')
       .select(`
         *,
-        category:article_categories(name)
+        category:article_categories(name, slug)
       `)
-      .order('created_at', { ascending: false });
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+    
+    // Apply filters
+    if (categoryId) {
+      query = query.eq('category_id', categoryId);
+    }
+    
+    if (subcategory) {
+      query = query.eq('subcategory', subcategory);
+    }
+    
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+    
+    // Execute the query
+    const { data, error } = await query;
 
     if (error) {
       console.error('Supabase query error:', error);
@@ -93,12 +94,35 @@ export async function GET() {
       );
     }
 
+    // Format the data to match the expected Article interface
+    const formattedArticles = data.map(article => ({
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      subtitle: article.subtitle,
+      excerpt: article.excerpt,
+      content: article.content,
+      image: article.featured_image,
+      category: article.category?.slug,
+      categoryName: article.category?.name,
+      category_id: article.category_id,
+      subcategory: article.subcategory,
+      date: article.published_at || article.created_at,
+      author: article.author_id, // You might need to join with authors table later
+      readTime: article.reading_time ? `${article.reading_time} min` : undefined,
+      status: article.status,
+      publishedAt: article.published_at,
+      createdAt: article.created_at,
+      updatedAt: article.updated_at,
+      featured_image: article.featured_image // Include original field to prevent breaking changes
+    }));
+
     console.log('Articles API success:', {
-      count: data?.length || 0
+      count: formattedArticles.length
     });
 
     return new NextResponse(
-      JSON.stringify(data || []),
+      JSON.stringify(formattedArticles),
       {
         status: 200,
         headers: {

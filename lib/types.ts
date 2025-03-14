@@ -69,25 +69,35 @@ export interface Article {
   // Media
   image: string;
   featuredVideo?: string;
+  featured_image?: string; // For compatibility with database naming
   
   // Categorization
-  category: ArticleCategory;
+  category?: ArticleCategory | string;
+  category_id?: string; // For compatibility with database naming
+  categoryName?: string; // For displaying category name
   subcategory?: ArticleSubcategories[ArticleCategory];
   tags?: string[];
   
   // Metadata
   author?: string;
   authorId?: string;
-  date: string;
+  author_id?: string; // For compatibility with database naming
+  date?: string;
   publishedAt?: string;
+  published_at?: string; // For compatibility with database naming
   createdAt?: string;
+  created_at?: string; // For compatibility with database naming
   updatedAt?: string;
+  updated_at?: string; // For compatibility with database naming
   readTime?: string | number;
+  reading_time?: number; // For compatibility with database naming
   status?: ArticleStatus;
   
   // SEO
   metaDescription?: string;
+  meta_description?: string; // For compatibility with database naming
   metaKeywords?: string[];
+  meta_keywords?: string[]; // For compatibility with database naming
   structuredData?: Record<string, any>;
 }
 

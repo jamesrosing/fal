@@ -96,6 +96,12 @@ const FadeIn = ({ children }: { children: React.ReactNode }) => (
   </motion.div>
 );
 
+// Add isValidDate function at the top of the file
+const isValidDate = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+};
+
 export function AppointmentScheduler() {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
@@ -282,7 +288,10 @@ export function AppointmentScheduler() {
         serviceName: getServiceName(selectedService),
         providerName: getProviderName(selectedProvider),
         date: format(selectedDate, 'MMMM d, yyyy'),
-        time: format(new Date(availableSlots.find(s => s.id === selectedSlot)?.start_time || ''), 'h:mm a'),
+        time: selectedSlot && availableSlots.find(s => s.id === selectedSlot)?.start_time && 
+          isValidDate(availableSlots.find(s => s.id === selectedSlot)?.start_time || '') 
+          ? format(new Date(availableSlots.find(s => s.id === selectedSlot)?.start_time || ''), 'h:mm a')
+          : 'No time selected',
       });
 
       toast({
@@ -329,7 +338,9 @@ export function AppointmentScheduler() {
     const providerName = getProviderName(selectedProvider);
     const appointmentDate = selectedDate ? format(selectedDate, 'MMMM d, yyyy') : '';
     const appointmentTime = availableSlots.find(slot => slot.id === selectedSlot)?.start_time || '';
-    const formattedTime = appointmentTime ? format(new Date(appointmentTime), 'h:mm a') : '';
+    const formattedTime = appointmentTime && isValidDate(appointmentTime) 
+      ? format(new Date(appointmentTime), 'h:mm a') 
+      : '';
     
     return (
       <SuccessDisplay 
@@ -527,7 +538,9 @@ export function AppointmentScheduler() {
                             htmlFor={slot.id}
                             className="flex items-center justify-center h-12 rounded-md border-2 border-zinc-800 bg-zinc-900 peer-checked:border-primary peer-checked:text-primary cursor-pointer hover:bg-zinc-800 transition-colors"
                           >
-                            {format(new Date(slot.start_time), 'h:mm a')}
+                            {isValidDate(slot.start_time) 
+                              ? format(new Date(slot.start_time), 'h:mm a')
+                              : 'Invalid time'}
                           </label>
                         </motion.div>
                       ))}
@@ -630,9 +643,10 @@ export function AppointmentScheduler() {
                   
                   <div className="text-zinc-400">Time:</div>
                   <div className="text-white">
-                    {availableSlots.find(slot => slot.id === selectedSlot)?.start_time 
+                    {selectedSlot && availableSlots.find(slot => slot.id === selectedSlot)?.start_time && 
+                      isValidDate(availableSlots.find(slot => slot.id === selectedSlot)!.start_time)
                       ? format(new Date(availableSlots.find(slot => slot.id === selectedSlot)!.start_time), 'h:mm a')
-                      : ''}
+                      : 'No time selected'}
                   </div>
                   
                   <div className="text-zinc-400">Provider:</div>
