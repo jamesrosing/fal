@@ -7,6 +7,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { createClient } from '@supabase/supabase-js'
 import { Article } from "@/lib/types"
+import ArticleContent from "@/components/articles/ArticleContent"
 
 type Props = {
   params: { slug: string }
@@ -252,58 +253,7 @@ export default async function ArticlePage({ params }: Props) {
       {/* Article Content */}
       <section className="py-16 md:py-24 bg-zinc-900 text-white">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <div className="prose prose-lg prose-invert max-w-none">
-            {typeof article.content === 'string' ? (
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
-            ) : article.content && Array.isArray(article.content) ? (
-              article.content.map((block, index) => (
-                <div key={index} className="mb-8">
-                  {block.type === 'paragraph' && <p>{block.content}</p>}
-                  {block.type === 'heading' && <h2>{block.content}</h2>}
-                  {block.type === 'image' && (
-                    <div className="my-8">
-                      <Image
-                        src={getCloudinaryUrl(block.content, {
-                          width: 800,
-                          height: 450,
-                          crop: 'fill'
-                        })}
-                        alt={block.metadata?.alt || 'Article image'}
-                        width={800}
-                        height={450}
-                        className="rounded-lg"
-                      />
-                      {block.metadata?.caption && (
-                        <p className="text-center text-sm text-zinc-400 mt-2">
-                          {block.metadata.caption}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  {block.type === 'list' && (
-                    <ul className="list-disc pl-6">
-                      {block.content.split('\n').map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-                  {block.type === 'quote' && (
-                    <blockquote className="border-l-4 border-zinc-500 pl-4 italic">
-                      {block.content}
-                    </blockquote>
-                  )}
-                  {block.type === 'callout' && (
-                    <div className="bg-zinc-800 p-6 rounded-lg">
-                      <p className="font-bold mb-2">{block.metadata?.title || 'Note'}</p>
-                      <p>{block.content}</p>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p className="text-center py-12">This article has no content yet.</p>
-            )}
-          </div>
+          <ArticleContent article={article} />
         </div>
       </section>
       

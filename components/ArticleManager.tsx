@@ -21,6 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { CloudinaryUploader } from '@/components/CloudinaryUploader';
+import CloudinaryMediaLibrary from '@/components/CloudinaryMediaLibrary';
 import { CloudinaryAsset } from '@/lib/cloudinary';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,6 +55,7 @@ import {
   Bot,
   X,
   FileImage,
+  Wand2,
 } from 'lucide-react';
 import {
   Select,
@@ -127,6 +129,10 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
   const [loadingSubcategories, setLoadingSubcategories] = useState(false);
   const [isSubcategoryDialogOpen, setIsSubcategoryDialogOpen] = useState(false);
   const [currentSubcategory, setCurrentSubcategory] = useState<Partial<ArticleSubcategory> | null>(null);
+  const [isAiEnhancerDialogOpen, setIsAiEnhancerDialogOpen] = useState(false);
+  const [enhancementFocus, setEnhancementFocus] = useState<'general' | 'seo' | 'engagement' | 'conversion' | 'images'>('general');
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [enhancementPlan, setEnhancementPlan] = useState<any>(null);
 
   // Fetch articles and categories
   useEffect(() => {
@@ -235,28 +241,39 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
 
   // Filter articles based on search query, category, subcategory, and status
   const filteredArticles = articles.filter(article => {
-    // Check if article matches the search query
-    const matchesSearch = 
-      searchQuery === '' || 
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (article.excerpt && article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    // Check if article matches the selected category
-    const matchesCategory = 
-      activeCategoryId === 'all' || 
-      article.category_id === activeCategoryId;
-    
-    // Check if article matches the selected subcategory
-    const matchesSubcategory = 
-      activeSubcategoryId === 'all' || 
-      article.subcategory === activeSubcategoryId;
-    
-    // Check if article matches the selected status
-    const matchesStatus = 
-      statusFilter === 'all' || 
-      article.status === statusFilter;
-    
-    return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
+    try {
+      // Skip articles with corrupted or invalid data
+      if (!article || !article.title) {
+        console.warn('Skipping article with missing title', article?.id);
+        return false;
+      }
+
+      // Check if article matches the search query
+      const matchesSearch = 
+        searchQuery === '' || 
+        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (article.excerpt && article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Check if article matches the selected category
+      const matchesCategory = 
+        activeCategoryId === 'all' || 
+        article.category_id === activeCategoryId;
+      
+      // Check if article matches the selected subcategory
+      const matchesSubcategory = 
+        activeSubcategoryId === 'all' || 
+        article.subcategory === activeSubcategoryId;
+      
+      // Check if article matches the selected status
+      const matchesStatus = 
+        statusFilter === 'all' || 
+        article.status === statusFilter;
+      
+      return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
+    } catch (error) {
+      console.error('Error filtering article:', error, article?.id);
+      return false;
+    }
   });
 
   // Generate article content with AI
@@ -326,25 +343,94 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
       
       // Ensure content is properly formatted
       if (articleToSave.content) {
+        let validContent = [];
+        
+        // If content is a string, try to parse it or convert to paragraph
         if (typeof articleToSave.content === 'string') {
           try {
-            articleToSave.content = JSON.parse(articleToSave.content);
+            const contentStr = articleToSave.content as string;
+            if (contentStr.trim().startsWith('[')) {
+              // Try to parse as JSON array
+              const parsed = JSON.parse(contentStr);
+              if (Array.isArray(parsed)) {
+                validContent = parsed.map(block => {
+                  // Ensure each block has correct structure
+                  const validTypes = ['paragraph', 'heading', 'list', 'image', 'video', 'quote'];
+                  return {
+                    type: validTypes.includes(block.type) ? block.type : 'paragraph',
+                    content: block.content || 'Content placeholder'
+                  };
+                });
+              } else {
+                // If parsed but not an array, create a paragraph
+                validContent = [{ 
+                  type: 'paragraph' as const, 
+                  content: articleToSave.content 
+                }];
+              }
+            } else {
+              // Not JSON, create a paragraph
+              validContent = [{ 
+                type: 'paragraph' as const, 
+                content: articleToSave.content 
+              }];
+            }
           } catch (e) {
-            // If not valid JSON, treat as a single paragraph
-            articleToSave.content = [{ 
+            // If parsing fails, create a paragraph
+            validContent = [{ 
               type: 'paragraph' as const, 
-              content: typeof articleToSave.content === 'string' 
-                ? articleToSave.content 
-                : String(articleToSave.content || '')
+              content: articleToSave.content 
             }];
           }
-        } else if (!Array.isArray(articleToSave.content)) {
-          // If it's an object but not an array, wrap it in an array
-          articleToSave.content = [articleToSave.content as any];
+        } 
+        // If content is already an array, validate each item
+        else if (Array.isArray(articleToSave.content)) {
+          validContent = articleToSave.content.map(block => {
+            // Ensure required properties exist on each block
+            if (!block || typeof block !== 'object') {
+              return {
+                type: 'paragraph' as const,
+                content: 'Content placeholder'
+              };
+            }
+            
+            // Ensure block has valid type
+            const validTypes = ['paragraph', 'heading', 'list', 'image', 'video', 'quote'];
+            const type = validTypes.includes(block.type) ? block.type : 'paragraph';
+            
+            // Ensure block has content (except for image/video types)
+            let content = block.content;
+            if ((type !== 'image' && type !== 'video') && (!content || typeof content !== 'string')) {
+              content = 'Content placeholder';
+            }
+            
+            return { 
+              type: type as 'paragraph' | 'heading' | 'list' | 'image' | 'video' | 'quote', 
+              content 
+            };
+          });
+        } 
+        // If content is some other type, convert to array with single paragraph
+        else {
+          validContent = [{ 
+            type: 'paragraph' as const, 
+            content: articleToSave.excerpt || 'Default article content' 
+          }];
         }
+        
+        // Set the validated content
+        articleToSave.content = validContent;
       } else {
+        // If no content, initialize with empty array
         articleToSave.content = [];
       }
+      
+      // Log the article being saved for debugging
+      console.log('Saving article with content structure:', 
+        Array.isArray(articleToSave.content) ? 
+          `Array with ${articleToSave.content.length} blocks` : 
+          typeof articleToSave.content
+      );
       
       const response = await fetch(url, {
         method,
@@ -631,6 +717,84 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
     }
   };
 
+  // Enhance article with AI
+  const enhanceArticleWithAI = async () => {
+    if (!currentArticle) {
+      toast({
+        title: 'Error',
+        description: 'No article selected for enhancement',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsEnhancing(true);
+    try {
+      const response = await fetch('/api/ai/article-enhancer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          article: currentArticle,
+          focus: enhancementFocus,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setEnhancementPlan(data.enhancementPlan);
+      
+      toast({
+        title: 'Success',
+        description: 'Article enhancement plan generated successfully',
+      });
+    } catch (error) {
+      console.error('Error enhancing article:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate enhancement plan',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
+  // Apply enhancement
+  const applyEnhancement = (field: string, value: any) => {
+    if (!currentArticle || !enhancementPlan) return;
+    
+    let updatedArticle = { ...currentArticle };
+    
+    switch (field) {
+      case 'title':
+        updatedArticle.title = value;
+        break;
+      case 'subtitle':
+        updatedArticle.subtitle = value;
+        break;
+      case 'meta_description':
+        updatedArticle.meta_description = value;
+        break;
+      case 'meta_keywords':
+        updatedArticle.meta_keywords = value;
+        break;
+      default:
+        return;
+    }
+    
+    setCurrentArticle(updatedArticle);
+    
+    toast({
+      title: 'Enhancement Applied',
+      description: `Applied enhancement to ${field}`,
+    });
+  };
+
   // Initial skeleton UI while loading
   if (loading) {
     return (
@@ -827,94 +991,237 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredArticles.map((article) => {
-              const category = categories.find(c => c.id === article.category_id);
-              
-              return (
-                <Card key={article.id} className="overflow-hidden">
-                  {article.featured_image ? (
-                    <div className="relative h-48 w-full">
-                      <CloudinaryImage
-                        publicId={article.featured_image}
-                        alt={article.title}
-                        className="object-cover h-full w-full"
-                        fallbackSrc="/images/placeholder.jpg"
-                      />
-                    </div>
-                  ) : (
-                    <div className="bg-muted h-48 flex items-center justify-center">
-                      <FileImage className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        {category && (
-                          <Badge variant="outline" className="mb-2">{category.name}</Badge>
-                        )}
+              try {
+                const category = categories.find(c => c.id === article.category_id);
+                
+                return (
+                  <Card key={article.id} className="overflow-hidden">
+                    {article.featured_image ? (
+                      <div className="relative h-48 w-full">
+                        <CloudinaryImage
+                          publicId={article.featured_image}
+                          alt={article.title || 'Article image'}
+                          className="object-cover h-full w-full"
+                          fallbackSrc="/images/placeholder.jpg"
+                        />
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => {
-                            setCurrentArticle(article);
-                            setIsCreating(false);
-                            setIsEditorOpen(true);
-                          }}>
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            <span>Edit</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => router.push(`/articles/${article.slug}`)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            <span>View</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => {
-                              setSelectedArticleId(article.id);
-                              setIsDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Delete</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    <CardTitle className="line-clamp-2">{article.title}</CardTitle>
-                    {article.subtitle && (
-                      <CardDescription className="line-clamp-1">{article.subtitle}</CardDescription>
+                    ) : (
+                      <div className="bg-muted h-48 flex items-center justify-center">
+                        <FileImage className="w-8 h-8 text-muted-foreground" />
+                      </div>
                     )}
-                  </CardHeader>
-                  
-                  <CardContent className="pb-2">
-                    <p className="text-sm line-clamp-3">
-                      {article.excerpt}
-                    </p>
-                  </CardContent>
-                  
-                  <CardFooter className="flex justify-between items-center text-sm text-muted-foreground pt-0">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${
-                        article.status === 'published' ? 'bg-green-500' : 
-                        article.status === 'draft' ? 'bg-amber-500' : 'bg-gray-500'
-                      }`} />
-                      <span className="capitalize">{article.status}</span>
+                    
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          {category && (
+                            <Badge variant="outline" className="mb-2">{category.name}</Badge>
+                          )}
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => {
+                              setCurrentArticle(article);
+                              setIsCreating(false);
+                              setIsEditorOpen(true);
+                            }}>
+                              <Edit2 className="mr-2 h-4 w-4" />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                try {
+                                  if (article.slug) {
+                                    router.push(`/articles/${article.slug}`);
+                                  } else {
+                                    toast({
+                                      title: 'Error',
+                                      description: 'This article has no slug and cannot be viewed',
+                                      variant: 'destructive',
+                                    });
+                                  }
+                                } catch (error) {
+                                  console.error('Error navigating to article:', error);
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Could not navigate to article',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              <span>View</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                // Reset article data
+                                const fixedArticle = { ...article };
+                                // Ensure content is properly formatted
+                                if (!fixedArticle.content || (Array.isArray(fixedArticle.content) && fixedArticle.content.length === 0)) {
+                                  fixedArticle.content = [{
+                                    type: 'paragraph' as const,
+                                    content: fixedArticle.excerpt || 'Article content here'
+                                  }];
+                                }
+                                setCurrentArticle(fixedArticle);
+                                setIsCreating(false);
+                                setIsEditorOpen(true);
+                                toast({
+                                  title: 'Article data refreshed',
+                                  description: 'The article data has been reset to a stable state',
+                                });
+                              }}
+                            >
+                              <Loader2 className="mr-2 h-4 w-4" />
+                              <span>Repair</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => {
+                                setSelectedArticleId(article.id);
+                                setIsDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                setCurrentArticle(article);
+                                setIsAiEnhancerDialogOpen(true);
+                              }}
+                            >
+                              <Wand2 className="mr-2 h-4 w-4" />
+                              <span>AI Enhance</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <CardTitle className="line-clamp-2">{article.title || 'Untitled Article'}</CardTitle>
+                      {article.subtitle && (
+                        <CardDescription className="line-clamp-1">{article.subtitle}</CardDescription>
+                      )}
+                    </CardHeader>
+                    
+                    <CardContent className="pb-2">
+                      <p className="text-sm line-clamp-3">
+                        {article.excerpt || 'No excerpt available'}
+                      </p>
+                    </CardContent>
+                    
+                    <CardFooter className="flex justify-between items-center text-sm text-muted-foreground pt-0">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          article.status === 'published' ? 'bg-green-500' : 
+                          article.status === 'draft' ? 'bg-amber-500' : 'bg-gray-500'
+                        }`} />
+                        <span className="capitalize">{article.status || 'unknown'}</span>
+                      </div>
+                      <div>
+                        {article.created_at && isValidDate(article.created_at) 
+                          ? format(new Date(article.created_at), 'MMM d, yyyy')
+                          : 'No date'}
+                      </div>
+                    </CardFooter>
+                  </Card>
+                );
+              } catch (error) {
+                console.error('Error rendering article card:', error, article?.id);
+                return (
+                  <Card key={article.id || 'error-card'} className="overflow-hidden border-red-200">
+                    <div className="bg-red-50 h-48 flex items-center justify-center">
+                      <AlertCircle className="w-8 h-8 text-red-400" />
                     </div>
-                    <div>
-                      {article.created_at && isValidDate(article.created_at) 
-                        ? format(new Date(article.created_at), 'MMM d, yyyy')
-                        : 'No date'}
-                    </div>
-                  </CardFooter>
-                </Card>
-              );
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <Badge variant="outline" className="mb-2 text-red-500">Error</Badge>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={() => {
+                                // Create a clean version of the article
+                                const cleanArticle = {
+                                  id: article.id,
+                                  title: article.title || 'Problematic Article',
+                                  excerpt: article.excerpt || '',
+                                  content: [{
+                                    type: 'paragraph' as const,
+                                    content: article.excerpt || 'Article content here'
+                                  }],
+                                  status: article.status || 'draft',
+                                  category_id: article.category_id || '',
+                                };
+                                setCurrentArticle(cleanArticle);
+                                setIsCreating(false);
+                                setIsEditorOpen(true);
+                              }}
+                            >
+                              <Loader2 className="mr-2 h-4 w-4" />
+                              <span>Repair</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => {
+                                setSelectedArticleId(article.id);
+                                setIsDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <CardTitle className="line-clamp-2">
+                        {article.title || 'Problematic Article'}
+                      </CardTitle>
+                      <CardDescription className="text-red-500">
+                        This article has rendering issues and needs repair
+                      </CardDescription>
+                    </CardHeader>
+                    <CardFooter>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          // Create a clean version of the article
+                          const cleanArticle = {
+                            id: article.id,
+                            title: article.title || 'Problematic Article',
+                            excerpt: article.excerpt || '',
+                            content: [{
+                              type: 'paragraph' as const,
+                              content: article.excerpt || 'Article content here'
+                            }],
+                            status: article.status || 'draft',
+                            category_id: article.category_id || '',
+                          };
+                          setCurrentArticle(cleanArticle);
+                          setIsCreating(false);
+                          setIsEditorOpen(true);
+                        }}
+                      >
+                        <Loader2 className="w-4 h-4 mr-2" />
+                        Repair Article
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              }
             })}
           </div>
         )}
@@ -1053,34 +1360,55 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                   </div>
 
                   {/* Featured Image */}
-                  <div>
-                    <Label className="block mb-2">Featured Image</Label>
-                    {currentArticle.featured_image ? (
-                      <div className="relative aspect-video mb-2 border rounded-md overflow-hidden">
-                        <CloudinaryImage
-                          publicId={currentArticle.featured_image}
-                          alt="Featured image"
-                          className="object-cover w-full h-full"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => setCurrentArticle({ ...currentArticle, featured_image: undefined })}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="border rounded-md p-8 flex flex-col items-center justify-center bg-muted/30">
+                  <div className="space-y-2">
+                    <Label htmlFor="featured_image">Featured Image</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="featured_image"
+                        value={currentArticle?.featured_image || ''}
+                        onChange={(e) => setCurrentArticle({ ...currentArticle, featured_image: e.target.value })}
+                        placeholder="Featured image URL"
+                      />
+                      <div className="flex gap-2">
                         <CloudinaryUploader
-                          area="article"
-                          folder="articles/featured"
-                          onSuccess={handleImageUpload}
-                          buttonLabel="Upload Featured Image"
+                          onSuccess={(result) => {
+                            if (currentArticle && result) {
+                              const asset = Array.isArray(result) ? result[0] : result;
+                              setCurrentArticle({
+                                ...currentArticle,
+                                featured_image: asset.publicId,
+                              });
+                            }
+                          }}
+                          folder="articles"
+                          buttonLabel="Upload"
+                        />
+                        <CloudinaryMediaLibrary
+                          onSelect={(publicId: string, url: string) => {
+                            if (currentArticle) {
+                              setCurrentArticle({
+                                ...currentArticle,
+                                featured_image: url,
+                              });
+                              toast({
+                                title: "Image Selected",
+                                description: "Featured image has been updated from Media Library",
+                              });
+                            }
+                          }}
+                          buttonText="Media Library"
+                          variant="secondary"
+                          supportedFileTypes={['image']}
+                          onError={(error: Error) => {
+                            toast({
+                              title: "Error",
+                              description: `Failed to open Media Library: ${error.message}`,
+                              variant: "destructive",
+                            });
+                          }}
                         />
                       </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Content Blocks - simplified for now */}
@@ -1425,6 +1753,247 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
               <Button onClick={() => saveSubcategory(currentSubcategory!)}>
                 {currentSubcategory?.id ? 'Update' : 'Create'}
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* AI Article Enhancement Dialog */}
+        <Dialog open={isAiEnhancerDialogOpen} onOpenChange={setIsAiEnhancerDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+            <DialogHeader>
+              <DialogTitle>AI Article Enhancement</DialogTitle>
+              <DialogDescription>
+                Analyze and enhance your article with AI to improve SEO, engagement, and visuals.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6 py-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-lg font-medium mb-1">Current Article</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Select an enhancement focus to get AI recommendations for improving your article.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Select
+                    value={enhancementFocus}
+                    onValueChange={(value: any) => setEnhancementFocus(value)}
+                  >
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Focus" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General</SelectItem>
+                      <SelectItem value="seo">SEO</SelectItem>
+                      <SelectItem value="engagement">Engagement</SelectItem>
+                      <SelectItem value="conversion">Conversion</SelectItem>
+                      <SelectItem value="images">Images</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={enhanceArticleWithAI}
+                    disabled={isEnhancing || !currentArticle}
+                  >
+                    {isEnhancing ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enhancing...</>
+                    ) : (
+                      <><Wand2 className="mr-2 h-4 w-4" /> Enhance</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {currentArticle && (
+                <div className="border rounded-md p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium mb-1">Title</h4>
+                      <p className="text-sm">{currentArticle.title}</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Subtitle</h4>
+                      <p className="text-sm">{currentArticle.subtitle || 'None'}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-1">Excerpt</h4>
+                    <p className="text-sm">{currentArticle.excerpt}</p>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-1">Meta Description</h4>
+                    <p className="text-sm">
+                      {currentArticle.meta_description || 'None'}
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-1">Meta Keywords</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {(currentArticle.meta_keywords || []).length > 0 ? (
+                        (currentArticle.meta_keywords || []).map((keyword: string, index: number) => (
+                          <Badge key={index} variant="secondary">{keyword}</Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No keywords defined</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {enhancementPlan && (
+                <div className="border rounded-md p-4 mt-6">
+                  <h3 className="text-lg font-medium mb-4">Enhancement Suggestions</h3>
+                  
+                  {/* Title Enhancement */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium">Title</h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => applyEnhancement('title', enhancementPlan.title)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Apply
+                      </Button>
+                    </div>
+                    <p className="text-sm p-2 bg-muted rounded-md">{enhancementPlan.title}</p>
+                  </div>
+                  
+                  {/* Subtitle Enhancement */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium">Subtitle</h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => applyEnhancement('subtitle', enhancementPlan.subtitle)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Apply
+                      </Button>
+                    </div>
+                    <p className="text-sm p-2 bg-muted rounded-md">{enhancementPlan.subtitle}</p>
+                  </div>
+                  
+                  {/* Meta Description */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium">Meta Description</h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => applyEnhancement('meta_description', enhancementPlan.meta_description)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Apply
+                      </Button>
+                    </div>
+                    <p className="text-sm p-2 bg-muted rounded-md">{enhancementPlan.meta_description}</p>
+                  </div>
+                  
+                  {/* Meta Keywords */}
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium">Meta Keywords</h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => applyEnhancement('meta_keywords', enhancementPlan.meta_keywords)}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        Apply
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-1 p-2 bg-muted rounded-md">
+                      {enhancementPlan.meta_keywords.map((keyword: string, index: number) => (
+                        <Badge key={index} variant="secondary">{keyword}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Content Structure Suggestions */}
+                  <div className="mb-6">
+                    <h4 className="font-medium mb-2">Content Structure Suggestions</h4>
+                    <div className="p-2 bg-muted rounded-md">
+                      {enhancementPlan.content_structure.map((item: any, index: number) => (
+                        <div key={index} className="mb-3">
+                          {item.type === 'heading' && <h5 className="font-medium text-sm">{item.content}</h5>}
+                          {item.type === 'notes' && <p className="text-sm text-muted-foreground">{item.content}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Image Suggestions */}
+                  {enhancementPlan.image_suggestions && enhancementPlan.image_suggestions.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="font-medium mb-2">Image Suggestions</h4>
+                      <div className="space-y-2">
+                        {enhancementPlan.image_suggestions.map((suggestion: any, index: number) => (
+                          <div key={index} className="p-2 bg-muted rounded-md">
+                            <p className="text-sm font-medium">{suggestion.purpose}</p>
+                            <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Cloudinary Transformations */}
+                  {enhancementPlan.cloudinary_transformations && enhancementPlan.cloudinary_transformations.length > 0 && (
+                    <div>
+                      <h4 className="font-medium mb-2">Cloudinary Image Transformations</h4>
+                      <div className="space-y-2">
+                        {enhancementPlan.cloudinary_transformations.map((transform: any, index: number) => (
+                          <div key={index} className="p-2 bg-muted rounded-md">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="text-sm font-medium">{transform.name}</p>
+                                <p className="text-sm text-muted-foreground">{transform.purpose}</p>
+                              </div>
+                              <code className="text-xs bg-background p-1 rounded border">{transform.code}</code>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAiEnhancerDialogOpen(false)}>
+                Close
+              </Button>
+              {enhancementPlan && (
+                <Button 
+                  onClick={() => {
+                    // Apply all enhancements at once
+                    if (currentArticle && enhancementPlan) {
+                      setCurrentArticle({
+                        ...currentArticle,
+                        title: enhancementPlan.title,
+                        subtitle: enhancementPlan.subtitle,
+                        meta_description: enhancementPlan.meta_description,
+                        meta_keywords: enhancementPlan.meta_keywords,
+                      });
+                      
+                      toast({
+                        title: 'All Enhancements Applied',
+                        description: 'Applied all AI enhancement suggestions to the article',
+                      });
+                      
+                      setIsAiEnhancerDialogOpen(false);
+                      setIsEditorOpen(true);
+                    }
+                  }}
+                >
+                  Apply All & Edit
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>

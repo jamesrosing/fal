@@ -91,7 +91,7 @@ export interface Article {
 }
 
 export interface ArticleContent {
-  type: 'paragraph' | 'heading' | 'image' | 'video' | 'quote' | 'list';
+  type: 'paragraph' | 'heading' | 'image' | 'video' | 'quote' | 'list' | 'callout';
   content: string;
   metadata?: Record<string, any>;
 }
@@ -165,15 +165,14 @@ export async function getCasesByAlbum(albumId: string) {
   const { data, error } = await createClient()
     .from('cases')
     .select('*, images(*)')
-    .eq('album_id', albumId)
-    .order('created_at', { ascending: false });
+    .eq('album_id', albumId);
   
   if (error) throw error;
   
   // Sort images by display_order for each case
-  const casesWithSortedImages = data.map(caseItem => {
+  const casesWithSortedImages = data?.map(caseItem => {
     if (caseItem.images && Array.isArray(caseItem.images)) {
-      caseItem.images.sort((a, b) => {
+      caseItem.images.sort((a: any, b: any) => {
         // Default to 0 if display_order doesn't exist yet
         const orderA = a.display_order || 0;
         const orderB = b.display_order || 0;
@@ -181,12 +180,7 @@ export async function getCasesByAlbum(albumId: string) {
       });
     }
     return caseItem;
-  });
-  
-  // Sort cases by order
-  casesWithSortedImages.sort((a: any, b: any) => {
-    return a.order - b.order;
-  });
+  }) || [];
   
   return casesWithSortedImages as (Case & { images: Image[] })[];
 }
@@ -203,6 +197,36 @@ export async function getCase(caseId: string) {
   // Sort images by display_order if it exists
   if (data && data.images && Array.isArray(data.images)) {
     data.images.sort((a, b) => {
+      // Default to 0 if display_order doesn't exist yet
+      const orderA = a.display_order || 0;
+      const orderB = b.display_order || 0;
+      return orderA - orderB;
+    });
+  }
+  
+  return data as Case & { images: Image[] };
+}
+
+function compareByDate(a: any, b: any) {
+  // comparison function code
+}
+
+function compareByRelevance(a: any, b: any) {
+  // comparison function code
+}
+
+export async function getCaseById(caseId: string) {
+  const { data, error } = await createClient()
+    .from('cases')
+    .select('*, images(*)')
+    .eq('id', caseId)
+    .single();
+  
+  if (error) throw error;
+  
+  // Sort images by display_order if it exists
+  if (data && data.images && Array.isArray(data.images)) {
+    data.images.sort((a: any, b: any) => {
       // Default to 0 if display_order doesn't exist yet
       const orderA = a.display_order || 0;
       const orderB = b.display_order || 0;

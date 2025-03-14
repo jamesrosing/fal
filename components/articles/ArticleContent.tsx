@@ -1,6 +1,5 @@
 import { Article } from '@/lib/types'
 import { format } from 'date-fns'
-import Head from 'next/head'
 import Image from 'next/image'
 import { getCloudinaryUrl } from '@/lib/cloudinary'
 
@@ -21,40 +20,32 @@ export default function ArticleContent({ article }: { article: Article }) {
     null;
 
   return (
-    <>
-      <Head>
-        <title>{article.title} | Allure MD</title>
-        <meta name="description" content={article.snippet || article.content.substring(0, 160)} />
-        <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.snippet || article.content.substring(0, 160)} />
-        {imageUrl && <meta property="og:image" content={imageUrl} />}
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-      <article className="max-w-3xl mx-auto px-4 py-8 font-sans" itemScope itemType="http://schema.org/Article">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold font-serif mb-4 text-foreground" itemProp="headline">{article.title}</h1>
-          <div className="mt-2 text-sm text-muted-foreground">
-            Published on {article.created_at && isValidDate(article.created_at) 
-              ? <time dateTime={article.created_at}>{format(new Date(article.created_at), 'MMMM d, yyyy')}</time>
-              : <span>unknown date</span>}
+    <article className="max-w-3xl mx-auto px-4 py-8 font-sans" itemScope itemType="http://schema.org/Article">
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold font-serif mb-4 text-foreground" itemProp="headline">{article.title}</h1>
+        <div className="mt-2 text-sm text-muted-foreground">
+          Published on {article.created_at && isValidDate(article.created_at) 
+            ? <time dateTime={article.created_at}>{format(new Date(article.created_at), 'MMMM d, yyyy')}</time>
+            : <span>unknown date</span>}
+        </div>
+        {imageUrl && (
+          <div className="mt-6">
+            <Image 
+              src={imageUrl} 
+              alt={article.title} 
+              width={1200} 
+              height={630} 
+              className="rounded-lg object-cover w-full h-auto" 
+              itemProp="image" 
+            />
           </div>
-          {imageUrl && (
-            <div className="mt-6">
-              <Image 
-                src={imageUrl} 
-                alt={article.title} 
-                width={1200} 
-                height={630} 
-                className="rounded-lg object-cover w-full h-auto" 
-                itemProp="image" 
-              />
-            </div>
-          )}
-        </header>
-        
-        <div className="prose prose-lg dark:prose-invert max-w-none text-foreground" itemProp="articleBody">
-          {article.content.split('\n\n').map((paragraph, index) => {
+        )}
+      </header>
+      
+      <div className="prose prose-lg dark:prose-invert max-w-none text-foreground" itemProp="articleBody">
+        {typeof article.content === 'string' ? (
+          // Handle plain text content
+          article.content.split('\n\n').map((paragraph, index) => {
             if (paragraph.startsWith('# ')) {
               return <h2 key={index} className="text-3xl font-bold mt-8 mb-4 font-serif">{paragraph.slice(2)}</h2>
             } else if (paragraph.startsWith('## ')) {
@@ -64,15 +55,63 @@ export default function ArticleContent({ article }: { article: Article }) {
             } else {
               return <p key={index} className="mb-4 leading-relaxed">{paragraph}</p>
             }
-          })}
-        </div>
-        
-        <footer className="mt-12 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-muted-foreground">
-            Category: <span itemProp="articleSection" className="font-semibold">{article.category}</span>
-          </p>
-        </footer>
-      </article>
-    </>
+          })
+        ) : Array.isArray(article.content) ? (
+          // Handle structured content blocks
+          article.content.map((block, index) => (
+            <div key={index} className="mb-8">
+              {block.type === 'paragraph' && <p>{block.content}</p>}
+              {block.type === 'heading' && <h2>{block.content}</h2>}
+              {block.type === 'image' && (
+                <div className="my-8">
+                  <Image
+                    src={getCloudinaryUrl(block.content, {
+                      width: 800,
+                      height: 450,
+                      crop: 'fill'
+                    })}
+                    alt={block.metadata?.alt || 'Article image'}
+                    width={800}
+                    height={450}
+                    className="rounded-lg"
+                  />
+                  {block.metadata?.caption && (
+                    <p className="text-center text-sm text-muted-foreground mt-2">
+                      {block.metadata.caption}
+                    </p>
+                  )}
+                </div>
+              )}
+              {block.type === 'list' && (
+                <ul className="list-disc pl-6">
+                  {block.content.split('\n').map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {block.type === 'quote' && (
+                <blockquote className="border-l-4 border-zinc-500 pl-4 italic">
+                  {block.content}
+                </blockquote>
+              )}
+              {block.type === 'callout' && (
+                <div className="bg-zinc-800 p-6 rounded-lg">
+                  <p className="font-bold mb-2">{block.metadata?.title || 'Note'}</p>
+                  <p>{block.content}</p>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No content available</p>
+        )}
+      </div>
+      
+      <footer className="mt-12 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-sm text-muted-foreground">
+          Category: <span itemProp="articleSection" className="font-semibold">{article.category}</span>
+        </p>
+      </footer>
+    </article>
   )
 }
