@@ -1,20 +1,12 @@
-import { NavBar } from "@/components/nav-bar"
-import Image from "next/image"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import Image from "next/image"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
-import { generateMetadata } from "@/components/seo/metadata"
-import { PageHero } from "@/components/ui/page-hero"
-import { Section } from "@/components/ui/section"
 
-export const metadata = generateMetadata({
+// Simple metadata for now
+export const metadata = {
   title: 'Our Services',
   description: 'Discover our comprehensive range of aesthetic services including plastic surgery, dermatology, medical spa treatments, and functional medicine.',
-  image: {
-    path: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-services',
-    alt: 'Our Services'
-  }
-})
+}
 
 const services = [
   {
@@ -49,46 +41,14 @@ const services = [
 
 export default function Services() {
   return (
-    <main className="min-h-screen bg-black">
-      <NavBar />
-      
-      {/* Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "MedicalOrganization",
-            "name": "Advanced Aesthetic Medicine",
-            "description": "Comprehensive aesthetic and wellness services including plastic surgery, dermatology, medical spa treatments, and functional medicine.",
-            "medicalSpecialty": [
-              "Plastic Surgery",
-              "Dermatology",
-              "Medical Spa",
-              "Functional Medicine"
-            ],
-            "availableService": services.map(service => ({
-              "@type": "MedicalProcedure",
-              "name": service.title,
-              "description": service.description,
-              "url": `https://www.alluremd.com${service.href}`
-            }))
-          })
-        }}
-      />
-      
-      <PageHero
-        title="Comprehensive Aesthetic Solutions"
-        subtitle="Our Services"
-        description="Experience the perfect blend of artistry and medical expertise across our range of aesthetic and wellness services."
-        image={{
-          path: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-services',
-          alt: 'Our Services'
-        }}
-      />
+    <main className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-serif text-center mb-8">Our Services</h1>
+        <p className="text-lg text-center mb-12 max-w-3xl mx-auto">
+          Experience the perfect blend of artistry and medical expertise across our range of aesthetic and wellness services.
+        </p>
 
-      {/* Services Grid */}
-      <Section>
+        {/* Services Grid */}
         <div className="grid gap-8 md:grid-cols-2">
           {services.map((service) => (
             <Link 
@@ -96,27 +56,17 @@ export default function Services() {
               href={service.href}
               className="group block"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className="relative aspect-[4/3] overflow-hidden rounded-lg"
-              >
-                <Image
-                  src={getCloudinaryUrl(service.image, {
-                    width: 800,
-                    height: 600,
-                    crop: 'fill',
-                    gravity: 'auto',
-                    quality: 90
-                  })}
-                  alt={service.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="w-full h-full relative">
+                  <Image
+                    src={getCloudinaryUrl(service.image)}
+                    alt={service.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                </div>
                 
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <h3 className="text-2xl font-serif mb-2">{service.title}</h3>
@@ -132,11 +82,11 @@ export default function Services() {
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </Link>
           ))}
         </div>
-      </Section>
+      </div>
     </main>
   )
 } 

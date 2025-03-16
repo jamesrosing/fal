@@ -167,16 +167,16 @@ export const getCloudinaryUrl = (
   publicId: string,
   options: CloudinaryImageOptions = {}
 ) => {
+  // If publicId is undefined or null, return a placeholder
+  if (publicId === undefined || publicId === null) {
+    console.warn('Empty publicId provided, returning placeholder image');
+    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+  }
+
   // If publicId is already a full URL (starts with http or https), return it as is
   if (publicId && (publicId.startsWith('http://') || publicId.startsWith('https://'))) {
     console.log('URL already provided, skipping Cloudinary transformation:', publicId);
     return publicId;
-  }
-
-  // If publicId is empty or undefined, return a placeholder image
-  if (!publicId) {
-    console.warn('Empty publicId provided, returning placeholder image');
-    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
   }
 
   const {
@@ -191,15 +191,15 @@ export const getCloudinaryUrl = (
 
   // For simplified mode, use fewer transformations
   if (simplifiedMode) {
-    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName || 'demo'}/image/upload/${publicId}`;
   }
 
   try {
     // Use a more conservative set of transformations to reduce the chance of errors
-    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}/${publicId}`;
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName || 'demo'}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}/${publicId}`;
   } catch (error) {
     console.error('Error generating Cloudinary URL:', error);
-    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+    return 'https://via.placeholder.com/800x600?text=Error+Loading+Image';
   }
 };
 

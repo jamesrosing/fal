@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       ZENOTI_API_URL: process.env.ZENOTI_API_URL,
       ZENOTI_API_KEY: includeCredentials ? process.env.ZENOTI_API_KEY : `${process.env.ZENOTI_API_KEY?.substring(0, 4)}...${process.env.ZENOTI_API_KEY?.slice(-4)}`,
       ZENOTI_API_SECRET: includeCredentials ? process.env.ZENOTI_API_SECRET : `${process.env.ZENOTI_API_SECRET?.substring(0, 4)}...${process.env.ZENOTI_API_SECRET?.slice(-4)}`,
-      ZENOTI_APPLICATION_ID: process.env.ZENOTI_APPLICATION_ID,
+      ZENOTI_APPLICATION_ID: process.env.ZENOTI_APP_ID,
     };
     
     // Test connection

@@ -3,7 +3,7 @@ import axios from 'axios';
 const ZENOTI_API_URL = process.env.ZENOTI_API_URL;
 const ZENOTI_API_KEY = process.env.ZENOTI_API_KEY;
 const ZENOTI_API_SECRET = process.env.ZENOTI_API_SECRET;
-const ZENOTI_APPLICATION_ID = process.env.ZENOTI_APPLICATION_ID;
+const ZENOTI_APPLICATION_ID = process.env.ZENOTI_APP_ID;
 
 if (!ZENOTI_API_URL || !ZENOTI_API_KEY || !ZENOTI_API_SECRET || !ZENOTI_APPLICATION_ID) {
   throw new Error('Missing required Zenoti environment variables');

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import {openaiClient} from '@/lib/openai-client';
+import OpenAI from 'openai';
 import { ArticleContent } from '@/lib/supabase';
 
 const openai = new OpenAI({
