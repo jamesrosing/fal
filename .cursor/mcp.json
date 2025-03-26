@@ -1,35 +1,11 @@
 {
-    "model_specs": [
-      {
-        "name": "Supabase",
-        "project_id": "rqilxksajlgltmhpmdnt",
-        "type": "supabase",
-        "path": "",
-        "config": {
-          "supabase_url": "https://rqilxksajlgltmhpmdnt.supabase.co",
-          "tables": [
-            "albums",
-            "appointments",
-            "article_categories",
-            "articles",
-            "before_after_images",
-            "cases",
-            "contact_submissions",
-            "cursor_positions",
-            "galleries",
-            "images",
-            "media_assets",
-            "media_associations",
-            "media_audit_logs",
-            "media_categories",
-            "media_files",
-            "media_placeholders",
-            "profiles",
-            "services",
-            "team_members",
-            "user_roles"
-          ]
-        }
-      }
-    ]
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ]
+    }
   }
+}

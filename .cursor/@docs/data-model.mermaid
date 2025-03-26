@@ -1,0 +1,81 @@
+erDiagram
+    ARTICLES {
+        uuid id PK
+        string title
+        string slug UK
+        jsonb content
+        string excerpt
+        uuid author_id FK
+        uuid category_id FK
+        string status
+        string featured_image
+    }
+    
+    ARTICLE_CATEGORIES {
+        uuid id PK
+        string name
+        string slug UK
+        string description
+        int order_position
+    }
+    
+    TEAM_MEMBERS {
+        uuid id PK
+        string name
+        string title
+        string role
+        string image_url
+        string description
+        int order
+        boolean is_provider
+    }
+    
+    GALLERIES {
+        uuid id PK
+        string title
+        string description
+    }
+    
+    ALBUMS {
+        uuid id PK
+        uuid gallery_id FK
+        string title
+        string description
+    }
+    
+    CASES {
+        uuid id PK
+        uuid album_id FK
+        string title
+        string description
+        jsonb metadata
+    }
+    
+    IMAGES {
+        uuid id PK
+        uuid case_id FK
+        string cloudinary_url
+        string caption
+        array tags
+        int display_order
+    }
+    
+    MEDIA_ASSETS {
+        uuid id PK
+        string cloudinary_id
+        string type
+        jsonb metadata
+    }
+    
+    MEDIA_MAPPINGS {
+        uuid id PK
+        string placeholder_id
+        uuid media_id FK
+    }
+    
+    ARTICLES }|--|| ARTICLE_CATEGORIES : "belongs to"
+    ARTICLES }|--|| TEAM_MEMBERS : "authored by"
+    ALBUMS }|--|| GALLERIES : "belongs to"
+    CASES }|--|| ALBUMS : "belongs to"
+    IMAGES }|--|| CASES : "belongs to"
+    MEDIA_MAPPINGS }|--|| MEDIA_ASSETS : "references"

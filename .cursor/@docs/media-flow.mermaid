@@ -1,0 +1,8 @@
+flowchart TD
+    A[Upload Media] --> B{Store in Cloudinary}
+    B --> C[Save Media Reference in Supabase]
+    C --> D[Media Placeholder System]
+    D --> E[Site Media Manager]
+    E --> F[Admin Interface]
+    F --> G[Map Media to Placeholders]
+    G --> H[Front-end Display]
