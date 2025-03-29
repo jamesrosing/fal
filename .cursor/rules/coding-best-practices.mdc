@@ -8,16 +8,7 @@ description:
 globs: 
 alwaysApply: true
 ---
----
-description: 
-globs: 
-alwaysApply: true
----
----
-description: 
-globs: 
-alwaysApply: true
----
+
 ## Coding Best Practices
 - **Do not modify code or UI elements that already work**, unless explicitly instructed.
 - Avoid duplicating existing functionality; reuse working components whenever possible.

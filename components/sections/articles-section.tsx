@@ -98,7 +98,7 @@ export function ArticlesSection() {
                   </div>
                   <div className="p-6 flex flex-col flex-1">
                     <p className="text-sm font-cerebri text-zinc-400">
-                      {new Date(article.published_at || article.created_at).toLocaleDateString('en-US', {
+                      {new Date(article.published_at || article.created_at || '').toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'

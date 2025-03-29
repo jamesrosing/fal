@@ -14,6 +14,7 @@
     "prepare": "husky install",
     "precommit": "lint-staged",
     "analyze": "cross-env ANALYZE=true next build",
+    "backup-data": "node --loader ts-node/esm scripts/backup-data.ts",
     "optimize-video": "node --loader ts-node/esm scripts/optimize-video.ts",
     "optimize-custom-video": "node --loader ts-node/esm scripts/optimize-video.ts",
     "sync-cloudinary": "cross-env NODE_ENV=development node --loader ts-node/esm scripts/sync-cloudinary.ts",
