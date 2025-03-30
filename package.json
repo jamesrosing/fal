@@ -31,7 +31,8 @@
     "test-zenoti-formats": "node scripts/zenoti-apikey-formats.js",
     "zenoti-token": "node scripts/zenoti-token-generator.js",
     "test-zenoti": "node --loader ts-node/esm scripts/test-zenoti-integration.js",
-    "seed-media": "ts-node scripts/seed-media-assets.ts"
+    "seed-media": "ts-node scripts/seed-media-assets.ts",
+    "db:types": "node --require dotenv/config --loader ts-node/esm scripts/generate-types.ts dotenv_config_path=.env.local"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.38.0",

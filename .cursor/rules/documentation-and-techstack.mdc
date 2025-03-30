@@ -8,22 +8,16 @@ description:
 globs: 
 alwaysApply: true
 ---
----
-description: 
-globs: 
-alwaysApply: true
----
----
-description: 
-globs: 
-alwaysApply: true
----
+
 ## Documentation Usage
-- Always consult the project's **` `**  or clear understanding of goals and features.
-- Review all additional documentation files within the **`docs`** directory provided with the project.
+- Always consult the project's **` [app-prd.md](mdc:.cursor/@docs/app-prd.md) `**  for clear understanding of overall comprehensive goals and features.
+- Always review the following guides as we adjust the application codebase and function to optimize and remove duplicate or overlapping processes: **` [comprehensive-plan.md](mdc:.cursor/@docs/comprehensive-plan.md) [final-analysis-app-optimization.md](mdc:.cursor/@docs/final-analysis-app-optimization.md) [media-system-optimization.md](mdc:.cursor/@docs/media-system-optimization.md) [nextjs-15-compatibility.md](mdc:.cursor/@docs/nextjs-15-compatibility.md) [project-analysis.md](mdc:.cursor/@docs/project-analysis.md) [zenoti-solution.md](mdc:.cursor/@docs/zenoti-solution.md) and [complete-database-schema-optimization.md](mdc:.cursor/@docs/complete-database-schema-optimization.md) `**
+- Understand the preexisting project by reviewing **` [data-model.mermaid](mdc:.cursor/@docs/data-model.mermaid) [media-flow.mermaid](mdc:.cursor/@docs/media-flow.mermaid) [project-overview.mermaid](mdc:.cursor/@docs/project-overview.mermaid) `**
+- Review all additional documentation files within the **` .cursor/@docs `** directory provided with the project.
 - If additional or updated documentation is required, use MCP servers (Brave Search, Puppeteer, FireCrawl) to locate official and current sources online.
 
 ## Technical Stack Compliance
+- **Always use PowerShell commands**
 - **Adhere strictly to the project's established technology stack.**
 - Do not introduce new technologies unless explicitly instructed and justified.
 - You may suggest alternative technologies if beneficial, but never implement them without user confirmation.

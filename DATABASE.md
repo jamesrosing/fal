@@ -1,14 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
----
-description: 
-globs: 
-alwaysApply: true
----
-
 # Database Schema Documentation
 
 This document outlines the database schema structure and the tools available for managing it in the FAL project.
@@ -133,9 +122,3 @@ The database includes tables for:
 - Chat messages and appointment requests
 
 See `schema.json` for the complete schema definition. 
-
-
-## Supabase (MCP)
-- Always use the project-specific **Supabase MCP server** for database operations.
-- Use structured relational SQL storage provided by Supabase. Avoid using raw JSON file storage for structured data unless explicitly required by schema design.
-- **Never delete or alter critical data without explicit confirmation.** Operations should be carefully controlled.

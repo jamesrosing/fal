@@ -1,10 +1,93 @@
 {
   "mcpServers": {
-    "supabase": {
+    "github": {
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-postgres"
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/github",
+        "--config",
+        "{\"githubPersonalAccessToken\":\"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\"}"
+      ]
+    },
+    "brave-search": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/brave-search",
+        "--key",
+        "41398ac5-2722-4463-8689-cacf9494d30d"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "D:\\"
+      ]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    },
+    "mcp-scholarly": {
+      "command": "uvx",
+      "args": [
+        "mcp-scholarly"
+      ]
+    },
+    "claude-code-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@auchenberg/claude-code-mcp",
+        "--config",
+        "\"{}\""
+      ]
+    },
+    "desktop-commander": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@wonderwhy-er/desktop-commander",
+        "--key",
+        "41398ac5-2722-4463-8689-cacf9494d30d"
+      ]
+    },
+    "supabase-mcp-server": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@joshuarileydev/supabase-mcp-server",
+        "--key",
+        "41398ac5-2722-4463-8689-cacf9494d30d"
       ]
     }
   }
