@@ -17,13 +17,13 @@ async function generateTypes() {
   // Create a Supabase client with admin privileges
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // Get database definition
-  console.log('Fetching tables information...');
-  const { data: tables, error: tablesError } = await supabase // Use default client
-    .from('information_schema.tables') // Query directly
-    .select('*')
-    .eq('table_schema', 'public');
-    
+  // Fetch tables information...
+  // const { data: tables, error: tablesError } = await supabase // Use default client
+  //   .from('information_schema.tables') // Query directly
+  //   .select('*')
+  //   .eq('table_schema', 'public');
+  const { data: tables, error: tablesError } = await supabase.rpc('get_public_tables');
+  
   if (tablesError) {
     console.error('Error fetching tables:', tablesError);
     return;
@@ -62,11 +62,12 @@ export interface Database {
     console.log(`Processing table: ${tableName}`);
     
     // Get columns for this table
-    const { data: columns, error: columnsError } = await supabase // Use default client
-      .from('information_schema.columns') // Query directly
-      .select('*')
-      .eq('table_schema', 'public')
-      .eq('table_name', tableName);
+    // const { data: columns, error: columnsError } = await supabase // Use default client
+    //   .from('information_schema.columns') // Query directly
+    //   .select('*')
+    //   .eq('table_schema', 'public')
+    //   .eq('table_name', tableName);
+    const { data: columns, error: columnsError } = await supabase.rpc('get_table_columns', { p_table_name: tableName });
       
     if (columnsError) {
       console.error(`Error fetching columns for ${tableName}:`, columnsError);
