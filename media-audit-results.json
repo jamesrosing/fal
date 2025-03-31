@@ -1,0 +1,698 @@
+[
+  {
+    "filePath": "app\\team\\page.tsx",
+    "lineNumber": 53,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\team\\page.tsx",
+    "lineNumber": 154,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\page.tsx",
+    "lineNumber": 61,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\page.tsx",
+    "lineNumber": 64,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\page.tsx",
+    "lineNumber": 65,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133480/services-plastic-surgery/hero/plastic-surgery-hero.png\""
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\page.tsx",
+    "lineNumber": 122,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\head-and-neck\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\head-and-neck\\page.tsx",
+    "lineNumber": 76,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/head-and-neck-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\head-and-neck\\page.tsx",
+    "lineNumber": 131,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\breast\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\breast\\page.tsx",
+    "lineNumber": 76,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/breast-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\breast\\page.tsx",
+    "lineNumber": 131,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\body\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\body\\page.tsx",
+    "lineNumber": 76,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/body-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\plastic-surgery\\body\\page.tsx",
+    "lineNumber": 131,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\medical-spa\\skin-rejuvenation\\page.tsx",
+    "lineNumber": 64,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/skin-rejuvenation-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\medical-spa\\laser-treatments\\page.tsx",
+    "lineNumber": 64,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/laser-treatments-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\medical-spa\\injectables\\page.tsx",
+    "lineNumber": 64,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/injectables-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\medical-spa\\facial-treatments\\page.tsx",
+    "lineNumber": 64,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/facial-treatments-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\medical-spa\\body-analysis\\page.tsx",
+    "lineNumber": 53,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/body-analysis-hero.jpg\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\page.tsx",
+    "lineNumber": 85,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\page.tsx",
+    "lineNumber": 86,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133470/articles/categories/functional-medicine-hero.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\page.tsx",
+    "lineNumber": 143,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133469/articles/categories/functional-medicine-sleep.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\neurocognitive-performance\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\neurocognitive-performance\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-neuro.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\hormone-optimization\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\hormone-optimization\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-hormone.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\hair-restoration\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\hair-restoration\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133467/articles/categories/functional-medicine-hair.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\epigenetic-optimization\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\epigenetic-optimization\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133466/articles/categories/functional-medicine-epigenetic.png\""
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133465/articles/categories/functional-medicine-cardio.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\page.tsx",
+    "lineNumber": 79,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133464/services-dermatology/hero/dermatology-hero.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\skin-screening\\page.tsx",
+    "lineNumber": 74,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\services\\dermatology\\skin-screening\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\rosacea\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133462/services-dermatology/hero/dermatology-rosacea.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\psoriasis\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133463/services-dermatology/hero/dermatology-psoriasis.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\eczema\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133460/services-dermatology/hero/dermatology-eczema.png\""
+  },
+  {
+    "filePath": "app\\services\\dermatology\\acne\\page.tsx",
+    "lineNumber": 75,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133459/services-dermatology/hero/dermatology-acne.png\""
+  },
+  {
+    "filePath": "app\\reviews\\page.tsx",
+    "lineNumber": 44,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/reviews-hero.jpg\""
+  },
+  {
+    "filePath": "app\\out-of-town\\page.tsx",
+    "lineNumber": 121,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\out-of-town\\page.tsx",
+    "lineNumber": 247,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\gallery\\page.tsx",
+    "lineNumber": 60,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\gallery\\page.tsx",
+    "lineNumber": 61,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"/images/gallery/hero.jpg\""
+  },
+  {
+    "filePath": "app\\gallery\\page.tsx",
+    "lineNumber": 110,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\gallery\\[...slug]\\page.tsx",
+    "lineNumber": 130,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\gallery\\[...slug]\\page.tsx",
+    "lineNumber": 170,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\gallery\\[...slug]\\page.tsx",
+    "lineNumber": 197,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\financing\\page.tsx",
+    "lineNumber": 69,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/financing/hero.jpg\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 358,
+    "pattern": "/<img\\s/",
+    "context": "<img src=\"${review.profile_photo_url || ''}\" alt=\"${review.author_name || 'Reviewer'}\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 358,
+    "pattern": "/src=[\"']/",
+    "context": "<img src=\"${review.profile_photo_url || ''}\" alt=\"${review.author_name || 'Reviewer'}\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 389,
+    "pattern": "/<img\\s/",
+    "context": "<img src=\"${photoUrl}\" alt=\"${place.name || 'Business photo'}\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 389,
+    "pattern": "/src=[\"']/",
+    "context": "<img src=\"${photoUrl}\" alt=\"${place.name || 'Business photo'}\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 649,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyCXWUoSOrmjjsKDo0wfLzl8lK8Vts5UnGc&libraries=places\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 663,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js\""
+  },
+  {
+    "filePath": "app\\contact\\page.tsx",
+    "lineNumber": 674,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/1441-1401-avocado-avenue.jpg\""
+  },
+  {
+    "filePath": "app\\chat\\page.tsx",
+    "lineNumber": 71,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png\""
+  },
+  {
+    "filePath": "app\\articles\\articles-list.tsx",
+    "lineNumber": 212,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\articles\\[slug]\\page.tsx",
+    "lineNumber": 201,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\articles\\[slug]\\page.tsx",
+    "lineNumber": 286,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\appointment\\page.tsx",
+    "lineNumber": 27,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\appointment\\page.tsx",
+    "lineNumber": 28,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/appointment-hero.jpg\""
+  },
+  {
+    "filePath": "app\\admin\\team\\page.tsx",
+    "lineNumber": 236,
+    "pattern": "/<img\\s/",
+    "context": "<img"
+  },
+  {
+    "filePath": "app\\admin\\media\\page.tsx",
+    "lineNumber": 1434,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "app\\admin\\media\\page.tsx",
+    "lineNumber": 1450,
+    "pattern": "/<img\\s/",
+    "context": "<img"
+  },
+  {
+    "filePath": "app\\admin\\media\\page.tsx",
+    "lineNumber": 1515,
+    "pattern": "/\\.(mp4|webm|ogg|mov)/",
+    "context": "const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv', '.flv', '.mkv'];"
+  },
+  {
+    "filePath": "app\\admin\\media\\page.tsx",
+    "lineNumber": 1657,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://widget.cloudinary.com/v2.0/global/all.js\""
+  },
+  {
+    "filePath": "app\\admin\\media\\page.tsx",
+    "lineNumber": 1665,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://media-library.cloudinary.com/global/all.js\""
+  },
+  {
+    "filePath": "app\\admin\\images\\page.tsx",
+    "lineNumber": 263,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\admin\\gallery\\[collection]\\[album]\\page.tsx",
+    "lineNumber": 175,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "app\\admin\\gallery\\[collection]\\[album]\\[caseId]\\page.tsx",
+    "lineNumber": 155,
+    "pattern": "/<img\\s/",
+    "context": "<img"
+  },
+  {
+    "filePath": "app\\admin\\gallery\\[collection]\\[album]\\new\\page.tsx",
+    "lineNumber": 273,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\VisualMediaManager.tsx",
+    "lineNumber": 151,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\VisualMediaManager.tsx",
+    "lineNumber": 177,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\nav-bar.tsx",
+    "lineNumber": 350,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\nav-bar.tsx",
+    "lineNumber": 351,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738462872/logos/allure_md_plastic_surgery_dermatology_white_logo.png\""
+  },
+  {
+    "filePath": "components\\image-upload-field.tsx",
+    "lineNumber": 138,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\image-display.tsx",
+    "lineNumber": 73,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\image-display.tsx",
+    "lineNumber": 108,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\hero.tsx",
+    "lineNumber": 13,
+    "pattern": "/\\.(mp4|webm|ogg|mov)/",
+    "context": "// Example CDN URL structure: https://your-cdn.com/videos/allure-md/hero-720p.webm"
+  },
+  {
+    "filePath": "components\\CloudinaryMediaLibrary.tsx",
+    "lineNumber": 117,
+    "pattern": "/src=[\"']/",
+    "context": "src=\"https://media-library.cloudinary.com/global/all.js\""
+  },
+  {
+    "filePath": "components\\CloudinaryMediaLibrary.tsx",
+    "lineNumber": 127,
+    "pattern": "/<Image\\s/",
+    "context": "<Image className=\"w-4 h-4 mr-2\" />"
+  },
+  {
+    "filePath": "components\\case-viewer.tsx",
+    "lineNumber": 100,
+    "pattern": "/<img\\s/",
+    "context": "<img"
+  },
+  {
+    "filePath": "components\\ui\\media-image.tsx",
+    "lineNumber": 107,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\ui\\media-image.tsx",
+    "lineNumber": 119,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\ui\\background-video.tsx",
+    "lineNumber": 96,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\ui\\background-video.tsx",
+    "lineNumber": 132,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\ui\\background-video.tsx",
+    "lineNumber": 153,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 109,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 118,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 166,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 243,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 270,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\team-section.tsx",
+    "lineNumber": 279,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\plastic-surgery-section.tsx",
+    "lineNumber": 47,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\mission-section.tsx",
+    "lineNumber": 38,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\mission-section.tsx",
+    "lineNumber": 47,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\mission-section.tsx",
+    "lineNumber": 100,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\mission-section.tsx",
+    "lineNumber": 109,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\medical-spa-section.tsx",
+    "lineNumber": 91,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\medical-spa-section.tsx",
+    "lineNumber": 100,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\medical-spa-section.tsx",
+    "lineNumber": 154,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\medical-spa-section.tsx",
+    "lineNumber": 164,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\hero-section.tsx",
+    "lineNumber": 22,
+    "pattern": "/<video\\s/",
+    "context": "<video"
+  },
+  {
+    "filePath": "components\\sections\\hero-section.tsx",
+    "lineNumber": 32,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\functional-medicine-section.tsx",
+    "lineNumber": 47,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\dermatology-section.tsx",
+    "lineNumber": 47,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\articles-section.tsx",
+    "lineNumber": 91,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\sections\\about-section.tsx",
+    "lineNumber": 80,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\articles\\ArticlePreview.tsx",
+    "lineNumber": 47,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\articles\\ArticlePreview.tsx",
+    "lineNumber": 72,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\articles\\ArticleContent.tsx",
+    "lineNumber": 33,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  },
+  {
+    "filePath": "components\\articles\\ArticleContent.tsx",
+    "lineNumber": 67,
+    "pattern": "/<Image\\s/",
+    "context": "<Image"
+  }
+]
