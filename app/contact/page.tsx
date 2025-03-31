@@ -10,6 +10,9 @@ import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import Head from "next/head"
 import axios from 'axios'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 /// <reference path="../../types/maps.d.ts" />
 
@@ -670,13 +673,7 @@ export default function ContactPage() {
         {/* Hero Section */}
         <section className="relative">
           <div className="relative aspect-[16/9] w-full">
-            <Image
-              src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/1441-1401-avocado-avenue.jpg"
-              alt="Contact Allure MD"
-              fill
-              className="object-cover"
-              priority
-            />
+            <OptimizedImage id="hero/1441-1401-avocado-avenue.jpg" alt="Contact Allure MD"   priority fill />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           </div>
           

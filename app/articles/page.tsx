@@ -3,6 +3,9 @@ import { PageHero } from "@/components/ui/page-hero"
 import { Metadata } from "next"
 import { ArticlesList } from "./articles-list"
 import { CldOgImage } from "next-cloudinary"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export const metadata: Metadata = {
   title: 'Articles & Resources | Allure MD',

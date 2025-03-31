@@ -19,6 +19,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
   ChevronRight,
   FileImage,
   Folder,

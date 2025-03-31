@@ -10,6 +10,9 @@ import { Section } from "@/components/ui/section"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import Head from "next/head"
 import { Footer } from "./footer"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Inline StructuredData component
 function StructuredData({ type, data }: { type: string; data: Record<string, any> }) {

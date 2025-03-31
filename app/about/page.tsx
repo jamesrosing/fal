@@ -6,6 +6,9 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useMediaAsset, MediaHookResult } from '@/hooks/useMedia'
 import { useIsMobile } from "@/hooks/use-mobile"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Define types for better type safety
 type Value = {

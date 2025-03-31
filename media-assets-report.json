@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2025-03-31T05:41:14.102Z",
+  "totalAssets": 9,
+  "assetsByType": {
+    "image": 8,
+    "video": 1
+  },
+  "assetsByArea": {
+    "component": 1,
+    "example": 1,
+    "hero": 1,
+    "articles": 1,
+    "services": 1,
+    "team": 1,
+    "gallery": 1,
+    "branding": 1,
+    "videos": 1
+  }
+}

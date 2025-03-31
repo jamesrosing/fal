@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Head from "next/head"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface BackgroundVideoProps {
   poster: string;

@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const treatments = [
   {
@@ -71,13 +74,7 @@ export default function SkinScreeningPage() {
       {/* Hero Section */}
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png"
-            alt="Skin Screening Services"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="services-dermatology/hero/dermatology-skin-health.png" alt="Skin Screening Services"   priority fill />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         

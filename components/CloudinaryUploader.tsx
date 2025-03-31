@@ -15,6 +15,9 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export interface CloudinaryUploaderProps {
   onSuccess?: (result: CloudinaryAsset | CloudinaryAsset[]) => void;

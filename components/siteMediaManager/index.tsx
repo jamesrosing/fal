@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { getCloudinaryUrl } from '@/lib/cloudinary';
 import styles from './SiteMediaManager.module.css';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 /**
  * SiteMediaManager Component

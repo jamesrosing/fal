@@ -7,6 +7,9 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -75,13 +78,7 @@ export default function Dermatology() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133464/services-dermatology/hero/dermatology-hero.png"
-            alt="Dermatology at Allure MD"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="services-dermatology/hero/dermatology-hero.png" alt="Dermatology at Allure MD"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

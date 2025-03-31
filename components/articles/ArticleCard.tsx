@@ -7,6 +7,9 @@ import type { Article } from '@/lib/types'
 import { Bookmark, Headphones, Share2 } from 'lucide-react'
 import AudioPlayer from '@/components/AudioPlayer'
 import { getCloudinaryUrl } from '@/lib/cloudinary'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 type ArticleCardProps = {
   article: Article;

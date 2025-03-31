@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMediaPublicId, getMediaPublicIds, updateMediaAsset } from '@/lib/media-utils';
+import mediaRegistry from '@/lib/media/registry';
+import { getMediaUrl } from '@/lib/media/utils';
 
 /**
  * API route for fetching media public IDs from Supabase
@@ -7,37 +9,48 @@ import { getMediaPublicId, getMediaPublicIds, updateMediaAsset } from '@/lib/med
  * GET /api/media?placeholderIds=home-hero,about-hero,services-hero
  */
 export async function GET(request: NextRequest) {
+  // Get query parameters
   const searchParams = request.nextUrl.searchParams;
-  const placeholderId = searchParams.get('placeholderId');
-  const placeholderIds = searchParams.get('placeholderIds');
-
-  // If placeholderId is provided, fetch a single public ID
-  if (placeholderId) {
-    const publicId = await getMediaPublicId(placeholderId);
-    
-    if (!publicId) {
-      return NextResponse.json(
-        { error: 'Media not found' },
-        { status: 404 }
-      );
-    }
-    
-    return NextResponse.json({ publicId });
+  const id = searchParams.get('id');
+  const width = searchParams.get('width');
+  const height = searchParams.get('height');
+  const quality = searchParams.get('quality');
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Missing required parameter: id' },
+      { status: 400 }
+    );
   }
   
-  // If placeholderIds is provided, fetch multiple public IDs
-  if (placeholderIds) {
-    const ids = placeholderIds.split(',');
-    const publicIds = await getMediaPublicIds(ids);
-    
-    return NextResponse.json({ publicIds });
+  // Get asset from registry
+  const asset = mediaRegistry.getAsset(id);
+  
+  if (!asset) {
+    return NextResponse.json(
+      { error: 'Media asset not found' },
+      { status: 404 }
+    );
   }
   
-  // If neither is provided, return an error
-  return NextResponse.json(
-    { error: 'Missing placeholderId or placeholderIds parameter' },
-    { status: 400 }
-  );
+  // Transform options
+  const options = {
+    width: width ? parseInt(width) : undefined,
+    height: height ? parseInt(height) : undefined,
+    quality: quality ? parseInt(quality) : undefined,
+  };
+  
+  // Get the URL
+  const url = getMediaUrl(asset.publicId, options);
+  
+  // Return asset with URL
+  return NextResponse.json({
+    id: asset.id,
+    publicId: asset.publicId,
+    type: asset.type,
+    url,
+    dimensions: asset.dimensions,
+  });
 }
 
 /**

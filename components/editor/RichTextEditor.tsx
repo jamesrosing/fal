@@ -17,6 +17,9 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface RichTextEditorProps {
   content: string;

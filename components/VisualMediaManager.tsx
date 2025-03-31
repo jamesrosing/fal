@@ -7,6 +7,9 @@ import { handleMediaUpload } from '@/app/admin/media/actions';
 import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import { CldImage } from 'next-cloudinary';
 import { Image as ImageIcon } from 'lucide-react';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Upload preset is only used as a fallback if needed
 const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'emsculpt';

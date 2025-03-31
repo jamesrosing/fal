@@ -7,6 +7,9 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
 import { Article } from '@/lib/types'
 import { Skeleton } from '@/components/ui/skeleton'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function ArticleList({ initialArticles }: { initialArticles: Article[] }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)

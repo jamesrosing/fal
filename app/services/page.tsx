@@ -1,6 +1,9 @@
 import Link from "next/link"
 import Image from "next/image"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Simple metadata for now
 export const metadata = {

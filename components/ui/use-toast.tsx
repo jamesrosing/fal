@@ -1,5 +1,8 @@
 import * as React from "react"
 import { type ToastActionElement, type ToastProps } from "@/components/ui/toast"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000

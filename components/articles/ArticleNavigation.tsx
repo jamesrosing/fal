@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Article } from '@/lib/types'
 import { fetchAdjacentArticles } from '@/lib/api'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function ArticleNavigation({ currentArticleId }: { currentArticleId: number }) {
   const [prevArticle, setPrevArticle] = useState<Article | null>(null)

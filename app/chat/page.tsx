@@ -8,6 +8,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const presetPrompts = [
   {
@@ -67,14 +70,7 @@ export default function ChatPage() {
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-center gap-4">
             <div className="relative w-16 h-16">
-              <Image
-                src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/logos/avatar/Sophie-at-Allure-MD.png"
-                alt="Anna"
-                fill
-                className="rounded-full object-cover"
-                sizes="64px"
-                priority
-              />
+              <OptimizedImage id="logos/avatar/Sophie-at-Allure-MD.png" alt="Anna"   priority fill />
             </div>
             <div>
               <h2 className="text-xl font-medium text-white">Anna</h2>

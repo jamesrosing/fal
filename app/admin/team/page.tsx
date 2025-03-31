@@ -33,6 +33,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])

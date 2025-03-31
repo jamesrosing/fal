@@ -8,6 +8,9 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, FolderOpen, Image as ImageIcon } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Keep the existing collections structure
 const collections = {

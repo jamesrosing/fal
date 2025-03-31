@@ -3,6 +3,9 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export interface SectionProps {
   title?: string;

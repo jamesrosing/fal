@@ -1,5 +1,8 @@
 import type { Metadata } from "next"
 import { articles } from "@/lib/articles"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 type Props = {
   params: { slug: string }

@@ -17,6 +17,9 @@ import { CalendarIcon, Clock, DollarSign, ShoppingCart, MessageSquare, TagIcon }
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from '@/components/ui/use-toast';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Mock data for the example
 const mockBooking = {

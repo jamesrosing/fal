@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Image } from 'lucide-react';
 import Script from 'next/script';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export interface CloudinaryMediaLibraryProps {
   onSelect: (publicId: string, url: string, metadata?: any) => void;

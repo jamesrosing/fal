@@ -3,6 +3,9 @@
 import { useState } from "react"
 import ImageUploader from "@/components/image-uploader"
 import ImageDisplay from "@/components/image-display"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function UploadPage() {
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null)

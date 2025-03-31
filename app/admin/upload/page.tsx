@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { Trash } from "lucide-react"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/image-config"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface UploadedImage {
   url: string

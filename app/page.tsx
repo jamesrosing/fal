@@ -8,6 +8,9 @@ import { FunctionalMedicineSection } from "@/components/sections/functional-medi
 import { TeamSection } from "@/components/sections/team-section"
 import { AboutSection } from "@/components/sections/about-section"
 import { ArticlesSection } from "@/components/sections/articles-section"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function Home() {
   return (

@@ -8,6 +8,9 @@ import { Article, ArticleCategory, ARTICLE_CATEGORIES } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Define the main category slugs we want to show in the menubar
 const MAIN_CATEGORY_SLUGS = ['latest-news', 'plastic-surgery', 'dermatology', 'medical-spa', 'functional-medicine', 'educational'];

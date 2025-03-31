@@ -6,6 +6,9 @@ import {
   CloudinaryAsset 
 } from '@/lib/cloudinary';
 import { toast } from '@/components/ui/use-toast';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Style for the directory structure
 const directoryStyles = {

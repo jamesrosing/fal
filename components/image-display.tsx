@@ -4,6 +4,9 @@ import { useState } from "react"
 import Image from "next/image"
 import { Download, Maximize2, Minimize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface ImageDisplayProps {
   imageUrl: string | null;

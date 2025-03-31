@@ -12,6 +12,9 @@
   import { Button } from "./ui/button"
   import { ThemeToggle } from "./theme-toggle"
   import { ScrollArea } from "./ui/scroll-area"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
   const data = {
     teams: [

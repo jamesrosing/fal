@@ -6,6 +6,9 @@ import { MoreHorizontal, Plus, type LucideIcon } from "lucide-react"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,

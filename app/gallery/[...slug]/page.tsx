@@ -19,6 +19,9 @@ import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import { Gallery, Album, Case, Image as GalleryImage } from "@/lib/supabase"
 import { Share2, Heart } from "lucide-react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface PageProps {
   galleries: Gallery[];

@@ -5,6 +5,9 @@ import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { Card } from "@/components/ui/card"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const financingOptions = [
   {
@@ -65,13 +68,7 @@ export default function FinancingPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/financing/hero.jpg"
-            alt="Financing Options"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="financing/hero.jpg" alt="Financing Options"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

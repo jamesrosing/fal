@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const treatments = [
   {
@@ -60,13 +63,7 @@ export default function SkinRejuvenationPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/skin-rejuvenation-hero.jpg"
-            alt="Skin Rejuvenation Treatments"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="medical-spa/skin-rejuvenation-hero.jpg" alt="Skin Rejuvenation Treatments"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

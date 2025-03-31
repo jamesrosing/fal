@@ -7,6 +7,9 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -82,13 +85,7 @@ export default function FunctionalMedicine() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133470/articles/categories/functional-medicine-hero.png"
-            alt="Functional Medicine at Allure MD"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="articles/categories/functional-medicine-hero.png" alt="Functional Medicine at Allure MD"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

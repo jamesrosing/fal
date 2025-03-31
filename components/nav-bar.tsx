@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface SubItem {
   name: string;
@@ -347,13 +350,7 @@ export function NavBar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="relative w-40 h-12">
-              <Image
-                src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738462872/logos/allure_md_plastic_surgery_dermatology_white_logo.png"
-                alt="ALLURE MD"
-                fill
-                className="object-contain"
-                priority
-              />
+              <OptimizedImage id="logos/allure_md_plastic_surgery_dermatology_white_logo.png" alt="ALLURE MD"   priority fill />
             </div>
           </Link>
           <nav className="hidden md:flex items-center">

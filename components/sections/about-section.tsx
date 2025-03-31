@@ -5,6 +5,9 @@ import Image from "next/image"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useMediaAsset } from '@/hooks/useMedia'
 import { useIsMobile } from "@/hooks/use-mobile"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export function AboutSection() {
   const isMobile = useIsMobile();

@@ -13,6 +13,9 @@ import { z } from 'zod';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { motion, AnimatePresence } from 'framer-motion';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const formSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),

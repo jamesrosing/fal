@@ -7,6 +7,9 @@ import { useMediaAsset } from "@/hooks/useMedia"
 import { useState } from "react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 type TabItem = {
   name: string;

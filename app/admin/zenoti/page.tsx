@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertCircle, RefreshCw, Server, Settings, Info } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export default function ZenotiAdminPage() {
   const [status, setStatus] = useState<'loading' | 'connected' | 'error'>('loading');

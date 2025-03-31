@@ -4,6 +4,9 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface LearnMoreButtonProps {
   href: string

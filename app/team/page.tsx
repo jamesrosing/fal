@@ -11,6 +11,9 @@ import { Copy, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import { useMediaAsset } from "@/hooks/useMedia"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 function TeamMemberCard({ member, isPhysician = false }: { 
   member: TeamMember

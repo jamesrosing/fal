@@ -2,6 +2,9 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export function AdminNavBar() {
   return (

@@ -1,4 +1,7 @@
 import Link from "next/link"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const footerSections = [
   {

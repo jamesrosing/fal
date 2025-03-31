@@ -7,6 +7,9 @@ import { BackgroundVideo } from "@/components/ui/background-video"
 import Link from "next/link"
 import { getCloudinaryVideoUrl, getCloudinaryUrl } from "@/lib/cloudinary"
 import Image from 'next/image'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // TODO: Replace these URLs with your CDN URLs
 // Recommended: Use a CDN service like Cloudinary, Bunny.net, or Amazon S3 + CloudFront

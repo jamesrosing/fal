@@ -8,6 +8,9 @@ import { motion } from "framer-motion"
 import { createClient } from '@supabase/supabase-js'
 import { Article } from "@/lib/types"
 import ArticleContent from "@/components/articles/ArticleContent"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 type Props = {
   params: { slug: string }

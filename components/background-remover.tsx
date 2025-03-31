@@ -3,6 +3,9 @@
 import { useState } from "react"
 import ImageUploader from "./image-uploader"
 import ImageDisplay from "./image-display"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface ProcessedImage {
   url: string;

@@ -2,6 +2,9 @@ import { Article } from '@/lib/types'
 import { format } from 'date-fns'
 import Image from 'next/image'
 import { getCloudinaryUrl } from '@/lib/cloudinary'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const isValidDate = (dateString: string): boolean => {
   const date = new Date(dateString);

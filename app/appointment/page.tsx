@@ -6,6 +6,9 @@ import { NavBar } from "@/components/nav-bar"
 import { AppointmentScheduler } from "@/components/scheduling/AppointmentScheduler"
 import { Suspense } from "react"
 import { Loader2 } from "lucide-react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 function LoadingScheduler() {
   return (
@@ -24,13 +27,7 @@ export default function AppointmentPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] lg:h-[50vh]">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/appointment-hero.jpg"
-            alt="Schedule an Appointment"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="hero/appointment-hero.jpg" alt="Schedule an Appointment"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

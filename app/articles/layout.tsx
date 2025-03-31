@@ -1,5 +1,8 @@
 import { Metadata } from "next"
 import type { ReactNode } from "react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export const metadata: Metadata = {
   title: 'Articles - Allure MD',

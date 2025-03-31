@@ -1,6 +1,9 @@
 import React from 'react'
 import { Metadata } from 'next'
 import { getCloudinaryUrl } from '../../lib/cloudinary'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface SEOProps {
   title: string;

@@ -3,6 +3,9 @@
 import { useState } from "react"
 import { StructuredImageUpload } from "./structured-image-upload"
 import { TeamMember } from "@/lib/supabase"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface TeamMemberImageUploadProps {
   teamMember: TeamMember

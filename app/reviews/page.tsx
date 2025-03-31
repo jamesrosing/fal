@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { Star } from "lucide-react"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 const reviews = [
   {
@@ -40,13 +43,7 @@ export default function ReviewsPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <Image
-            src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/hero/reviews-hero.jpg"
-            alt="Patient Reviews"
-            fill
-            className="object-cover"
-            priority
-          />
+          <OptimizedImage id="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

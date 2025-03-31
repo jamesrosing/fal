@@ -7,6 +7,9 @@ import Link from "next/link"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export function ArticlesSection() {
   const [articles, setArticles] = useState<Article[]>([]);

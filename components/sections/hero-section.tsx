@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 export function HeroSection() {
   // Use useMediaAsset hook for hero background

@@ -9,6 +9,9 @@ import { ChevronRight, Image, Settings, Users, FolderOpen, Album, ImageIcon, Mor
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSidebar } from "@/components/ui/sidebar"
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 // Define the collections structure
 const collections = {
