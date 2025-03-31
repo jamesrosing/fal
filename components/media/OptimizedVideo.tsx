@@ -1,9 +1,10 @@
+"use client";
+
 import React, { useRef, useEffect, useState } from 'react';
 import { getVideoSources, getMediaUrl } from '@/lib/media/utils';
 import Image from 'next/image';
 import { VideoOptions } from '@/lib/media/types';
 import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 interface OptimizedVideoProps {
@@ -15,7 +16,7 @@ interface OptimizedVideoProps {
   onError?: () => void;
 }
 
-export default function OptimizedVideo({
+export function OptimizedVideo({
   id,
   options = {},
   className = '',
@@ -130,4 +131,6 @@ export default function OptimizedVideo({
       )}
     </div>
   );
-} 
+}
+
+export default OptimizedVideo; 

@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { getMediaType } from '@/lib/media/utils';
 import OptimizedImage from './OptimizedImage';
@@ -14,7 +16,7 @@ interface MediaRendererProps {
   fallbackId?: string;
 }
 
-export default function MediaRenderer({
+export function MediaRenderer({
   id,
   alt = '',
   className = '',
@@ -46,4 +48,6 @@ export default function MediaRenderer({
       fallbackSrc={fallbackId ? `/api/media/proxy?id=${fallbackId}` : undefined}
     />
   );
-} 
+}
+
+export default MediaRenderer; 

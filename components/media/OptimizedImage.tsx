@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import Image, { ImageProps } from 'next/image';
 import { getNextImageProps, getMediaUrl } from '@/lib/media/utils';
@@ -11,7 +13,7 @@ interface OptimizedImageProps extends Omit<ImageProps, 'src' | 'width' | 'height
   fill?: boolean;
 }
 
-export default function OptimizedImage({
+export function OptimizedImage({
   id,
   options = {},
   fallbackSrc,
@@ -65,4 +67,6 @@ export default function OptimizedImage({
       {...props}
     />
   );
-} 
+}
+
+export default OptimizedImage; 

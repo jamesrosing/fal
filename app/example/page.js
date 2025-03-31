@@ -173,12 +173,12 @@ export default function MediaExamplePage() {
       
       {/* Layout-Based Placement Example */}
       <section className="container mx-auto py-12 px-4">
-        <h2 className="text-3xl font-bold mb-8 text-center">Layout-Based Media Organization</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center text-black">Layout-Based Media Organization</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div className="p-6 border rounded-lg bg-white">
-            <h3 className="text-xl font-bold mb-4">Structured Hierarchy</h3>
-            <ul className="list-disc list-inside space-y-2">
+            <h3 className="text-xl font-bold mb-4 text-black">Structured Hierarchy</h3>
+            <ul className="list-disc list-inside space-y-2 text-black">
               <li>Place global assets in <code>public/images/global</code></li>
               <li>Page-specific assets in <code>public/images/pages/[pageName]</code></li>
               <li>Component-specific assets in component folders</li>
@@ -187,8 +187,8 @@ export default function MediaExamplePage() {
           </div>
           
           <div className="p-6 border rounded-lg bg-white">
-            <h3 className="text-xl font-bold mb-4">Accessing Assets</h3>
-            <ul className="list-disc list-inside space-y-2">
+            <h3 className="text-xl font-bold mb-4 text-black">Accessing Assets</h3>
+            <ul className="list-disc list-inside space-y-2 text-black">
               <li>Component assets: <code>component:ComponentName/assets/file.jpg</code></li>
               <li>Page assets: <code>page:pageName/image.jpg</code></li>
               <li>Global assets: <code>page:global/icons/icon.svg</code></li>
@@ -198,8 +198,8 @@ export default function MediaExamplePage() {
         </div>
         
         <div className="p-6 border rounded-lg bg-white">
-          <h3 className="text-xl font-bold mb-4">Example Layout Usage</h3>
-          <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
+          <h3 className="text-xl font-bold mb-4 text-black">Example Layout Usage</h3>
+          <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto text-black">
 {`// In your page component
 import { MediaContentSection } from '@/components/layouts/TwoColumnLayout';
 
