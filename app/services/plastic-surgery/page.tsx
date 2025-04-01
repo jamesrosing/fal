@@ -64,7 +64,7 @@ export default function PlasticSurgery() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <OptimizedImage id="services-plastic-surgery/hero/plastic-surgery-hero.png" alt="Plastic Surgery at Allure MD"   priority fill />
+          <OptimizedImage id="page:services/plastic-surgery/plastic-surgery-hero.jpg" alt="Plastic Surgery at Allure MD" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

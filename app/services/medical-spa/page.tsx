@@ -8,8 +8,6 @@ import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 function ScrollHandler() {
@@ -40,44 +38,44 @@ const treatments = [
     externalLink: "https://emsculpt-newportbeach.com"
   },
   {
-    category: "Body Analysis",
-    id: "body-analysis",
+    category: "ShapeScale",
+    id: "shapescale",
     description: "Precise 3D body scanning and progress tracking.",
     treatments: ["3D Body Scanning", "Progress Tracking", "Body Composition", "Measurements", "Visual Progress"],
     image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131824/services-medical-spa/hero/medical-spa-shapescale.webp",
-    path: "/services/medical-spa/body-analysis"
+    path: "/services/medical-spa/shapescale"
   },
   {
-    category: "Skin Rejuvenation",
-    id: "skin-rejuvenation",
+    category: "RF Microneedling",
+    id: "rf-microneedling",
     description: "Combined RF and microneedling for skin transformation.",
     treatments: ["Skin Tightening", "Wrinkle Reduction", "Scar Treatment", "Texture Improvement", "Pore Refinement"],
     image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131825/services-medical-spa/hero/medical-spa-rf-microneedling.webp",
-    path: "/services/medical-spa/skin-rejuvenation"
+    path: "/services/medical-spa/rf-microneedling"
   },
   {
-    category: "Injectable Treatments",
-    id: "injectables",
+    category: "Cosmetic Injections",
+    id: "cosmetic-injections",
     description: "Premium injectable treatments for facial enhancement.",
     treatments: ["Botox", "Dermal Fillers", "Lip Enhancement", "Jawline Contouring", "Under-eye Treatment"],
     image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131827/services-medical-spa/hero/medical-spa-injections.webp",
-    path: "/services/medical-spa/injectables"
+    path: "/services/medical-spa/cosmetic-injections"
   },
   {
-    category: "Laser Treatments",
-    id: "laser-treatments",
+    category: "Skin Lasers",
+    id: "skin-lasers",
     description: "Advanced laser therapies for various skin concerns.",
     treatments: ["Hair Removal", "Skin Resurfacing", "Pigmentation", "Vascular Lesions", "Tattoo Removal"],
     image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131829/services-medical-spa/hero/medical-spa-lasers.webp",
-    path: "/services/medical-spa/laser-treatments"
+    path: "/services/medical-spa/skin-lasers"
   },
   {
-    category: "Facial Treatments",
-    id: "facial-treatments",
+    category: "Esthetician Services",
+    id: "esthetician-services",
     description: "Luxurious facial treatments for radiant skin.",
     treatments: ["Custom Facials", "Chemical Peels", "Dermaplaning", "LED Therapy", "Oxygen Treatment"],
     image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131831/services-medical-spa/hero/medical-spa-facials.webp",
-    path: "/services/medical-spa/facial-treatments"
+    path: "/services/medical-spa/esthetician-services"
   }
 ]
 
@@ -93,10 +91,9 @@ export default function MedicalSpa() {
       <section className="relative h-screen">
         <div className="absolute inset-0">
           <CloudinaryImage
-  publicId="services-medical-spa/hero/medical-spa-hero"
-  alt="Medical Spa at Allure MD"
-  
-/>
+            publicId="services-medical-spa/hero/medical-spa-hero"
+            alt="Medical Spa at Allure MD"
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

@@ -1,78 +1,54 @@
-# Create a base directory for the ZIP
-$baseDir = "fal-media-structure"
+# Base directory for the ZIP structure
+$baseDir = "fal-media-structure-from-map"
 New-Item -Path $baseDir -ItemType Directory -Force
 
-# Create the main directories
-$publicImages = "$baseDir/public/images"
-$publicVideos = "$baseDir/public/videos"
-$components = "$baseDir/components"
+# Directories derived from the usage map
+$dirsToCreate = @(
+    "$baseDir/public/images/global/logos",
+    "$baseDir/public/images/global/icons",
+    "$baseDir/public/images/global/ui",
+    "$baseDir/public/images/pages/home",
+    "$baseDir/public/images/pages/about",
+    "$baseDir/public/images/pages/services",
+    "$baseDir/public/images/pages/services/plastic-surgery",
+    "$baseDir/public/images/pages/services/dermatology",
+    "$baseDir/public/images/pages/services/medical-spa",
+    "$baseDir/public/images/pages/services/functional-medicine",
+    "$baseDir/public/images/pages/team",
+    "$baseDir/public/images/pages/gallery",
+    "$baseDir/public/images/pages/example", # Present in map
+    "$baseDir/public/images/financing", # Implied from financing/hero.jpg
+    "$baseDir/public/images/appointment", # Implied from hero/appointment-hero.jpg
+    "$baseDir/public/images/reviews", # Implied from hero/reviews-hero.jpg
+    "$baseDir/public/videos/backgrounds",
+    "$baseDir/public/videos/content",
+    "$baseDir/components/Hero/assets",
+    "$baseDir/components/ServiceCard/assets", # Assumed based on structure
+    "$baseDir/components/TeamMember/assets" # Assumed based on structure
+)
 
-# Create global image directories
-$globalDirs = @("logos", "icons", "ui")
-foreach ($dir in $globalDirs) {
-    New-Item -Path "$publicImages/global/$dir" -ItemType Directory -Force
+foreach ($dir in $dirsToCreate) {
+    New-Item -Path $dir -ItemType Directory -Force -ErrorAction SilentlyContinue
 }
 
-# Create page-specific image directories
-$pageDirs = @("home", "about", "services", "team", "gallery")
-foreach ($dir in $pageDirs) {
-    New-Item -Path "$publicImages/pages/$dir" -ItemType Directory -Force
-}
-
-# Create service subdirectories
-$serviceDirs = @("plastic-surgery", "dermatology", "medical-spa", "functional-medicine")
-foreach ($dir in $serviceDirs) {
-    New-Item -Path "$publicImages/pages/services/$dir" -ItemType Directory -Force
-}
-
-# Create video directories
-$videoDirs = @("backgrounds", "content")
-foreach ($dir in $videoDirs) {
-    New-Item -Path "$publicVideos/$dir" -ItemType Directory -Force
-}
-
-# Create common component asset directories
-$componentDirs = @("Hero", "ServiceCard", "TeamMember")
-foreach ($dir in $componentDirs) {
-    New-Item -Path "$components/$dir/assets" -ItemType Directory -Force
-}
-
-# Add a README to help users
+# Add a README
 $readme = @"
-# FAL Media Structure
+# FAL Media Structure (Based on Usage Map)
 
-Place your media files in the appropriate directories:
-
-## Public Images
-- global/logos/ - Logo assets
-- global/icons/ - Icon assets
-- global/ui/ - UI elements
-
-- pages/home/ - Homepage images
-- pages/about/ - About page images
-- pages/services/ - Service category images
-- pages/team/ - Team page images
-- pages/gallery/ - Gallery images
-
-## Videos
-- backgrounds/ - Video backgrounds
-- content/ - Content videos
-
-## Component Assets
-- Hero/assets/ - Hero component-specific assets
-- ServiceCard/assets/ - Service card component assets
-- TeamMember/assets/ - Team member component assets
+This structure reflects the directories identified in the media usage map.
+Place your media files accordingly.
 
 After filling this structure with your images:
-1. ZIP the entire folder
-2. Upload back to the project
-3. Run: npm run media:register
+1. ZIP the entire '$baseDir' folder.
+2. Upload the ZIP back to the project.
+3. Extract the 'public' and 'components' folders into your project root.
+4. Run: npm run media:register
 "@
 
-$readme | Out-File -FilePath "$baseDir/README.md"
+$readme | Out-File -FilePath "$baseDir/README.md" -Encoding utf8
 
 # ZIP the directory structure
-Compress-Archive -Path $baseDir -DestinationPath "fal-media-structure.zip" -Force
+Compress-Archive -Path "$($baseDir)/*" -DestinationPath "$($baseDir).zip" -Force
 
-Write-Host "Media structure created and zipped to fal-media-structure.zip"
-Write-Host "Download this file, extract it, fill the folders with your images, and ZIP it back up." 
+Write-Host "Media structure created based on usage map and zipped to $($baseDir).zip"
+Write-Host "Download this file, extract it, fill the folders, and ZIP it back up." 

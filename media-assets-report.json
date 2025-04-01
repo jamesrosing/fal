@@ -1,16 +1,18 @@
 {
-  "generatedAt": "2025-03-31T05:41:14.102Z",
-  "totalAssets": 9,
+  "generatedAt": "2025-04-01T06:51:29.410Z",
+  "totalAssets": 15,
   "assetsByType": {
-    "image": 8,
+    "image": 14,
     "video": 1
   },
   "assetsByArea": {
     "component": 1,
     "example": 1,
+    "services": 2,
+    "global-icons": 2,
+    "global-logos": 3,
     "hero": 1,
     "articles": 1,
-    "services": 1,
     "team": 1,
     "gallery": 1,
     "branding": 1,
