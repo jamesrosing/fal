@@ -188,7 +188,7 @@ export function MedicalSpaSection() {
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Rejuvenation treatments for face and body
           </h3>
-          <div className="space-y-6 text-lg font-cerebri font-light">
+          <div className="space-y-6 text-base font-cerebri font-light">
             <p>
               Our medical spa combines luxury with clinical excellence. Enjoy targeted treatments like chemical peels,
               microneedling, and advanced facials customized for your unique skin needs, all in a serene, spa-like setting.

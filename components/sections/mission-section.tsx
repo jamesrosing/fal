@@ -138,7 +138,7 @@ export function MissionSection() {
           <h3 className="text-[clamp(2.2rem,5vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-10">
             Transforming lives through advanced aesthetic medicine
           </h3>
-          <div className="space-y-6 text-lg font-cerebri font-light text-gray-200">
+          <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
             <p>Beauty and wellness have evolved. How we approach aesthetic enhancement needs to evolve too.</p>
             <p>
               At Allure MD, we combine cutting-edge technology with artistic vision to deliver natural-looking results

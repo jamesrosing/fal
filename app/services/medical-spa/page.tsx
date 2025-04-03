@@ -8,6 +8,9 @@ import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 
 function ScrollHandler() {

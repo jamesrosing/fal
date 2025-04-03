@@ -83,7 +83,7 @@ export function PlasticSurgerySection() {
             <div className="mt-8 space-y-4">
               <LearnMoreButton href="/team">Meet Dr. James Rosing</LearnMoreButton>
               <br />
-              <LearnMoreButton href="/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
+              <LearnMoreButton href="/services/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
               <br />
               <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
             </div>
@@ -137,7 +137,7 @@ export function PlasticSurgerySection() {
             <h3 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
               Trusted expertise in aesthetic medicine
             </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light">
+            <div className="space-y-6 text-base font-cerebri font-light">
               <p>
                 Our team of board-certified physicians and licensed medical professionals brings decades of combined
                 experience in aesthetic medicine. We stay at the forefront of medical advances to provide you with the
@@ -146,7 +146,7 @@ export function PlasticSurgerySection() {
               <div className="space-y-4">
                 <LearnMoreButton href="/team">Meet Dr. James Rosing</LearnMoreButton>
                 <br />
-                <LearnMoreButton href="/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
+                <LearnMoreButton href="/services/plastic-surgery">Explore Plastic Surgery Services</LearnMoreButton>
                 <br />
                 <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
               </div>

@@ -5,7 +5,6 @@ import Image, { ImageProps } from 'next/image';
 import { getNextImageProps, getMediaUrl } from '@/lib/media/utils';
 import { MediaOptions } from '@/lib/media/types';
 
-
 interface OptimizedImageProps extends Omit<ImageProps, 'src' | 'width' | 'height'> {
   id: string;
   options?: MediaOptions;

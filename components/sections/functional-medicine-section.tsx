@@ -130,7 +130,7 @@ export function FunctionalMedicineSection() {
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Optimize your health from within
           </h3>
-          <div className="space-y-6 text-lg font-cerebri font-light">
+          <div className="space-y-6 text-base font-cerebri font-light">
             <p>
               Led by Dr. Pooja Gidwani, our functional medicine approach addresses the root causes of health concerns,
               optimizing everything from hormone balance to cognitive performance.

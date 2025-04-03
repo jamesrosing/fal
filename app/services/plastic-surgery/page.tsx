@@ -1,14 +1,12 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CloudinaryImage } from '@/components/media/CloudinaryMedia'
 
 
 function ScrollHandler() {
@@ -35,21 +33,21 @@ const procedures = [
     id: "head-and-neck",
     description: "Refined procedures for facial rejuvenation and harmony.",
     procedures: ["Eyelids", "Ears", "Face", "Neck", "Nose"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133478/services-plastic-surgery/hero/plastic-surgery-face-neck-procedures.png"
+    imageId: "fal/pages/services/plastic-surgery/head-and-neck/plastic-surgery-head-and-neck-hero"
   },
   {
     category: "Breast",
     id: "breast",
     description: "Customized breast enhancement and reconstruction procedures.",
     procedures: ["Augmentation", "Lift", "Reduction", "Revision", "Nipple Areolar Complex"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-breast-procedures.png"
+    imageId: "fal/pages/services/plastic-surgery/breast/plastic-surgery-breast-hero"
   },
   {
     category: "Body",
     id: "body",
     description: "Comprehensive body contouring and refinement procedures.",
     procedures: ["Abdominoplasty", "Mini-Abdominoplasty", "Liposuction", "Arm Lift", "Thigh Lift"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133479/services-plastic-surgery/hero/plastic-surgery-body-procedures.png"
+    imageId: "fal/pages/services/plastic-surgery/body/plastic-surgery-body-hero"
   }
 ]
 
@@ -62,27 +60,38 @@ export default function PlasticSurgery() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-screen">
-        <div className="absolute inset-0">
-          <OptimizedImage id="page:services/plastic-surgery/plastic-surgery-hero.jpg" alt="Plastic Surgery at Allure MD" priority fill />
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
-        
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-4">
+      <section className="bg-black">
+        {/* Mobile Hero with Image on top + Text below */}
+        <div className="lg:hidden">
+          {/* Media container with full width */}
+          <div className="relative w-full aspect-[16/9]">
+            <CloudinaryImage 
+              id="page:services/plastic-surgery/plastic-surgery-hero.jpg" 
+              alt="Plastic Surgery at Allure MD" 
+              priority 
+              fill 
+              width={1920}
+              height={1080}
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
+          
+          {/* Text content below image */}
+          <div className="px-4 py-10 bg-black">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="max-w-3xl text-white"
+              className="text-white"
             >
               <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
                 Plastic Surgery
               </h1>
-              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+              <h2 className="mb-6 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
                 Artistry in aesthetic transformation
               </h2>
-              <div className="space-y-6 text-lg font-cerebri font-light">
+              <div className="space-y-6 text-base font-cerebri font-light">
                 <p>
                   At Allure MD, we combine surgical expertise with an artistic vision to enhance your natural beauty.
                   Our board-certified plastic surgeons deliver personalized care and exceptional results.
@@ -96,66 +105,151 @@ export default function PlasticSurgery() {
             </motion.div>
           </div>
         </div>
-      </section>
-
-      {/* Procedures Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-24">
-            {procedures.map((category, index) => (
+        
+        {/* Desktop Hero with Text over Image */}
+        <div className="hidden lg:block relative h-screen">
+          <div className="absolute inset-0">
+            <CloudinaryImage 
+              id="page:services/plastic-surgery/plastic-surgery-hero.jpg" 
+              alt="Plastic Surgery at Allure MD" 
+              priority 
+              fill 
+              width={1920}
+              height={1080}
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
+          
+          <div className="relative h-full flex items-center">
+            <div className="container mx-auto px-4 lg:px-8">
               <motion.div
-                id={category.id}
-                key={category.category}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                viewport={{ once: true }}
-                className={`flex flex-col ${
-                  index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                } gap-12 items-center scroll-mt-20`}
+                className="max-w-3xl text-white"
               >
-                <div className="w-full lg:w-1/2">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden">
-                    <Image
-                      src={category.image}
-                      alt={category.category}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
-                  </div>
-                </div>
-                
-                <div className="w-full lg:w-1/2 text-white">
-                  <h3 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                    {category.category}
-                  </h3>
-                  <p className="mb-8 text-[clamp(1.5rem,3vw,2rem)] leading-none tracking-tight font-serif">
-                    {category.description}
+                <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                  Plastic Surgery
+                </h1>
+                <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+                  Artistry in aesthetic transformation
+                </h2>
+                <div className="space-y-6 text-base font-cerebri font-light">
+                  <p>
+                    At Allure MD, we combine surgical expertise with an artistic vision to enhance your natural beauty.
+                    Our board-certified plastic surgeons deliver personalized care and exceptional results.
                   </p>
-                  <ul className="space-y-4">
-                    {category.procedures.map((procedure) => (
-                      <li key={procedure} className="flex items-center space-x-4">
-                        <span className="w-8 h-[1px] bg-white"></span>
-                        <span className="text-lg font-cerebri font-light">{procedure}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8">
-                    <LearnMoreButton href={`/services/plastic-surgery/${category.id}`}>
-                      Learn More
-                    </LearnMoreButton>
+                  <div className="space-y-4">
+                    <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
+                    <br />
+                    <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
                   </div>
                 </div>
               </motion.div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Procedures Section */}
+      <section className="bg-black">
+          <div className="py-10 lg:py-16 px-0 lg:container lg:mx-auto lg:px-4">
+            <div className="grid gap-16 lg:gap-20">
+              {procedures.map((category, index) => (
+                <motion.div
+                  id={category.id}
+                  key={category.category}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true }}
+                  className="scroll-mt-20"
+                >
+                  {/* Mobile View */}
+                  <div className="lg:hidden">
+                    {/* Full-width image container */}
+                    <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] aspect-[4/3]">
+                      <CloudinaryImage
+                        id={category.imageId}
+                        alt={category.category}
+                        fill
+                        width={800}
+                        height={600}
+                        className="object-cover"
+                        sizes="100vw"
+                      />
+                    </div>
+                    
+                    {/* Text content with proper padding */}
+                    <div className="px-4 py-8 bg-black">
+                      <h3 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
+                        {category.category}
+                      </h3>
+                      <p className="mb-6 text-[clamp(1.5rem,3vw,2rem)] leading-tight tracking-tight font-serif text-white">
+                        {category.description}
+                      </p>
+                      
+                      <p className="text-base font-cerebri font-light leading-relaxed mb-8 text-white">
+                        Our comprehensive {category.category.toLowerCase()} procedures include {category.procedures.join(", ")}, 
+                        each tailored to enhance your natural features with precision and artistry.
+                      </p>
+                      
+                      <div className="mt-6">
+                        <LearnMoreButton href={`/services/plastic-surgery/${category.id}`}>
+                          Learn More
+                        </LearnMoreButton>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Desktop View */}
+                  <div className={`hidden lg:flex ${
+                    index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
+                  } gap-10 items-center px-4 lg:px-0`}>
+                    <div className="w-1/2">
+                      <div className="relative aspect-[4/3] w-full">
+                        <CloudinaryImage
+                          id={category.imageId}
+                          alt={category.category}
+                          fill
+                          width={800}
+                          height={600}
+                          className="object-cover w-full h-full"
+                          sizes="50vw"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="w-1/2 text-white">
+                      <h3 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                        {category.category}
+                      </h3>
+                      <p className="mb-6 text-[clamp(1.5rem,3vw,2rem)] leading-tight tracking-tight font-serif">
+                        {category.description}
+                      </p>
+                      
+                      <p className="text-base font-cerebri font-light leading-relaxed mb-8">
+                        Our comprehensive {category.category.toLowerCase()} procedures include {category.procedures.join(", ")}, 
+                        each tailored to enhance your natural features with precision and artistry.
+                      </p>
+                      
+                      <div className="mt-6">
+                        <LearnMoreButton href={`/services/plastic-surgery/${category.id}`}>
+                          Learn More
+                        </LearnMoreButton>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+      </section>
+
       {/* CTA Section */}
-      <section className="relative py-24 bg-[#f5f5f5] dark:bg-black">
-        <div className="container mx-auto px-4">
+      <section className="relative py-16 lg:py-20 bg-[#f5f5f5] dark:bg-black">
+        <div className="px-4 lg:container lg:mx-auto lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -166,10 +260,10 @@ export default function PlasticSurgery() {
             <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
               Your Journey Begins Here
             </h2>
-            <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
+            <h3 className="mb-6 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif">
               Schedule your consultation today
             </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light">
+            <div className="space-y-6 text-base font-cerebri font-light">
               <p>
                 Take the first step towards achieving your aesthetic goals. Our expert team is ready to guide you through your transformation journey.
               </p>

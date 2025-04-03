@@ -36,7 +36,10 @@
     "media:migrate": "node scripts/migrate-media.js",
     "media:verify": "node scripts/verify-media.js",
     "media:register": "node scripts/register-media-assets.js",
-    "media:structure": ".\\scripts\\create-media-structure.bat"
+    "media:structure": ".\\scripts\\create-media-structure.bat",
+    "media:align": "node scripts/align-cloudinary-structure.js",
+    "media:update-paths": "node scripts/update-component-paths.js",
+    "media:full-sync": "npm run media:align && npm run media:update-paths"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.38.0",
@@ -108,8 +111,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uploadthing": "^7.4.4",
     "vercel": "^41.4.0",
-    "zod": "^3.24.1",
-    "glob": "^10.3.10"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@babel/parser": "^7.26.9",
@@ -125,6 +127,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^7.3.1",
     "@typescript-eslint/parser": "^7.3.1",
+    "canvas": "^2.11.2",
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "eslint": "^8.57.0",
@@ -138,7 +141,6 @@
     "prettier": "^3.2.5",
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2",
-    "canvas": "^2.11.2"
+    "typescript": "^5.8.2"
   }
 }

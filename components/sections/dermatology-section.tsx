@@ -133,7 +133,7 @@ export function DermatologySection() {
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Advanced skincare solutions for lasting results
           </h3>
-          <div className="space-y-6 text-lg font-cerebri font-light">
+          <div className="space-y-6 text-base font-cerebri font-light">
             <p>
               Our comprehensive dermatology services combine medical expertise with aesthetic precision. From skin cancer
               screenings to advanced treatments for acne, eczema, and other conditions, we provide personalized care for

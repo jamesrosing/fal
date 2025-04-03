@@ -15,7 +15,7 @@ export function getMediaUrl(
 ): string {
   // Check if it's an asset ID first
   const asset = mediaRegistry.getAsset(idOrPublicId);
-  const publicId = asset ? asset.publicId : idOrPublicId;
+  let publicId = asset ? asset.publicId : idOrPublicId;
   
   // If already a full URL, return as is
   if (publicId.startsWith('http')) {
@@ -26,6 +26,21 @@ export function getMediaUrl(
   if (!publicId) {
     console.warn('Empty publicId provided, returning placeholder');
     return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+  }
+  
+  // Strip prefix for Cloudinary usage
+  if (publicId.startsWith('page:')) {
+    // Local file from /public/images/pages/
+    // Not suitable for Cloudinary - show placeholder
+    console.warn(`Image ${publicId} is a local file, not a Cloudinary image`);
+    return `/images/pages/${publicId.replace('page:', '')}`;
+  }
+  
+  if (publicId.startsWith('component:')) {
+    // Local file from component assets
+    // Not suitable for Cloudinary - show placeholder
+    console.warn(`Image ${publicId} is a component asset, not a Cloudinary image`);
+    return `/components/${publicId.replace('component:', '')}`;
   }
   
   // For images

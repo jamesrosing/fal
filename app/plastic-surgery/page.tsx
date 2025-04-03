@@ -8,6 +8,9 @@ import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -160,12 +163,7 @@ export default function PlasticSurgery() {
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-1/3">
                 <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md">
-                  <Image
-                    src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/team/dr-james-rosing-portrait.jpg"
-                    alt="Dr. James Rosing"
-                    fill
-                    className="object-cover"
-                  />
+                  <OptimizedImage id="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill />
                 </div>
               </div>
               <div className="w-full md:w-2/3">
