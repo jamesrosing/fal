@@ -40,8 +40,8 @@ function shouldRedirectPath(pathname: string, search: string): boolean {
   );
 }
 
-export function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+export async function middleware(request: NextRequest) {
+  const { pathname, search } = await request.nextUrl;
   
   // Only apply under-construction redirects in production environment
   // Skip redirects in development environment

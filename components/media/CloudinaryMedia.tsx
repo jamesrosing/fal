@@ -35,31 +35,86 @@ interface CloudinaryVideoProps {
 
 // Convert our current ID format to Cloudinary path
 function getCloudinaryPath(id: string): string {
+  console.log(`Original image path: ${id}`);
+  
+  // Handle special case for general/general pattern (fix for 404 errors)
+  if (id.startsWith('general/general/')) {
+    // Convert general/general/placeholder-XXX to home/placeholders/XXX
+    const name = id.replace('general/general/placeholder-', '');
+    const newPath = `home/placeholders/${name.toLowerCase().replace(/\s+/g, '-')}`;
+    console.log(`Mapped general/general path: ${id} to ${newPath}`);
+    return newPath;
+  }
+  
+  // Handle special case for hero/hero-articles pattern (fix for 404 errors)
+  if (id === 'hero/hero-articles') {
+    console.log(`Mapped hero/hero-articles to home/hero/articles`);
+    return 'home/hero/articles';
+  }
+  
+  // Handle other hero/hero-* patterns
+  if (id === 'hero/hero-poster') {
+    console.log(`Mapped hero/hero-poster to home/hero/poster`);
+    return 'home/hero/poster';
+  }
+  
+  if (id === 'hero/hero-fallback') {
+    console.log(`Mapped hero/hero-fallback to home/hero/fallback`);
+    return 'home/hero/fallback';
+  }
+  
   // Map fal/ paths to home/ for Cloudinary compatibility
+  if (id.startsWith('fal/pages/')) {
+    // Convert fal/pages/services/plastic-surgery/body/liposuction to home/services/plastic-surgery/body/liposuction
+    const newPath = id.replace('fal/pages/', 'home/');
+    console.log(`Mapped to: ${newPath}`);
+    return newPath;
+  }
+  
+  // Handle other fal/ paths
   if (id.startsWith('fal/')) {
-    console.log(`Mapping Cloudinary path from ${id} to ${id.replace('fal/', 'home/')}`);
-    return id.replace('fal/', 'home/');
+    // Convert fal/components/ or fal/videos/ etc. to home/...
+    const newPath = id.replace('fal/', 'home/');
+    console.log(`Mapped to: ${newPath}`);
+    return newPath;
   }
   
   // Handle different ID formats
   if (id.startsWith('page:')) {
-    // Convert page:services/hero.jpg to home/pages/services/hero
+    // Convert page:services/hero.jpg to home/services/hero
     const path = id.replace('page:', '').replace(/\.[^/.]+$/, ''); // Remove file extension
-    return `home/pages/${path}`;
+    const newPath = `home/${path}`;
+    console.log(`Mapped page: ${id} to ${newPath}`);
+    return newPath;
   }
   
   if (id.startsWith('component:')) {
     // Convert component:Hero/assets/background.jpg to home/components/Hero/assets/background
     const path = id.replace('component:', '').replace(/\.[^/.]+$/, '');
-    return `home/components/${path}`;
+    const newPath = `home/components/${path}`;
+    console.log(`Mapped component: ${id} to ${newPath}`);
+    return newPath;
   }
   
   // If it's an absolute path without prefix, add home/ prefix
   if (id.match(/^(pages|services|components)/)) {
-    return `home/${id}`;
+    const newPath = `home/${id}`;
+    console.log(`Mapped path: ${id} to ${newPath}`);
+    return newPath;
   }
   
-  // If it's already a Cloudinary path, use as is
+  // If it's already a path that starts with home/, use as is
+  if (id.startsWith('home/')) {
+    return id;
+  }
+  
+  // Handle special case for homepage-mission-section video
+  if (id === 'homepage-mission-section' || id.includes('homepage-mission-section.mp4')) {
+    console.log(`Mapped homepage-mission-section to home/videos/homepage-mission-section`);
+    return 'home/videos/homepage-mission-section';
+  }
+  
+  // Default case - assume direct Cloudinary path
   return id;
 }
 

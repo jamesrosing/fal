@@ -312,17 +312,30 @@ export default function AboutPage() {
                 className="text-white"
               >
                 <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-lg">
-                  {facilityMediaHooks[facility.mediaKey]?.url && (
+                  {/* Special case for operating room - use the panoramic image shared by user */}
+                  {facility.title === "State-of-the-Art Operating Rooms" ? (
                     <Image
-                      src={facilityMediaHooks[facility.mediaKey].url as string}
+                      src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1743748061/operating_room.jpg"
                       alt={facility.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                  )}
-                  {!facilityMediaHooks[facility.mediaKey]?.url && (
-                    <div className="w-full h-full animate-pulse bg-zinc-800 rounded-lg"></div>
+                  ) : (
+                    <>
+                      {facilityMediaHooks[facility.mediaKey]?.url && (
+                        <Image
+                          src={facilityMediaHooks[facility.mediaKey].url as string}
+                          alt={facility.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      )}
+                      {!facilityMediaHooks[facility.mediaKey]?.url && (
+                        <div className="w-full h-full animate-pulse bg-zinc-800 rounded-lg"></div>
+                      )}
+                    </>
                   )}
                 </div>
                 <h4 className="text-xl font-serif mb-2">{facility.title}</h4>
@@ -334,8 +347,22 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-24 bg-zinc-900">
-        <div className="container mx-auto px-4">
+      <section className="relative py-24 bg-zinc-900 overflow-hidden">
+        {/* Video Background */}
+        <div className="absolute inset-0 z-0">
+          <video
+            src="https://res.cloudinary.com/dyrzyfg3w/video/upload/v1741809081/homepage-mission-section.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+        
+        {/* Content (now with z-10 to appear above video) */}
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -349,7 +376,7 @@ export default function AboutPage() {
             <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
               Experience the Allure MD difference
             </h3>
-            <div className="space-y-6 text-lg font-cerebri font-light text-gray-400">
+            <div className="space-y-6 text-lg font-cerebri font-light text-gray-300">
               <p>
                 Take the first step towards achieving your aesthetic goals with our expert team of professionals.
               </p>
