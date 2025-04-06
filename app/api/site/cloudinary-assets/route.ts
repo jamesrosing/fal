@@ -29,8 +29,8 @@ export async function GET(request: Request) {
   try {
     // Get query parameters
     const { searchParams } = new URL(request.url);
-    const folder = searchParams.get('folder') || '';
-    const resourceType = searchParams.get('type') || 'image';
+    const folder = (await searchParams).get('folder') || '';
+    const resourceType = (await searchParams).get('type') || 'image';
     const maxResults = parseInt(searchParams.get('max') || '100', 10);
     
     // Validate resource type

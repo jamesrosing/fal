@@ -126,7 +126,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const albumId = searchParams.get('albumId');
+    const albumId = (await searchParams).get('albumId');
 
     if (!albumId) {
       return NextResponse.json(

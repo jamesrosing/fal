@@ -41,7 +41,9 @@ function shouldRedirectPath(pathname: string, search: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname, search } = await request.nextUrl;
+  // In Next.js 15, nextUrl itself is not a Promise, only its components might be
+  const pathname = request.nextUrl.pathname;
+  const search = request.nextUrl.search;
   
   // Only apply under-construction redirects in production environment
   // Skip redirects in development environment

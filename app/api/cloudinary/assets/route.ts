@@ -31,13 +31,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // Extract filtering parameters
-    const area = searchParams.get('area') as ImageArea | undefined;
-    const resourceType = searchParams.get('resourceType') as 'image' | 'video' | undefined;
-    const folder = searchParams.get('folder');
-    const tag = searchParams.get('tag');
-    const searchTerm = searchParams.get('searchTerm');
+    const area = (await searchParams).get('area') as ImageArea | undefined;
+    const resourceType = (await searchParams).get('resourceType') as 'image' | 'video' | undefined;
+    const folder = (await searchParams).get('folder');
+    const tag = (await searchParams).get('tag');
+    const searchTerm = (await searchParams).get('searchTerm');
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
-    const nextCursor = searchParams.get('nextCursor');
+    const nextCursor = (await searchParams).get('nextCursor');
     
     // Build search expression for Cloudinary
     const expressions: string[] = [];

@@ -5,7 +5,7 @@ import { ARTICLE_SUBCATEGORIES } from '@/lib/types';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const categorySlug = searchParams.get('category');
+    const categorySlug = (await searchParams).get('category');
     
     if (!categorySlug) {
       return NextResponse.json({ error: 'Category slug is required' }, { status: 400 });

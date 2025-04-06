@@ -173,7 +173,7 @@ export async function DELETE(request: Request) {
     
     // Get category ID from URL params
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const id = (await searchParams).get('id');
     
     if (!id) {
       return new NextResponse(

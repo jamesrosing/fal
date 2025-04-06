@@ -40,8 +40,8 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
         setCategories(categoriesData);
         
         // Determine the active category from search params
-        const categorySlug = searchParams.category as string | undefined;
-        const subcategorySlug = searchParams.subcategory as string | undefined;
+        const categorySlug = (await searchParams).category as string | undefined;
+        const subcategorySlug = (await searchParams).subcategory as string | undefined;
 
         if (categorySlug && categorySlug !== 'all') {
           setActiveCategory(categorySlug);

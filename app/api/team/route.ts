@@ -191,7 +191,7 @@ export async function PATCH(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
+    const id = (await searchParams).get('id')
 
     if (!id) {
       return NextResponse.json(

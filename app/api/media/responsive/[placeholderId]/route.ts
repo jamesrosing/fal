@@ -16,7 +16,7 @@ export async function GET(
   { params }: { params: { placeholderId: string } }
 ) {
   const placeholderId = params.placeholderId;
-  const searchParams = request.nextUrl.searchParams;
+  const searchParams = await request.nextUrl.searchParams;
   
   // Parse optional parameters with defaults
   const width = parseInt(searchParams.get('width') || '1920', 10);

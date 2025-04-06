@@ -10,7 +10,7 @@ import { getMediaUrl } from '@/lib/media/utils';
  */
 export async function GET(request: NextRequest) {
   // Get query parameters
-  const searchParams = request.nextUrl.searchParams;
+  const searchParams = await request.nextUrl.searchParams;
   const id = searchParams.get('id');
   const width = searchParams.get('width');
   const height = searchParams.get('height');

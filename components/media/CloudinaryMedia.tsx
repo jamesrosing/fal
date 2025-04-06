@@ -114,6 +114,27 @@ function getCloudinaryPath(id: string): string {
     return 'home/videos/homepage-mission-section';
   }
   
+  // Handle special case for services-medical-spa path pattern
+  if (id.startsWith('services-medical-spa/')) {
+    const newPath = `home/services/medical-spa/${id.replace('services-medical-spa/', '')}`;
+    console.log(`Mapped services-medical-spa path: ${id} to ${newPath}`);
+    return newPath;
+  }
+  
+  // Handle special case for services-dermatology path pattern
+  if (id.startsWith('services-dermatology/')) {
+    const newPath = `home/services/dermatology/${id.replace('services-dermatology/', '')}`;
+    console.log(`Mapped services-dermatology path: ${id} to ${newPath}`);
+    return newPath;
+  }
+  
+  // Handle special case for services-plastic-surgery path pattern
+  if (id.startsWith('services-plastic-surgery/')) {
+    const newPath = `home/services/plastic-surgery/${id.replace('services-plastic-surgery/', '')}`;
+    console.log(`Mapped services-plastic-surgery path: ${id} to ${newPath}`);
+    return newPath;
+  }
+  
   // Default case - assume direct Cloudinary path
   return id;
 }

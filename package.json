@@ -14,6 +14,7 @@
     "prepare": "husky install",
     "precommit": "lint-staged",
     "analyze": "cross-env ANALYZE=true next build",
+    "next15:migrate": "node scripts/next15-migration.js",
     "backup-data": "node --loader ts-node/esm scripts/backup-data.ts",
     "optimize-video": "node --loader ts-node/esm scripts/optimize-video.ts",
     "optimize-custom-video": "node --loader ts-node/esm scripts/optimize-video.ts",

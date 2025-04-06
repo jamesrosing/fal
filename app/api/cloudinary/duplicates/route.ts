@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const folder = searchParams.get('folder') || '';
+    const folder = (await searchParams).get('folder') || '';
     const limit = parseInt(searchParams.get('limit') || '1000');
     
     // Validate Cloudinary credentials

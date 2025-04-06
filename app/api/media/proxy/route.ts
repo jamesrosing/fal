@@ -3,7 +3,7 @@ import { getMediaUrl } from '@/lib/media/utils';
 import mediaRegistry from '@/lib/media/registry';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  const searchParams = await request.nextUrl.searchParams;
   const id = searchParams.get('id');
   
   if (!id) {

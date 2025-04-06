@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const action = searchParams.get('action');
+  const action = (await searchParams).get('action');
 
   try {
     switch (action) {
@@ -119,9 +119,9 @@ export async function GET(request: Request) {
         }
 
       case 'availability': {
-        const serviceId = searchParams.get('serviceId');
-        const date = searchParams.get('date');
-        const providerId = searchParams.get('providerId');
+        const serviceId = (await searchParams).get('serviceId');
+        const date = (await searchParams).get('date');
+        const providerId = (await searchParams).get('providerId');
 
         if (!serviceId || !date) {
           return NextResponse.json(

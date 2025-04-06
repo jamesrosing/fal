@@ -22,7 +22,7 @@ import { ZenotiMarketingService } from '@/lib/zenoti-marketing';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') as 'active' | 'all' | undefined;
+    const status = (await searchParams).get('status') as 'active' | 'all' | undefined;
     
     const campaigns = await ZenotiMarketingService.getCampaigns(status);
     return NextResponse.json({ campaigns });
@@ -42,7 +42,7 @@ import { ZenotiMarketingService } from '@/lib/zenoti-marketing';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const code = searchParams.get('code');
+    const code = (await searchParams).get('code');
     
     if (!code) {
       return NextResponse.json(
@@ -328,10 +328,10 @@ import { ZenotiMarketingService } from '@/lib/zenoti-marketing';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const fromDate = searchParams.get('from_date') || undefined;
-    const toDate = searchParams.get('to_date') || undefined;
-    const limitParam = searchParams.get('limit');
-    const offsetParam = searchParams.get('offset');
+    const fromDate = (await searchParams).get('from_date') || undefined;
+    const toDate = (await searchParams).get('to_date') || undefined;
+    const limitParam = (await searchParams).get('limit');
+    const offsetParam = (await searchParams).get('offset');
     
     const limit = limitParam ? parseInt(limitParam) : undefined;
     const offset = offsetParam ? parseInt(offsetParam) : undefined;

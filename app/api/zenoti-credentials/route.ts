@@ -3,7 +3,7 @@ import zenotiClient from '@/lib/zenoti-server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const includeCredentials = searchParams.get('includeCredentials') === 'true';
+  const includeCredentials = (await searchParams).get('includeCredentials') === 'true';
   
   // Only allow in development mode for security
   if (process.env.NODE_ENV !== 'development' && includeCredentials) {

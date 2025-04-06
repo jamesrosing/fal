@@ -11,7 +11,7 @@ import { revalidatePath } from 'next/cache';
 export async function POST(request: NextRequest) {
   try {
     // Get the path from the query parameters
-    const path = request.nextUrl.searchParams.get('path');
+    const path = await request.nextUrl.searchParams.get('path');
     
     if (!path) {
       return NextResponse.json(
