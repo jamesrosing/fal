@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { BackgroundVideo } from "@/components/ui/background-video"
 import Link from "next/link"
 import { getCloudinaryVideoUrl, getCloudinaryUrl } from "@/lib/cloudinary"
-import Image from 'next/image'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import Image from 'next/image'
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 // TODO: Replace these URLs with your CDN URLs
@@ -40,7 +41,7 @@ const posterImage = getCloudinaryUrl("hero/hero-poster", {
   crop: 'fill',
   gravity: 'auto',
   format: 'auto',
-  quality: 'auto'
+  quality: 80
 });
 
 const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
@@ -49,7 +50,7 @@ const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
   crop: 'fill',
   gravity: 'auto',
   format: 'auto',
-  quality: 'auto'
+  quality: 80
 });
 
 export function Hero() {
@@ -132,14 +133,14 @@ export function PageHero({
     ? image.path 
     : getCloudinaryUrl(image.path, {
         format: 'auto',
-        quality: 'auto'
+        quality: 80
       });
 
   return (
     <section className="relative pt-20">
       <div className="relative aspect-[16/9] w-full">
-        <Image
-          src={imageUrl}
+        <UnifiedImage
+          placeholderId={image.path.includes('https://res.cloudinary.com') ? image.path.split('/').slice(-3).join('/') : image.path}
           alt={image.alt}
           fill
           className="object-cover"

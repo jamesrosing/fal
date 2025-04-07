@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Unified Cloudinary Media System - Implementation Plan 04/06/2025
+
+- Always refer to and use documentation of the implementation plan [unified-media-system.md](mdc:.cursor/@docs/unified-media-system.md) when making changes to code involving media.

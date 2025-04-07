@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image';
 import { getCloudinaryUrl } from '@/lib/cloudinary';
 import { handleMediaUpload } from '@/app/admin/media/actions';
 import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import { CldImage } from 'next-cloudinary';
 import { Image as ImageIcon } from 'lucide-react';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 // Upload preset is only used as a fallback if needed
@@ -151,8 +152,8 @@ export default function VisualMediaManager() {
           >
             <div className="h-24 bg-gray-100 dark:bg-gray-800 relative mb-2 rounded overflow-hidden">
               {page.preview ? (
-                <Image 
-                  src={page.preview} 
+                <UnifiedImage 
+                  placeholderId={page.preview} // Assuming preview is a valid placeholder or URL path
                   alt={page.name} 
                   fill 
                   className="object-cover"

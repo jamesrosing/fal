@@ -1,121 +1,127 @@
+// components/media/UnifiedImage.tsx
 'use client';
 
-import React, { useState } from 'react';
-import Image, { ImageProps } from 'next/image';
-import { mediaService, MediaOptions } from '@/lib/services/media-service';
+import React, { useState, useEffect, Suspense } from 'react';
+import NextImage, { ImageProps as NextImageProps } from 'next/image';
 import { Skeleton } from "@/components/ui/skeleton";
+import { mediaService, MediaAsset, MediaOptions } from '@/lib/services/media-service';
 
-interface UnifiedImageProps extends Omit<ImageProps, 'src'> {
+// Combine NextImageProps with our specific props
+interface UnifiedImageProps extends Omit<NextImageProps, 'src' | 'alt'> {
   placeholderId: string;
-  options?: MediaOptions;
+  alt?: string; // Making alt optional initially, will use asset's alt if available
   fallbackSrc?: string;
   showLoading?: boolean;
+  mediaOptions?: MediaOptions; // For applying transformations
 }
 
-/**
- * UnifiedImage component - A wrapper around Next.js Image component
- * 
- * Features:
- * - Automatically resolves placeholder IDs to Cloudinary URLs
- * - Handles loading and error states
- * - Supports responsive images
- * - Provides fallback for missing images
- * 
- * @example
- * <UnifiedImage
- *   placeholderId="home-hero"
- *   alt="Home hero image"
- *   width={1200}
- *   height={600}
- *   options={{ quality: 90 }}
- *   priority
- * />
- */
 export default function UnifiedImage({
   placeholderId,
-  options = {},
-  fallbackSrc = '/placeholder-image.jpg',
-  showLoading = true,
-  alt = '',
+  alt,
   width,
   height,
+  fill = false,
+  priority = false,
   sizes = '100vw',
-  ...props
+  className = '',
+  fallbackSrc = '/placeholder.svg', // Use a generic SVG placeholder
+  showLoading = true,
+  mediaOptions = {},
+  ...rest // Pass through other NextImage props like style, quality, unoptimized, etc.
 }: UnifiedImageProps) {
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [asset, setAsset] = useState<any>(null);
-  
-  // Fetch the media asset when the component mounts
-  React.useEffect(() => {
+
+  const [asset, setAsset] = useState<MediaAsset | null | undefined>(undefined); // undefined: loading, null: error/not found
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
     let isMounted = true;
-    
+
     async function loadAsset() {
       try {
-        setLoading(true);
-        const result = await mediaService.getMediaByPlaceholderId(placeholderId);
-        
+        const fetchedAsset = await mediaService.getMediaByPlaceholderId(placeholderId);
         if (isMounted) {
-          setAsset(result);
-          setLoading(false);
+          if (fetchedAsset && fetchedAsset.type === 'image') {
+            setAsset(fetchedAsset);
+            const url = mediaService.getMediaUrl(fetchedAsset, mediaOptions);
+            setImageUrl(url);
+          } else {
+             if (fetchedAsset && fetchedAsset.type !== 'image') {
+                console.warn(`Asset for placeholderId '${placeholderId}' is not an image.`);
+             }
+             setAsset(null); // Treat non-image or null as not found
+             setImageUrl(fallbackSrc);
+          }
         }
       } catch (err) {
-        console.error(`Error loading image for ${placeholderId}:`, err);
+        console.error(`Error loading image for placeholderId '${placeholderId}':`, err);
         if (isMounted) {
-          setError(true);
-          setLoading(false);
+          setAsset(null); // Error state
+          setImageUrl(fallbackSrc);
         }
       }
     }
-    
+
+    setAsset(undefined); // Reset to loading state on prop change
+    setImageUrl(null);
     loadAsset();
-    
+
     return () => {
       isMounted = false;
     };
-  }, [placeholderId]);
-  
-  // Handle loading state
-  if (loading && showLoading) {
-    return (
-      <Skeleton 
-        className="rounded overflow-hidden" 
-        style={{ width: width || '100%', height: height || 'auto', aspectRatio: width && height ? width / height : undefined }}
-      />
-    );
-  }
-  
-  // Handle error state or missing asset
-  if (error || !asset) {
-    if (!fallbackSrc) {
-      return null;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeholderId, JSON.stringify(mediaOptions), fallbackSrc]); // Reload if placeholderId or options change
+
+  const effectiveAlt = alt ?? asset?.alt_text ?? `Image for ${placeholderId}`; // Provide a meaningful default alt
+  const isLoading = asset === undefined;
+  const hasError = asset === null;
+
+  // Determine final width and height for layout
+  const finalWidth = fill ? undefined : (width ?? asset?.width ?? undefined);
+  const finalHeight = fill ? undefined : (height ?? asset?.height ?? undefined);
+
+  if (isLoading && showLoading) {
+    // Ensure Skeleton matches the expected aspect ratio if possible
+    let skeletonHeight: string | number = 'auto';
+    if (finalHeight) {
+      skeletonHeight = `${finalHeight}px`;
+    } else if (finalWidth && typeof finalWidth === 'number') {
+      // Default aspect ratio if height is unknown (e.g., 16:9)
+      skeletonHeight = `${Math.round(finalWidth * 9 / 16)}px`;
     }
-    
+
     return (
-      <Image 
-        src={fallbackSrc}
-        alt={alt}
-        width={typeof width === 'number' ? width : 800}
-        height={typeof height === 'number' ? height : 600}
-        sizes={sizes}
-        {...props}
+      <Skeleton
+        className={className}
+        style={{
+          width: finalWidth ? `${finalWidth}px` : '100%',
+          height: skeletonHeight,
+          aspectRatio: (finalWidth && finalHeight) ? `${finalWidth}/${finalHeight}` : undefined,
+          ...((rest.style as React.CSSProperties) ?? {}),
+        }}
       />
     );
   }
-  
-  // Get the optimized URL with transformations
-  const src = mediaService.getMediaUrl(asset, options);
-  
-  // Return the Next.js Image with the resolved src
+
+  // Use NextImage for rendering, leveraging its optimization features
+  // Src will be the Cloudinary URL or fallback
   return (
-    <Image
-      src={src}
-      alt={alt || asset.alt_text || placeholderId}
-      width={typeof width === 'number' ? width : asset.width || 800}
-      height={typeof height === 'number' ? height : asset.height || 600}
+    <NextImage
+      src={imageUrl || fallbackSrc} // Use resolved URL or fallback
+      alt={effectiveAlt}
+      width={finalWidth} // Pass calculated or provided width
+      height={finalHeight} // Pass calculated or provided height
+      fill={fill}
+      priority={priority}
       sizes={sizes}
-      onError={() => setError(true)}
-      {...props}
+      className={className}
+      onError={() => {
+          // Handle image loading errors (e.g., network issue, broken Cloudinary link)
+          if (imageUrl !== fallbackSrc) {
+            console.warn(`Failed to load image: ${imageUrl}. Falling back to ${fallbackSrc}`);
+            setImageUrl(fallbackSrc);
+          }
+      }}
+      {...rest} // Spread remaining props
     />
   );
 }

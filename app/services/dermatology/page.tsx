@@ -7,8 +7,9 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 function ScrollHandler() {
@@ -78,7 +79,12 @@ export default function Dermatology() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <OptimizedImage id="services-dermatology/hero/dermatology-hero.png" alt="Dermatology at Allure MD"   priority fill />
+          <UnifiedImage 
+            placeholderId="services-dermatology/hero/dermatology-hero.png" 
+            alt="Dermatology at Allure MD"   
+            priority 
+            fill 
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
@@ -130,8 +136,8 @@ export default function Dermatology() {
               >
                 <div className="w-full lg:w-1/2">
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
-                    <Image
-                      src={category.image}
+                    <UnifiedImage
+                      placeholderId={category.image.split('/').slice(-3).join('/')}
                       alt={category.category}
                       fill
                       className="object-cover"

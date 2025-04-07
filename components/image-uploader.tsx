@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { processImage } from "../app/actions"
 import { resizeImage } from "@/lib/utils"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 type OutputFormat = "png" | "jpg" | "jpeg"

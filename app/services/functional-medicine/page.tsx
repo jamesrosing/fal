@@ -1,14 +1,13 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
+// import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 function ScrollHandler() {
@@ -85,7 +84,12 @@ export default function FunctionalMedicine() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <OptimizedImage id="articles/categories/functional-medicine-hero.png" alt="Functional Medicine at Allure MD"   priority fill />
+          <UnifiedImage 
+            placeholderId="articles/categories/functional-medicine-hero.png" 
+            alt="Functional Medicine at Allure MD"   
+            priority 
+            fill 
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
@@ -137,8 +141,8 @@ export default function FunctionalMedicine() {
               >
                 <div className="w-full lg:w-1/2">
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
-                    <Image
-                      src={category.image}
+                    <UnifiedImage
+                      placeholderId={category.image.split('/').slice(-3).join('/')}
                       alt={category.category}
                       fill
                       className="object-cover"

@@ -1,5 +1,4 @@
-import { OptimizedImage } from '../media/OptimizedImage';
-import { OptimizedVideo } from '../media/OptimizedVideo';
+import { MediaRenderer } from '../media/MediaRenderer';
 
 /**
  * Hero Component - Full-width hero section with support for images or videos
@@ -7,15 +6,15 @@ import { OptimizedVideo } from '../media/OptimizedVideo';
  * This component demonstrates co-located assets and media organization best practices
  */
 export function Hero({
-  media,
+  media, // Expected: { id: string, type: 'image' | 'video', alt?: string, fallbackId?: string }
   title,
   subtitle,
   align = 'center',
   overlayOpacity = 50,
   height = 'lg'
 }) {
-  // Determine if the media is a video or image
-  const isVideo = media.type === 'video';
+  // Determine if the media is a video or image - No longer needed with MediaRenderer
+  // const isVideo = media.type === 'video';
   
   // Calculate height class based on size prop
   const heightClass = {
@@ -33,37 +32,39 @@ export function Hero({
     'right': 'text-right items-end'
   }[align] || 'text-center items-center';
   
-  // Calculate overlay opacity
-  const opacityClass = `bg-opacity-${overlayOpacity}`;
+  // Calculate overlay opacity - Ensure template literal is correct
+  const opacityValue = Math.min(100, Math.max(0, overlayOpacity)); // Clamp between 0-100
+  const opacityStyle = { backgroundColor: `rgba(0, 0, 0, ${opacityValue / 100})` }; 
 
   return (
     <section className={`relative w-full ${heightClass} overflow-hidden`}>
-      {/* Media background */}
+      {/* Media background using MediaRenderer */}
       <div className="absolute inset-0 z-0">
-        {isVideo ? (
-          <OptimizedVideo
-            id={media.id}
-            options={{
-              autoPlay: true,
-              muted: true,
-              loop: true,
-              controls: false
-            }}
-            fallbackImageId={media.fallbackId}
-            className="object-cover w-full h-full"
-          />
-        ) : (
-          <OptimizedImage
-            id={media.id}
-            alt={media.alt || title}
-            fill
-            priority
-            className="object-cover"
-          />
-        )}
+        <MediaRenderer
+          placeholderId={media.id}
+          // Image specific props
+          alt={media.alt || title}
+          fill // Ensures the media covers the container
+          priority // Assume hero media is high priority
+          // Video specific props
+          posterPlaceholderId={media.fallbackId} // Map fallbackId to poster
+          options={{
+             autoPlay: true,
+             muted: true,
+             loop: true,
+             controls: false,
+             // Add other necessary video options if needed
+          }}
+          // Common props
+          className="object-cover w-full h-full" // Class for sizing/fitting
+          // Pass width/height if needed for non-fill scenarios, but fill=true covers this
+        />
         
-        {/* Gradient overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-black to-transparent ${opacityClass}`}></div>
+        {/* Gradient overlay using inline style for dynamic opacity */}
+        <div 
+           className="absolute inset-0 bg-gradient-to-t from-black to-transparent"
+           style={opacityStyle} // Apply calculated opacity
+        ></div>
       </div>
       
       {/* Content */}

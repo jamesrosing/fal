@@ -1,15 +1,13 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 function ScrollHandler() {
@@ -163,7 +161,11 @@ export default function PlasticSurgery() {
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-1/3">
                 <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md">
-                  <OptimizedImage id="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill />
+                  <UnifiedImage 
+                    placeholderId="team/dr-james-rosing-portrait.jpg" 
+                    alt="Dr. James Rosing"    
+                    fill 
+                  />
                 </div>
               </div>
               <div className="w-full md:w-2/3">
@@ -203,8 +205,8 @@ export default function PlasticSurgery() {
               >
                 <div className="w-full lg:w-1/2">
                   <div className="relative aspect-[4/3] w-full overflow-hidden">
-                    <Image
-                      src={procedure.image}
+                    <UnifiedImage
+                      placeholderId={procedure.image.split('/').slice(-3).join('/')}
                       alt={procedure.category}
                       fill
                       className="object-cover"

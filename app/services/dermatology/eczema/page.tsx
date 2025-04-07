@@ -1,11 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
+// import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 const treatments = [
@@ -74,7 +73,12 @@ export default function EczemaPage() {
       {/* Hero Section */}
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
-          <OptimizedImage id="services-dermatology/hero/dermatology-eczema.png" alt="Eczema Treatment Services"   priority fill />
+          <UnifiedImage 
+            placeholderId="services-dermatology/hero/dermatology-eczema.png" 
+            alt="Eczema Treatment Services"   
+            priority 
+            fill 
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         

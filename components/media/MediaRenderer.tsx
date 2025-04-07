@@ -1,26 +1,41 @@
 'use client';
 
-import React from 'react';
-import { mediaService } from '@/lib/services/media-service';
+import React, { useState, useEffect } from 'react';
+import { mediaService, MediaAsset, MediaOptions } from '@/lib/services/media-service';
 import UnifiedImage from './UnifiedImage';
 import UnifiedVideo from './UnifiedVideo';
+import { Skeleton } from "@/components/ui/skeleton";
+import type { ImageProps as NextImageProps } from 'next/image';
+import type { ComponentProps } from 'react';
 
+// Extract VideoOptions type if UnifiedVideo exports it, otherwise redefine
+type VideoOptions = ComponentProps<typeof UnifiedVideo>['options'];
+
+// Define props clearly separating concerns
 interface MediaRendererProps {
   placeholderId: string;
-  alt?: string;
   className?: string;
-  width?: number;
-  height?: number;
-  fill?: boolean;
-  priority?: boolean;
-  sizes?: string;
-  autoPlay?: boolean;
-  muted?: boolean;
-  loop?: boolean;
-  controls?: boolean;
-  quality?: number;
-  fallbackSrc?: string;
+  width?: number | string;
+  height?: number | string;
   showLoading?: boolean;
+
+  // Image Props (subset of NextImageProps + mediaOptions)
+  alt?: string;
+  fill?: NextImageProps['fill'];
+  priority?: NextImageProps['priority'];
+  sizes?: NextImageProps['sizes'];
+  quality?: NextImageProps['quality'];
+  unoptimized?: NextImageProps['unoptimized'];
+  style?: NextImageProps['style'];
+  mediaOptions?: MediaOptions; // For UnifiedImage transformations
+  // Note: NextImage's onLoad/onError are not directly exposed here
+  // UnifiedImage handles its internal NextImage events
+
+  // Video Props
+  options?: VideoOptions; // Video playback options
+  posterPlaceholderId?: string;
+  onVideoLoad?: () => void; // Video-specific load event
+  onVideoError?: () => void; // Video-specific error event
 }
 
 /**
@@ -42,84 +57,125 @@ interface MediaRendererProps {
  */
 export default function MediaRenderer({
   placeholderId,
-  alt = '',
-  className = '',
+  className,
   width,
   height,
-  fill = false,
-  priority = false,
-  sizes = '100vw',
-  autoPlay = true,
-  muted = true,
-  loop = true,
-  controls = false,
-  quality = 80,
-  fallbackSrc,
-  showLoading = true
+  showLoading = true,
+  // Image Props
+  alt,
+  fill,
+  priority,
+  sizes,
+  quality,
+  unoptimized,
+  style,
+  mediaOptions,
+  // Video Props
+  options: videoOptions,
+  posterPlaceholderId,
+  onVideoLoad,
+  onVideoError,
 }: MediaRendererProps) {
-  // State to track the media type (initially unknown)
-  const [mediaType, setMediaType] = React.useState<'image' | 'video' | 'unknown'>('unknown');
-  
-  // Fetch the media type on component mount
-  React.useEffect(() => {
+
+  const [asset, setAsset] = useState<MediaAsset | null | undefined>(undefined);
+
+  useEffect(() => {
     let isMounted = true;
-    
-    async function detectMediaType() {
+    async function loadAsset() {
+      setAsset(undefined);
       try {
-        const asset = await mediaService.getMediaByPlaceholderId(placeholderId);
-        if (isMounted && asset) {
-          setMediaType(asset.type as 'image' | 'video');
+        const fetchedAsset = await mediaService.getMediaByPlaceholderId(placeholderId);
+        if (isMounted) {
+          setAsset(fetchedAsset || null);
         }
       } catch (err) {
-        console.error(`Error detecting media type for ${placeholderId}:`, err);
+        console.error(`Error loading asset for MediaRenderer (placeholderId: ${placeholderId}):`, err);
         if (isMounted) {
-          setMediaType('unknown');
+          setAsset(null);
         }
       }
     }
-    
-    detectMediaType();
-    
-    return () => {
-      isMounted = false;
-    };
+    loadAsset();
+    return () => { isMounted = false; };
   }, [placeholderId]);
-  
-  // Render the appropriate component based on media type
-  if (mediaType === 'video') {
+
+  const isLoading = asset === undefined;
+  const hasError = asset === null;
+
+  const getSize = (value: number | string | undefined): string | undefined => {
+      if (typeof value === 'number') return `${value}px`;
+      return value;
+  };
+  const styleWidth = getSize(width);
+  const styleHeight = getSize(height);
+
+  // Combine incoming style with calculated dimensions if they are strings
+  const combinedStyle = {
+    ...(typeof width === 'string' ? { width } : {}),
+    ...(typeof height === 'string' ? { height } : {}),
+    ...style,
+  };
+
+  if (isLoading && showLoading) {
+    const aspectRatio = (typeof width === 'number' && typeof height === 'number' && height > 0) ? `${width}/${height}` : '16/9';
+    return (
+      <Skeleton
+        className={className}
+        style={{ width: styleWidth ?? '100%', height: styleHeight, aspectRatio, ...style }}
+      />
+    );
+  }
+
+  if (hasError) {
+    console.warn(`MediaRenderer could not load asset for placeholderId: ${placeholderId}`);
+    return (
+        <div className={`bg-destructive/10 text-destructive flex items-center justify-center ${className ?? ''}`}
+             style={{ width: styleWidth ?? '100%', height: styleHeight ?? '100px', ...style }}>
+            Media Error
+        </div>
+    );
+  }
+
+  if (asset?.type === 'video') {
     return (
       <UnifiedVideo
         placeholderId={placeholderId}
-        options={{
-          autoPlay,
-          muted,
-          loop,
-          controls,
-          quality
-        }}
-        className={className}
+        options={videoOptions}
+        posterPlaceholderId={posterPlaceholderId}
+        onLoad={onVideoLoad}
+        onError={onVideoError}
         width={width}
         height={height}
-        fallbackSrc={fallbackSrc}
+        className={className}
+        style={style}
         showLoading={showLoading}
       />
     );
   }
-  
-  // For images or unknown media type (default to image)
-  return (
-    <UnifiedImage
-      placeholderId={placeholderId}
-      alt={alt}
-      className={className}
-      width={width}
-      height={height}
-      fill={fill}
-      priority={priority}
-      sizes={sizes}
-      options={{ quality }}
-      fallbackSrc={fallbackSrc}
-      showLoading={showLoading}
-    />
-  );
+
+  if (asset?.type === 'image') {
+    // Pass width/height to UnifiedImage only if they are numbers and fill is not set
+    const imageWidth = typeof width === 'number' && !fill ? width : undefined;
+    const imageHeight = typeof height === 'number' && !fill ? height : undefined;
+
+    return (
+      <UnifiedImage
+        placeholderId={placeholderId}
+        alt={alt}
+        fill={fill}
+        priority={priority}
+        sizes={sizes}
+        quality={quality}
+        unoptimized={unoptimized}
+        style={combinedStyle}
+        mediaOptions={mediaOptions}
+        width={imageWidth}
+        height={imageHeight}
+        className={className}
+        showLoading={showLoading}
+      />
+    );
+  }
+
+  return null;
 }

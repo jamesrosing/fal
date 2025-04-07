@@ -2,8 +2,8 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 const alertVariants = cva(

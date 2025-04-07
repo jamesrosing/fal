@@ -40,7 +40,10 @@
     "media:structure": ".\\scripts\\create-media-structure.bat",
     "media:align": "node scripts/align-cloudinary-structure.js",
     "media:update-paths": "node scripts/update-component-paths.js",
-    "media:full-sync": "npm run media:align && npm run media:update-paths"
+    "media:full-sync": "npm run media:align && npm run media:update-paths",
+    "scan-placeholders": "node --loader ts-node/esm scripts/scan-for-placeholders.js",
+    "setup-media-tables": "node --loader ts-node/esm scripts/setup-media-tables.js",
+    "media:populate": "node scripts/populate-media-assets.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.38.0",

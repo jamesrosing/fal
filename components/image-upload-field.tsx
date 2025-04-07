@@ -1,15 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { Upload, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { type ImageArea, getImageProps, IMAGE_SIZES, IMAGE_PLACEMENTS } from "@/lib/image-utils"
 import { resizeImage } from "@/lib/utils"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 interface ImageUploadFieldProps {
@@ -138,8 +136,9 @@ export default function ImageUploadField({
 
       {previewUrl && (
         <div className="relative aspect-[16/9]">
-          <Image
+          <UnifiedImage
             {...imageProps}
+            placeholderId={previewUrl}
             alt="Preview"
             className={`${imageProps.className} rounded-lg`}
           />

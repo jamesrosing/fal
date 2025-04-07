@@ -1,21 +1,31 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import Image from 'next/image';
-import { mediaService, VideoOptions } from '@/lib/services/media-service';
+import NextImage from 'next/image';
+import { mediaService, MediaAsset, MediaOptions } from '@/lib/services/media-service';
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Define more specific video options if needed, inheriting from MediaOptions
+interface VideoSpecificOptions extends MediaOptions {
+  autoPlay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  controls?: boolean;
+  playsInline?: boolean;
+}
 
 interface UnifiedVideoProps {
   placeholderId: string;
-  options?: VideoOptions;
+  options?: VideoSpecificOptions;
   className?: string;
   posterPlaceholderId?: string;
-  fallbackSrc?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
+  style?: React.CSSProperties;
   onLoad?: () => void;
   onError?: () => void;
   showLoading?: boolean;
+  // No fallbackSrc for video, use poster or just show error/nothing
 }
 
 /**
@@ -41,172 +51,181 @@ export default function UnifiedVideo({
   options = {},
   className = '',
   posterPlaceholderId,
-  fallbackSrc,
   width,
   height,
+  style,
   onLoad,
   onError,
-  showLoading = true
+  showLoading = true,
 }: UnifiedVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [asset, setAsset] = useState<any>(null);
-  const [posterAsset, setPosterAsset] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  
-  // Default options
+  const [videoAsset, setVideoAsset] = useState<MediaAsset | null>(null);
+  const [posterAsset, setPosterAsset] = useState<MediaAsset | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [posterUrl, setPosterUrl] = useState<string | null>(null);
+
   const {
-    autoPlay = true,
+    autoPlay = false,
     muted = true,
-    loop = true,
+    loop = false,
     controls = false,
+    playsInline = true,
+    ...mediaOpts
   } = options;
-  
-  // Fetch video and poster assets
+
   useEffect(() => {
     let isMounted = true;
-    
     async function loadAssets() {
+      setIsLoading(true);
+      setHasError(false);
+      setVideoAsset(null);
+      setPosterAsset(null);
+      setVideoUrl(null);
+      setPosterUrl(null);
+
       try {
-        setLoading(true);
-        
-        // Load video asset
-        const videoAsset = await mediaService.getMediaByPlaceholderId(placeholderId);
-        
-        // Load poster asset if provided
-        let posterResult = null;
-        if (posterPlaceholderId) {
-          posterResult = await mediaService.getMediaByPlaceholderId(posterPlaceholderId);
-        }
-        
+        const [fetchedVideoAsset, fetchedPosterAsset] = await Promise.all([
+          mediaService.getMediaByPlaceholderId(placeholderId),
+          posterPlaceholderId ? mediaService.getMediaByPlaceholderId(posterPlaceholderId) : Promise.resolve(null)
+        ]);
+
         if (isMounted) {
-          setAsset(videoAsset);
-          if (posterResult) setPosterAsset(posterResult);
-          setLoading(false);
+          if (fetchedVideoAsset && fetchedVideoAsset.type === 'video') {
+            setVideoAsset(fetchedVideoAsset);
+            const url = mediaService.getMediaUrl(fetchedVideoAsset, mediaOpts);
+            setVideoUrl(url);
+          } else {
+            if (fetchedVideoAsset) {
+              console.warn(`Asset for placeholderId '${placeholderId}' is not a video.`);
+            }
+            setHasError(true);
+          }
+
+          if (fetchedPosterAsset && fetchedPosterAsset.type === 'image') {
+            setPosterAsset(fetchedPosterAsset);
+            const posterOpts: MediaOptions = { format: 'auto', quality: 'auto' };
+            const pUrl = mediaService.getMediaUrl(fetchedPosterAsset, posterOpts);
+            setPosterUrl(pUrl);
+          } else if (posterPlaceholderId) {
+            console.warn(`Asset for posterPlaceholderId '${posterPlaceholderId}' is not an image or not found.`);
+          }
         }
       } catch (err) {
-        console.error(`Error loading video for ${placeholderId}:`, err);
-        if (isMounted) {
-          setHasError(true);
-          setLoading(false);
-        }
+        console.error(`Error loading assets for video placeholderId '${placeholderId}':`, err);
+        if (isMounted) setHasError(true);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     }
-    
+
     loadAssets();
-    
+
     return () => {
       isMounted = false;
     };
-  }, [placeholderId, posterPlaceholderId]);
-  
-  // Setup video events
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeholderId, posterPlaceholderId, JSON.stringify(mediaOpts)]);
+
+  // Handle Video Element Events
   useEffect(() => {
-    if (loading || !asset) return;
-    
-    const video = videoRef.current;
-    if (!video) return;
-    
-    const handleLoad = () => {
-      setIsLoaded(true);
+    const videoElement = videoRef.current;
+    if (!videoElement || !videoUrl) return;
+
+    const handleLoadedData = () => {
       onLoad?.();
+      if (autoPlay) {
+        videoElement.play().catch(e => console.warn('Video autoplay failed:', e));
+      }
     };
-    
-    const handleError = () => {
+    const handleErrorEvent = (e: Event) => {
+      console.error('Video element error:', placeholderId, e);
       setHasError(true);
       onError?.();
     };
-    
-    video.addEventListener('loadeddata', handleLoad);
-    video.addEventListener('error', handleError);
-    
-    // Try to play the video
-    if (autoPlay) {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.warn('Autoplay prevented:', error);
-        });
-      }
-    }
-    
+
+    videoElement.addEventListener('loadeddata', handleLoadedData);
+    videoElement.addEventListener('error', handleErrorEvent);
+
+    videoElement.src = videoUrl;
+
     return () => {
-      video.removeEventListener('loadeddata', handleLoad);
-      video.removeEventListener('error', handleError);
+      videoElement.removeEventListener('loadeddata', handleLoadedData);
+      videoElement.removeEventListener('error', handleErrorEvent);
+      if (videoElement) {
+        videoElement.src = '';
+        videoElement.removeAttribute('src');
+        videoElement.load();
+      }
     };
-  }, [loading, asset, autoPlay, onLoad, onError]);
-  
-  // Handle loading state
-  if (loading && showLoading) {
+  }, [videoUrl, autoPlay, onLoad, onError, placeholderId]);
+
+  // Helper function to get CSS compatible size
+  const getSize = (value: number | string | undefined): string | undefined => {
+    if (typeof value === 'number') return `${value}px`;
+    return value; // Assumes string is a valid CSS size (e.g., '100%')
+  };
+
+  const styleWidth = getSize(width);
+  const styleHeight = getSize(height);
+
+  // Combine provided style with calculated dimensions
+  const combinedStyle: React.CSSProperties = {
+    display: 'block', // Ensure video behaves like a block element
+    width: styleWidth,
+    height: styleHeight,
+    ...style, // Apply passed-in styles last
+  };
+
+  if (isLoading && showLoading) {
+    const aspectRatio = (typeof width === 'number' && typeof height === 'number' && height > 0) ? `${width}/${height}` : '16/9';
     return (
-      <Skeleton 
-        className="rounded overflow-hidden" 
-        style={{ 
-          width: width || '100%', 
-          height: height || 'auto', 
-          aspectRatio: width && height ? width / height : 16/9 
-        }}
+      <Skeleton
+        className={className}
+        style={{ width: styleWidth ?? '100%', height: styleHeight, aspectRatio, ...style }}
       />
     );
   }
-  
-  // Handle error state or missing asset
-  if (hasError || !asset) {
-    if (fallbackSrc) {
+
+  if (hasError || !videoAsset) {
+    if (posterUrl) {
       return (
-        <Image 
-          src={fallbackSrc}
-          alt="Video thumbnail"
-          width={width || 800}
-          height={height || 450}
+        <NextImage
+          src={posterUrl}
+          alt={posterAsset?.alt_text ?? `Poster image for ${placeholderId}`}
+          width={typeof width === 'number' ? width : undefined}
+          height={typeof height === 'number' ? height : undefined}
+          style={{ ...combinedStyle, objectFit: 'cover' }} // Use combined style for poster too
           className={className}
         />
       );
     }
-    return null;
+    return (
+      <div className={`bg-muted text-muted-foreground flex items-center justify-center ${className}`}
+           style={{ ...combinedStyle, height: styleHeight ?? '300px' }}> // Ensure height is set
+        Video Error
+      </div>
+    );
   }
-  
-  // Get all video sources for different formats/resolutions
-  const videoSources = mediaService.getVideoSources(asset, options);
-  
-  // Get poster URL if available
-  const posterUrl = posterAsset ? mediaService.getMediaUrl(posterAsset) : undefined;
-  
+
+  // Render the video element
   return (
-    <div className="relative overflow-hidden" style={{ width, height }}>
-      {/* Video element */}
-      <video
-        ref={videoRef}
-        className={`w-full h-full object-cover ${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-        autoPlay={autoPlay}
-        muted={muted}
-        loop={loop}
-        controls={controls}
-        playsInline
-        poster={posterUrl}
-      >
-        {videoSources.map((source, index) => (
-          <source 
-            key={index} 
-            src={source.src} 
-            type={source.type} 
-          />
-        ))}
-        Your browser does not support the video tag.
-      </video>
-      
-      {/* Poster/fallback image while video loads */}
-      {!isLoaded && posterUrl && (
-        <div className="absolute inset-0 z-10">
-          <Image
-            src={posterUrl}
-            alt="Video poster"
-            fill
-            className="object-cover"
-          />
-        </div>
-      )}
-    </div>
+    <video
+      ref={videoRef}
+      className={className}
+      width={typeof width === 'number' ? width : undefined}
+      height={typeof height === 'number' ? height : undefined}
+      style={combinedStyle} // Apply combined style
+      poster={posterUrl ?? undefined}
+      muted={muted}
+      loop={loop}
+      autoPlay={autoPlay}
+      playsInline={playsInline}
+      controls={controls}
+      preload="metadata"
+    >
+      Your browser does not support the video tag.
+    </video>
   );
 }

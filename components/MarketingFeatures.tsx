@@ -12,8 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertCircle, CheckCircle2, Gift, CreditCard, Heart, ShoppingBag, TagIcon, PercentIcon, TicketIcon, RefreshCw } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+// import OptimizedImage from '@/components/media/OptimizedImage';
+// import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 interface MarketingFeatureProps {

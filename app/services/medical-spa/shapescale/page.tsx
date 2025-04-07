@@ -4,8 +4,7 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 const services = [
@@ -52,7 +51,12 @@ export default function ShapeScalePage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/body-analysis-hero.jpg" alt="ShapeScale Body Analysis Services" priority fill />
+          <UnifiedImage 
+            placeholderId="medical-spa/body-analysis-hero.jpg" 
+            alt="ShapeScale Body Analysis Services" 
+            priority 
+            fill 
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

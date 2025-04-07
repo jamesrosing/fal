@@ -1,287 +1,371 @@
 // lib/services/media-service.ts
-import { createClient } from '@/lib/supabase';
 import { cache } from 'react';
-import mediaRegistry from '@/lib/media/registry';
-import { getMediaUrl } from '@/lib/media/utils';
+import { createClient } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { fill } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { auto } from '@cloudinary/url-gen/qualifiers/format';
+import { auto as qAuto } from '@cloudinary/url-gen/qualifiers/quality';
 
-// Type definitions
+// Types matching database schema described in documentation
 export interface MediaAsset {
-  id: string;
-  cloudinary_id: string;
+  id: string; // UUID
+  cloudinary_id: string; // Cloudinary public ID
   type: 'image' | 'video';
-  title?: string;
-  alt_text?: string;
-  metadata?: Record<string, any>;
-  width?: number;
-  height?: number;
-  format?: string;
-  created_at: string;
-  updated_at: string;
+  title?: string | null;
+  alt_text?: string | null;
+  metadata?: Record<string, any> | null; // JSONB
+  width?: number | null;
+  height?: number | null;
+  format?: string | null;
+  created_at: string; // timestamptz
+  updated_at: string; // timestamptz
 }
 
 export interface MediaMapping {
-  id: string;
-  placeholder_id: string;
-  media_id: string;
-  created_at: string;
-  updated_at: string;
+  id: string; // UUID
+  placeholder_id: string; // Unique text identifier
+  media_id: string; // Foreign key to media_assets.id
+  created_at: string; // timestamptz
+  updated_at: string; // timestamptz
 }
 
 export interface MediaOptions {
   width?: number;
   height?: number;
-  quality?: number;
-  format?: string;
-  crop?: string;
-  gravity?: string;
+  quality?: number | 'auto';
+  format?: string | 'auto';
+  // Add other transformation options as needed from Cloudinary
 }
 
-export interface VideoOptions extends MediaOptions {
-  autoPlay?: boolean;
-  muted?: boolean;
-  loop?: boolean;
-  controls?: boolean;
-  poster?: string;
-}
-
-/**
- * MediaService - A unified service for managing media assets
- * 
- * This service provides a centralized way to:
- * - Fetch media by placeholder ID
- * - Update media mappings
- * - Generate optimized media URLs
- * - Handle responsive images and videos
- */
 class MediaService {
-  /**
-   * Get a media asset by its placeholder ID
-   * This is cached to minimize database calls
-   */
+  private supabase = createClient();
+  private cloudinary: Cloudinary;
+  // In-memory cache for resolved media assets
+  private assetCache = new Map<string, MediaAsset | null>();
+  private mappingCache = new Map<string, string | null>(); // placeholder_id -> media_id
+
+  constructor() {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    if (!cloudName) {
+      console.warn('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME is not set. Using demo cloud.');
+      this.cloudinary = new Cloudinary({ cloud: { cloudName: 'demo' } });
+    } else {
+       this.cloudinary = new Cloudinary({ cloud: { cloudName } });
+    }
+    // TODO: Consider pre-loading mappings or assets if needed
+  }
+
+  // Resolves placeholder ID to media asset
+  // Uses cache first, then database
   getMediaByPlaceholderId = cache(async (placeholderId: string): Promise<MediaAsset | null> => {
-    // First try to get from registry (in-memory)
-    const registryAsset = mediaRegistry.getAsset(placeholderId);
-    if (registryAsset) {
-      return {
-        id: registryAsset.id,
-        cloudinary_id: registryAsset.publicId,
-        type: registryAsset.type as 'image' | 'video',
-        title: registryAsset.description,
-        alt_text: registryAsset.description,
-        metadata: {},
-        width: registryAsset.dimensions?.width,
-        height: registryAsset.dimensions?.height,
-        format: '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+    // 1. Check mapping cache
+    if (this.mappingCache.has(placeholderId)) {
+        const mediaId = this.mappingCache.get(placeholderId);
+        if (mediaId === null) return null; // Explicitly not found
+        // 2. Check asset cache
+        if (this.assetCache.has(mediaId!)) {
+            return this.assetCache.get(mediaId!) || null;
+        }
     }
-    
-    // Otherwise query the database
-    const supabase = createClient();
-    
-    // First get the mapping
-    const { data: mapping, error: mappingError } = await supabase
-      .from('media_mappings')
-      .select('media_id')
-      .eq('placeholder_id', placeholderId)
-      .single();
-      
-    if (mappingError || !mapping) {
-      console.error(`Error fetching mapping for placeholder ${placeholderId}:`, mappingError);
-      return null;
+
+    // 3. Fetch mapping from DB if not cached
+    let mediaId = this.mappingCache.get(placeholderId);
+    if (mediaId === undefined) {
+        const { data: mappingData, error: mappingError } = await this.supabase
+            .from('media_mappings')
+            .select('media_id')
+            .eq('placeholder_id', placeholderId)
+            .single();
+
+        if (mappingError || !mappingData) {
+            if (mappingError && mappingError.code !== 'PGRST116') { // Ignore 'Row not found' errors
+               console.error(`Error fetching mapping for placeholder ${placeholderId}:`, mappingError);
+            }
+            this.mappingCache.set(placeholderId, null); // Cache not found
+            return null;
+        }
+        mediaId = mappingData.media_id;
+        this.mappingCache.set(placeholderId, mediaId);
     }
-    
-    // Then get the media asset
-    const { data: mediaAsset, error: mediaError } = await supabase
+
+    if (!mediaId) return null;
+
+    // 4. Fetch asset from DB if not cached
+    if (!this.assetCache.has(mediaId)) {
+        const { data: assetData, error: assetError } = await this.supabase
+            .from('media_assets')
+            .select('*')
+            .eq('id', mediaId)
+            .single();
+
+        if (assetError || !assetData) {
+            if (assetError && assetError.code !== 'PGRST116') {
+                console.error(`Error fetching asset ${mediaId} for placeholder ${placeholderId}:`, assetError);
+            }
+            this.assetCache.set(mediaId, null); // Cache not found
+            // Also invalidate mapping cache in case the asset was deleted
+            this.mappingCache.delete(placeholderId);
+            return null;
+        }
+        this.assetCache.set(mediaId, assetData as MediaAsset);
+    }
+
+    // Set timeout to clear cache after 5 minutes (adjust as needed)
+    setTimeout(() => {
+        this.mappingCache.delete(placeholderId);
+        if (mediaId) this.assetCache.delete(mediaId);
+    }, 5 * 60 * 1000);
+
+
+    return this.assetCache.get(mediaId) || null;
+  });
+
+  // Generates an optimized Cloudinary URL
+  getMediaUrl(asset: MediaAsset | null, options: MediaOptions = {}): string | null {
+    if (!asset || !asset.cloudinary_id) {
+        // Return a default placeholder or null if asset is not found
+        return '/placeholder.svg'; // Or configure a proper placeholder
+    }
+
+    const resourceType = asset.type === 'video' ? 'video' : 'image';
+    const cldAsset = this.cloudinary[resourceType](asset.cloudinary_id);
+
+    // Apply transformations
+    if (options.width || options.height) {
+        cldAsset.resize(fill(options.width, options.height).gravity(autoGravity()));
+    }
+    if (options.format) {
+        cldAsset.format(options.format === 'auto' ? auto() : options.format);
+    } else {
+        cldAsset.format(auto()); // Default to auto format
+    }
+    if (options.quality) {
+        cldAsset.quality(options.quality === 'auto' ? qAuto() : options.quality);
+    } else {
+        cldAsset.quality(qAuto()); // Default to auto quality
+    }
+
+    // Add other transformations based on MediaOptions as needed
+
+    return cldAsset.toURL();
+  }
+
+  // Update media mapping
+  async updateMediaMapping(placeholderId: string, cloudinaryId: string, metadata?: Record<string, any>): Promise<MediaMapping | null> {
+    // 1. Find or create the MediaAsset
+    let { data: existingAsset, error: assetFindError } = await this.supabase
       .from('media_assets')
       .select('*')
-      .eq('id', mapping.media_id)
-      .single();
-      
-    if (mediaError || !mediaAsset) {
-      console.error(`Error fetching media asset ${mapping.media_id}:`, mediaError);
+      .eq('cloudinary_id', cloudinaryId)
+      .maybeSingle();
+
+    let mediaId: string;
+
+    if (assetFindError) {
+      console.error('Error finding media asset:', assetFindError);
       return null;
     }
-    
-    return mediaAsset as MediaAsset;
-  });
-  
-  /**
-   * Get multiple media assets by placeholder IDs
-   */
-  async getMediaByPlaceholderIds(placeholderIds: string[]): Promise<Record<string, MediaAsset | null>> {
-    const result: Record<string, MediaAsset | null> = {};
-    
-    // Fetch all in parallel
-    const promises = placeholderIds.map(async (id) => {
-      result[id] = await this.getMediaByPlaceholderId(id);
-    });
-    
-    await Promise.all(promises);
-    return result;
-  }
-  
-  /**
-   * Get a complete URL for a media asset
-   */
-  getMediaUrl(asset: MediaAsset | null, options: MediaOptions = {}): string {
-    if (!asset) return '/placeholder-image.jpg';
-    
-    return getMediaUrl(asset.cloudinary_id, {
-      ...options,
-      resource_type: asset.type
-    });
-  }
-  
-  /**
-   * Get a complete URL for a media asset by placeholder ID
-   */
-  async getMediaUrlByPlaceholderId(placeholderId: string, options: MediaOptions = {}): Promise<string> {
-    const asset = await this.getMediaByPlaceholderId(placeholderId);
-    return this.getMediaUrl(asset, options);
-  }
-  
-  /**
-   * Update a media mapping
-   */
-  async updateMediaMapping(placeholderId: string, cloudinaryId: string, metadata: Record<string, any> = {}): Promise<boolean> {
-    const supabase = createClient();
-    
-    try {
-      // Check if media asset already exists
-      const { data: existingAsset } = await supabase
-        .from('media_assets')
-        .select('id')
-        .eq('cloudinary_id', cloudinaryId)
-        .single();
-      
-      let mediaId: string;
-      
-      if (existingAsset) {
-        // Update existing asset with new metadata
-        mediaId = existingAsset.id;
-        await supabase
+
+    if (existingAsset) {
+      mediaId = existingAsset.id;
+      // Optionally update asset metadata if provided
+      if (metadata) {
+        const { error: updateError } = await this.supabase
           .from('media_assets')
-          .update({
-            metadata: { ...metadata },
-            updated_at: new Date().toISOString()
-          })
+          .update({ metadata, updated_at: new Date().toISOString() })
           .eq('id', mediaId);
-      } else {
-        // Create new media asset
-        const assetType = this.detectAssetType(cloudinaryId);
-        const { data: newAsset, error: assetError } = await supabase
-          .from('media_assets')
-          .insert({
-            cloudinary_id: cloudinaryId,
-            type: assetType,
-            metadata: { ...metadata },
-            title: metadata.title || placeholderId,
-            alt_text: metadata.alt_text || placeholderId
-          })
-          .select()
-          .single();
-          
-        if (assetError || !newAsset) {
-          console.error('Error creating media asset:', assetError);
-          return false;
-        }
-        
-        mediaId = newAsset.id;
+        if (updateError) console.error('Error updating asset metadata:', updateError);
+        else this.assetCache.set(mediaId, { ...existingAsset, metadata }); // Update cache
       }
-      
-      // Check if mapping exists
-      const { data: existingMapping } = await supabase
-        .from('media_mappings')
-        .select('id')
-        .eq('placeholder_id', placeholderId)
+    } else {
+      // Fetch metadata from Cloudinary if needed or use provided
+      // For simplicity, we assume essential details like type, w/h are in `metadata` or handled elsewhere
+      const newAsset: Omit<MediaAsset, 'id' | 'created_at' | 'updated_at'> = {
+        cloudinary_id: cloudinaryId,
+        type: metadata?.resource_type || 'image', // Infer type or default
+        metadata: metadata || null,
+        width: metadata?.width || null,
+        height: metadata?.height || null,
+        format: metadata?.format || null,
+        title: metadata?.title || null,
+        alt_text: metadata?.alt || null,
+      };
+      const { data: insertedAsset, error: insertAssetError } = await this.supabase
+        .from('media_assets')
+        .insert(newAsset)
+        .select()
         .single();
-        
-      if (existingMapping) {
-        // Update existing mapping
-        await supabase
-          .from('media_mappings')
-          .update({
-            media_id: mediaId,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingMapping.id);
-      } else {
-        // Create new mapping
-        await supabase
-          .from('media_mappings')
-          .insert({
-            placeholder_id: placeholderId,
-            media_id: mediaId
-          });
+
+      if (insertAssetError || !insertedAsset) {
+        console.error('Error creating new media asset:', insertAssetError);
+        return null;
       }
-      
-      return true;
-    } catch (error) {
-      console.error('Error updating media mapping:', error);
-      return false;
+      mediaId = insertedAsset.id;
+      this.assetCache.set(mediaId, insertedAsset as MediaAsset); // Add to cache
     }
+
+    // 2. Upsert the MediaMapping
+    const { data: mapping, error: upsertError } = await this.supabase
+        .from('media_mappings')
+        .upsert({ placeholder_id: placeholderId, media_id: mediaId }, { onConflict: 'placeholder_id' })
+        .select()
+        .single();
+
+    if (upsertError || !mapping) {
+        console.error('Error upserting media mapping:', upsertError);
+        return null;
+    }
+
+    // Update mapping cache
+    this.mappingCache.set(placeholderId, mediaId);
+     // Clear cache timeout if exists
+    clearTimeout(this.assetCacheTimeoutId);
+    this.assetCacheTimeoutId = setTimeout(() => {
+      this.mappingCache.delete(placeholderId);
+      this.assetCache.delete(mediaId);
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return mapping as MediaMapping;
   }
-  
-  /**
-   * Detect the type of asset from its ID or URL
-   */
-  detectAssetType(cloudinaryId: string): 'image' | 'video' {
-    const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.wmv'];
-    const hasVideoExtension = videoExtensions.some(ext => 
-      cloudinaryId.toLowerCase().endsWith(ext)
-    );
-    
-    const isVideoResource = cloudinaryId.includes('/video/') || 
-                           cloudinaryId.includes('resource_type=video');
-    
-    return (hasVideoExtension || isVideoResource) ? 'video' : 'image';
+
+  // Delete media mapping
+  async deleteMediaMapping(placeholderId: string): Promise<boolean> {
+      const { error } = await this.supabase
+          .from('media_mappings')
+          .delete()
+          .eq('placeholder_id', placeholderId);
+
+      if (error) {
+          console.error(`Error deleting mapping for placeholder ${placeholderId}:`, error);
+          return false;
+      }
+
+      // Clear caches
+      this.mappingCache.delete(placeholderId);
+      // Note: We don't delete the asset itself, just the mapping.
+      // You might want to implement asset cleanup logic separately.
+
+      return true;
   }
-  
-  /**
-   * Get responsive image sources for different screen sizes
-   */
-  getResponsiveImageSources(asset: MediaAsset | null, options: MediaOptions = {}): Array<{
-    src: string;
-    width: number;
-  }> {
-    if (!asset) return [];
-    
-    const widths = [320, 640, 768, 1024, 1280, 1536, 1920];
-    
-    return widths.map(width => ({
-      src: this.getMediaUrl(asset, { ...options, width }),
-      width
-    }));
+
+  // Upload new media and map it
+  // This is a basic example; needs robust error handling, progress, etc.
+  // Assumes Cloudinary upload happens client-side or via a separate serverless function
+  // This service method primarily handles creating the DB records after upload.
+  async handleNewUpload(placeholderId: string, uploadResult: any): Promise<MediaMapping | null> {
+    // `uploadResult` should contain Cloudinary response (public_id, resource_type, etc.)
+     if (!uploadResult || !uploadResult.public_id) {
+       console.error('Invalid upload result provided');
+       return null;
+     }
+
+     const cloudinaryId = uploadResult.public_id;
+     const metadata = {
+        resource_type: uploadResult.resource_type || 'image',
+        format: uploadResult.format,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        bytes: uploadResult.bytes,
+        // Extract title/alt from context if available, or use defaults
+        title: uploadResult.context?.custom?.title,
+        alt: uploadResult.context?.custom?.alt,
+        // Add any other relevant metadata from the Cloudinary response
+     };
+
+     return this.updateMediaMapping(placeholderId, cloudinaryId, metadata);
   }
-  
-  /**
-   * Get video sources for different formats and resolutions
-   */
-  getVideoSources(asset: MediaAsset | null, options: VideoOptions = {}): Array<{
-    src: string;
-    type: string;
-    width: number;
-  }> {
-    if (!asset || asset.type !== 'video') return [];
-    
-    const formats = ['mp4', 'webm'];
-    const widths = [480, 720, 1080];
-    
-    return formats.flatMap(format => 
-      widths.map(width => ({
-        src: this.getMediaUrl(asset, { 
-          ...options, 
-          format, 
-          width,
-          resource_type: 'video'
-        }),
-        type: `video/${format}`,
-        width
-      }))
-    );
+
+  // Fetch multiple assets efficiently
+  async getMultipleMediaByPlaceholderIds(placeholderIds: string[]): Promise<Record<string, MediaAsset | null>> {
+    const results: Record<string, MediaAsset | null> = {};
+    const idsToFetch: string[] = [];
+
+    // Check cache first
+    for (const pid of placeholderIds) {
+      if (this.mappingCache.has(pid)) {
+        const mid = this.mappingCache.get(pid);
+        if (mid && this.assetCache.has(mid)) {
+          results[pid] = this.assetCache.get(mid) || null;
+        } else if (mid === null) {
+          results[pid] = null;
+        } else {
+          idsToFetch.push(pid);
+        }
+      } else {
+        idsToFetch.push(pid);
+      }
+    }
+
+    if (idsToFetch.length === 0) return results;
+
+    // Fetch remaining mappings and assets
+    const { data, error } = await this.supabase
+      .from('media_mappings')
+      .select(`
+        placeholder_id,
+        media_assets (*)
+      `)
+      .in('placeholder_id', idsToFetch);
+
+    if (error) {
+      console.error('Error fetching multiple media assets:', error);
+      // Fill missing ones with null
+       idsToFetch.forEach(pid => { if(!(pid in results)) results[pid] = null; });
+       return results;
+    }
+
+    // Process fetched data and update caches
+    const fetchedMap = new Map(data?.map(item => [item.placeholder_id, item.media_assets as MediaAsset | null]) || []);
+
+    idsToFetch.forEach(pid => {
+      const asset = fetchedMap.get(pid);
+      results[pid] = asset || null;
+      const mediaId = asset?.id || null;
+      this.mappingCache.set(pid, mediaId);
+      if (mediaId && asset) {
+        this.assetCache.set(mediaId, asset);
+      }
+      // Set cache timeouts (consider a more efficient way for bulk operations)
+      setTimeout(() => {
+        this.mappingCache.delete(pid);
+        if (mediaId) this.assetCache.delete(mediaId);
+      }, 5 * 60 * 1000);
+    });
+
+    return results;
   }
+
+  // Fetch all media assets (use with caution, potentially large payload)
+  async getAllMediaAssets(): Promise<MediaAsset[]> {
+    const { data, error } = await this.supabase
+      .from('media_assets')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching all media assets:', error);
+      return [];
+    }
+    return (data || []) as MediaAsset[];
+  }
+
+    // Fetch all media mappings
+  async getAllMediaMappings(): Promise<MediaMapping[]> {
+    const { data, error } = await this.supabase
+      .from('media_mappings')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching all media mappings:', error);
+      return [];
+    }
+    return (data || []) as MediaMapping[];
+  }
+
+  // Private helper to manage cache timeouts
+  private assetCacheTimeoutId: NodeJS.Timeout | null = null;
+
 }
 
 // Export singleton instance

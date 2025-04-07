@@ -1,11 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
+// import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import UnifiedImage from '@/components/media/UnifiedImage';
 
 
 const treatments = [
@@ -74,7 +73,12 @@ export default function SleepTravelPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="articles/categories/functional-medicine-sleep.png" alt="Sleep & Travel Optimization Services"   priority fill />
+          <UnifiedImage 
+            placeholderId="articles/categories/functional-medicine-sleep.png" 
+            alt="Sleep & Travel Optimization Services"   
+            priority 
+            fill 
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

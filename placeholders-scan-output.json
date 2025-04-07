@@ -1,0 +1,146 @@
+[
+  {
+    "name": "team/dr-james-rosing-portrait.jpg",
+    "description": "Found in app\\plastic-surgery\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\plastic-surgery\\page.tsx"
+  },
+  {
+    "name": "out-of-town-hero-Arial-Allure-MD-Office",
+    "description": "Found in app\\out-of-town\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\out-of-town\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-hero.png",
+    "description": "Found in app\\services\\functional-medicine\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-hero.png",
+    "description": "Found in app\\services\\dermatology\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\page.tsx"
+  },
+  {
+    "name": "medical-spa/laser-treatments-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\skin-lasers\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\skin-lasers\\page.tsx"
+  },
+  {
+    "name": "medical-spa/body-analysis-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\shapescale\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\shapescale\\page.tsx"
+  },
+  {
+    "name": "medical-spa/skin-rejuvenation-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\rf-microneedling\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\rf-microneedling\\page.tsx"
+  },
+  {
+    "name": "medical-spa/injectables-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\cosmetic-injections\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\cosmetic-injections\\page.tsx"
+  },
+  {
+    "name": "medical-spa/facial-treatments-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\esthetician-services\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\esthetician-services\\page.tsx"
+  },
+  {
+    "name": "medical-spa/emsculpt-hero.jpg",
+    "description": "Found in app\\services\\medical-spa\\emsculpt\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\medical-spa\\emsculpt\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-sleep.png",
+    "description": "Found in app\\services\\functional-medicine\\sleep-travel-optimization\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\sleep-travel-optimization\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-neuro.png",
+    "description": "Found in app\\services\\functional-medicine\\neurocognitive-performance\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\neurocognitive-performance\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-hormone.png",
+    "description": "Found in app\\services\\functional-medicine\\hormone-optimization\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\hormone-optimization\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-hair.png",
+    "description": "Found in app\\services\\functional-medicine\\hair-restoration\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\hair-restoration\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-epigenetic.png",
+    "description": "Found in app\\services\\functional-medicine\\epigenetic-optimization\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\epigenetic-optimization\\page.tsx"
+  },
+  {
+    "name": "articles/categories/functional-medicine-cardio.png",
+    "description": "Found in app\\services\\functional-medicine\\cardiometabolic-optimization\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\functional-medicine\\cardiometabolic-optimization\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-skin-health.png",
+    "description": "Found in app\\services\\dermatology\\skin-screening\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\skin-screening\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-rosacea.png",
+    "description": "Found in app\\services\\dermatology\\rosacea\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\rosacea\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-psoriasis.png",
+    "description": "Found in app\\services\\dermatology\\psoriasis\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\psoriasis\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-eczema.png",
+    "description": "Found in app\\services\\dermatology\\eczema\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\eczema\\page.tsx"
+  },
+  {
+    "name": "services-dermatology/hero/dermatology-acne.png",
+    "description": "Found in app\\services\\dermatology\\acne\\page.tsx",
+    "page_path": null,
+    "component_path": "app\\services\\dermatology\\acne\\page.tsx"
+  },
+  {
+    "name": "logos/allure_md_plastic_surgery_dermatology_white_logo.png",
+    "description": "Found in components\\nav-bar.tsx",
+    "page_path": null,
+    "component_path": "components\\nav-bar.tsx"
+  },
+  {
+    "name": "home-hero-video",
+    "description": "Found in components\\media\\UnifiedVideo.tsx",
+    "page_path": null,
+    "component_path": "components\\media\\UnifiedVideo.tsx"
+  },
+  {
+    "name": "home-hero-media",
+    "description": "Found in components\\media\\MediaRenderer.tsx",
+    "page_path": null,
+    "component_path": "components\\media\\MediaRenderer.tsx"
+  }
+]

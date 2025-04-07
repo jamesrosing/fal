@@ -1,276 +1,151 @@
+// app/api/unified-media/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { mediaService } from '@/lib/services/media-service';
-import { createClient } from '@/lib/supabase';
-import { v2 as cloudinary } from 'cloudinary';
+import { mediaService, MediaAsset, MediaMapping } from '@/lib/services/media-service';
+// Assume Cloudinary upload handling might be separate or handled client-side
+// For PUT, we'll focus on updating the database mapping after an upload
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo',
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true
-});
-
-/**
- * Unified Media API
- * 
- * Handles all media-related operations:
- * - GET /api/unified-media?id=placeholder-id (Get media by placeholder ID)
- * - GET /api/unified-media/assets (Get all media assets)
- * - POST /api/unified-media (Update media mapping)
- * - PUT /api/unified-media (Upload new media)
- * - DELETE /api/unified-media?id=placeholder-id (Delete media mapping)
- */
-
-/**
- * GET handler - Fetch media assets
- */
+// GET - Fetch media by placeholder ID(s) or all
 export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const id = searchParams.get('id');
+  const ids = searchParams.get('ids');
+  const getAll = searchParams.get('all');
+
   try {
-    const searchParams = await request.nextUrl.searchParams;
-    const id = searchParams.get('id');
-    const ids = searchParams.get('ids');
-    const width = searchParams.get('width');
-    const height = searchParams.get('height');
-    const quality = searchParams.get('quality');
-    const allAssets = searchParams.get('all') === 'true';
-    
-    // Query options
-    const options = {
-      width: width ? parseInt(width) : undefined,
-      height: height ? parseInt(height) : undefined,
-      quality: quality ? parseInt(quality) : undefined,
-    };
-    
-    // Get all assets
-    if (allAssets) {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('media_assets')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
-      
-      return NextResponse.json({ assets: data });
-    }
-    
-    // Get media by multiple IDs
-    if (ids) {
-      const idArray = ids.split(',').map(id => id.trim());
-      const result = await mediaService.getMediaByPlaceholderIds(idArray);
-      
-      // Generate URLs
-      const withUrls = Object.entries(result).reduce((acc, [key, asset]) => {
-        acc[key] = asset ? {
-          ...asset,
-          url: mediaService.getMediaUrl(asset, options)
-        } : null;
-        return acc;
-      }, {} as Record<string, any>);
-      
-      return NextResponse.json({ assets: withUrls });
-    }
-    
-    // Get single media by ID
     if (id) {
       const asset = await mediaService.getMediaByPlaceholderId(id);
-      
       if (!asset) {
-        return NextResponse.json(
-          { error: 'Media asset not found' },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: 'Media not found for placeholder ID' }, { status: 404 });
       }
-      
-      // Get URL with options
-      const url = mediaService.getMediaUrl(asset, options);
-      
-      return NextResponse.json({
-        ...asset,
-        url
-      });
+      return NextResponse.json(asset);
     }
-    
-    return NextResponse.json(
-      { error: 'Missing required parameter' },
-      { status: 400 }
-    );
-  } catch (error: any) {
-    console.error('Media API Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'An error occurred' },
-      { status: 500 }
-    );
+
+    if (ids) {
+      const placeholderIds = ids.split(',').map(pid => pid.trim()).filter(Boolean);
+      if (placeholderIds.length === 0) {
+         return NextResponse.json({ error: 'No valid placeholder IDs provided' }, { status: 400 });
+      }
+      const assets = await mediaService.getMultipleMediaByPlaceholderIds(placeholderIds);
+      return NextResponse.json(assets);
+    }
+
+    if (getAll === 'true') {
+      // Decide whether to return assets or mappings based on common use case.
+      // Returning mappings might be lighter if only placeholder relations are needed.
+      // Let's return mappings as per the documentation table structure hint.
+      // Consider adding another flag like ?details=true to get full assets.
+      const mappings = await mediaService.getAllMediaMappings();
+      // Optionally, fetch all assets: const assets = await mediaService.getAllMediaAssets();
+      return NextResponse.json(mappings);
+    }
+
+    return NextResponse.json({ error: 'Missing required query parameter: id, ids, or all=true' }, { status: 400 });
+
+  } catch (error) {
+    console.error('[API/UNIFIED-MEDIA GET] Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-/**
- * POST handler - Update media mappings
- */
+// POST - Update media mapping
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { placeholderId, cloudinaryId, metadata = {} } = body;
-    
+    const { placeholderId, cloudinaryId, metadata } = body;
+
     if (!placeholderId || !cloudinaryId) {
-      return NextResponse.json(
-        { error: 'Missing placeholderId or cloudinaryId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields: placeholderId and cloudinaryId' }, { status: 400 });
     }
-    
-    // Update the mapping
-    const success = await mediaService.updateMediaMapping(
-      placeholderId,
-      cloudinaryId,
-      metadata
-    );
-    
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to update media mapping' },
-        { status: 500 }
-      );
+
+    const mapping = await mediaService.updateMediaMapping(placeholderId, cloudinaryId, metadata);
+
+    if (!mapping) {
+      return NextResponse.json({ error: 'Failed to update media mapping' }, { status: 500 });
     }
-    
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Media API Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'An error occurred' },
-      { status: 500 }
-    );
+
+    return NextResponse.json(mapping);
+
+  } catch (error) {
+    console.error('[API/UNIFIED-MEDIA POST] Error:', error);
+    if (error instanceof SyntaxError) {
+         return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-/**
- * PUT handler - Upload new media directly to Cloudinary
- */
+// PUT - Upload new media (handle DB update post-upload)
 export async function PUT(request: NextRequest) {
   try {
+    // Cloudinary upload should ideally happen client-side or via a dedicated signed upload endpoint.
+    // This PUT endpoint assumes the upload is done and we receive the result to update the DB.
+    // If handling file upload directly here, use FormData parsing.
+
+    // Example assuming JSON body after client-side upload:
+    const uploadResult = await request.json(); // Contains { placeholderId, cloudinaryResponse }
+    const { placeholderId, cloudinaryResponse } = uploadResult;
+
+    // --- OR --- Handling FormData if uploading through this endpoint:
+    /*
     const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const placeholderId = formData.get('placeholderId') as string;
-    const folder = formData.get('folder') as string || 'uploads';
-    
+    const file = formData.get('file') as File | null;
+    const placeholderId = formData.get('placeholderId') as string | null;
+    const folder = formData.get('folder') as string | null; // Optional folder for Cloudinary
+
     if (!file || !placeholderId) {
-      return NextResponse.json(
-        { error: 'Missing file or placeholderId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing file or placeholderId' }, { status: 400 });
     }
-    
-    // Convert file to base64
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64 = buffer.toString('base64');
-    const dataURI = `data:${file.type};base64,${base64}`;
-    
-    // Upload to Cloudinary
-    const result = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload(
-        dataURI,
-        {
-          folder,
-          resource_type: 'auto',
-          public_id: placeholderId.replace(/[^a-z0-9]/gi, '-').toLowerCase(),
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        }
-      );
-    });
-    
-    // Update mapping
-    const success = await mediaService.updateMediaMapping(
-      placeholderId,
-      result.public_id,
-      {
-        title: placeholderId,
-        alt_text: placeholderId,
-        original_filename: file.name,
-        width: result.width,
-        height: result.height,
-        format: result.format,
-        resource_type: result.resource_type
-      }
-    );
-    
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to update media mapping after upload' },
-        { status: 500 }
-      );
+
+    // TODO: Implement actual Cloudinary Upload logic here or preferably
+    // call a serverless function designed for uploads.
+    // Example structure (replace with actual upload call):
+    const cloudinaryResponse = await uploadToCloudinary(file, { folder });
+    if (!cloudinaryResponse) {
+       return NextResponse.json({ error: 'Cloudinary upload failed' }, { status: 500 });
     }
-    
-    return NextResponse.json({
-      success: true,
-      public_id: result.public_id,
-      url: result.secure_url
-    });
-  } catch (error: any) {
-    console.error('Media Upload Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'An error occurred' },
-      { status: 500 }
-    );
+    */
+
+    if (!placeholderId || !cloudinaryResponse || !cloudinaryResponse.public_id) {
+      return NextResponse.json({ error: 'Missing placeholderId or invalid Cloudinary response' }, { status: 400 });
+    }
+
+    const mapping = await mediaService.handleNewUpload(placeholderId, cloudinaryResponse);
+
+    if (!mapping) {
+      return NextResponse.json({ error: 'Failed to create media asset or mapping after upload' }, { status: 500 });
+    }
+
+    return NextResponse.json(mapping, { status: 201 }); // 201 Created
+
+  } catch (error) {
+    console.error('[API/UNIFIED-MEDIA PUT] Error:', error);
+    // Handle specific errors like invalid FormData, JSON parsing errors etc.
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-/**
- * DELETE handler - Remove media mappings
- */
+// DELETE - Remove media mapping
 export async function DELETE(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const placeholderId = searchParams.get('id');
+
+  if (!placeholderId) {
+    return NextResponse.json({ error: 'Missing required query parameter: id' }, { status: 400 });
+  }
+
   try {
-    const searchParams = await request.nextUrl.searchParams;
-    const id = searchParams.get('id');
-    
-    if (!id) {
-      return NextResponse.json(
-        { error: 'Missing required parameter: id' },
-        { status: 400 }
-      );
+    const success = await mediaService.deleteMediaMapping(placeholderId);
+
+    if (!success) {
+      // Could be because mapping didn't exist or DB error
+      // Consider checking if it existed first for a more specific response (404 vs 500)
+      return NextResponse.json({ error: 'Failed to delete media mapping or mapping not found' }, { status: 404 });
     }
-    
-    const supabase = createClient();
-    
-    // Get the mapping first
-    const { data: mapping, error: mappingError } = await supabase
-      .from('media_mappings')
-      .select('id')
-      .eq('placeholder_id', id)
-      .single();
-      
-    if (mappingError) {
-      return NextResponse.json(
-        { error: 'Media mapping not found' },
-        { status: 404 }
-      );
-    }
-    
-    // Delete the mapping
-    const { error: deleteError } = await supabase
-      .from('media_mappings')
-      .delete()
-      .eq('id', mapping.id);
-      
-    if (deleteError) {
-      return NextResponse.json(
-        { error: 'Failed to delete media mapping' },
-        { status: 500 }
-      );
-    }
-    
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Media API Error:', error);
-    return NextResponse.json(
-      { error: error.message || 'An error occurred' },
-      { status: 500 }
-    );
+
+    return NextResponse.json({ message: 'Media mapping deleted successfully' }, { status: 200 }); // Or 204 No Content
+
+  } catch (error) {
+    console.error('[API/UNIFIED-MEDIA DELETE] Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
