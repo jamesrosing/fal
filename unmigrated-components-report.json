@@ -1,0 +1,44 @@
+{
+  "scannedFiles": 172,
+  "totalIssues": 4,
+  "issuesByPriority": {
+    "high": 2,
+    "medium": 2,
+    "low": 0
+  },
+  "scanDate": "2025-04-25T06:33:04.224Z",
+  "issues": [
+    {
+      "file": "D:\\fal\\app\\contact\\page.tsx",
+      "pattern": "Regular img tag",
+      "lineNumber": 361,
+      "match": "<img src=\"${review.profile_photo_url || '",
+      "context": "                  <div style=\"display: flex; align-items: center; margin-bottom: 4px;\">\r\n                    <img src=\"${review.profile_photo_url || '/images/profile-placeholder.png'}\" alt=\"${review.author_name || 'Reviewer'}\" \r\n                      style=\"width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;\" />\r",
+      "priority": "high"
+    },
+    {
+      "file": "D:\\fal\\app\\contact\\page.tsx",
+      "pattern": "Regular img tag",
+      "lineNumber": 392,
+      "match": "<img src=\"${photoUrl || '",
+      "context": "            return `\r\n              <img src=\"${photoUrl || '/images/place-placeholder.png'}\" alt=\"${place.name || 'Business photo'}\" \r\n                style=\"width: 80px; height: 80px; object-fit: cover; border-radius: 4px;\" />\r",
+      "priority": "high"
+    },
+    {
+      "file": "D:\\fal\\components\\CloudinaryVideo.tsx",
+      "pattern": "Video tag",
+      "lineNumber": 87,
+      "match": "<video\r\n        src={fallbackSrc}\r\n        autoPlay={autoPlay}\r\n        loop={loop}\r\n        muted={muted}\r\n        controls={controls}\r\n        playsInline={playsInline}\r\n        className={className}\r\n        onEnded={onEnded}\r\n      />\r\n    ) : null;\r\n  }\r\n\r\n  // Generate video sources for different formats and resolutions\r\n  const sources = getCloudinaryVideoSources(publicId, {\r\n    formats: ['mp4', 'webm'],\r\n    widths: [480, 720, 1080],\r\n    baseOptions: options\r\n  });\r\n\r\n  // Generate poster image URL from the video or custom thumbnail\r\n  const posterUrl = thumbnailOptions.publicId\r\n    ? getCloudinaryUrl(thumbnailOptions.publicId, {\r\n        format: thumbnailOptions.format || 'auto',\r\n        quality: thumbnailOptions.quality || 80\r\n      })\r\n    : getCloudinaryUrl(`${publicId.replace(/\\.[^/.]+$/, '')}.jpg`, {\r\n        format: 'auto',\r\n        quality: 70\r\n      });\r\n\r\n  // Handle error loading the video\r\n  const handleError = () => {\r\n    console.warn(`CloudinaryVideo: Failed to load video with publicId: ${publicId}`);\r\n    setError(true);\r\n  };\r\n\r\n  // Show fallback if there was an error\r\n  if (error && fallbackSrc) {\r\n    return (\r\n      <video\r\n        src={fallbackSrc}\r\n        autoPlay={autoPlay}\r\n        loop={loop}\r\n        muted={muted}\r\n        controls={controls}\r\n        playsInline={playsInline}\r\n        className={className}\r\n        onEnded={onEnded}\r\n      />\r\n    );\r\n  }\r\n\r\n  // Handle video ready event\r\n  const handleCanPlay = () => {\r\n    setIsLoaded(true);\r\n    if (onReady) onReady();\r\n  };\r\n\r\n  return (\r\n    <video\r\n      ref={videoRef}\r\n      poster={posterUrl}\r\n      autoPlay={autoPlay}\r\n      loop={loop}\r\n      muted={muted}\r\n      controls={controls}\r\n      playsInline={playsInline}\r\n      className={`${className} ${!isLoaded ? 'animate-pulse bg-gray-200' : ''}`}\r\n      onCanPlay={handleCanPlay}\r\n      onError={handleError}\r\n      onEnded={onEnded}\r\n    >\r\n      {sources.map((source, index) => (\r\n        <source key={index} src={source.src} type={source.type} media={source.media} />\r\n      ))}\r\n      Your browser does not support the video tag.\r\n    </video>",
+      "context": "    return fallbackSrc ? (\r\n      <video\r\n        src={fallbackSrc}\r",
+      "priority": "medium"
+    },
+    {
+      "file": "D:\\fal\\components\\media\\OptimizedVideo.tsx",
+      "pattern": "Video tag",
+      "lineNumber": 105,
+      "match": "<video\r\n        ref={videoRef}\r\n        className={`w-full h-full object-cover ${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}\r\n        autoPlay={autoPlay}\r\n        muted={muted}\r\n        loop={loop}\r\n        controls={controls}\r\n        playsInline\r\n        poster={posterUrl}\r\n      >\r\n        {sources.map((source, index) => (\r\n          <source key={index} src={source.src} type={source.type} media={source.media} />\r\n        ))}\r\n        Your browser does not support the video tag.\r\n      </video>",
+      "context": "      {/* Video element */}\r\n      <video\r\n        ref={videoRef}\r",
+      "priority": "medium"
+    }
+  ]
+}

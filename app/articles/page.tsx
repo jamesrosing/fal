@@ -5,6 +5,8 @@ import { ArticlesList } from "./articles-list"
 import { CldOgImage } from "next-cloudinary"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 export const metadata: Metadata = {
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
     description: 'Stay informed with the latest news, educational content, and resources about aesthetic procedures, dermatology, medical spa treatments, and functional medicine.',
     images: [
       {
-        url: 'https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/hero/hero-articles',
+        url: mediaId("f_auto,q_auto/hero/hero-articles"),
         width: 1200,
         height: 630,
         alt: 'Articles & Resources'

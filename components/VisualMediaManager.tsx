@@ -177,18 +177,7 @@ export default function VisualMediaManager() {
     if (mediaType === 'video' && position.currentImage) {
       return (
         <div className="relative w-full aspect-video bg-gray-900 rounded-md overflow-hidden">
-          <video 
-            src={getCloudinaryUrl(position.currentImage, { resource_type: 'video' })}
-            className="w-full h-full object-cover" 
-            controls
-            muted
-            poster={getCloudinaryUrl(position.currentImage, { 
-              resource_type: 'video',
-              format: 'jpg'
-            })}
-          >
-            Your browser does not support video playback.
-          </video>
+          <OptimizedVideo id={position.currentImage} options={{ controls: true, muted: true }} />
         </div>
       );
     }

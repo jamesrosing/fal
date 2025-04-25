@@ -10,6 +10,8 @@ import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage'
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 function ScrollHandler() {
@@ -36,7 +38,7 @@ const procedures = [
     id: "face-lift",
     description: "Redefine your facial contours with expert facelift procedures.",
     treatments: ["Complete Facelift", "Mini-Facelift", "Neck Lift", "Deep Plane Lift", "SMAS Facelift"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/face-lift-hero.jpg",
+    image: mediaId("plastic-surgery/face-lift-hero"),
     path: "/services/plastic-surgery/head-and-neck?procedure=facelift"
   },
   {
@@ -44,7 +46,7 @@ const procedures = [
     id: "eyelid-surgery",
     description: "Rejuvenate your appearance with blepharoplasty procedures.",
     treatments: ["Upper Eyelid Surgery", "Lower Eyelid Surgery", "Ptosis Correction", "Asian Eyelid Surgery", "Canthopexy"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/eyelid-surgery-hero.jpg",
+    image: mediaId("plastic-surgery/eyelid-surgery-hero"),
     path: "/services/plastic-surgery/head-and-neck?procedure=eyelids"
   },
   {
@@ -52,7 +54,7 @@ const procedures = [
     id: "rhinoplasty",
     description: "Sculpt your ideal nose profile with precision rhinoplasty.",
     treatments: ["Primary Rhinoplasty", "Revision Rhinoplasty", "Ethnic Rhinoplasty", "Functional Correction", "Tip Refinement"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/rhinoplasty-hero.jpg",
+    image: mediaId("plastic-surgery/rhinoplasty-hero"),
     path: "/services/plastic-surgery/head-and-neck?procedure=nose"
   },
   {
@@ -60,7 +62,7 @@ const procedures = [
     id: "breast-surgery",
     description: "Achieve your aesthetic goals with tailored breast procedures.",
     treatments: ["Breast Augmentation", "Breast Lift", "Breast Reduction", "Implant Revision", "Male Breast Reduction"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/plastic-surgery/breast-surgery-hero.jpg",
+    image: mediaId("plastic-surgery/breast-surgery-hero"),
     path: "/services/plastic-surgery/breast"
   }
 ]

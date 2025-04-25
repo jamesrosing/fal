@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 interface MediaImageProps {
@@ -79,12 +81,14 @@ export function MediaImage({
 
   // Build Cloudinary URL with transformations
   const getCloudinaryUrl = (publicId: string): string => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    if (!cloudName) return '';
-    
     const { crop = 'fill', gravity = 'auto', format = 'auto' } = transformations;
     
-    return `https://res.cloudinary.com/${cloudName}/image/upload/c_${crop},g_${gravity},f_${format},q_${quality}/${publicId}`;
+    return mediaUrl(publicId, {
+      crop,
+      gravity,
+      format,
+      quality
+    });
   };
 
   if (loading) {

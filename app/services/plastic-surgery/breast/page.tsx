@@ -6,6 +6,9 @@ import Link from "next/link"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { CloudinaryImage } from '@/components/media/CloudinaryMedia'
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 
 const procedures = [

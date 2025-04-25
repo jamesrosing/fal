@@ -8,6 +8,8 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 // Style for the directory structure
@@ -1451,7 +1453,7 @@ export default function MediaLibraryAdmin() {
                       />
                     ) : (
                       <img 
-                        src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${asset.cloudinary_id}`}
+                        src={mediaUrl(asset.cloudinary_id)}
                         alt={asset.placeholder_id}
                         className="max-h-full max-w-full object-contain"
                         onError={(e) => {

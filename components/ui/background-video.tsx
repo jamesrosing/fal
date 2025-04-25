@@ -13,9 +13,17 @@ interface BackgroundVideoProps {
     type: string;
     media?: string;
   }[];
+  videoId?: string; // Optional videoId for OptimizedVideo
+  className?: string; // Optional className for styling
 }
 
-export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVideoProps) {
+export function BackgroundVideo({ 
+  poster, 
+  fallbackImage, 
+  sources,
+  videoId,
+  className 
+}: BackgroundVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -132,23 +140,30 @@ export function BackgroundVideo({ poster, fallbackImage, sources }: BackgroundVi
         </Head>
       )}
       <div className="absolute inset-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={poster}
-          className={`h-full w-full object-cover transition-opacity duration-1000 ${
-            isVideoLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          aria-hidden="true"
-        >
-          {sources.map((source, index) => (
-            source.src && <source key={index} {...source} />
-          ))}
-          Your browser does not support the video tag.
-        </video>
+        {videoId ? (
+          // Use OptimizedVideo when videoId is provided
+          <OptimizedVideo 
+            id={videoId} 
+            options={{ autoPlay: true, muted: true, loop: true }} 
+            className={className || "object-cover w-full h-full"} 
+          />
+        ) : (
+          // Use default video implementation when no videoId is provided
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className={`w-full h-full object-cover ${className || ""}`}
+            poster={poster}
+          >
+            {validSources.map((source, index) => (
+              <source key={index} src={source.src} type={source.type} media={source.media} />
+            ))}
+            Your browser does not support HTML video.
+          </video>
+        )}
         <div className="absolute inset-0 bg-black/30" />
         
         {/* Show poster while video loads */}

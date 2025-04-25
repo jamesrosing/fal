@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 export function ArticlesSection() {
@@ -79,7 +81,7 @@ export function ArticlesSection() {
               const imageUrl = article.featured_image || article.image;
               const formattedImageUrl = imageUrl?.includes('https://') 
                 ? imageUrl 
-                : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${imageUrl}`;
+                : mediaUrl(`articles/${imageUrl}`);
                 
               return (
                 <motion.div

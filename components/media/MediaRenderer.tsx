@@ -4,6 +4,9 @@ import React from 'react';
 import { mediaService } from '@/lib/services/media-service';
 import UnifiedImage from './UnifiedImage';
 import UnifiedVideo from './UnifiedVideo';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface MediaRendererProps {
   placeholderId: string;

@@ -1,4 +1,4 @@
-import { OptimizedImage } from '../media/OptimizedImage';
+import OptimizedImage from '../media/OptimizedImage';
 import { OptimizedVideo } from '../media/OptimizedVideo';
 
 /**

@@ -10,10 +10,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRouter } from 'next/navigation';
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 // Define the main category slugs we want to show in the menubar
 const MAIN_CATEGORY_SLUGS = ['latest-news', 'plastic-surgery', 'dermatology', 'medical-spa', 'functional-medicine', 'educational'];
+
+// Fallback categories in case API fails
+const FALLBACK_CATEGORIES = [
+  { id: 'latest-news', slug: 'latest-news', name: 'Latest News' },
+  { id: 'plastic-surgery', slug: 'plastic-surgery', name: 'Plastic Surgery' },
+  { id: 'dermatology', slug: 'dermatology', name: 'Dermatology' },
+  { id: 'medical-spa', slug: 'medical-spa', name: 'Medical Spa' },
+  { id: 'functional-medicine', slug: 'functional-medicine', name: 'Functional Medicine' },
+  { id: 'educational', slug: 'educational', name: 'Educational' }
+];
 
 interface ArticlesListProps {
   searchParams: { [key: string]: string | string[] | undefined }
@@ -27,17 +37,30 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeSubcategory, setActiveSubcategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
+        setError(null);
         
         // Fetch categories first
-        const categoriesResponse = await fetch('/api/articles/categories');
-        if (!categoriesResponse.ok) throw new Error('Failed to fetch categories');
-        const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData);
+        let categoriesData = [];
+        try {
+          const categoriesResponse = await fetch('/api/articles/categories');
+          if (!categoriesResponse.ok) {
+            throw new Error('Failed to fetch categories');
+          }
+          categoriesData = await categoriesResponse.json();
+          setCategories(categoriesData);
+        } catch (categoryError) {
+          console.error('Error fetching categories:', categoryError);
+          // Fall back to predefined categories
+          console.log('Using fallback categories');
+          categoriesData = FALLBACK_CATEGORIES;
+          setCategories(FALLBACK_CATEGORIES);
+        }
         
         // Determine the active category from search params
         const categorySlug = (await searchParams).category as string | undefined;
@@ -47,8 +70,7 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
           setActiveCategory(categorySlug);
 
           // Find subcategories based on active category
-          const mainCategoryDef = ARTICLE_CATEGORIES.find(c => c.id === categorySlug);
-          if (mainCategoryDef) {
+          try {
             // Get available subcategories for this category from the database
             const subcategoriesResponse = await fetch(`/api/articles/subcategories?category=${categorySlug}`);
             
@@ -56,9 +78,12 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
               const subcategoriesData = await subcategoriesResponse.json();
               setSubcategories(subcategoriesData);
             } else {
-              // Fallback to static subcategories if API fails
+              // Fallback to empty subcategories if API fails
               setSubcategories([]);
             }
+          } catch (subcatError) {
+            console.error('Error fetching subcategories:', subcatError);
+            setSubcategories([]);
           }
 
           if (subcategorySlug && subcategorySlug !== 'all') {
@@ -73,31 +98,38 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
         }
         
         // Fetch articles with optional category filter
-        let apiUrl = '/api/articles';
-        const queryParams = [];
-        
-        if (categorySlug && categorySlug !== 'all') {
-          const categoryId = categoriesData.find((c: any) => c.slug === categorySlug)?.id;
-          if (categoryId) {
-            queryParams.push(`category=${categoryId}`);
+        try {
+          let apiUrl = '/api/articles';
+          const queryParams = [];
+          
+          if (categorySlug && categorySlug !== 'all') {
+            const categoryId = categoriesData.find((c: any) => c.slug === categorySlug)?.id;
+            if (categoryId) {
+              queryParams.push(`category=${categoryId}`);
+            }
+            
+            if (subcategorySlug && subcategorySlug !== 'all') {
+              queryParams.push(`subcategory=${subcategorySlug}`);
+            }
           }
           
-          if (subcategorySlug && subcategorySlug !== 'all') {
-            queryParams.push(`subcategory=${subcategorySlug}`);
+          if (queryParams.length > 0) {
+            apiUrl += `?${queryParams.join('&')}`;
           }
+          
+          const articlesResponse = await fetch(apiUrl);
+          if (!articlesResponse.ok) throw new Error('Failed to fetch articles');
+          const articlesData = await articlesResponse.json();
+          
+          setArticles(articlesData);
+        } catch (articlesError) {
+          console.error('Error fetching articles:', articlesError);
+          setArticles([]);
+          setError('Could not load articles. Please try again later.');
         }
-        
-        if (queryParams.length > 0) {
-          apiUrl += `?${queryParams.join('&')}`;
-        }
-        
-        const articlesResponse = await fetch(apiUrl);
-        if (!articlesResponse.ok) throw new Error('Failed to fetch articles');
-        const articlesData = await articlesResponse.json();
-        
-        setArticles(articlesData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error in main fetchData function:', error);
+        setError('An error occurred while loading content.');
       } finally {
         setLoading(false);
       }
@@ -194,7 +226,7 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
           const imageUrl = article.featured_image || article.image;
           const formattedImageUrl = imageUrl?.includes('https://') 
             ? imageUrl 
-            : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${imageUrl}`;
+            : mediaUrl(`articles/${imageUrl}`);
           
           const publishDate = article.publishedAt || article.date || article.createdAt;
           const categoryName = article.categoryName || 

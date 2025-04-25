@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const services = [
@@ -18,7 +20,7 @@ const services = [
       "Progress monitoring over time",
       "Customized treatment planning"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/3d-body-scanning.jpg"
+    image: mediaId("medical-spa/3d-body-scanning")
   },
   {
     title: "Body Composition Analysis",
@@ -29,7 +31,7 @@ const services = [
       "Metabolic rate assessment",
       "Hydration level monitoring"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/body-composition.jpg"
+    image: mediaId("medical-spa/body-composition")
   },
   {
     title: "Treatment Planning",
@@ -40,7 +42,7 @@ const services = [
       "Goal setting and monitoring",
       "Regular assessment updates"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/treatment-planning.jpg"
+    image: mediaId("medical-spa/treatment-planning")
   }
 ]
 

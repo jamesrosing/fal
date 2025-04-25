@@ -4,6 +4,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { mediaService, VideoOptions } from '@/lib/services/media-service';
 import { Skeleton } from "@/components/ui/skeleton";
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface UnifiedVideoProps {
   placeholderId: string;
@@ -176,25 +179,7 @@ export default function UnifiedVideo({
   return (
     <div className="relative overflow-hidden" style={{ width, height }}>
       {/* Video element */}
-      <video
-        ref={videoRef}
-        className={`w-full h-full object-cover ${className} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
-        autoPlay={autoPlay}
-        muted={muted}
-        loop={loop}
-        controls={controls}
-        playsInline
-        poster={posterUrl}
-      >
-        {videoSources.map((source, index) => (
-          <source 
-            key={index} 
-            src={source.src} 
-            type={source.type} 
-          />
-        ))}
-        Your browser does not support the video tag.
-      </video>
+      <OptimizedVideo id={src} options={{ autoPlay, muted, loop, controls, playsInline }} />
       
       {/* Poster/fallback image while video loads */}
       {!isLoaded && posterUrl && (

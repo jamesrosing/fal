@@ -10,6 +10,8 @@ import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 
@@ -37,7 +39,7 @@ const treatments = [
     id: "emsculpt",
     description: "Advanced non-invasive body sculpting treatments.",
     treatments: ["Muscle Building", "Fat Reduction", "Core Strengthening", "Buttocks Toning", "Arms & Calves"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131822/services-medical-spa/hero/medical-spa-emsculpt.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-emsculpt"),
     externalLink: "https://emsculpt-newportbeach.com"
   },
   {
@@ -45,7 +47,7 @@ const treatments = [
     id: "shapescale",
     description: "Precise 3D body scanning and progress tracking.",
     treatments: ["3D Body Scanning", "Progress Tracking", "Body Composition", "Measurements", "Visual Progress"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131824/services-medical-spa/hero/medical-spa-shapescale.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-shapescale"),
     path: "/services/medical-spa/shapescale"
   },
   {
@@ -53,7 +55,7 @@ const treatments = [
     id: "rf-microneedling",
     description: "Combined RF and microneedling for skin transformation.",
     treatments: ["Skin Tightening", "Wrinkle Reduction", "Scar Treatment", "Texture Improvement", "Pore Refinement"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131825/services-medical-spa/hero/medical-spa-rf-microneedling.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-rf-microneedling"),
     path: "/services/medical-spa/rf-microneedling"
   },
   {
@@ -61,7 +63,7 @@ const treatments = [
     id: "cosmetic-injections",
     description: "Premium injectable treatments for facial enhancement.",
     treatments: ["Botox", "Dermal Fillers", "Lip Enhancement", "Jawline Contouring", "Under-eye Treatment"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131827/services-medical-spa/hero/medical-spa-injections.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-injections"),
     path: "/services/medical-spa/cosmetic-injections"
   },
   {
@@ -69,7 +71,7 @@ const treatments = [
     id: "skin-lasers",
     description: "Advanced laser therapies for various skin concerns.",
     treatments: ["Hair Removal", "Skin Resurfacing", "Pigmentation", "Vascular Lesions", "Tattoo Removal"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131829/services-medical-spa/hero/medical-spa-lasers.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-lasers"),
     path: "/services/medical-spa/skin-lasers"
   },
   {
@@ -77,7 +79,7 @@ const treatments = [
     id: "esthetician-services",
     description: "Luxurious facial treatments for radiant skin.",
     treatments: ["Custom Facials", "Chemical Peels", "Dermaplaning", "LED Therapy", "Oxygen Treatment"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741131831/services-medical-spa/hero/medical-spa-facials.webp",
+    image: mediaId("services-medical-spa/hero/medical-spa-facials"),
     path: "/services/medical-spa/esthetician-services"
   }
 ]

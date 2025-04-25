@@ -2,6 +2,9 @@
 import Image from 'next/image';
 import { mediaService } from '@/lib/services/media-service';
 import { MediaOptions } from '@/lib/media/types';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 /**
  * Server Image Component
@@ -44,23 +47,12 @@ export async function ServerImage({
   if (!asset) {
     if (fill) {
       return (
-        <Image 
-          src="/images/placeholder.jpg"
-          alt={alt || "Image not found"}
-          fill
-          className={className}
-        />
+        <OptimizedImage id="/images/placeholder.jpg" alt=""    fill />
       );
     }
     
     return (
-      <Image 
-        src="/images/placeholder.jpg"
-        alt={alt || "Image not found"}
-        width={width || 800}
-        height={height || 600}
-        className={className}
-      />
+      <OptimizedImage id="/images/placeholder.jpg" alt="" width={width || 800} height={height || 600}   />
     );
   }
   

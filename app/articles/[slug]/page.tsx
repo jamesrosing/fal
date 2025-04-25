@@ -10,6 +10,8 @@ import { Article } from "@/lib/types"
 import ArticleContent from "@/components/articles/ArticleContent"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 type Props = {
@@ -165,7 +167,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         {
           url: article.image.includes('https://') 
             ? article.image 
-            : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`,
+            : mediaUrl(`articles/${article.image}`),
           width: 1200,
           height: 630,
           alt: article.title
@@ -188,7 +190,7 @@ export default async function ArticlePage({ params }: Props) {
   const imageUrl = article.image 
     ? (article.image.includes('https://') 
       ? article.image 
-      : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`) 
+      : mediaUrl(`articles/${article.image}`)) 
     : '/placeholder-image.jpg';
   
   // Get the article category display name
@@ -272,7 +274,7 @@ export default async function ArticlePage({ params }: Props) {
                 const relatedImageUrl = relatedArticle.image ? 
                   (relatedArticle.image.includes('https://') 
                     ? relatedArticle.image 
-                    : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${relatedArticle.image}`) 
+                    : mediaUrl(`articles/${relatedArticle.image}`)) 
                   : '/placeholder-image.jpg';
                 
                 return (

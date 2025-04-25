@@ -12,6 +12,8 @@ import Head from "next/head"
 import { Footer } from "./footer"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 // Inline StructuredData component
@@ -50,7 +52,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
   const imageUrl = article.image ? 
     (article.image.includes('https://res.cloudinary.com') 
       ? article.image 
-      : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${article.image}`) 
+      : mediaUrl(`articles/${article.image}`)) 
     : null;
 
   // Generate structured data for the article
@@ -74,7 +76,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
         name: "Allure MD",
         logo: {
           "@type": "ImageObject",
-          url: `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/branding/logo`
+          url: mediaUrl("f_auto,q_auto/branding/logo")
         }
       },
       mainEntityOfPage: {
@@ -216,7 +218,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
               const relatedImageUrl = relatedArticle.image ? 
                 (relatedArticle.image.includes('https://res.cloudinary.com') 
                   ? relatedArticle.image 
-                  : `https://res.cloudinary.com/dyrzyfg3w/image/upload/f_auto,q_auto/${relatedArticle.image}`) 
+                  : mediaUrl(`articles/${relatedArticle.image}`)) 
                 : '/placeholder-image.jpg';
                 
               return (

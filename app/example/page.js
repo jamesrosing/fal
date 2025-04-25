@@ -1,6 +1,6 @@
 import { SimpleHero } from '@/components/Hero/Hero';
 import { MediaContentSection } from '@/components/layouts/TwoColumnLayout';
-import { OptimizedImage } from '@/components/media/OptimizedImage';
+import OptimizedImage from '@/components/media/OptimizedImage';
 import { OptimizedVideo } from '@/components/media/OptimizedVideo';
 import { MediaRenderer } from '@/components/media/MediaRenderer';
 

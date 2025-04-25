@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const treatments = [
@@ -18,7 +20,7 @@ const treatments = [
       "Minimizes pore size",
       "Stimulates collagen production"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/rf-microneedling-face.jpg"
+    image: mediaId("medical-spa/rf-microneedling-face")
   },
   {
     title: "RF Microneedling Body",
@@ -29,7 +31,7 @@ const treatments = [
       "Smooths uneven texture",
       "Tightens loose skin"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/rf-microneedling-body.jpg"
+    image: mediaId("medical-spa/rf-microneedling-body")
   },
   {
     title: "Scar Reduction",
@@ -40,7 +42,7 @@ const treatments = [
       "Stretch mark treatment",
       "Custom treatment protocols"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/rf-microneedling-scars.jpg"
+    image: mediaId("medical-spa/rf-microneedling-scars")
   },
   {
     title: "Skin Tightening",
@@ -51,7 +53,7 @@ const treatments = [
       "Arms and thighs improvement",
       "Progressive results program"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/rf-microneedling-tightening.jpg"
+    image: mediaId("medical-spa/rf-microneedling-tightening")
   }
 ]
 

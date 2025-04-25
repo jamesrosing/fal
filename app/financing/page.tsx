@@ -7,6 +7,8 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { Card } from "@/components/ui/card"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const financingOptions = [
@@ -19,7 +21,7 @@ const financingOptions = [
       "Quick credit decisions",
       "Use for all procedures"
     ],
-    logo: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/financing/carecredit-logo.png"
+    logo: mediaId("financing/carecredit-logo")
   },
   {
     name: "Alphaeon Credit",
@@ -30,7 +32,7 @@ const financingOptions = [
       "Monthly payment plans",
       "Exclusive for aesthetic procedures"
     ],
-    logo: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/financing/alphaeon-logo.png"
+    logo: mediaId("financing/alphaeon-logo")
   },
   {
     name: "PatientFi",
@@ -41,7 +43,7 @@ const financingOptions = [
       "Transparent terms",
       "No hidden fees"
     ],
-    logo: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/financing/patientfi-logo.png"
+    logo: mediaId("financing/patientfi-logo")
   }
 ]
 

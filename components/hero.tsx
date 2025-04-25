@@ -39,8 +39,8 @@ const posterImage = getCloudinaryUrl("hero/hero-poster", {
   height: 1080,
   crop: 'fill',
   gravity: 'auto',
-  format: 'auto',
-  quality: 'auto'
+  format: 'auto' as any,
+  quality: 'auto' as any
 });
 
 const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
@@ -48,8 +48,8 @@ const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
   height: 1080,
   crop: 'fill',
   gravity: 'auto',
-  format: 'auto',
-  quality: 'auto'
+  format: 'auto' as any,
+  quality: 'auto' as any
 });
 
 export function Hero() {
@@ -59,6 +59,7 @@ export function Hero() {
         poster={posterImage}
         fallbackImage={fallbackImage}
         sources={videoSources}
+        className="object-cover"
       />
 
       <div className="relative h-full flex items-center text-white">
@@ -131,8 +132,8 @@ export function PageHero({
   const imageUrl = image.path.includes('https://res.cloudinary.com') 
     ? image.path 
     : getCloudinaryUrl(image.path, {
-        format: 'auto',
-        quality: 'auto'
+        format: 'auto' as any,
+        quality: 'auto' as any
       });
 
   return (

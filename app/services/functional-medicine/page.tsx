@@ -9,6 +9,8 @@ import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 function ScrollHandler() {
@@ -35,42 +37,42 @@ const approaches = [
     id: "cardiometabolic-optimization",
     description: "Comprehensive approach to heart and metabolic health.",
     approaches: ["Heart Health Assessment", "Metabolic Testing", "Nutritional Guidance", "Exercise Programs", "Lifestyle Modifications"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133465/articles/categories/functional-medicine-cardio.png"
+    image: mediaId("articles/categories/functional-medicine-cardio")
   },
   {
     category: "Epigenetic Optimization",
     id: "epigenetic-optimization",
     description: "Personalized treatments based on genetic factors.",
     approaches: ["Genetic Testing", "DNA Analysis", "Personalized Protocols", "Environmental Factors", "Lifestyle Integration"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133466/articles/categories/functional-medicine-epigenetic.png"
+    image: mediaId("articles/categories/functional-medicine-epigenetic")
   },
   {
     category: "Hair Restoration",
     id: "hair-restoration",
     description: "Advanced techniques for hair regrowth and restoration.",
     approaches: ["PRP Therapy", "Stem Cell Treatment", "Scalp Micropigmentation", "Nutritional Support", "Hormone Optimization"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133467/articles/categories/functional-medicine-hair.png"
+    image: mediaId("articles/categories/functional-medicine-hair")
   },
   {
     category: "Hormone Optimization",
     id: "hormone-optimization",
     description: "Balancing and optimizing hormone levels for overall well-being.",
     approaches: ["Hormone Testing", "Bioidentical Hormones", "Thyroid Management", "Adrenal Support", "Sexual Health"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-hormone.png"
+    image: mediaId("articles/categories/functional-medicine-hormone")
   },
   {
     category: "Neurocognitive Health",
     id: "neurocognitive-performance",
     description: "Enhancing brain function and cognitive abilities.",
     approaches: ["Cognitive Assessment", "Brain Mapping", "Memory Enhancement", "Focus Improvement", "Stress Management"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133468/articles/categories/functional-medicine-neuro.png"
+    image: mediaId("articles/categories/functional-medicine-neuro")
   },
   {
     category: "Sleep & Travel Health",
     id: "sleep-travel-optimization",
     description: "Improving sleep quality and managing travel-related health issues.",
     approaches: ["Sleep Analysis", "Circadian Optimization", "Jet Lag Management", "Travel Wellness", "Recovery Protocols"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133469/articles/categories/functional-medicine-sleep.png"
+    image: mediaId("articles/categories/functional-medicine-sleep")
   }
 ]
 

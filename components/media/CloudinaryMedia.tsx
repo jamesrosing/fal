@@ -3,6 +3,11 @@
 import React from 'react';
 import { CldImage } from 'next-cloudinary';
 import Image from 'next/image';
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
+
 
 // Define prop types for our components
 interface CloudinaryImageProps {
@@ -278,14 +283,14 @@ export function CloudinaryVideo({
   
   // For now, use a basic video tag 
   const posterUrl = poster ? 
-    (poster.startsWith('http') ? poster : `https://res.cloudinary.com/dyrzyfg3w/image/upload/${getCloudinaryPath(poster)}`) : 
+    (poster.startsWith('http') ? poster : mediaUrl(getCloudinaryPath(poster))) : 
     undefined;
   
   if (fill) {
     return (
       <div className="relative w-full h-full">
         <video
-          src={`https://res.cloudinary.com/dyrzyfg3w/video/upload/${src}`}
+          src={mediaUrl(id)}
           className={`w-full h-full object-cover ${className}`}
           autoPlay={autoPlay}
           muted={muted}
@@ -300,7 +305,7 @@ export function CloudinaryVideo({
   
   return (
     <video
-      src={`https://res.cloudinary.com/dyrzyfg3w/video/upload/${src}`}
+      src={mediaUrl(id)}
       width={width}
       height={height}
       className={className}

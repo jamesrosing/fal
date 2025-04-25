@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const services = [
@@ -18,7 +20,7 @@ const services = [
       "Effective for abdomen and buttocks",
       "No downtime required"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/emsculpt-muscle.jpg"
+    image: mediaId("medical-spa/emsculpt-muscle")
   },
   {
     title: "Fat Reduction",
@@ -29,7 +31,7 @@ const services = [
       "Clinically proven results",
       "Complements healthy lifestyle"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/emsculpt-fat.jpg"
+    image: mediaId("medical-spa/emsculpt-fat")
   },
   {
     title: "Treatment Plans",
@@ -40,7 +42,7 @@ const services = [
       "Multiple session packages",
       "Maintenance recommendations"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/emsculpt-plan.jpg"
+    image: mediaId("medical-spa/emsculpt-plan")
   }
 ]
 

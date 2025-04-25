@@ -358,7 +358,7 @@ export default function ContactPage() {
               return `
                 <div style="margin-bottom: 10px;">
                   <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                    <img src="${review.profile_photo_url || ''}" alt="${review.author_name || 'Reviewer'}" 
+                    <img src="${review.profile_photo_url || '/images/profile-placeholder.png'}" alt="${review.author_name || 'Reviewer'}" 
                       style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" />
                     <span style="font-weight: 500; color: #333; font-size: 13px;">${review.author_name || 'Anonymous'}</span>
                   </div>
@@ -389,7 +389,7 @@ export default function ContactPage() {
           ${photos.map(photo => {
             const photoUrl = photo.getUrl ? photo.getUrl({maxWidth: 150, maxHeight: 150}) : '';
             return `
-              <img src="${photoUrl}" alt="${place.name || 'Business photo'}" 
+              <img src="${photoUrl || '/images/place-placeholder.png'}" alt="${place.name || 'Business photo'}" 
                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;" />
             `;
           }).join('')}

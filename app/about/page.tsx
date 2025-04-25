@@ -314,13 +314,7 @@ export default function AboutPage() {
                 <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-lg">
                   {/* Special case for operating room - use the panoramic image shared by user */}
                   {facility.title === "State-of-the-Art Operating Rooms" ? (
-                    <Image
-                      src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1743748061/operating_room.jpg"
-                      alt={facility.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+                    <OptimizedImage id="operating_room.jpg" alt=""    fill />
                   ) : (
                     <>
                       {facilityMediaHooks[facility.mediaKey]?.url && (

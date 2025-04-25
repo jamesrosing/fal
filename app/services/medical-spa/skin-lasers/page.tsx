@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const treatments = [
@@ -18,7 +20,7 @@ const treatments = [
       "Year-round treatments",
       "Customized protocols"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/laser-hair-removal.jpg"
+    image: mediaId("medical-spa/laser-hair-removal")
   },
   {
     title: "Laser Skin Resurfacing",
@@ -29,7 +31,7 @@ const treatments = [
       "Acne scar treatment",
       "Skin rejuvenation"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/laser-resurfacing.jpg"
+    image: mediaId("medical-spa/laser-resurfacing")
   },
   {
     title: "IPL Photofacial",
@@ -40,7 +42,7 @@ const treatments = [
       "Age spot removal",
       "Skin tone evening"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/ipl-photofacial.jpg"
+    image: mediaId("medical-spa/ipl-photofacial")
   },
   {
     title: "Laser Vein Treatment",
@@ -51,7 +53,7 @@ const treatments = [
       "Leg vein therapy",
       "Multiple treatment options"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/laser-vein.jpg"
+    image: mediaId("medical-spa/laser-vein")
   }
 ]
 

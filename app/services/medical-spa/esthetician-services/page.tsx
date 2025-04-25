@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const treatments = [
@@ -18,7 +20,7 @@ const treatments = [
       "Custom mask application",
       "Relaxing facial massage"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/signature-facial.jpg"
+    image: mediaId("medical-spa/signature-facial")
   },
   {
     title: "HydraFacial",
@@ -29,7 +31,7 @@ const treatments = [
       "Hydration infusion",
       "Custom boosters available"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/hydrafacial.jpg"
+    image: mediaId("medical-spa/hydrafacial")
   },
   {
     title: "Microneedling",
@@ -40,7 +42,7 @@ const treatments = [
       "Scar reduction",
       "Texture improvement"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/microneedling.jpg"
+    image: mediaId("medical-spa/microneedling")
   },
   {
     title: "Oxygen Facial",
@@ -51,7 +53,7 @@ const treatments = [
       "Instant brightening",
       "Red carpet ready results"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/oxygen-facial.jpg"
+    image: mediaId("medical-spa/oxygen-facial")
   }
 ]
 

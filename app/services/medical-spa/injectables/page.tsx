@@ -6,6 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 const treatments = [
@@ -18,7 +20,7 @@ const treatments = [
       "Jeuveau® treatments",
       "Custom treatment plans"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/neuromodulators.jpg"
+    image: mediaId("medical-spa/neuromodulators")
   },
   {
     title: "Dermal Fillers",
@@ -29,7 +31,7 @@ const treatments = [
       "RHA® collection",
       "Sculptra® Aesthetic"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/dermal-fillers.jpg"
+    image: mediaId("medical-spa/dermal-fillers")
   },
   {
     title: "Lip Enhancement",
@@ -40,7 +42,7 @@ const treatments = [
       "Volume restoration",
       "Cupid's bow refinement"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/lip-enhancement.jpg"
+    image: mediaId("medical-spa/lip-enhancement")
   },
   {
     title: "Liquid Facelift",
@@ -51,7 +53,7 @@ const treatments = [
       "Progressive enhancement",
       "Natural-looking results"
     ],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1738570833/medical-spa/liquid-facelift.jpg"
+    image: mediaId("medical-spa/liquid-facelift")
   }
 ]
 

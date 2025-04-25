@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import Image, { ImageProps } from 'next/image';
 import { mediaService, MediaOptions } from '@/lib/services/media-service';
 import { Skeleton } from "@/components/ui/skeleton";
+import OptimizedImage from '@/components/media/OptimizedImage';
+import OptimizedVideo from '@/components/media/OptimizedVideo';
+
 
 interface UnifiedImageProps extends Omit<ImageProps, 'src'> {
   placeholderId: string;

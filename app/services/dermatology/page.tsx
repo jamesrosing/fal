@@ -9,6 +9,8 @@ import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+
 
 
 function ScrollHandler() {
@@ -35,35 +37,35 @@ const treatments = [
     id: "skin-screening",
     description: "Comprehensive evaluations and treatments for optimal skin health.",
     treatments: ["Full Body Examination", "Mole Mapping", "Early Detection", "Prevention Strategies", "Regular Monitoring"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133461/services-dermatology/hero/dermatology-skin-health.png"
+    image: mediaId("services-dermatology/hero/dermatology-skin-health")
   },
   {
     category: "Acne",
     id: "acne",
     description: "Advanced treatments for acne and related conditions.",
     treatments: ["Topical Treatments", "Oral Medications", "Chemical Peels", "Light Therapy", "Scar Treatment"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133459/services-dermatology/hero/dermatology-acne.png"
+    image: mediaId("services-dermatology/hero/dermatology-acne")
   },
   {
     category: "Eczema",
     id: "eczema",
     description: "Management and treatment of eczema and dermatitis.",
     treatments: ["Moisturizing Therapy", "Topical Steroids", "Immunomodulators", "Trigger Avoidance", "Lifestyle Modifications"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133460/services-dermatology/hero/dermatology-eczema.png"
+    image: mediaId("services-dermatology/hero/dermatology-eczema")
   },
   {
     category: "Rosacea",
     id: "rosacea",
     description: "Specialized care for rosacea symptoms.",
     treatments: ["Trigger Management", "Topical Treatments", "Oral Antibiotics", "Laser Therapy", "Skincare Routine"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133462/services-dermatology/hero/dermatology-rosacea.png"
+    image: mediaId("services-dermatology/hero/dermatology-rosacea")
   },
   {
     category: "Psoriasis",
     id: "psoriasis",
     description: "Cutting-edge psoriasis treatments and management.",
     treatments: ["Topical Therapy", "Phototherapy", "Systemic Medications", "Biologics", "Lifestyle Support"],
-    image: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741133463/services-dermatology/hero/dermatology-psoriasis.png"
+    image: mediaId("services-dermatology/hero/dermatology-psoriasis")
   }
 ]
 
