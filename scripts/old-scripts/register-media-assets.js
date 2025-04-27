@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { glob } from 'glob';
-import { DIRECTORY_STRUCTURE } from '../lib/media/structure.js';
+import { DIRECTORY_STRUCTURE } from '../../lib/media/structure.js';
 
 // Asset type detection based on file extension
 const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.svg'];

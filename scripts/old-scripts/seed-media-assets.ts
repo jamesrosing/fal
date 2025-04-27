@@ -4,7 +4,7 @@
  * Run with: npx ts-node scripts/seed-media-assets.ts
  */
 
-import { createClient } from '../lib/supabase';
+import { createClient } from '../../lib/supabase';
 
 // Initial media assets to seed
 const initialMediaAssets = [

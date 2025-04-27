@@ -1,5 +1,5 @@
-import { getMediaUrl } from '../lib/media/utils.js';
-import mediaRegistry from '../lib/media/registry.js';
+import { getMediaUrl } from '../../lib/media/utils.js';
+import mediaRegistry from '../../lib/media/registry.js';
 import fs from 'fs';
 import path from 'path';
 

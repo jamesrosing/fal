@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 
 // Use createRequire to import JSON
 const require = createRequire(import.meta.url);
-const replacementMap = require('../cloudinary-replacement-map.json');
+const replacementMap = require('../../cloudinary-replacement-map.json');
 
 // Cloud name from environment
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w';
@@ -37,7 +37,7 @@ async function checkCloudinaryUrl(id, publicId) {
 async function main() {
   try {
     // Import the IMAGE_ASSETS object dynamically
-    const imageConfigModule = await import('../lib/image-config.js');
+    const imageConfigModule = await import('../../lib/image-config.js');
     const IMAGE_ASSETS = imageConfigModule.IMAGE_ASSETS;
     
     // Get all registered assets

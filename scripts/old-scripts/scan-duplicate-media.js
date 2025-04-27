@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { glob } from 'glob';
 import { createClient } from '@supabase/supabase-js';
-import { DIRECTORY_STRUCTURE } from '../lib/media/structure.js';
+import { DIRECTORY_STRUCTURE } from '../../lib/media/structure.js';
 import dotenv from 'dotenv';
 
 // Load environment variables
