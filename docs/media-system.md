@@ -1,266 +1,181 @@
-# Media System Documentation
+# Allure MD Media System
 
-This document provides comprehensive information about the unified media system in the FAL project. The system is designed to provide a consistent, maintainable approach to handling images and videos throughout the application.
+This document provides an overview of the media system in the Allure MD project, including the recent fixes and improvements made to address issues with media handling.
 
 ## Overview
 
-The FAL media system addresses several key needs:
+The Allure MD website uses a unified media system based on Cloudinary for storing and serving optimized images and videos. The system consists of:
 
-1. **Consistent Media Handling**: A unified approach to media across the application
-2. **Placeholder System**: A flexible approach to managing content placeholders
-3. **Optimization**: Automatic optimization of images and videos
-4. **Caching**: Efficient caching to improve performance
-5. **Server Components**: Support for both client and server components
+1. **Media Registry**: A centralized registry of all media assets used in the application
+2. **Optimized Components**: React components that use the registry to display media
+3. **Utilities**: Helper functions for generating media URLs and handling errors
 
-## System Components
+## Recent Fixes
 
-### Core Components
+The following issues have been addressed:
 
-1. **MediaService**: The primary service that handles all media operations
-   - Located at `lib/services/media-service.ts`
-   - Provides methods for retrieving, updating, and optimizing media
+1. **Empty Image Registry**: The `image-config.js` file has been populated with all media assets from Cloudinary.
+2. **Error Handling**: Improved error handling in the media components to provide better fallbacks.
+3. **Component Migration**: Added scripts to migrate hardcoded URLs to the new optimized components.
+4. **Debugging Tools**: Added debugging information to help diagnose media issues.
 
-2. **Media Registry**: A centralized store of all media assets
-   - Located at `lib/media/registry.ts`
-   - Stores metadata for all media assets, including dimensions and default options
+## Media System Architecture
 
-3. **Media Types**: TypeScript interfaces for all media-related types
-   - Located at `lib/media/types.ts`
-   - Defines interfaces for assets, placements, and options
+### 1. Media Registry (`lib/image-config.js`)
 
-4. **Media API**: A consolidated API for media operations
-   - Located at `app/api/unified-media/route.ts`
-   - Provides endpoints for retrieving and updating media
+This file contains a registry of all media assets used in the application, with the following properties:
 
-### React Components
+- `id`: Unique identifier for the asset
+- `type`: Type of asset ('image' or 'video')
+- `area`: Area of the application where the asset is used (e.g., 'hero', 'article')
+- `description`: Human-readable description of the asset
+- `publicId`: Cloudinary public ID for the asset
+- `dimensions`: Width, height, and aspect ratio
+- `defaultOptions`: Default transformation options
 
-1. **OptimizedImage**: A client component for images
-   - Located at `components/media/OptimizedImage.tsx`
-   - Supports placeholder IDs or direct asset IDs
+### 2. Media Utilities (`lib/media/utils.js`)
 
-2. **OptimizedVideo**: A client component for videos
-   - Located at `components/media/OptimizedVideo.tsx`
-   - Supports responsive sources and fallback images
+Key utility functions:
 
-3. **ServerImage**: A server component for images
-   - Located at `components/media/ServerImage.tsx`
-   - Loads media assets on the server for improved performance
+- `getMediaUrl(id, options)`: Generates a Cloudinary URL with transformations
+- `getNextImageProps(id, options)`: Gets all props needed for Next.js Image component
+- `getVideoSources(id, options)`: Gets sources for different video formats and resolutions
+- `getMediaType(id)`: Detects media type from ID or URL
 
-4. **MediaRenderer**: A unified component that renders the appropriate media type
-   - Located at `components/media/MediaRenderer.tsx`
-   - Automatically detects the media type (image or video)
+### 3. Optimized Components
 
-## How It Works
+- `OptimizedImage`: Enhanced Image component with error handling and debugging
+- `OptimizedVideo`: Enhanced Video component with error handling and debugging
 
-### Media Placeholders
+## Usage Guidelines
 
-The system uses "placeholders" to represent where media should appear in the application. Each placeholder has:
+### Using Images
 
-1. A unique ID (e.g., `home-hero`, `about-section-image`)
-2. A type (image or video)
-3. Mappings to actual media assets in Cloudinary
+```jsx
+import OptimizedImage from '@/components/media/OptimizedImage';
 
-Benefits of this approach:
-- Content can be changed without updating code
-- Consistent naming conventions
-- Centralized management
+// Basic usage
+<OptimizedImage id="hero-image" alt="Hero section" />
 
-### Database Structure
+// With options
+<OptimizedImage 
+  id="article-header" 
+  alt="Article header"
+  width={800}
+  height={600}
+  options={{
+    crop: 'fill',
+    gravity: 'center'
+  }}
+/>
 
-The system uses three main tables in Supabase:
+// With fallback
+<OptimizedImage 
+  id="team-member" 
+  alt="Team member"
+  fallbackSrc="/images/placeholder-person.jpg"
+/>
 
-1. **media_assets**: Stores metadata about Cloudinary assets
-   - `id`: Unique identifier
-   - `cloudinary_id`: The Cloudinary public ID
-   - `type`: 'image' or 'video'
-   - `title`: Asset title
-   - `alt_text`: Alternative text for accessibility
-   - `metadata`: JSON metadata (dimensions, area, etc.)
+// With debugging (development only)
+<OptimizedImage 
+  id="logo" 
+  alt="Company logo"
+  showDebugInfo={process.env.NODE_ENV === 'development'}
+/>
+```
 
-2. **media_mappings**: Maps placeholders to media assets
-   - `id`: Unique identifier
-   - `placeholder_id`: The placeholder ID
-   - `media_id`: Reference to media_assets.id
+### Using Videos
 
-3. **application_structure**: Defines where placeholders are used
-   - `id`: Unique identifier
-   - `placeholder_id`: The placeholder ID
-   - `type`: 'image' or 'video'
-   - `page`: The page where the placeholder is used
-   - `section`: The section within the page
-   - `container`: The container within the section
+```jsx
+import OptimizedVideo from '@/components/media/OptimizedVideo';
 
-### Media Flow
+// Basic usage
+<OptimizedVideo id="hero-video" />
 
-1. Component requests media by placeholder ID
-2. MediaService checks the registry for the asset
-3. If not found, it queries the database using the placeholder ID
-4. The service retrieves the media asset and generates an optimized URL
-5. Component renders the media with proper optimization options
+// With options
+<OptimizedVideo 
+  id="product-demo" 
+  options={{
+    autoPlay: true,
+    muted: true,
+    loop: true,
+    controls: false
+  }}
+/>
 
-## Usage Examples
+// With poster image
+<OptimizedVideo 
+  id="testimonial" 
+  posterImageId="testimonial-poster"
+/>
+```
 
-### Server Component Usage
+## Maintaining the Media System
 
-```tsx
-// Using the ServerImage component in a page
-import { ServerImage } from '@/components/media/ServerImage';
+### Adding New Assets
 
-export default function AboutPage() {
-  return (
-    <div className="hero-section">
-      <ServerImage 
-        placeholderId="about-hero" 
-        alt="About Us" 
-        fill 
-        priority 
-        className="object-cover"
-      />
-      <h1>About Our Company</h1>
-    </div>
-  );
+1. Upload assets to Cloudinary using the admin interface
+2. Register the assets in `lib/image-config.js`:
+
+```javascript
+// Example new asset
+"new-asset-id": {
+  "id": "new-asset-id",
+  "type": "image",
+  "area": "hero",
+  "description": "New hero image",
+  "publicId": "hero/new-asset",
+  "dimensions": {
+    "width": 1200,
+    "height": 800,
+    "aspectRatio": 1.5
+  },
+  "defaultOptions": {
+    "width": 1200,
+    "quality": 90,
+    "format": "auto"
+  }
 }
 ```
 
-### Client Component Usage
+### Scripts for Media Management
 
-```tsx
-// Using the OptimizedImage component in a client component
-'use client';
-import { OptimizedImage } from '@/components/media/OptimizedImage';
+The following scripts are available to help manage media:
 
-export function TeamCard({ name, role, imageId }) {
-  return (
-    <div className="team-card">
-      <OptimizedImage 
-        id={imageId} 
-        alt={name} 
-        width={300} 
-        height={400} 
-        className="rounded-lg"
-      />
-      <h3>{name}</h3>
-      <p>{role}</p>
-    </div>
-  );
-}
-```
+1. **Verify Media Assets**: Check that all registered assets are accessible
+   ```
+   node scripts/verify-image-registry.js
+   ```
 
-### Direct MediaService Usage
+2. **Migrate Hardcoded URLs**: Replace hardcoded Cloudinary URLs with optimized components
+   ```
+   node scripts/migrate-hardcoded-urls.js
+   ```
 
-```tsx
-// Using mediaService directly
-import { mediaService } from '@/lib/services/media-service';
+3. **Scan for Unmigrated Components**: Find components that still use standard Image tags
+   ```
+   node scripts/scan-unmigrated-components.js
+   ```
 
-export async function ProductPage({ params }) {
-  // Get product image by placeholder
-  const productImage = await mediaService.getImageSrc(`product-${params.id}`);
-  
-  return (
-    <div>
-      <img src={productImage} alt="Product" />
-    </div>
-  );
-}
-```
+### Debugging Media Issues
+
+If you encounter issues with media display:
+
+1. Enable debug info on the component:
+   ```jsx
+   <OptimizedImage id="problematic-image" showDebugInfo={true} />
+   ```
+
+2. Check the browser console for warning and error messages
+
+3. Verify that the asset is properly registered in `lib/image-config.js`
+
+4. Check that the Cloudinary URL is accessible via `https://res.cloudinary.com/dyrzyfg3w/image/upload/[publicId]`
 
 ## Best Practices
 
-1. **Use Server Components When Possible**
-   - Server components avoid the need for client-side JS and hydration
-   - They render immediately with the correct props
-
-2. **Provide Alt Text for Accessibility**
-   - Always provide alt text for images
-   - Use descriptive text that conveys the purpose of the image
-
-3. **Use Appropriate Dimensions**
-   - Specify width and height to avoid layout shifts
-   - Use fill mode for hero images and backgrounds
-
-4. **Optimize for Performance**
-   - Use priority for above-the-fold images
-   - Use responsive sizes for different viewports
-   - Enable blur placeholder for better user experience
-
-5. **Use the Registry for Static Assets**
-   - Register frequently used assets in the registry
-   - This improves performance by avoiding database queries
-
-## Media Registration
-
-To add new media assets to the registry:
-
-1. Edit `lib/image-config.ts`
-2. Add new assets following the existing pattern
-3. Include proper dimensions and default options
-
-Example:
-```typescript
-'about-hero': {
-  id: 'about-hero',
-  area: 'hero',
-  description: 'About page hero image',
-  publicId: 'hero/about-hero-image',
-  dimensions: {
-    width: 1920,
-    height: 1080,
-    aspectRatio: 16/9
-  },
-  defaultOptions: {
-    width: 1920,
-    quality: 90,
-    format: 'auto'
-  }
-},
-```
-
-## Admin Interface
-
-The admin interface allows content managers to:
-
-1. View all placeholders in the application
-2. Associate placeholders with media assets
-3. Upload new media to Cloudinary
-4. Edit metadata for media assets
-
-To access the admin interface, go to `/admin/media`.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Image Not Found**
-   - Check if the placeholder ID exists in the database
-   - Verify the Cloudinary asset exists
-   - Check the mapping between placeholder and asset
-
-2. **Image Quality Issues**
-   - Check the quality option in the component props
-   - Verify the dimensions of the original asset
-
-3. **Performance Issues**
-   - Use the priority prop for important images
-   - Verify proper caching is implemented
-   - Check image dimensions and formats
-
-### Debugging
-
-To debug media issues:
-
-1. Check the browser console for errors
-2. Use the `/api/unified-media?placeholderId=your-id` endpoint to check the raw data
-3. Verify the Cloudinary asset using the Cloudinary Media Library
-
-## Migration Guide
-
-If you're migrating from the old media system:
-
-1. Replace direct Cloudinary URLs with placeholder IDs
-2. Use OptimizedImage instead of Next.js Image
-3. Use ServerImage for server components
-4. Register your assets in the media registry
-
-## Conclusion
-
-The unified media system provides a consistent, maintainable approach to handling media in the FAL project. By following the patterns and best practices outlined in this document, you can ensure that your media is optimized, accessible, and maintainable.
+1. **Use IDs, not URLs**: Always reference media by their ID, not by URL
+2. **Provide Fallbacks**: Use the `fallbackSrc` prop for important images
+3. **Set Dimensions**: Always provide `width` and `height` for better page layout
+4. **Use Appropriate Areas**: Organize assets by area for better management
+5. **Run Verification**: Regularly run the verification script to check for broken assets
