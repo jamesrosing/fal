@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next'
 import bundleAnalyzer from '@next/bundle-analyzer'
+import { withNextCloudinary } from 'next-cloudinary/plugin'
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -107,7 +108,9 @@ const config: NextConfig = {
   excludeDefaultMomentLocales: true,
   distDir: '.next',
   poweredByHeader: false,
+  // Add transpilePackages for next-cloudinary
+  transpilePackages: ['next-cloudinary'],
 };
 
-// Apply bundle analyzer wrapper
-export default withBundleAnalyzer(config)
+// Apply bundle analyzer wrapper and next-cloudinary plugin
+export default withNextCloudinary(withBundleAnalyzer(config))
