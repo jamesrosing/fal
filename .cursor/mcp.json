@@ -45,25 +45,6 @@
                 "@modelcontextprotocol/server-memory"
             ]
         },
-        "mcp-scholarly": {
-            "command": "uvx",
-            "args": [
-                "mcp-scholarly"
-            ]
-        },
-        "claude-code-mcp": {
-            "command": "cmd",
-            "args": [
-                "/c",
-                "npx",
-                "-y",
-                "@smithery/cli@latest",
-                "run",
-                "@auchenberg/claude-code-mcp",
-                "--config",
-                "\"{}\""
-            ]
-        },
         "desktop-commander": {
             "command": "cmd",
             "args": [

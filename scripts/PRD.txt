@@ -1,47 +1,1486 @@
 <context>
-# Overview  
-[Provide a high-level overview of your product here. Explain what problem it solves, who it's for, and why it's valuable.]
+# 📚 Allure MD Next.js Web Application with Supabase & Cloudinary 
 
-# Core Features  
-[List and describe the main features of your product. For each feature, include:
-- What it does
-- Why it's important
-- How it works at a high level]
+A modern, mobile-first, flat-design, SEO-optimized web application built with the latest Next.js (app router), Supabase, TailwindCSS, Framer Motion, and Cloudinary. Designed for dynamic image organization, advanced filtering, and efficient management of various medical Articles, as well as Galleries, Albums, Cases, and Images. Modern LLM trained chatbot for answering both general medical questions and specific queries pertaining to our practice and task completion, e.g., scheduling appointments. Users may create profiles where they can then schedule appointments, see appointment history, receive invitations to exclusive events and communicate via chat with providers.
 
-# User Experience  
-[Describe the user journey and experience. Include:
-- User personas
-- Key user flows
-- UI/UX considerations]
-</context>
-<PRD>
-# Technical Architecture  
-[Outline the technical implementation details:
-- System components
-- Data models
-- APIs and integrations
-- Infrastructure requirements]
+## 🚀 Project Overview
 
-# Development Roadmap  
-[Break down the development process into phases:
-- MVP requirements
-- Future enhancements
-- Do not think about timelines whatsoever -- all that matters is scope and detailing exactly what needs to be build in each phase so it can later be cut up into tasks]
+### Goal
+Build a web app focused on:
 
-# Logical Dependency Chain
-[Define the logical order of development:
-- Which features need to be built first (foundation)
-- Getting as quickly as possible to something usable/visible front end that works
-- Properly pacing and scoping each feature so it is atomic but can also be built upon and improved as development approaches]
+- Speed & Scalability
+- SEO Optimization
+- Seamless Mobile Experience
+- Efficient Image Delivery via Cloudinary
+- Metadata Management in Supabase
+- A cutting-edge chatbot powered by a modern **Large Language Model (LLM)**
+- Users can:
+    - Read articles
+    - Watch videos
+    - View a gallery of images and video content
+    - Bookmark content
+    - Learn about the medical practice and provider details
+    - Create a profile by logging in with:
+        - First name
+        - Last name
+        - Email
+        - Cell phone number
+        - Password
 
-# Risks and Mitigations  
-[Identify potential risks and how they'll be addressed:
-- Technical challenges
-- Figuring out the MVP that we can build upon
-- Resource constraints]
+### Key Features
+- 📱 Mobile-First Design
+- 🎨 Flat, Modern UI
+- 📈 SEO Optimization: Includes meta tags, sitemap, and structured data.
+- 📊 Dynamic Organization: Galleries → Albums → Cases → Images
+- 🏷️ Tagging & Filtering System
+- 🖼️ Bulk Image Uploads
+- 🛡️ Admin Dashboard: Manage Galleries, Albums, Cases, and Images.
+- 🚀 Fast Load Times with Cloudinary Image CDN
+- Secure Auth System: Powered by Supabase Authentication.
+- A cutting-edge chatbot powered by a modern **Large Language Model (LLM)**
 
-# Appendix  
-[Include any additional information:
-- Research findings
-- Technical specifications]
+## Feature Requirements
+
+### Cloudinary Media System Implementation
+
+#### Overview
+The Cloudinary integration for Allure MD will use industry best practices for Next.js and Cloudinary:
+
+1. **Direct use of Cloudinary public IDs**: Use public IDs directly in components instead of custom placeholder system
+2. **Next Cloudinary components**: Leverage official `next-cloudinary` package with `CldImage` and `CldVideo` components
+3. **Optimized metadata**: Store Cloudinary metadata in database for improved asset management
+4. **Native transformations**: Use Cloudinary's transformation URLs directly for optimization
+5. **Server-side optimization**: Implement Next.js server-side image optimization
+
+#### Implementation Details
+
+##### Media Components
+```typescript
+// components/media/CldImage.tsx
+import { CldImage } from 'next-cloudinary';
+
+interface CldEnhancedImageProps {
+  publicId: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
+  sizes?: string;
+  className?: string;
+}
+
+export default function CldEnhancedImage({
+  publicId,
+  alt,
+  width = 800,
+  height = 600,
+  priority = false,
+  sizes = '100vw',
+  className = '',
+  ...props
+}: CldEnhancedImageProps) {
+  return (
+    <CldImage
+      src={publicId}
+      width={width}
+      height={height}
+      alt={alt}
+      priority={priority}
+      sizes={sizes}
+      className={className}
+      format="auto"
+      quality="auto"
+      {...props}
+    />
+  );
+}
+```
+
+##### Database Schema
+```sql
+CREATE TABLE IF NOT EXISTS "public"."media_assets" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "public_id" TEXT NOT NULL,
+  "type" TEXT NOT NULL CHECK (type IN ('image', 'video')), 
+  "title" TEXT,
+  "alt_text" TEXT,
+  "width" INTEGER,
+  "height" INTEGER,
+  "format" TEXT,
+  "tags" TEXT[],
+  "metadata" JSONB DEFAULT '{}'::jsonb,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+##### Integration with Next.js
+```typescript
+// next.config.ts
+import { withNextCloudinary } from 'next-cloudinary/plugin';
+
+const nextConfig = {
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
+  },
+  transpilePackages: ['next-cloudinary'],
+};
+
+export default withNextCloudinary(nextConfig);
+```
+
+##### Usage in Components
+```tsx
+// Example usage in a component
+import { CldImage } from 'next-cloudinary';
+
+export default function HeroSection() {
+  return (
+    <section className="hero">
+      <CldImage
+        src="allure-md/hero/homepage-hero"
+        width={1920}
+        height={1080}
+        alt="Allure MD Hero Image"
+        priority
+        sizes="100vw"
+        className="w-full h-auto"
+      />
+    </section>
+  );
+}
+```
+
+##### Server-Side Optimization
+```typescript
+// Server component example
+import { CldOgImage } from 'next-cloudinary';
+
+export default function ArticleLayout({ params }) {
+  const { slug } = params;
+  const article = await getArticle(slug);
+  
+  return (
+    <>
+      <head>
+        <title>{article.title}</title>
+        <meta property="og:image" content={
+          generateCldOgImageUrl({
+            src: article.heroImagePublicId,
+            text: {
+              text: article.title,
+              color: 'white',
+            },
+            overlays: [{
+              publicId: 'allure-md/branding/logo',
+              position: { gravity: 'south_east' },
+              effects: [{ opacity: 80 }],
+            }],
+          })
+        } />
+      </head>
+      {/* Rest of the component */}
+    </>
+  );
+}
+```
+
+### Modern LLM-Trained Chatbot
+
+#### Overview
+A cutting-edge chatbot powered by a modern **Large Language Model (LLM)** designed to:
+- Answer **general medical questions**.
+- Handle **specific queries** related to:
+  - Our practice.
+  - Task completion (e.g., scheduling appointments).
+
+#### Features
+##### User Functionality
+1. **Profile Creation**:
+   - Users can create personalized profiles to access advanced features.
+
+2. **Appointment Management**:
+   - Schedule appointments directly through the chatbot.
+   - View and manage **appointment history**.
+
+3. **Exclusive Invitations**:
+   - Receive personalized invitations to **exclusive events** hosted by our practice.
+
+4. **Provider Communication**:
+   - Chat with providers in real-time for:
+     - Medical advice.
+     - Updates on treatment plans.
+     - General queries.
+
+#### Benefits
+- **Convenience**: Users can manage their healthcare interactions seamlessly.
+- **Efficiency**: Automated scheduling and direct communication reduce wait times.
+- **Personalized Experience**: Tailored responses and event invitations enhance user engagement.
+
+This chatbot integrates modern LLM capabilities with practice-specific functionalities to provide a streamlined, user-friendly experience.
+
+
+### Articles
+- **Display Format**:
+  - Articles are displayed in a **scrollable list format**.
+  - Each article includes:
+    - An image or short video at the top.
+    - An engaging title.
+    - A four-line brief snippet of the article.
+
+- **Design and Layout**:
+  - Article cards must match the layouts shown in:
+    - `public/screenshots/header.png`
+    - `public/screenshots/fonts.png`
+    - `public/screenshots/home.png`
+  - Fonts for titles and snippets should align with `public/screenshots/fonts.png` in terms of:
+    - Font family
+    - Font weight
+    - Font size
+  - A **consistent color palette** must be implemented.
+
+- **Categorization**:
+  - Articles are grouped into four main categories:
+    - Plastic surgery
+    - Dermatology
+    - Medical spa
+    - Functional medicine
+
+- **Accessibility**:
+  - Users can listen to articles via **text-to-speech** by clicking an audio icon.
+
+#### Header
+- **Examples**:
+  - Reference `public/screenshots/header.png` for the general header design.
+  - Reference `public/screenshots/header-with-section-menu-toggled.png` for the toggled navigation menu (hamburger icon).
+- **Features**:
+  - A **search icon** is available to open a search screen for finding articles, videos, images, and content.
+  - Header design is consistent across all pages and screens.
+
+#### Responsive Design
+- **Mobile vs Desktop**:
+  - On desktop:
+    - Article images/videos are displayed on the right.
+    - Titles and snippets are displayed on the left (split 50/50 layout).
+  - On mobile:
+    - Articles are presented in a vertically stacked layout.
+
+### Gallery
+- The gallery page integrates a beautiful, organized, mobile first, fast, gallery structure.
+- Galleries are collections categorized by themes such as:
+  - Plastic Surgery
+  - Emsculpt
+  - Injections
+  - SylfirmX
+  - Facials
+- Dynamic routes include:
+  - `/gallery/[id]/`: Displays a specific gallery collection.
+  - `/album/[id]/`: Displays albums within a gallery collection.
+  - `/case/[id]/`: Displays specific cases within an album.
+- Admin features:
+  - Dashboard for managing galleries, albums, and cases.
+  - Upload page to add new images and content.
+  - Settings page for configuration options.
+  - CRUD APIs for galleries, albums, cases, and images.
+
+### Admin Features
+#### Login Screen
+- Form includes:
+  - Username field
+  - Password field
+- Buttons:
+  - Submit button
+  - "Forgot password" link
+- Displays an error message if credentials are incorrect.
+- **Successful login** redirects to the admin dashboard.
+
+#### Dashboard
+- **Tabs**:
+  - Articles
+  - Analytics
+  - Media Library
+  - Gallery
+  - Marketing
+  - User Data
+
+- **Articles Tab**:
+  - Displays a **grid of articles** with sorting and filtering options by:
+    - Category
+    - Tags
+    - Keywords
+  - Includes a **chat interface** for an AI content writer (reference `public/screenshots/chat-interface.png`) that allows:
+    - Entering article ideas.
+    - Finding relevant images or video clips.
+    - Creating internal and external content links.
+    - Receiving and refining article outlines.
+    - Saving drafts and publishing final articles.
+
+- **Analytics Tab**:
+  - Displays detailed analytics data for the web application.
+
+- **Media Library Tab**:
+  - Provides a **grid view** of all images and videos.
+  - Offers advanced search and filtering options.
+  - UI is inspired by **Adobe Lightroom**.
+
+- **Gallery Tab**:
+  - Displays a **grid of collections** (e.g., plastic surgery, dermatology).
+  - Each collection contains albums for individual procedure types (e.g., face, neck, ears, nose, eyelids, breast augmentation, breast lift, abdominoplasty, liposuction, etc.).
+  - Each album contains **cases**, which include:
+    - Cropped, side-by-side before-and-after images (typically 5 per case).
+  - Allows admins to:
+    - Edit, upload, delete, and manage images/videos.
+    - Create and organize collections and albums.
+
+- **Marketing Tab**:
+  - Features tabs for managing:
+    - Email campaigns
+    - SMS campaigns
+    - Social media campaigns
+  - **Email Campaigns**:
+    - View previous campaigns with relevant data.
+    - Create, manage, and schedule new campaigns.
+  - **SMS Campaigns**:
+    - View previous SMS campaigns with relevant data.
+    - Create, manage, and schedule new campaigns.
+  - **Social Media Campaigns**:
+    - Login interface for Instagram to manage content.
+    - Tools include:
+      - Content editor for creating/managing posts.
+      - Content calendar for scheduling.
+      - Insights tab for performance analytics.
+  - AI chat integration:
+    - Assists with content creation.
+    - Provides scheduling suggestions based on analytics.
+
+- **User Data Tab**:
+  - Displays a grid of all users.
+  - Allows admins to:
+    - Edit, create, delete, categorize, tag, and publish user profiles.
+
+### Standard User Features
+#### Login Screen
+- Form includes:
+  - Username field
+  - Password field
+- Buttons:
+  - Submit button
+  - "Forgot password" link
+- Displays an error message if credentials are incorrect.
+
+#### Standard User Features
+- **Login Screen**:
+  - Form fields for username and password.
+  - Submit button.
+  - Error message displayed for incorrect credentials.
+  - "Forgot password" link as a button.
+- View and manage:
+  - Bookmarked articles, videos, images, and content.
+  - Profile page.
+  - Appointment history.
+- Book appointments.
+
+### Public Access
+- Public users can access:
+  - Homepage articles.
+  - Limited gallery videos/images.
+  - Contact, About, Services, Providers, and Medical Practice pages.
+  - Login, Signup, and Forgot Password pages.
+- Other features/pages are restricted to logged-in users.
+
+## Theming
+- **Theme**: Modern, flat, and minimalistic.
+- **Color Palette**: 
+  - Shadcn/ui gray palette (see documentation at [shadcn/ui colors](https://ui.shadcn.com/colors)).
+  - Refer to `public/screenshots/colors.png` for examples.
+- **Typography**: Modern, flat, and minimalistic.
+
+## 🛠️ Tech Stack
+
+### Frontend:
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: TailwindCSS + Radix UI Components
+- **Animations**: Framer Motion
+- **SEO**: Next.js Metadata API
+- **Image Optimization**: Cloudinary Image Delivery via CDN
+- **State Management**: React Query for data fetching and caching
+- **Performance Monitoring**: Lighthouse CI integration
+
+### Backend / Database:
+- **CMS & Database**: Supabase
+- **Authentication**: Supabase Auth
+- **Caching Layer**: Redis for query caching
+- **Chatbot Integration**: OpenAI-powered LLM chatbot for real-time communication and task automation.
+- **AI Features**:
+  - **AI-Based Image Tagging**: Automatically categorize and tag images in the media library for efficient management and search.
+  - **AI Treatment Recommendations**: Generate personalized treatment plans for users based on profile data and medical history.
+  - **AI Image Transformation**: Allow users to:
+    - Upload a photo.
+    - Use interactive controls to simulate potential outcomes of procedures offered by the practice.
+
+### Deployment:
+- **Platform**: Vercel
+- **CDN**: Cloudinary for image delivery
+- **Edge Functions**: Vercel Edge for optimized API routes
+- **Analytics**: Vercel Analytics + Custom tracking
+
+### Integration Support:
+- **APIs**: RESTful APIs with Next.js API Routes
+- **Custom Hooks**: Reusable hooks for data fetching
+- **LLM Chatbot**: Integrated OpenAI API for handling user queries, profile management, appointment scheduling, and event invitations.
+- **AI Services**: Cloud-based APIs for image tagging, treatment recommendations, and photo transformations.
+
+## 🏗️ Technical Architecture
+
+### System Components
+
+```mermaid
+graph TD
+    A[Client Browser] --> B[Next.js Frontend]
+    B --> C[API Routes]
+    C --> D[Supabase Database]
+    C --> E[Cloudinary CDN]
+    C --> F[Zenoti API]
+    C --> G[OpenAI API]
+    B --> H[Vercel Edge]
+    D --> I[Row Level Security]
+    E --> J[Media Management]
+    G --> K[Chatbot Service]
+    C --> L[Redis Cache]
+```
+
+### Data Models
+
+The application uses a comprehensive data model structure:
+
+#### Core Entities
+1. **Team Members** - Healthcare providers and staff
+2. **Articles** - Medical content with categories and tags
+3. **Galleries/Albums/Cases/Images** - Visual content organization
+4. **Profiles** - User accounts
+5. **Appointments** - Scheduling system
+6. **Chat Messages** - Conversational interface
+7. **Media Assets** - Cloudinary media assets with metadata
+
+#### Database Relationships
+```mermaid
+erDiagram
+    PROFILES ||--o{ BOOKMARKS : has
+    PROFILES ||--o{ APPOINTMENTS : books
+    PROFILES ||--o{ CHAT_MESSAGES : sends
+    ARTICLES ||--o{ ARTICLE_CATEGORIES : belongs_to
+    GALLERIES ||--o{ ALBUMS : contains
+    ALBUMS ||--o{ CASES : contains
+    CASES ||--o{ IMAGES : contains
+    MEDIA_ASSETS ||--o{ ARTICLE_IMAGES : used_in
+    MEDIA_ASSETS ||--o{ CASE_IMAGES : used_in
+```
+
+### APIs and Integrations
+
+1. **Cloudinary API**
+   - Media upload and transformation
+   - Image optimization with WebP/AVIF format support
+   - Video delivery with adaptive streaming
+   - Automated tagging
+
+2. **Supabase**
+   - Authentication
+   - Real-time database
+   - Row-level security
+   - File storage
+
+3. **Zenoti API**
+   - Appointment scheduling
+   - Provider availability
+   - Service management
+   - Customer records
+
+4. **OpenAI API**
+   - Chatbot functionality
+   - Content generation
+   - Medical Q&A
+   - Appointment assistance
+
+## 📊 Performance Optimization Strategy
+
+### Image Optimization
+- Use WebP format with AVIF fallback for modern browsers
+- Implement responsive images with srcset
+- Lazy loading for below-the-fold images
+- Priority loading for above-the-fold images
+- Image dimensions specified to prevent layout shifts
+
+### Caching Strategy
+- Browser caching with proper cache headers
+- Edge caching via Vercel Edge Network
+- Redis caching for frequent database queries
+- Incremental Static Regeneration (ISR) for articles:
+  ```typescript
+  export const revalidate = 3600; // Revalidate every hour
+  ```
+
+### State Management
+```typescript
+// Example with React Query
+const { data: articles } = useQuery({
+  queryKey: ['articles', category],
+  queryFn: () => fetchArticles(category),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+  cacheTime: 30 * 60 * 1000, // 30 minutes
+});
+```
+
+### Edge Computing
+- Use edge functions for API routes requiring low latency
+- Geographically distributed content delivery
+- Serverless functions for scalability
+
+## 🔍 SEO Enhancement Strategy
+
+### Technical SEO
+1. **Dynamic sitemap generation**
+   ```typescript
+   // app/sitemap.ts
+   export default async function sitemap() {
+     const articles = await getArticles();
+     return [
+       { url: 'https://alluremd.com', lastModified: new Date() },
+       ...articles.map(article => ({
+         url: `https://alluremd.com/articles/${article.slug}`,
+         lastModified: article.updated_at,
+       })),
+     ];
+   }
+   ```
+
+2. **Structured data implementation**
+   ```typescript
+   // Article structured data example
+   const articleSchema = {
+     "@context": "https://schema.org",
+     "@type": "Article",
+     "headline": article.title,
+     "datePublished": article.published_at,
+     "author": {
+       "@type": "Person",
+       "name": article.author.name
+     }
+   };
+   ```
+
+3. **Meta tags and OpenGraph**
+   ```typescript
+   export const metadata = {
+     title: 'Allure MD - Advanced Medical Treatments',
+     description: 'Leading provider of plastic surgery, dermatology...',
+     openGraph: {
+       title: 'Allure MD',
+       description: 'Advanced medical treatments and care',
+       images: ['/og-image.jpg'],
+     },
+     twitter: {
+       card: 'summary_large_image',
+       title: 'Allure MD',
+       description: 'Advanced medical treatments and care',
+     },
+   };
+   ```
+
+4. **Canonical URLs to prevent duplicate content**
+   ```typescript
+   <link rel="canonical" href={`https://alluremd.com${path}`} />
+   ```
+
+## 🛡️ Cloudinary Media System
+
+### CldImage Component Usage
+
+```tsx
+// Example component with optimized Cloudinary image
+import { CldImage } from 'next-cloudinary';
+
+export default function ArticleCard({ article }) {
+  return (
+    <div className="article-card">
+      <div className="article-image">
+        <CldImage
+          src={article.imagePublicId}
+          width={600}
+          height={400}
+          alt={article.title}
+          crop="fill"
+          gravity="auto"
+          loading="lazy"
+          className="rounded-lg"
+        />
+      </div>
+      <div className="article-content">
+        <h2>{article.title}</h2>
+        <p>{article.excerpt}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+### CldVideo Component Usage
+
+```tsx
+// Example component with optimized Cloudinary video
+import { CldVideoPlayer } from 'next-cloudinary';
+
+export default function VideoFeature({ videoPublicId, posterPublicId }) {
+  return (
+    <div className="video-feature">
+      <CldVideoPlayer
+        src={videoPublicId}
+        width={800}
+        height={450}
+        poster={posterPublicId}
+        controls
+        autoPlay="on-scroll"
+        muted
+        loop
+      />
+    </div>
+  );
+}
+```
+
+### Responsive Images Implementation
+
+```tsx
+// Responsive image component with multiple breakpoints
+import { CldImage } from 'next-cloudinary';
+
+export default function ResponsiveHero({ publicId }) {
+  return (
+    <CldImage
+      src={publicId}
+      width={1920}
+      height={1080}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      alt="Hero Image"
+      priority
+      placeholder="blur"
+      className="w-full h-auto"
+    />
+  );
+}
+```
+
+## 📂 Project Structure
+
+```plaintext
+allure-md/
+├── app/
+│   ├── (authenticated)/         # Authenticated route group
+│   │   ├── admin/
+│   │   │   ├── dashboard/
+│   │   │   ├── articles/
+│   │   │   ├── media/
+│   │   │   ├── gallery/
+│   │   │   └── users/
+│   │   └── profile/
+│   │       ├── appointments/
+│   │       ├── bookmarks/
+│   │       └── settings/
+│   ├── (public)/                # Public route group
+│   │   ├── articles/
+│   │   ├── gallery/
+│   │   ├── services/
+│   │   └── about/
+│   ├── api/
+│   │   ├── auth/
+│   │   ├── cloudinary/
+│   │   ├── articles/
+│   │   └── appointments/
+│   ├── error.tsx
+│   ├── global-error.tsx
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── admin/
+│   ├── media/
+│   │   ├── CldImage.tsx
+│   │   ├── CldVideo.tsx
+│   │   └── CldUpload.tsx
+│   ├── ui/
+│   └── layout/
+├── lib/
+│   ├── cloudinary/
+│   │   ├── config.ts
+│   │   ├── client.ts
+│   │   └── server.ts
+│   ├── supabase/
+│   ├── zenoti/
+│   └── openai/
+├── public/
+│   ├── images/
+│   ├── videos/
+│   └── screenshots/
+├── styles/
+│   └── globals.css
+├── types/
+│   └── index.ts
+├── hooks/
+│   ├── useCloudinary.ts
+│   ├── useArticles.ts
+│   └── useAuth.ts
+├── next.config.ts
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+## 🗂️ Database Schema
+
+### 1. Media Assets
+```sql
+CREATE TABLE IF NOT EXISTS "public"."media_assets" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "public_id" TEXT NOT NULL,
+  "type" TEXT NOT NULL CHECK (type IN ('image', 'video')),
+  "title" TEXT,
+  "alt_text" TEXT,
+  "width" INTEGER,
+  "height" INTEGER,
+  "format" TEXT,
+  "tags" TEXT[],
+  "metadata" JSONB DEFAULT '{}'::jsonb,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT "media_assets_public_id_key" UNIQUE ("public_id")
+);
+```
+
+### 2. Gallery
+```sql
+CREATE TABLE IF NOT EXISTS "public"."galleries" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "title" TEXT NOT NULL,
+  "slug" TEXT NOT NULL UNIQUE,
+  "description" TEXT,
+  "thumbnail_id" UUID REFERENCES media_assets(id),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### 3. Album
+```sql
+CREATE TABLE IF NOT EXISTS "public"."albums" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "gallery_id" UUID NOT NULL REFERENCES galleries(id) ON DELETE CASCADE,
+  "title" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "description" TEXT,
+  "thumbnail_id" UUID REFERENCES media_assets(id),
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE ("gallery_id", "slug")
+);
+```
+
+### 4. Case
+```sql
+CREATE TABLE IF NOT EXISTS "public"."cases" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "album_id" UUID NOT NULL REFERENCES albums(id) ON DELETE CASCADE,
+  "title" TEXT NOT NULL,
+  "slug" TEXT NOT NULL,
+  "description" TEXT,
+  "metadata" JSONB DEFAULT '{}'::jsonb,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE ("album_id", "slug")
+);
+```
+
+### 5. Case Images
+```sql
+CREATE TABLE IF NOT EXISTS "public"."case_images" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "case_id" UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  "media_id" UUID NOT NULL REFERENCES media_assets(id) ON DELETE CASCADE,
+  "sequence" INTEGER NOT NULL,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE ("case_id", "sequence")
+);
+```
+
+## 🔑 Authentication
+
+Authentication is handled via Supabase Auth, providing:
+
+- Email/password authentication
+- Social login options (Google, Apple)
+- Magic link authentication
+- Two-factor authentication
+- Role-based access control
+- JWT token handling
+- Session management
+
+## 🖥️ Cloudinary Organization
+
+### Folder Structure
+
+```plaintext
+allure-md/
+├── hero/
+│   ├── home
+│   ├── services
+│   └── about
+├── articles/
+│   ├── plastic-surgery
+│   ├── dermatology
+│   ├── medical-spa
+│   └── functional-medicine
+├── gallery/
+│   ├── plastic-surgery/
+│   │   ├── face/
+│   │   │   ├── case-1/
+│   │   │   │   ├── image-1
+│   │   │   │   ├── image-2
+│   │   │   │   └── ...
+│   │   │   └── ...
+│   │   ├── breast/
+│   │   └── body/
+│   ├── dermatology/
+│   ├── medical-spa/
+│   └── ...
+├── team/
+│   ├── headshots
+│   └── group-photos
+└── branding/
+    ├── logo
+    ├── favicon
+    └── icons
+```
+
+### Implementation with Next Cloudinary
+
+The implementation uses the Next Cloudinary package, which provides:
+
+1. **CldImage Component**: Optimized image rendering with automatic format selection
+2. **CldVideoPlayer**: Advanced video player with adaptive streaming
+3. **CldUploadWidget**: Client-side upload capabilities
+4. **CldOgImage**: Dynamic Open Graph image generation
+
+## 📅 Development Roadmap
+
+### Phase 1: Foundation (MVP)
+- Basic Next.js application structure
+- Supabase integration and authentication
+- Homepage with hero section
+- Basic article display
+- Provider pages
+- Contact form
+
+### Phase 2: Content Management
+- Article CMS implementation
+- Media upload functionality with Cloudinary's CldUploadWidget
+- Basic gallery structure
+- SEO optimization foundation
+- Search functionality
+
+### Phase 3: Media System
+- Cloudinary integration with WebP/AVIF support
+- CldImage and CldVideo components implementation
+- Responsive image optimization
+- Video player implementation with adaptive streaming
+- Gallery navigation
+
+### Phase 4: User Features
+- User registration and profiles
+- Appointment booking system
+- Personal dashboards
+- Bookmark functionality
+- Appointment history
+
+### Phase 5: Admin Dashboard
+- Content management interface
+- Analytics integration
+- Media library management
+- Marketing tools
+- User management
+
+### Phase 6: Advanced Features
+- LLM-powered chatbot
+- AI content generation
+- Email/SMS campaigns
+- Social media integration
+- Advanced analytics
+
+### Phase 7: Performance Optimization
+- Implement caching strategies
+- Edge function deployment
+- Performance monitoring
+- ISR for dynamic content
+- Service worker implementation
+
+## 🔄 Logical Dependency Chain
+
+```mermaid
+graph TD
+    A[1. Initial Setup] --> B[2. Database Schema]
+    B --> C[3. Authentication]
+    C --> D[4. Core Pages]
+    D --> E[5. Content Display]
+    E --> F[6. Media System]
+    F --> G[7. User Features]
+    G --> H[8. Admin Dashboard]
+    H --> I[9. API Integrations]
+    I --> J[10. AI Features]
+    J --> K[11. Performance Optimization]
+```
+
+1. **Initial Setup**: Next.js, Tailwind, basic configuration
+2. **Database Schema**: Supabase tables and relationships
+3. **Authentication**: User registration and login
+4. **Core Pages**: Homepage, About, Services
+5. **Content Display**: Articles, Gallery pages
+6. **Media System**: Cloudinary integration with CldImage and CldVideo
+7. **User Features**: Profiles, Bookmarks
+8. **Admin Dashboard**: CMS interface
+9. **API Integrations**: Zenoti, external services
+10. **AI Features**: Chatbot, content generation
+11. **Performance Optimization**: Caching, edge functions
+
+## Project Cleanup and Migration Plan
+
+To implement the architecture described in this PRD, we'll need to clean up the existing codebase. This section outlines the steps to transition from the current implementation to the target architecture.
+
+### 1. Media System Consolidation
+
+#### 1.1 Remove Deprecated Components
+```bash
+# Remove deprecated media components
+rm components/media/OptimizedImage.tsx
+rm components/media/OptimizedVideo.tsx
+rm components/media/ServerImage.tsx
+rm components/CloudinaryImage.tsx
+rm components/CloudinaryVideo.tsx
+```
+
+Keep only the unified components:
+```
+components/media/CldImage.tsx
+components/media/CldVideo.tsx
+components/media/MediaRenderer.tsx
+```
+
+#### 1.2 Migrate to Single Media Service
+Remove static registry:
+```bash
+rm lib/image-config.js
+rm lib/media/registry.ts
+```
+
+Update the media service to use database instead of static registry:
+
+```typescript
+// lib/services/media-service.ts
+import { cache } from 'react';
+import { createClient } from '@/lib/supabase';
+import { MediaAsset } from '@/types';
+
+export class MediaService {
+  // Fetch media by public ID
+  getMediaByPublicId = cache(async (publicId: string): Promise<MediaAsset | null> => {
+    const supabase = createClient();
+    
+    const { data, error } = await supabase
+      .from('media_assets')
+      .select('*')
+      .eq('public_id', publicId)
+      .single();
+      
+    if (error || !data) {
+      console.error(`Error fetching media asset with public ID ${publicId}:`, error);
+      return null;
+    }
+    
+    return data as MediaAsset;
+  });
+  
+  // More methods...
+}
+
+export const mediaService = new MediaService();
+export default mediaService;
+```
+
+#### 1.3 Update Component Usage
+Search and replace all instances of deprecated components with new ones:
+
+```bash
+# Example search and replace
+find . -type f -name "*.tsx" -exec sed -i 's/OptimizedImage/CldImage/g' {} +
+find . -type f -name "*.tsx" -exec sed -i 's/OptimizedVideo/CldVideo/g' {} +
+find . -type f -name "*.tsx" -exec sed -i 's/CloudinaryImage/CldImage/g' {} +
+```
+
+### 2. Database Migration
+
+#### 2.1 Create Migration Script
+Create a script to migrate from static registry to database:
+
+```typescript
+// scripts/migrate-to-cloudinary-direct.ts
+import { createClient } from '@/lib/supabase';
+import { IMAGE_ASSETS } from '../lib/image-config';
+
+async function migrateMediaAssets() {
+  const supabase = createClient();
+  
+  // Migrate assets from static registry to database
+  for (const [id, asset] of Object.entries(IMAGE_ASSETS)) {
+    // Check if asset already exists
+    const { data: existing } = await supabase
+      .from('media_assets')
+      .select('id')
+      .eq('public_id', asset.publicId)
+      .single();
+    
+    if (!existing) {
+      // Insert new asset
+      const { error: assetError } = await supabase
+        .from('media_assets')
+        .insert({
+          public_id: asset.publicId,
+          type: asset.type || 'image',
+          title: asset.description,
+          alt_text: asset.description,
+          width: asset.dimensions?.width,
+          height: asset.dimensions?.height,
+          metadata: {
+            legacy_id: id,
+            area: asset.area,
+            defaultOptions: asset.defaultOptions
+          }
+        });
+      
+      if (assetError) {
+        console.error(`Error inserting asset ${id}:`, assetError);
+      }
+    }
+  }
+  
+  console.log('Media assets migration completed');
+}
+
+migrateMediaAssets().catch(console.error);
+```
+
+Run the migration:
+```bash
+npm run ts-node scripts/migrate-to-cloudinary-direct.ts
+```
+
+### 3. Implement React Query
+
+#### 3.1 Install Dependencies
+```bash
+npm install @tanstack/react-query
+```
+
+#### 3.2 Create Query Provider
+```typescript
+// providers/query-provider.tsx
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactNode, useState } from 'react';
+
+export function QueryProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        cacheTime: 30 * 60 * 1000, // 30 minutes
+      },
+    },
+  }));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
+```
+
+#### 3.3 Update Root Layout
+```typescript
+// app/layout.tsx
+import { QueryProvider } from '@/providers/query-provider';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <QueryProvider>
+          {children}
+        </QueryProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### 4. Reorganize Project Structure
+
+#### 4.1 Update Directory Structure
+```bash
+# Create authenticated and public route groups
+mkdir -p app/\(authenticated\)/admin
+mkdir -p app/\(public\)
+
+# Move admin routes
+mv app/admin/* app/\(authenticated\)/admin/
+
+# Move public routes
+mv app/articles app/\(public\)/
+mv app/gallery app/\(public\)/
+mv app/services app/\(public\)/
+mv app/about app/\(public\)/
+```
+
+#### 4.2 Organize Library Files
+```bash
+# Create organized structure for lib
+mkdir -p lib/cloudinary
+mkdir -p lib/services
+mkdir -p lib/hooks
+mkdir -p lib/utils
+
+# Move files to appropriate locations
+mv lib/cloudinary.ts lib/cloudinary/index.ts
+mv lib/cloudinary-server.ts lib/cloudinary/server.ts
+mv lib/cloudinary-admin.ts lib/cloudinary/admin.ts
+```
+
+### 5. Implement Caching
+
+#### 5.1 Set up Redis
+Add Redis environment variables:
+```
+REDIS_URL=redis://localhost:6379
+```
+
+#### 5.2 Create Redis Client
+```typescript
+// lib/redis.ts
+import { Redis } from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL!);
+
+export async function getCachedData<T>(key: string): Promise<T | null> {
+  const data = await redis.get(key);
+  return data ? JSON.parse(data) : null;
+}
+
+export async function setCachedData(key: string, data: any, ttl: number = 3600): Promise<void> {
+  await redis.set(key, JSON.stringify(data), 'EX', ttl);
+}
+
+export default redis;
+```
+
+#### 5.3 Implement Incremental Static Regeneration (ISR)
+Add revalidation to dynamic routes:
+```typescript
+// app/(public)/articles/[slug]/page.tsx
+export const revalidate = 3600; // Revalidate every hour
+```
+
+### 6. Fix TypeScript Issues
+
+#### 6.1 Create Type Definitions
+```typescript
+// types/index.ts
+export interface MediaAsset {
+  id: string;
+  public_id: string;
+  type: 'image' | 'video';
+  title?: string;
+  alt_text?: string;
+  metadata?: Record<string, unknown>;
+  width?: number;
+  height?: number;
+  format?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  imagePublicId: string;
+  published_at: string;
+  updated_at: string;
+  author: {
+    name: string;
+  };
+  categories: string[];
+}
+
+// Add more interfaces as needed
+```
+
+#### 6.2 Remove 'any' Types
+Search for and replace all `any` types with proper types:
+```bash
+grep -r ": any" --include="*.ts" --include="*.tsx" .
+```
+
+### 7. SEO Improvements
+
+#### 7.1 Create Dynamic Sitemap
+```typescript
+// app/sitemap.ts
+import { MetadataRoute } from 'next';
+import { getAllArticles } from '@/lib/services/article-service';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const articles = await getAllArticles();
+  
+  return [
+    {
+      url: 'https://alluremd.com',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1,
+    },
+    ...articles.map(article => ({
+      url: `https://alluremd.com/articles/${article.slug}`,
+      lastModified: new Date(article.updated_at),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    })),
+  ];
+}
+```
+
+#### 7.2 Add Structured Data Components
+```typescript
+// components/seo/ArticleSchema.tsx
+'use client';
+
+interface ArticleSchemaProps {
+  article: {
+    title: string;
+    published_at: string;
+    updated_at: string;
+    author: {
+      name: string;
+    };
+  };
+}
+
+export function ArticleSchema({ article }: ArticleSchemaProps) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "datePublished": article.published_at,
+    "dateModified": article.updated_at,
+    "author": {
+      "@type": "Person",
+      "name": article.author.name
+    },
+  };
+  
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+```
+
+### 8. Remove Temporary Files
+
+#### 8.1 Clean Up Migration Artifacts
+```bash
+rm -rf temp-migration/
+rm cloudinary-migration-map.json
+rm cloudinary-replacement-map.json
+rm media-assets-report.json
+rm media-audit-analysis.json
+rm media-audit-results.json
+rm media-verification-report.json
+rm migration-summary.md
+rm unmigrated-components-report.json
+```
+
+#### 8.2 Consolidate Documentation
+```bash
+# Remove duplicate documentation
+rm media-placement-system.md
+
+# Update main documentation
+# Update MEDIA-SYSTEM.md to reflect the unified approach
+```
+
+### 9. Final Verification Checklist
+
+- [ ] Remove all deprecated media components
+- [ ] Migrate to single media service
+- [ ] Update all component usage
+- [ ] Remove migration artifacts
+- [ ] Clean up configuration files
+- [ ] Run database migration
+- [ ] Implement React Query
+- [ ] Set up caching
+- [ ] Reorganize project structure
+- [ ] Fix TypeScript issues
+- [ ] Implement performance optimizations
+- [ ] Add SEO improvements
+- [ ] Run final verification tests
+- [ ] Update documentation
+
+## 🚀 Deployment
+
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Add environment variables in Vercel Dashboard:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+   CLOUDINARY_API_KEY=your-api-key
+   CLOUDINARY_API_SECRET=your-api-secret
+   REDIS_URL=your-redis-url
+   ```
+4. Configure edge functions
+5. Set up Redis caching
+6. Enable Analytics
+7. Deploy
+
+## 📝 Future Enhancements
+
+- Advanced Search Functionality with Algolia
+- AI-based Image Tagging
+- Role-Based Access Control
+- Multi-language Support
+- Progressive Web App (PWA) capabilities
+- WebSocket for real-time chat
+- Content versioning system
+- A/B testing framework
+
+## 🔍 Architecture Diagrams
+
+### System Architecture
+```mermaid
+graph TB
+    subgraph Client["Client Layer"]
+        B1[Web Browser]
+        B2[Mobile Browser]
+    end
+    
+    subgraph Frontend["Frontend Layer"]
+        F1[Next.js App Router]
+        F2[React Components]
+        F3[TailwindCSS]
+        F4[Framer Motion]
+        F5[React Query]
+    end
+    
+    subgraph API["API Layer"]
+        A1[API Routes]
+        A2[Server Actions]
+        A3[Middleware]
+        A4[Edge Functions]
+    end
+    
+    subgraph Services["Services Layer"]
+        S1[Cloudinary Media Service]
+        S2[Auth Service]
+        S3[Appointment Service]
+        S4[Chat Service]
+        S5[Content Service]
+    end
+    
+    subgraph External["External Services"]
+        E1[Cloudinary]
+        E2[Supabase]
+        E3[Zenoti]
+        E4[OpenAI]
+        E5[Redis]
+    end
+    
+    Client --> Frontend
+    Frontend --> API
+    API --> Services
+    Services --> External
+```
+
+### Media System Flow
+```mermaid
+sequenceDiagram
+    participant C as Component
+    participant MS as CldImage/CldVideo
+    participant CDN as Cloudinary CDN
+    participant Cache as Browser Cache
+    
+    C->>MS: Render with publicId
+    MS->>CDN: Request optimized asset
+    CDN-->>MS: Return optimized asset
+    MS->>Cache: Store in browser cache
+    MS-->>C: Display optimized asset
+```
+
+## 📚 Appendix
+
+### Research Findings
+- Medical practice websites typically see 70% mobile traffic
+- Image optimization can improve load times by 40-60%
+- Chatbot integration increases user engagement by 30%
+- WebP format reduces image size by 25-35% compared to JPEG
+
+### Technical Specifications
+- Next.js 14+ with App Router
+- Supabase PostgreSQL database
+- Cloudinary for media management with next-cloudinary package
+- Vercel for deployment
+- Tailwind CSS for styling
+- OpenAI GPT-4 for chatbot
+- Redis for caching
+- React Query for state management
+
+### Current Implementation Status
+The project has implemented:
+- Basic authentication
+- Article management
+- Gallery structure
+- Task management system
+- Initial Cloudinary integration
+
+### Performance Targets
+- First Contentful Paint (FCP): < 1.8s
+- Largest Contentful Paint (LCP): < 2.5s
+- Cumulative Layout Shift (CLS): < 0.1
+- First Input Delay (FID): < 100ms
+- Time to Interactive (TTI): < 3.8s
+
+### Monitoring and Analytics
+- Vercel Analytics for performance monitoring
+- Custom event tracking for user interactions
+- Error tracking with Sentry
+- Real User Monitoring (RUM)
+- Google Analytics 4 integration
 </PRD>
