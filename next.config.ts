@@ -1,6 +1,5 @@
 import type { NextConfig } from 'next'
 import bundleAnalyzer from '@next/bundle-analyzer'
-import { withNextCloudinary } from 'next-cloudinary/plugin'
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -112,5 +111,17 @@ const config: NextConfig = {
   transpilePackages: ['next-cloudinary'],
 };
 
-// Apply bundle analyzer wrapper and next-cloudinary plugin
-export default withNextCloudinary(withBundleAnalyzer(config))
+let finalConfig = withBundleAnalyzer(config);
+
+// Conditionally apply next-cloudinary plugin if it's available
+try {
+  // Try to dynamically require the next-cloudinary plugin
+  const { withNextCloudinary } = require('next-cloudinary/plugin');
+  finalConfig = withNextCloudinary(finalConfig);
+  console.log('Next-cloudinary plugin applied successfully');
+} catch (error) {
+  console.warn('Could not apply next-cloudinary plugin:', error instanceof Error ? error.message : String(error));
+  console.warn('Continuing with standard Next.js configuration');
+}
+
+export default finalConfig;
