@@ -11,7 +11,7 @@ This file documents the tasks required to complete the Allure MD web application
 | 2 | Database Schema Implementation | Done | High | 1 |
 | 3 | Cloudinary Media System Integration | In Progress (80%) | High | 1 |
 | 4 | Article System Implementation | Pending | Medium | 2, 3 |
-| 5 | Authentication & User Management | Pending | High | 2 |
+| 5 | Authentication & User Management | Ready to Start | High | 2 |
 | 6 | Gallery System Implementation | Pending | Medium | 2, 3 |
 | 7 | Admin Dashboard Development | Pending | Medium | 2, 3, 4, 5, 6 |
 | 8 | Frontend UI Implementation | Pending | Medium | 3, 4, 5, 6 |
@@ -60,33 +60,37 @@ This file documents the tasks required to complete the Allure MD web application
   - Implemented media service for database interaction
   - Updated Next.js configuration for Cloudinary
   - Developed migration script from placeholder system
-  - Created test scripts to verify implementation
-  - Added comprehensive documentation
 - **Next Steps**:
-  - Execute the migration script to convert data
-  - Create a phased plan for component migration
-  - Update application code to use new components
+  - Execute the migration script to convert placeholder IDs to direct public IDs
+  - Create a phased approach for updating application code
+  - Update component references throughout the application
 
 ### Task 4: Article System Implementation
 - **Description**: Develop the article management system with categories and filtering
 - **Status**: Pending
 - **Priority**: Medium
 - **Dependencies**: 2, 3
-- **Blocked By**: Task 3
+- **Blocked By**: Task 3 (awaiting completion of Cloudinary Media System)
 
 ### Task 5: Authentication & User Management
 - **Description**: Implement user authentication, profiles, and related functionality
-- **Status**: Pending
+- **Status**: Ready to Start
 - **Priority**: High
 - **Dependencies**: 2
 - **Blocked By**: None (can now proceed as Task 2 is complete)
+- **Planned Activities**:
+  - Set up Supabase Auth with email/password authentication
+  - Create user profile table with additional fields
+  - Implement login and signup forms with validation
+  - Set up role-based access control
+  - Create protected routes using Next.js middleware
 
 ### Task 6: Gallery System Implementation
 - **Description**: Develop the gallery system with hierarchical organization
 - **Status**: Pending
 - **Priority**: Medium
 - **Dependencies**: 2, 3
-- **Blocked By**: Task 3
+- **Blocked By**: Task 3 (awaiting completion of Cloudinary Media System)
 
 ### Task 7: Admin Dashboard Development
 - **Description**: Build the comprehensive admin dashboard with content management
@@ -125,9 +129,16 @@ This file documents the tasks required to complete the Allure MD web application
 4. ✅ Update Next.js configuration for Cloudinary (COMPLETE)
 5. ✅ Create media service to interact with database (COMPLETE)
 6. ✅ Develop migration script from placeholder system (COMPLETE)
-7. Execute the migration script to convert data
-8. Create migration plan for application code
-9. Update component references throughout the application
+7. Execute the migration script to convert data (IN PROGRESS)
+8. Create phased migration plan for application code (PENDING)
+9. Update component references throughout the application (PENDING)
+
+### Task 5: Authentication & User Management (READY TO START)
+1. Set up Supabase Auth with email/password authentication
+2. Create user profile table with additional fields
+3. Implement login and signup forms with validation
+4. Set up role-based access control
+5. Create protected routes using Next.js middleware
 
 ## Next Steps Plan
 
@@ -136,9 +147,10 @@ This file documents the tasks required to complete the Allure MD web application
    - Create a phased approach for updating application code
    - Begin updating key components to use the new media system
 
-2. Begin Task 5: Authentication & User Management (Unblocked)
-   - Enhance user profiles with new schema
-   - Implement bookmarking functionality
+2. Begin Task 5: Authentication & User Management
+   - Set up Supabase Auth with email/password authentication
+   - Create user profile table with required fields
+   - Implement login and signup forms
 
 3. Plan for Task 4 and Task 6 in parallel as Task 3 nears completion
    - Update article and gallery systems to use new components and schema 
