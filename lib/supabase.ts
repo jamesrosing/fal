@@ -1,5 +1,4 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { Database } from './database.types';
+import { createBrowserClient } from '@supabase/ssr'
 
 /**
  * Supabase Client
@@ -8,16 +7,37 @@ import { Database } from './database.types';
  * for interacting with the Supabase database.
  */
 
-// Get the Supabase URL and key from environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-/**
- * Create a Supabase client
- * @returns A Supabase client instance
- */
+// Create a Supabase client for client components
 export function createClient() {
-  return createSupabaseClient(supabaseUrl, supabaseKey);
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+
+// For better naming in client components
+export const createClientComponentClient = createClient
+
+// Helper function to check if a user is authenticated and has admin privileges
+export async function isUserAdmin() {
+  const supabase = createClient()
+  
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) return false
+    
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', session.user.id)
+      .single()
+    
+    return data && ['admin', 'super_admin'].includes(data.role)
+  } catch (error) {
+    console.error('Error checking admin status:', error)
+    return false
+  }
 }
 
 // Types for our database tables
@@ -108,103 +128,97 @@ export interface ArticleCategory {
 
 // Helper functions for database operations
 export async function getGalleries() {
-  const { data, error } = await createClient()
+  const supabase = createClient();
+  const { data, error } = await supabase
     .from('galleries')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('display_order', { ascending: true });
   
   if (error) throw error;
-  return data as Gallery[];
+  return data || [];
 }
 
 export async function getGalleryByTitle(title: string) {
-  const { data, error } = await createClient()
+  const supabase = createClient();
+  const { data, error } = await supabase
     .from('galleries')
     .select('*')
     .eq('title', title)
     .single();
   
   if (error) throw error;
-  return data as Gallery;
+  return data;
 }
 
 export async function getAlbumsByGallery(galleryIdOrTitle: string) {
+  const supabase = createClient();
   // First try to get albums by gallery ID
-  let { data, error } = await createClient()
+  let { data, error } = await supabase
     .from('albums')
     .select('*')
     .eq('gallery_id', galleryIdOrTitle)
-    .order('created_at', { ascending: false });
-  
-  if (error?.code === '22P02') { // Invalid UUID error
-    // If gallery ID is invalid, try to get gallery by title first
-    const gallery = await getGalleryByTitle(galleryIdOrTitle);
-    if (!gallery) throw new Error('Gallery not found');
-    
-    const result = await createClient()
-      .from('albums')
-      .select('*')
-      .eq('gallery_id', gallery.id)
-      .order('created_at', { ascending: false });
-    
-    if (result.error) throw result.error;
-    data = result.data;
-  } else if (error) {
-    throw error;
-  }
-  
-  // Sort albums by order
-  data.sort((a: any, b: any) => {
-    return a.order - b.order;
-  });
-  
-  return data as Album[];
-}
-
-export async function getCasesByAlbum(albumId: string) {
-  const { data, error } = await createClient()
-    .from('cases')
-    .select('*, images(*)')
-    .eq('album_id', albumId);
+    .order('display_order', { ascending: true });
   
   if (error) throw error;
   
-  // Sort images by display_order for each case
-  const casesWithSortedImages = data?.map(caseItem => {
-    if (caseItem.images && Array.isArray(caseItem.images)) {
-      caseItem.images.sort((a: any, b: any) => {
-        // Default to 0 if display_order doesn't exist yet
-        const orderA = a.display_order || 0;
-        const orderB = b.display_order || 0;
-        return orderA - orderB;
-      });
+  // If no albums found, try to get the gallery by title
+  if (data && data.length === 0) {
+    try {
+      const gallery = await getGalleryByTitle(galleryIdOrTitle);
+      
+      if (!gallery) throw new Error('Gallery not found');
+      
+      const result = await supabase
+        .from('albums')
+        .select('*')
+        .eq('gallery_id', gallery.id)
+        .order('display_order', { ascending: true });
+      
+      if (result.error) throw result.error;
+      data = result.data;
+    } catch (err) {
+      console.error('Error fetching albums by gallery title:', err);
+      return [];
     }
-    return caseItem;
-  }) || [];
+  }
   
-  return casesWithSortedImages as (Case & { images: Image[] })[];
+  return data || [];
+}
+
+export async function getCasesByAlbum(albumId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*, images(*)')
+    .eq('album_id', albumId)
+    .order('display_order', { ascending: true });
+  
+  if (error) throw error;
+  return data || [];
 }
 
 export async function getCase(caseId: string) {
-  const { data, error } = await createClient()
+  const supabase = createClient();
+  const { data, error } = await supabase
     .from('cases')
     .select('*, images(*)')
     .eq('id', caseId)
     .single();
   
   if (error) throw error;
+  return data;
+}
+
+export async function getCaseById(caseId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('cases')
+    .select('*, images(*)')
+    .eq('id', caseId)
+    .single();
   
-  // Sort images by display_order if it exists
-  if (data && data.images && Array.isArray(data.images)) {
-    data.images.sort((a, b) => {
-      // Default to 0 if display_order doesn't exist yet
-      const orderA = a.display_order || 0;
-      const orderB = b.display_order || 0;
-      return orderA - orderB;
-    });
-  }
-  
-  return data as Case & { images: Image[] };
+  if (error) throw error;
+  return data;
 }
 
 function compareByDate(a: any, b: any) {
@@ -213,26 +227,4 @@ function compareByDate(a: any, b: any) {
 
 function compareByRelevance(a: any, b: any) {
   // comparison function code
-}
-
-export async function getCaseById(caseId: string) {
-  const { data, error } = await createClient()
-    .from('cases')
-    .select('*, images(*)')
-    .eq('id', caseId)
-    .single();
-  
-  if (error) throw error;
-  
-  // Sort images by display_order if it exists
-  if (data && data.images && Array.isArray(data.images)) {
-    data.images.sort((a: any, b: any) => {
-      // Default to 0 if display_order doesn't exist yet
-      const orderA = a.display_order || 0;
-      const orderB = b.display_order || 0;
-      return orderA - orderB;
-    });
-  }
-  
-  return data as Case & { images: Image[] };
 } 

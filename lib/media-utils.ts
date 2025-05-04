@@ -1,35 +1,61 @@
 import { createClient } from './supabase';
 
 /**
- * Fetches a Cloudinary public ID from Supabase based on a placeholder ID
- * @param placeholderId The ID of the placeholder to fetch the media for
+ * Fetches a Cloudinary public ID from Supabase based on a placeholder ID or returns the direct ID
+ * @param idOrPlaceholderId The ID of the placeholder or a direct Cloudinary ID
  * @returns The Cloudinary public ID or null if not found
  */
-export async function getMediaPublicId(placeholderId: string): Promise<string | null> {
+export async function getMediaPublicId(idOrPlaceholderId: string): Promise<string | null> {
+  // If it looks like a Cloudinary ID (contains a slash), return it directly
+  if (idOrPlaceholderId.includes('/')) {
+    return idOrPlaceholderId;
+  }
+  
   const supabase = createClient();
   
-  // Don't use .single() to avoid the error when no rows are found
+  // First try to find in media_assets by legacy_placeholder_id in metadata
+  const { data: metadataData, error: metadataError } = await supabase
+    .from('media_assets')
+    .select('public_id')
+    .filter('metadata->legacy_placeholder_id', 'eq', idOrPlaceholderId)
+    .maybeSingle();
+    
+  if (!metadataError && metadataData) {
+    return metadataData.public_id;
+  }
+  
+  // Next, check if the ID is a direct public_id in the media_assets table
   const { data, error } = await supabase
     .from('media_assets')
-    .select('cloudinary_id')
-    .eq('placeholder_id', placeholderId)
-    .maybeSingle(); // Use maybeSingle instead of single to avoid errors
+    .select('public_id')
+    .eq('public_id', idOrPlaceholderId)
+    .maybeSingle();
   
-  if (error) {
-    console.error('Error fetching media asset:', error);
-    return null;
+  if (!error && data) {
+    return data.public_id;
+  }
+  
+  // Legacy: Try to find in media_assets_old table
+  try {
+    const { data: oldData, error: oldError } = await supabase
+      .from('media_assets_old')
+      .select('cloudinary_id')
+      .eq('placeholder_id', idOrPlaceholderId)
+      .maybeSingle();
+      
+    if (!oldError && oldData) {
+      return oldData.cloudinary_id;
+    }
+  } catch (err) {
+    console.warn('Error checking media_assets_old table:', err);
   }
   
   // If no data is found, return null
-  if (!data) {
-    console.warn(`No media asset found for placeholder ID: ${placeholderId}`);
-    
-    // For now, return a default placeholder based on the placeholder ID
-    // This is a temporary solution until proper media assets are set up
-    return getDefaultPublicId(placeholderId);
-  }
+  console.warn(`No media asset found for ID: ${idOrPlaceholderId}`);
   
-  return data.cloudinary_id;
+  // For now, return a default placeholder based on the placeholder ID
+  // This is a temporary solution until proper media assets are set up
+  return getDefaultPublicId(idOrPlaceholderId);
 }
 
 /**
@@ -50,105 +76,221 @@ function getDefaultPublicId(placeholderId: string): string {
 }
 
 /**
- * Fetches multiple Cloudinary public IDs from Supabase based on an array of placeholder IDs
- * @param placeholderIds Array of placeholder IDs to fetch media for
- * @returns Object with placeholder IDs as keys and Cloudinary public IDs as values
+ * Fetches multiple Cloudinary public IDs from Supabase based on an array of placeholder IDs or direct IDs
+ * @param ids Array of IDs (placeholder IDs or direct Cloudinary IDs)
+ * @returns Object with IDs as keys and Cloudinary public IDs as values
  */
-export async function getMediaPublicIds(placeholderIds: string[]): Promise<Record<string, string>> {
-  const supabase = createClient();
+export async function getMediaPublicIds(ids: string[]): Promise<Record<string, string>> {
+  // Split IDs into direct IDs (contain slashes) and placeholder IDs
+  const directIds = ids.filter(id => id.includes('/'));
+  const placeholderIds = ids.filter(id => !id.includes('/'));
   
-  const { data, error } = await supabase
-    .from('media_assets')
-    .select('placeholder_id, cloudinary_id')
-    .in('placeholder_id', placeholderIds);
+  // Create result object with direct IDs mapped to themselves
+  const result: Record<string, string> = {};
+  directIds.forEach(id => result[id] = id);
   
-  if (error || !data) {
-    console.error('Error fetching media assets:', error);
-    return {};
+  if (placeholderIds.length === 0) {
+    return result;
   }
   
-  // Convert array to object with placeholder_id as keys and cloudinary_id as values
-  return data.reduce((acc, item) => {
-    acc[item.placeholder_id] = item.cloudinary_id;
-    return acc;
-  }, {} as Record<string, string>);
+  const supabase = createClient();
+  
+  // First check media_assets table by legacy_placeholder_id in metadata
+  try {
+    const { data: metadataData, error: metadataError } = await supabase
+      .rpc('filter_by_legacy_placeholder_ids', { placeholder_ids: placeholderIds });
+      
+    if (!metadataError && metadataData) {
+      metadataData.forEach((item: any) => {
+        result[item.legacy_placeholder_id] = item.public_id;
+      });
+    }
+  } catch (err) {
+    console.warn('Error checking legacy placeholder IDs:', err);
+  }
+  
+  // Filter remaining IDs that haven't been mapped yet
+  const remainingIds = placeholderIds.filter(id => !result[id]);
+  
+  if (remainingIds.length > 0) {
+    // Legacy: Try media_assets_old table
+    try {
+      const { data, error } = await supabase
+        .from('media_assets_old')
+        .select('placeholder_id, cloudinary_id')
+        .in('placeholder_id', remainingIds);
+        
+      if (!error && data) {
+        data.forEach(item => {
+          result[item.placeholder_id] = item.cloudinary_id;
+        });
+      }
+    } catch (err) {
+      console.warn('Error fetching from media_assets_old:', err);
+    }
+  }
+  
+  return result;
 }
 
 /**
- * Updates or creates a media asset mapping in Supabase
- * @param placeholderId The ID of the placeholder
+ * Updates or creates a media asset mapping in Supabase using the new media_assets table
+ * @param idOrPlaceholderId The ID of the placeholder or direct ID
  * @param cloudinaryId The Cloudinary public ID
  * @param metadata Optional metadata for the media asset
  * @returns Success status
  */
 export async function updateMediaAsset(
-  placeholderId: string, 
+  idOrPlaceholderId: string, 
   cloudinaryId: string,
   metadata: Record<string, any> = {}
 ): Promise<boolean> {
   const supabase = createClient();
   
-  // Check if the placeholder already exists
-  const { data: existingData } = await supabase
-    .from('media_assets')
-    .select('placeholder_id')
-    .eq('placeholder_id', placeholderId)
-    .single();
+  // Determine if the asset is a video
+  const isVideo = 
+    cloudinaryId.includes('/video/') || 
+    /\.(mp4|webm|avi|mov|wmv)$/i.test(cloudinaryId) ||
+    metadata.type === 'video';
   
-  if (existingData) {
-    // Update existing record
-    const { error } = await supabase
+  try {
+    // Check if this ID exists as a legacy_placeholder_id in metadata
+    const { data: existingMetadataData } = await supabase
       .from('media_assets')
-      .update({ 
-        cloudinary_id: cloudinaryId,
-        metadata,
-        uploaded_at: new Date().toISOString(),
-        uploaded_by: 'system'
-      })
-      .eq('placeholder_id', placeholderId);
-    
-    if (error) {
-      console.error('Error updating media asset:', error);
-      return false;
+      .select('id')
+      .filter('metadata->legacy_placeholder_id', 'eq', idOrPlaceholderId)
+      .maybeSingle();
+      
+    if (existingMetadataData) {
+      // Update existing record
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ 
+          public_id: cloudinaryId,
+          type: isVideo ? 'video' : 'image',
+          metadata: {
+            ...metadata,
+            legacy_placeholder_id: idOrPlaceholderId
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingMetadataData.id);
+        
+      if (error) {
+        console.error('Error updating media asset in media_assets:', error);
+        return false;
+      }
+      
+      return true;
     }
-  } else {
+    
+    // Check if a record exists with this public_id
+    const { data: existingPublicData } = await supabase
+      .from('media_assets')
+      .select('id')
+      .eq('public_id', cloudinaryId)
+      .maybeSingle();
+      
+    if (existingPublicData) {
+      // Update to include the legacy placeholder ID
+      const { error } = await supabase
+        .from('media_assets')
+        .update({
+          metadata: {
+            ...metadata,
+            legacy_placeholder_id: idOrPlaceholderId
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existingPublicData.id);
+        
+      if (error) {
+        console.error('Error updating media asset metadata:', error);
+        return false;
+      }
+      
+      return true;
+    }
+    
     // Insert new record
     const { error } = await supabase
       .from('media_assets')
       .insert({
-        placeholder_id: placeholderId,
-        cloudinary_id: cloudinaryId,
-        metadata,
-        uploaded_at: new Date().toISOString(),
-        uploaded_by: 'system'
+        public_id: cloudinaryId,
+        type: isVideo ? 'video' : 'image',
+        title: metadata.title || idOrPlaceholderId,
+        alt_text: metadata.alt_text || metadata.title || idOrPlaceholderId,
+        width: metadata.width || null,
+        height: metadata.height || null,
+        metadata: {
+          ...metadata,
+          legacy_placeholder_id: idOrPlaceholderId
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       });
-    
+      
     if (error) {
       console.error('Error inserting media asset:', error);
       return false;
     }
+    
+    return true;
+  } catch (err) {
+    console.error('Error in updateMediaAsset:', err);
+    return false;
   }
-  
-  return true;
 }
 
 /**
  * Deletes a media asset mapping from Supabase
- * @param placeholderId The ID of the placeholder to delete
+ * @param idOrPlaceholderId The ID of the placeholder or direct Cloudinary ID to delete
  * @returns Success status
  */
-export async function deleteMediaAsset(placeholderId: string): Promise<boolean> {
+export async function deleteMediaAsset(idOrPlaceholderId: string): Promise<boolean> {
   const supabase = createClient();
   
-  const { error } = await supabase
-    .from('media_assets')
-    .delete()
-    .eq('placeholder_id', placeholderId);
-  
-  if (error) {
-    console.error('Error deleting media asset:', error);
+  try {
+    if (idOrPlaceholderId.includes('/')) {
+      // It's a direct Cloudinary ID, delete by public_id
+      const { error } = await supabase
+        .from('media_assets')
+        .delete()
+        .eq('public_id', idOrPlaceholderId);
+        
+      if (error) {
+        console.error('Error deleting media asset by public_id:', error);
+        return false;
+      }
+    } else {
+      // It's a placeholder ID, delete by legacy_placeholder_id in metadata
+      const { data, error } = await supabase
+        .from('media_assets')
+        .select('id')
+        .filter('metadata->legacy_placeholder_id', 'eq', idOrPlaceholderId)
+        .maybeSingle();
+        
+      if (error) {
+        console.error('Error finding media asset by legacy_placeholder_id:', error);
+        return false;
+      }
+      
+      if (data) {
+        const { error: deleteError } = await supabase
+          .from('media_assets')
+          .delete()
+          .eq('id', data.id);
+          
+        if (deleteError) {
+          console.error('Error deleting media asset by id:', deleteError);
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Error in deleteMediaAsset:', err);
     return false;
   }
-  
-  return true;
 } 

@@ -6,8 +6,6 @@ import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
-
-
 interface MediaImageProps {
   // Either provide placeholderId OR publicId
   placeholderId?: string;
@@ -58,7 +56,15 @@ export function MediaImage({
 
   async function fetchCloudinaryId() {
     try {
-      const response = await fetch(`/api/media?placeholderId=${encodeURIComponent(placeholderId!)}`);
+      // First, check if the placeholderId is already a Cloudinary ID (contains /)
+      if (placeholderId && placeholderId.includes('/')) {
+        setCloudinaryId(placeholderId);
+        setLoading(false);
+        return;
+      }
+      
+      // Otherwise, fetch from API
+      const response = await fetch(`/api/media/${encodeURIComponent(placeholderId!)}`);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch media: ${response.statusText}`);

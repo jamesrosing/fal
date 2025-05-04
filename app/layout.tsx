@@ -3,6 +3,7 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Footer } from "@/components/footer"
 import { ChatBubble } from '@/components/ui/chat-bubble'
+import { ToasterProvider } from "@/providers/toaster-provider"
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
 
@@ -39,6 +40,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ToasterProvider />
           {children}
           <Footer />
           <ChatBubble />

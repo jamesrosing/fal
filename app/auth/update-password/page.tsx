@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
@@ -13,47 +12,69 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from "sonner"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("")
+export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const redirectPath = searchParams.get('redirect') || '/'
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  // Check if user has a valid session on component mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        toast.error("Invalid or expired password reset link")
+        router.push('/auth/login')
+      }
+    }
+    
+    checkSession()
+  }, [router, supabase])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage("")
+    
+    // Validate passwords
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match")
+      return
+    }
+    
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long")
+      return
+    }
+    
     setIsLoading(true)
     
     try {
-      // Initialize Supabase client in the browser
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      )
-      
-      // Sign in with email and password
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
+      // Update password
+      const { error } = await supabase.auth.updateUser({
+        password: password
       })
       
       if (error) {
         throw error
       }
       
-      // Successful login
-      toast.success("Logged in successfully")
+      // Success
+      toast.success("Password updated successfully")
       
-      // Redirect to the original destination or dashboard
-      router.push(redirectPath)
-      router.refresh()
+      // Redirect to profile page
+      router.push('/profile')
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign in")
-      console.error("Login error:", error)
+      toast.error(error.message || "Failed to update password")
+      setErrorMessage(error.message || "An error occurred during password update")
+      console.error("Password update error:", error)
     } finally {
       setIsLoading(false)
     }
@@ -71,7 +92,7 @@ export default function LoginPage() {
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Login</BreadcrumbPage>
+                    <BreadcrumbPage>Update Password</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
@@ -80,35 +101,38 @@ export default function LoginPage() {
           <div className="flex items-center justify-center p-6">
             <Card className="w-full max-w-md">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
-                <CardDescription>Enter your email and password to access your account</CardDescription>
+                <CardTitle className="text-2xl font-bold">Create New Password</CardTitle>
+                <CardDescription>Enter and confirm your new password</CardDescription>
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
-                      <Link href="/auth/reset-password" className="text-xs text-muted-foreground underline underline-offset-4 hover:text-primary">
-                        Forgot password?
-                      </Link>
+                  {errorMessage && (
+                    <div className="p-3 text-sm bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md">
+                      {errorMessage}
                     </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="password">New Password</Label>
                     <Input
                       id="password"
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      disabled={isLoading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Must be at least 8 characters long
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={isLoading}
                     />
@@ -116,14 +140,8 @@ export default function LoginPage() {
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Signing in..." : "Sign in"}
+                    {isLoading ? "Updating..." : "Update Password"}
                   </Button>
-                  <div className="text-sm text-center text-muted-foreground">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/auth/create-account" className="underline underline-offset-4 hover:text-primary">
-                      Create an account
-                    </Link>
-                  </div>
                 </CardFooter>
               </form>
             </Card>
@@ -132,6 +150,4 @@ export default function LoginPage() {
       </div>
     </SidebarProvider>
   )
-}
-
-
+} 
