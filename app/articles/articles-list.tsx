@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRouter } from 'next/navigation';
 import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage';
 import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Search, X } from 'lucide-react';
 
 // Define the main category slugs we want to show in the menubar
 const MAIN_CATEGORY_SLUGS = ['latest-news', 'plastic-surgery', 'dermatology', 'medical-spa', 'functional-medicine', 'educational'];
@@ -32,8 +35,11 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeSubcategory, setActiveSubcategory] = useState<string>('all');
+  const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -63,6 +69,18 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
         // Determine the active category from search params
         const categorySlug = (await searchParams).category as string | undefined;
         const subcategorySlug = (await searchParams).subcategory as string | undefined;
+        const tagParam = (await searchParams).tag as string | undefined;
+        const searchParam = (await searchParams).search as string | undefined;
+        
+        // Set search query from URL params if present
+        if (searchParam) {
+          setSearchQuery(searchParam);
+        }
+        
+        // Set active tags from URL params if present
+        if (tagParam) {
+          setActiveTags(Array.isArray(tagParam) ? tagParam : [tagParam]);
+        }
 
         if (categorySlug && categorySlug !== 'all') {
           setActiveCategory(categorySlug);
@@ -111,6 +129,19 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
             }
           }
           
+          // Add tag filter if present
+          if (tagParam) {
+            const tagsToFilter = Array.isArray(tagParam) ? tagParam : [tagParam];
+            tagsToFilter.forEach(tag => {
+              queryParams.push(`tag=${encodeURIComponent(tag)}`);
+            });
+          }
+          
+          // Add search query if present
+          if (searchParam) {
+            queryParams.push(`search=${encodeURIComponent(searchParam)}`);
+          }
+          
           if (queryParams.length > 0) {
             apiUrl += `?${queryParams.join('&')}`;
           }
@@ -120,6 +151,17 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
           const articlesData = await articlesResponse.json();
           
           setArticles(articlesData);
+          
+          // Extract unique tags from articles
+          const allTags = new Set<string>();
+          articlesData.forEach((article: Article) => {
+            if (article.tags && Array.isArray(article.tags)) {
+              article.tags.forEach(tag => allTags.add(tag));
+            }
+          });
+          
+          setTags(Array.from(allTags));
+          
         } catch (articlesError) {
           console.error('Error fetching articles:', articlesError);
           setArticles([]);
@@ -144,11 +186,101 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
 
   // Handle subcategory change
   const handleSubcategoryChange = (value: string) => {
-    if (value === 'all') {
-      router.push(`/articles?category=${activeCategory}`);
-    } else {
-      router.push(`/articles?category=${activeCategory}&subcategory=${value}`);
+    const params = new URLSearchParams();
+    
+    // Keep category parameter
+    if (activeCategory !== 'all') {
+      params.set('category', activeCategory);
     }
+    
+    // Set subcategory parameter if not 'all'
+    if (value !== 'all') {
+      params.set('subcategory', value);
+    }
+    
+    // Keep active tags
+    activeTags.forEach(tag => {
+      params.append('tag', tag);
+    });
+    
+    // Keep search query if present
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    
+    router.push(`/articles?${params.toString()}`);
+  };
+  
+  // Handle tag selection
+  const handleTagClick = (tag: string) => {
+    const params = new URLSearchParams();
+    
+    // Keep category parameter
+    if (activeCategory !== 'all') {
+      params.set('category', activeCategory);
+      
+      // Keep subcategory parameter if present
+      if (activeSubcategory !== 'all') {
+        params.set('subcategory', activeSubcategory);
+      }
+    }
+    
+    // Toggle tag in active tags
+    const newActiveTags = activeTags.includes(tag)
+      ? activeTags.filter(t => t !== tag)
+      : [...activeTags, tag];
+    
+    setActiveTags(newActiveTags);
+    
+    // Add tags to params
+    newActiveTags.forEach(t => {
+      params.append('tag', t);
+    });
+    
+    // Keep search query if present
+    if (searchQuery) {
+      params.set('search', searchQuery);
+    }
+    
+    router.push(`/articles?${params.toString()}`);
+  };
+  
+  // Handle search submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const params = new URLSearchParams();
+    
+    // Keep category parameter
+    if (activeCategory !== 'all') {
+      params.set('category', activeCategory);
+      
+      // Keep subcategory parameter if present
+      if (activeSubcategory !== 'all') {
+        params.set('subcategory', activeSubcategory);
+      }
+    }
+    
+    // Add tags to params
+    activeTags.forEach(tag => {
+      params.append('tag', tag);
+    });
+    
+    // Add search query if present
+    if (searchQuery.trim()) {
+      params.set('search', searchQuery.trim());
+    }
+    
+    router.push(`/articles?${params.toString()}`);
+  };
+  
+  // Clear all filters
+  const clearAllFilters = () => {
+    setActiveCategory('all');
+    setActiveSubcategory('all');
+    setActiveTags([]);
+    setSearchQuery('');
+    router.push('/articles');
   };
 
   if (loading) {
@@ -195,101 +327,215 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
         ))}
       </div>
       
-      {/* Subcategory Select Dropdown (only shown when a main category is selected) */}
-      {activeCategory !== 'all' && subcategories.length > 0 && (
-        <div className="mb-8 w-full max-w-xs">
-          <Select 
-            value={activeSubcategory} 
-            onValueChange={handleSubcategoryChange}
-          >
-            <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
-              <SelectValue placeholder="Filter by subcategory" />
-            </SelectTrigger>
-            <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-              <SelectItem value="all">All Subcategories</SelectItem>
-              {subcategories.map((subcat: any) => (
-                <SelectItem key={subcat.slug} value={subcat.slug}>
-                  {subcat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        {/* Subcategory Select Dropdown (only shown when a main category is selected) */}
+        {activeCategory !== 'all' && subcategories.length > 0 && (
+          <div className="mb-4 md:mb-0 w-full md:max-w-xs">
+            <Select 
+              value={activeSubcategory} 
+              onValueChange={handleSubcategoryChange}
+            >
+              <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
+                <SelectValue placeholder="Filter by subcategory" />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectItem value="all">All Subcategories</SelectItem>
+                {subcategories.map((subcat: any) => (
+                  <SelectItem key={subcat.slug} value={subcat.slug}>
+                    {subcat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
+        {/* Search Bar */}
+        <div className="w-full md:flex-1">
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-zinc-800 border-zinc-700 text-white pl-10"
+              />
+            </div>
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-white text-black rounded-md font-medium text-sm hover:bg-gray-200 transition-colors"
+            >
+              Search
+            </button>
+            
+            {/* Only show clear filters button when there are active filters */}
+            {(activeCategory !== 'all' || activeSubcategory !== 'all' || activeTags.length > 0 || searchQuery) && (
+              <button 
+                type="button"
+                onClick={clearAllFilters}
+                className="px-3 py-2 bg-zinc-800 text-white rounded-md font-medium text-sm hover:bg-zinc-700 transition-colors"
+              >
+                Clear filters
+              </button>
+            )}
+          </form>
+        </div>
+      </div>
+      
+      {/* Tags Section */}
+      {tags.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-sm font-medium mb-2 text-gray-400">Tags:</h3>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => handleTagClick(tag)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  activeTags.includes(tag)
+                    ? 'bg-white text-black'
+                    : 'bg-zinc-800 text-white hover:bg-zinc-700'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
       )}
       
-      {/* Articles Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {articles.map((article) => {
-          const imageIsCloudinaryUrl = article.featured_image && isCloudinaryUrl(article.featured_image);
-          const articleImageFolder = 'articles';
-          const articleImageName = article.featured_image ? 
-            (imageIsCloudinaryUrl ? extractImageNameFromPath(article.featured_image) : article.featured_image) : 
-            null;
-          
-          const publishDate = article.publishedAt || article.date || article.createdAt;
-          const categoryName = article.categoryName || 
-            categories.find((c: any) => c.id === article.category_id)?.name || 
-            categories.find((c: any) => c.slug === article.category)?.name || 
-            'Uncategorized';
-          
-          return (
-            <motion.div
-              key={article.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="group"
-            >
-              <Link href={`/articles/${article.slug}`} className="block">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  {articleImageName ? (
-                    <CloudinaryFolderImage
-                      folder={articleImageFolder}
-                      imageName={articleImageName}
-                      alt={article.title}
-                      width={600}
-                      height={450}
-                      crop="fill"
-                      gravity="auto"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                      <span className="text-zinc-500">No image</span>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <div className="text-sm font-medium text-zinc-400 mb-2">{categoryName}</div>
-                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-zinc-300 transition-colors">{article.title}</h3>
-                  <p className="text-zinc-400 text-sm line-clamp-2">{article.excerpt}</p>
+      {/* Active filters display */}
+      {(activeTags.length > 0 || searchQuery) && (
+        <div className="mb-8 bg-zinc-800/50 p-4 rounded-lg">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium text-gray-400">Active filters:</span>
+            
+            {activeTags.map(tag => (
+              <Badge key={tag} variant="outline" className="flex items-center gap-1 text-white">
+                {tag}
+                <button onClick={() => handleTagClick(tag)}>
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            
+            {searchQuery && (
+              <Badge variant="outline" className="flex items-center gap-1 text-white">
+                Search: {searchQuery}
+                <button onClick={() => {
+                  setSearchQuery('');
                   
-                  <div className="flex items-center mt-3 text-sm text-zinc-500">
-                    <span className="mr-2">
-                      {publishDate && new Date(publishDate).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                    {article.readTime && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <span>{article.readTime}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          )
-        })}
+                  const params = new URLSearchParams();
+                  if (activeCategory !== 'all') {
+                    params.set('category', activeCategory);
+                    if (activeSubcategory !== 'all') {
+                      params.set('subcategory', activeSubcategory);
+                    }
+                  }
+                  activeTags.forEach(tag => {
+                    params.append('tag', tag);
+                  });
+                  
+                  router.push(`/articles?${params.toString()}`);
+                }}>
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Results count */}
+      <div className="mb-8">
+        <p className="text-sm text-gray-400">
+          Showing {articles.length} {articles.length === 1 ? 'article' : 'articles'}
+        </p>
       </div>
       
-      {articles.length === 0 && !loading && (
-        <div className="text-center py-12">
+      {/* Articles Grid */}
+      {articles.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {articles.map((article) => {
+            const imageIsCloudinaryUrl = article.featured_image && isCloudinaryUrl(article.featured_image);
+            const articleImageFolder = 'articles';
+            const articleImageName = article.featured_image ? 
+              (imageIsCloudinaryUrl ? extractImageNameFromPath(article.featured_image) : article.featured_image) : 
+              null;
+            
+            const publishDate = article.publishedAt || article.date || article.createdAt;
+            const categoryName = article.categoryName || 
+              categories.find((c: any) => c.id === article.category_id)?.name || 
+              categories.find((c: any) => c.slug === article.category)?.name || 
+              'Uncategorized';
+            
+            return (
+              <motion.div
+                key={article.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="group"
+              >
+                <Link href={`/articles/${article.slug}`} className="block">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                    {articleImageName ? (
+                      <CloudinaryFolderImage
+                        folder={articleImageFolder}
+                        imageName={articleImageName}
+                        alt={article.title}
+                        width={600}
+                        height={450}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                        <span className="text-zinc-500">No image</span>
+                      </div>
+                    )}
+                    <div className="absolute top-0 left-0 m-4">
+                      <span className="bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                        {categoryName}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <h3 className="text-lg font-bold text-white group-hover:text-gray-300 transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-400 line-clamp-2">
+                      {article.excerpt || article.subtitle || 'No excerpt available'}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {article.tags && Array.isArray(article.tags) && article.tags.slice(0, 3).map((tag) => (
+                        <span key={tag} className="inline-block bg-zinc-800 text-xs text-gray-400 px-2 py-1 rounded">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    {publishDate && (
+                      <p className="mt-3 text-xs text-gray-500">
+                        {new Date(publishDate).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center py-12 bg-zinc-800/50 rounded-lg">
           <h3 className="text-xl font-bold mb-2">No articles found</h3>
-          <p className="text-zinc-400">Try selecting a different category or check back later.</p>
+          <p className="text-gray-400">Try adjusting your filters or search criteria</p>
+          <button 
+            onClick={clearAllFilters}
+            className="mt-4 px-4 py-2 bg-white text-black rounded-md font-medium text-sm hover:bg-gray-200 transition-colors"
+          >
+            Clear all filters
+          </button>
         </div>
       )}
     </div>

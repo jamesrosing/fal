@@ -184,4 +184,38 @@ export type MediaAsset = {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
-}; 
+};
+
+/**
+ * Common tags used across articles
+ */
+export const COMMON_ARTICLE_TAGS = [
+  'Plastic Surgery',
+  'Dermatology',
+  'Medical Spa',
+  'Functional Medicine',
+  'Treatments',
+  'Procedures',
+  'Before & After',
+  'Recovery',
+  'FAQ',
+  'Patient Stories',
+  'Education',
+  'News',
+  'Technology',
+  'Skincare',
+  'Anti-Aging',
+  'Wellness',
+  'Nutrition',
+  'Beauty',
+  'Research'
+];
+
+/**
+ * Tag definition with display name and category association
+ */
+export interface TagDefinition {
+  id: string;
+  name: string;
+  categories?: ArticleCategory[]; // Associated categories
+} 

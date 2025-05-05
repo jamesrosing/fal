@@ -58,19 +58,6 @@
                 "41398ac5-2722-4463-8689-cacf9494d30d"
             ]
         },
-        "supabase-mcp-server": {
-            "command": "cmd",
-            "args": [
-                "/c",
-                "npx",
-                "-y",
-                "@smithery/cli@latest",
-                "run",
-                "@joshuarileydev/supabase-mcp-server",
-                "--key",
-                "41398ac5-2722-4463-8689-cacf9494d30d"
-            ]
-        },
         "task-master-ai": {
             "command": "npx",
             "args": [
