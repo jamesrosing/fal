@@ -35,7 +35,6 @@ const config: NextConfig = {
         pathname: '/**',
       }
     ],
-    domains: ['res.cloudinary.com'],
     formats: ['image/avif', 'image/webp'],
   },
   env: {
@@ -108,20 +107,9 @@ const config: NextConfig = {
   distDir: '.next',
   poweredByHeader: false,
   // Add transpilePackages for next-cloudinary
-  transpilePackages: ['next-cloudinary'],
+  transpilePackages: [],
 };
 
-let finalConfig = withBundleAnalyzer(config);
-
-// Conditionally apply next-cloudinary plugin if it's available
-try {
-  // Try to dynamically require the next-cloudinary plugin
-  const { withNextCloudinary } = require('next-cloudinary/plugin');
-  finalConfig = withNextCloudinary(finalConfig);
-  console.log('Next-cloudinary plugin applied successfully');
-} catch (error) {
-  console.warn('Could not apply next-cloudinary plugin:', error instanceof Error ? error.message : String(error));
-  console.warn('Continuing with standard Next.js configuration');
-}
-
-export default finalConfig;
+// Simple export without trying to use the plugin
+// Since we're directly using the CldImage component, we don't need the plugin
+export default withBundleAnalyzer(config);

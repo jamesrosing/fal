@@ -17,13 +17,17 @@ export interface MediaAsset {
 }
 
 export interface MediaHookResult {
-  url: string | null;
+  url: string;  // Changed from string | null to always return a string
   publicId: string | null;
   srcSet?: string;
   isLoading: boolean;
   error: string | null;
   isVideo: boolean;
 }
+
+// Default fallback paths
+const DEFAULT_IMAGE_FALLBACK = '/images/placeholder.jpg';
+const DEFAULT_VIDEO_FALLBACK = '/videos/placeholder.mp4';
 
 /**
  * Helper function to detect if an asset is a video
@@ -46,15 +50,19 @@ export function isVideoAsset(publicId: string, type?: string): boolean {
  * Hook to fetch and use media assets
  * 
  * @param placeholderId The ID of the media placeholder (legacy support) or direct public ID
- * @param options Optional Cloudinary transformation options
+ * @param options Optional Cloudinary transformation options and fallback paths
  * @returns Object with url, publicId, srcSet, loading state, and error
  */
 export function useMediaAsset(
   placeholderId: string,
   options: Record<string, any> = {}
 ): MediaHookResult {
+  // Extract fallback options or use defaults
+  const imageFallback = options.imageFallback || DEFAULT_IMAGE_FALLBACK;
+  const videoFallback = options.videoFallback || DEFAULT_VIDEO_FALLBACK;
+
   const [result, setResult] = useState<MediaHookResult>({
-    url: null,
+    url: imageFallback, // Default to image fallback initially
     publicId: null,
     isLoading: true,
     error: null,
@@ -80,7 +88,7 @@ export function useMediaAsset(
             
           if (isMounted) {
             setResult({
-              url,
+              url: url || (isVideo ? videoFallback : imageFallback),
               publicId: placeholderId,
               srcSet,
               isLoading: false,
@@ -122,7 +130,7 @@ export function useMediaAsset(
             
             if (isMounted) {
               setResult({
-                url,
+                url: url || (isVideo ? videoFallback : imageFallback),
                 publicId,
                 srcSet,
                 isLoading: false,
@@ -158,7 +166,7 @@ export function useMediaAsset(
             
             if (isMounted) {
               setResult({
-                url,
+                url: url || (isVideo ? videoFallback : imageFallback),
                 publicId,
                 srcSet,
                 isLoading: false,
@@ -174,61 +182,80 @@ export function useMediaAsset(
         }
 
         // Fallback to the media map API
-        const response = await fetch('/api/site/media-assets');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch media assets: ${response.statusText}`);
-        }
-        
-        const mediaAssets = await response.json();
-        
-        // Check if it's a legacy placeholder ID
-        if (mediaAssets[placeholderId] && mediaAssets[placeholderId].cloudinaryPublicId) {
-          const asset = mediaAssets[placeholderId];
-          const publicId = asset.cloudinaryPublicId;
-          const isVideo = isVideoAsset(publicId);
-                         
-          let url;
-          let srcSet;
+        try {
+          const response = await fetch('/api/site/media-assets');
           
-          if (isVideo) {
-            url = getCloudinaryVideoUrl(publicId, options);
-          } else {
-            url = getCloudinaryUrl(publicId, options);
-            srcSet = options.responsive !== false ? 
-              getCloudinaryImageSrcSet(publicId, options) : 
-              undefined;
+          if (!response.ok) {
+            throw new Error(`Failed to fetch media assets: ${response.statusText}`);
           }
+          
+          const mediaAssets = await response.json();
+          
+          // Check if it's a legacy placeholder ID
+          if (mediaAssets[placeholderId] && mediaAssets[placeholderId].cloudinaryPublicId) {
+            const asset = mediaAssets[placeholderId];
+            const publicId = asset.cloudinaryPublicId;
+            const isVideo = isVideoAsset(publicId);
+                           
+            let url;
+            let srcSet;
             
-          if (isMounted) {
-            setResult({
-              url,
-              publicId,
-              srcSet,
-              isLoading: false,
-              error: null,
-              isVideo
-            });
+            if (isVideo) {
+              url = getCloudinaryVideoUrl(publicId, options);
+            } else {
+              url = getCloudinaryUrl(publicId, options);
+              srcSet = options.responsive !== false ? 
+                getCloudinaryImageSrcSet(publicId, options) : 
+                undefined;
+            }
+              
+            if (isMounted) {
+              setResult({
+                url: url || (isVideo ? videoFallback : imageFallback),
+                publicId,
+                srcSet,
+                isLoading: false,
+                error: null,
+                isVideo
+              });
+            }
+          } else {
+            if (isMounted) {
+              // Asset not found - return fallback
+              const isVideoFallback = placeholderId.toLowerCase().includes('video');
+              setResult({
+                url: isVideoFallback ? videoFallback : imageFallback,
+                publicId: null,
+                isLoading: false,
+                error: `Media asset not found: ${placeholderId}`,
+                isVideo: isVideoFallback
+              });
+            }
           }
-        } else {
+        } catch (apiError) {
+          console.warn('Error fetching from media-assets API:', apiError);
+          // In case the API fails, still use the fallback
+          const isVideoPlaceholder = placeholderId.toLowerCase().includes('video');
           if (isMounted) {
             setResult({
-              url: null,
+              url: isVideoPlaceholder ? videoFallback : imageFallback,
               publicId: null,
               isLoading: false,
-              error: `Media asset not found: ${placeholderId}`,
-              isVideo: false
+              error: apiError instanceof Error ? apiError.message : 'Unknown error fetching media asset',
+              isVideo: isVideoPlaceholder
             });
           }
         }
       } catch (error) {
+        // Fallback in case of any other errors
+        const isVideoPlaceholder = placeholderId.toLowerCase().includes('video');
         if (isMounted) {
           setResult({
-            url: null,
+            url: isVideoPlaceholder ? videoFallback : imageFallback,
             publicId: null,
             isLoading: false,
             error: error instanceof Error ? error.message : 'Unknown error fetching media asset',
-            isVideo: false
+            isVideo: isVideoPlaceholder
           });
         }
       }
@@ -239,7 +266,7 @@ export function useMediaAsset(
     return () => {
       isMounted = false;
     };
-  }, [placeholderId, JSON.stringify(options)]);
+  }, [placeholderId, JSON.stringify(options), imageFallback, videoFallback]);
 
   return result;
 }

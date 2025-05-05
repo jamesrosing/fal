@@ -1,21 +1,18 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
+// Create a Supabase client directly
+const createClient = () => {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+};
 
 export async function GET() {
   try {
-    // Environment check
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return NextResponse.json(
-        { error: 'Missing Supabase environment variables' },
-        { status: 500 }
-      );
-    }
-
     // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient();
 
     // Fetch all categories
     const { data, error } = await supabase
@@ -44,17 +41,7 @@ export async function GET() {
 // Create a new category
 export async function POST(req: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return NextResponse.json(
-        { error: 'Missing Supabase environment variables' },
-        { status: 500 }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient();
     const body = await req.json();
     
     // Generate slug from name if not provided
@@ -92,18 +79,8 @@ export async function POST(req: Request) {
 // Update a category
 export async function PUT(request: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Missing Supabase environment variables' }),
-        { status: 500 }
-      );
-    }
-
     // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient();
     
     // Parse request body
     const { id, ...categoryData } = await request.json();
@@ -158,22 +135,12 @@ export async function PUT(request: Request) {
 // Delete a category
 export async function DELETE(request: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return new NextResponse(
-        JSON.stringify({ error: 'Missing Supabase environment variables' }),
-        { status: 500 }
-      );
-    }
-
     // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient();
     
     // Get category ID from URL params
     const { searchParams } = new URL(request.url);
-    const id = (await searchParams).get('id');
+    const id = searchParams.get('id');
     
     if (!id) {
       return new NextResponse(

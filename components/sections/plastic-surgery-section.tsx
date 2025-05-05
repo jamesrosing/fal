@@ -31,6 +31,10 @@ export function PlasticSurgerySection() {
     );
   }
 
+  // Define a fallback image URL to prevent empty string errors
+  const fallbackImageUrl = "/images/placeholder.jpg";
+  const safeBackgroundUrl = backgroundUrl || fallbackImageUrl;
+
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (
@@ -39,7 +43,7 @@ export function PlasticSurgerySection() {
         <div className="relative w-full aspect-[16/9]">
           {isVideo ? (
             <video
-              src={backgroundUrl || ""}
+              src={safeBackgroundUrl}
               autoPlay
               loop
               muted
@@ -48,7 +52,7 @@ export function PlasticSurgerySection() {
             />
           ) : (
             <Image 
-              src={backgroundUrl || ""} 
+              src={safeBackgroundUrl} 
               alt="Plastic Surgery at Allure MD" 
               fill 
               className="object-cover"
@@ -100,7 +104,7 @@ export function PlasticSurgerySection() {
         {isVideo ? (
           // Render video background when the asset is a video
           <video
-            src={backgroundUrl || ""}
+            src={safeBackgroundUrl}
             autoPlay
             loop
             muted
@@ -110,7 +114,7 @@ export function PlasticSurgerySection() {
         ) : (
           // Render image background when the asset is an image
           <Image
-            src={backgroundUrl || ""}
+            src={safeBackgroundUrl}
             alt="Plastic Surgery at Allure MD"
             fill
             sizes="100vw"

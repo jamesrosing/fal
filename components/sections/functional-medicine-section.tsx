@@ -31,6 +31,10 @@ export function FunctionalMedicineSection() {
     );
   }
 
+  // Define a fallback image URL to prevent empty string errors
+  const fallbackImageUrl = "/images/placeholder.jpg";
+  const safeBackgroundUrl = backgroundUrl || fallbackImageUrl;
+
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (
@@ -39,7 +43,7 @@ export function FunctionalMedicineSection() {
         <div className="relative w-full aspect-[16/9]">
           {isVideo ? (
             <video
-              src={backgroundUrl || ""}
+              src={safeBackgroundUrl}
               autoPlay
               loop
               muted
@@ -48,7 +52,7 @@ export function FunctionalMedicineSection() {
             />
           ) : (
             <Image 
-              src={backgroundUrl || ""} 
+              src={safeBackgroundUrl} 
               alt="Dr. Gidwani consulting with patient" 
               fill 
               className="object-cover"
@@ -96,7 +100,7 @@ export function FunctionalMedicineSection() {
       <div className="absolute inset-0">
         {isVideo ? (
           <video
-            src={backgroundUrl || ""}
+            src={safeBackgroundUrl}
             autoPlay
             loop
             muted
@@ -105,7 +109,7 @@ export function FunctionalMedicineSection() {
           />
         ) : (
           <Image
-            src={backgroundUrl || ""}
+            src={safeBackgroundUrl}
             alt="Dr. Gidwani consulting with patient"
             fill
             className="object-cover object-center"
