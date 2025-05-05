@@ -350,7 +350,7 @@ export function NavBar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="relative w-40 h-12">
-              <OptimizedImage id="logos/allure_md_plastic_surgery_dermatology_white_logo.png" alt="ALLURE MD"   priority fill />
+              <OptimizedImage id="global/logos/allure_md_plastic_surgery_dermatology_white_logo.png" alt="ALLURE MD"   priority fill />
             </div>
           </Link>
           <nav className="hidden md:flex items-center">

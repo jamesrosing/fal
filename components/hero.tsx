@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { BackgroundVideo } from "@/components/ui/background-video"
 import Link from "next/link"
-import { getCloudinaryVideoUrl, getCloudinaryUrl } from "@/lib/cloudinary"
+import { getCloudinaryUrl, getCloudinaryVideoUrl } from "@/lib/cloudinary"
 import Image from 'next/image'
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';

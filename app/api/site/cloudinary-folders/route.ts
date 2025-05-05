@@ -12,6 +12,17 @@ interface CloudinaryFolder {
   subfolders: CloudinaryFolder[];
 }
 
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w';
+const apiKey = process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '956447123689192';
+const apiSecret = process.env.CLOUDINARY_API_SECRET || 'zGsan0MXgwGKIGnQ0t1EVKYSqg0';
+
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
+  secure: true
+});
+
 /**
  * GET handler for Cloudinary folders API
  * Returns the folder structure from Cloudinary

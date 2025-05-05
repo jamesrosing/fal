@@ -19,7 +19,7 @@ console.log('Cloudinary config:', {
 
 // Configure Cloudinary with direct values if env vars are missing
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w';
-const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '956447123689192';
+const apiKey = process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '956447123689192';
 const apiSecret = process.env.CLOUDINARY_API_SECRET || 'zGsan0MXgwGKIGnQ0t1EVKYSqg0';
 
 cloudinary.config({
@@ -36,71 +36,37 @@ export const revalidate = 0;
 // Fallback data for sections
 const fallbackAssets = [
   {
-    public_id: 'allure-md/homepage-plastic-surgery-background',
-    format: 'jpg',
-    url: '/images/pages/home/plastic-surgery-section.jpg',
-    width: 1920,
-    height: 1080,
-    created_at: new Date().toISOString(),
-    bytes: 0,
-    type: 'image',
-    folder: 'allure-md'
-  },
-  {
-    public_id: 'allure-md/homepage-functional-medicine-background',
-    format: 'jpg',
-    url: '/images/pages/home/functional-medicine-section.jpg',
-    width: 1920,
-    height: 1080,
-    created_at: new Date().toISOString(),
-    bytes: 0,
-    type: 'image',
-    folder: 'allure-md'
-  },
-  {
-    public_id: 'allure-md/logos/allure_md_plastic_surgery_dermatology_white_logo',
+    public_id: 'global/logos/allure_md_plastic_surgery_dermatology_white_logo.png',
     format: 'png',
-    url: '/images/global/logos/allure-md-logo-white.png',
-    width: 200,
-    height: 80,
+    url: `https://res.cloudinary.com/${cloudName}/image/upload/v1743748610/global/logos/allure_md_plastic_surgery_dermatology_white_logo.png`,
+    width: 1045,
+    height: 311,
     created_at: new Date().toISOString(),
-    bytes: 0,
+    bytes: 29680,
     type: 'image',
-    folder: 'allure-md/logos'
+    folder: 'global/logos'
   },
-  // Essential section backgrounds
   {
-    public_id: 'allure-md/homepage-medical-spa-background',
+    public_id: 'global/hero/hero-poster',
     format: 'jpg',
-    url: '/images/pages/home/medical-spa-section.jpg',
+    url: `https://res.cloudinary.com/${cloudName}/image/upload/v1743748610/global/hero/hero-poster`,
     width: 1920,
     height: 1080,
     created_at: new Date().toISOString(),
     bytes: 0,
     type: 'image',
-    folder: 'allure-md'
+    folder: 'global/hero'
   },
   {
-    public_id: 'allure-md/homepage-dermatology-background',
+    public_id: 'global/hero/hero-fallback',
     format: 'jpg',
-    url: '/images/pages/home/dermatology-section.jpg',
+    url: `https://res.cloudinary.com/${cloudName}/image/upload/v1743748610/global/hero/hero-fallback`,
     width: 1920,
     height: 1080,
     created_at: new Date().toISOString(),
     bytes: 0,
     type: 'image',
-    folder: 'allure-md'
-  },
-  {
-    public_id: 'allure-md/homepage-hero-background',
-    format: 'jpg',
-    url: '/images/pages/home/hero-bg.jpg',
-    width: 1920,
-    height: 1080,
-    created_at: new Date().toISOString(),
-    bytes: 0,
-    type: 'image',
-    folder: 'allure-md'
+    folder: 'global/hero'
   }
 ];
 
@@ -126,20 +92,20 @@ export async function GET() {
       const result = await cloudinary.api.resources({
         type: 'upload',
         max_results: 500,
-        prefix: 'allure-md'
+        prefix: 'global'
       });
       
       // Format the response
       const assets = result.resources.map((resource: any) => ({
         public_id: resource.public_id,
         format: resource.format,
-        url: resource.secure_url,
-        width: resource.width,
-        height: resource.height,
-        created_at: resource.created_at,
-        bytes: resource.bytes,
-        type: resource.resource_type,
-        folder: resource.folder
+        url: resource.secure_url || `https://res.cloudinary.com/${cloudName}/image/upload/${resource.public_id}`,
+        width: resource.width || 0,
+        height: resource.height || 0,
+        created_at: resource.created_at || new Date().toISOString(),
+        bytes: resource.bytes || 0,
+        type: resource.resource_type || 'image',
+        folder: resource.folder || resource.public_id.includes('/') ? resource.public_id.substring(0, resource.public_id.lastIndexOf('/')) : ''
       }));
       
       console.log('Cloudinary API returned', assets.length, 'assets');

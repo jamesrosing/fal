@@ -3,9 +3,6 @@
 import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
 
 export function ChatBubble() {
   const router = useRouter();

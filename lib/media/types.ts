@@ -42,6 +42,7 @@ export interface MediaOptions {
   simplifiedMode?: boolean;
   resource_type?: 'image' | 'video' | 'auto' | 'raw';
   alt?: string;
+  blurDataURL?: string;
 }
 
 export interface VideoOptions {

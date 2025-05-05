@@ -1,9 +1,10 @@
 import { MediaOptions, VideoOptions, MediaAsset } from './types';
 import mediaRegistry from './registry';
+import { getCloudinaryUrl, getCloudinaryVideoUrl, getCloudinaryImageSrcSet } from '@/lib/cloudinary';
 
 // Environment config
 const cloudinaryConfig = {
-  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w',
 };
 
 /**
@@ -54,11 +55,23 @@ export function getMediaUrl(
     resource_type = asset?.type || 'image'
   } = options;
   
-  // Build transformation string
-  const transformations = `f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}`;
-  
-  // Construct Cloudinary URL
-  return `https://res.cloudinary.com/${cloudinaryConfig.cloudName || 'demo'}/${resource_type}/upload/${transformations}/${publicId}`;
+  // Use the centralized Cloudinary functions based on resource type
+  if (resource_type === 'video') {
+    return getCloudinaryVideoUrl(publicId, {
+      format: format as any,
+      quality: quality as any,
+      width: width !== 'auto' ? width as number : undefined
+    });
+  } else {
+    return getCloudinaryUrl(publicId, {
+      width: width !== 'auto' ? width as number : undefined,
+      height: height !== 'auto' ? height as number : undefined,
+      quality: quality as any,
+      format: format as any,
+      crop: crop as any,
+      gravity: gravity as any,
+    });
+  }
 }
 
 /**
@@ -81,11 +94,10 @@ export function getVideoSources(
   
   return formats.flatMap(format => 
     widths.map(width => ({
-      src: getMediaUrl(publicId, { 
+      src: getCloudinaryVideoUrl(publicId, { 
         ...baseOptions, 
         format: format as any, 
-        width,
-        resource_type: 'video'
+        width
       }),
       type: `video/${format}`,
       media: width <= 480 
@@ -109,11 +121,11 @@ export function getNextImageProps(idOrPublicId: string, options: MediaOptions = 
     (asset?.dimensions?.aspectRatio ? Math.round(width / asset.dimensions.aspectRatio) : 600);
   
   return {
-    src: getMediaUrl(publicId, options),
+    src: getCloudinaryUrl(publicId, options),
     width,
     height,
     alt: options.alt || asset?.description || "",
-    blurDataURL: getMediaUrl(publicId, {
+    blurDataURL: getCloudinaryUrl(publicId, {
       width: 10,
       quality: 30,
       format: 'webp'

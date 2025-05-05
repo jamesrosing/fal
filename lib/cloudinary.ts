@@ -11,7 +11,7 @@
 
 // Client-side configuration
 const cloudinaryConfig = {
-  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w',
   apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
   uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
 };
@@ -42,12 +42,13 @@ export type VideoFormat = 'mp4' | 'webm' | 'mov';
 export interface CloudinaryImageOptions {
   width?: number;
   height?: number;
-  quality?: number;
+  quality?: number | string;
   format?: string;
   crop?: string;
   gravity?: string;
   simplifiedMode?: boolean;
   resource_type?: 'image' | 'video' | 'auto' | 'raw';
+  blurDataURL?: string;
 }
 
 export interface CloudinaryVideoOptions {
@@ -162,52 +163,81 @@ export const IMAGE_PLACEMENTS: Record<ImageArea, ImagePlacement> = {
   }
 };
 
-// Helper function to generate Cloudinary URLs
-export const getCloudinaryUrl = (
-  publicId: string,
-  options: CloudinaryImageOptions = {}
-) => {
-  // If publicId is undefined or null, return a placeholder
-  if (publicId === undefined || publicId === null) {
-    console.warn('Empty publicId provided, returning placeholder image');
-    return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
-  }
+/**
+ * Get Cloudinary configuration
+ */
+export function getCloudinaryConfig() {
+  return {
+    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w',
+    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET
+  };
+}
 
-  // If publicId is already a full URL (starts with http or https), return it as is
-  if (publicId && (publicId.startsWith('http://') || publicId.startsWith('https://'))) {
-    console.log('URL already provided, skipping Cloudinary transformation:', publicId);
-    return publicId;
-  }
-
-  const {
-    width = 'auto',
-    height = 'auto',
-    quality = 90,
-    format = 'auto',
-    crop = 'scale',
-    gravity = 'auto',
-    simplifiedMode = false
-  } = options;
-
-  // For simplified mode, use fewer transformations
-  if (simplifiedMode) {
-    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName || 'demo'}/image/upload/${publicId}`;
-  }
-
+/**
+ * Generate a Cloudinary URL for a given public ID and options
+ */
+export const generateCloudinaryUrl = (publicId: string, options: CloudinaryImageOptions = {}): string => {
   try {
-    // Use a more conservative set of transformations to reduce the chance of errors
-    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName || 'demo'}/image/upload/f_${format},q_${quality}${width !== 'auto' ? `,w_${width}` : ''}/${publicId}`;
+    // Extract transformation parameters
+    const width = options.width ?? null;
+    const height = options.height ?? null;
+    const quality = options.quality ?? 'auto';
+    const format = options.format ?? 'auto';
+    
+    // Construct the transformation parameters
+    let transformations = [];
+    
+    if (format) transformations.push(`f_${format}`);
+    if (quality) transformations.push(`q_${quality}`);
+    if (width) transformations.push(`w_${width}`);
+    if (height) transformations.push(`h_${height}`);
+    
+    // Join transformations with commas
+    const transformationString = transformations.length > 0 ? transformations.join(',') + '/' : '';
+    
+    // Correct URL format: https://res.cloudinary.com/{cloudName}/image/upload/{transformations}/{publicId}
+    // We'll handle the version as part of the publicId if it's not already included
+    const hasVersion = publicId.includes('v1743748610/') || publicId.includes('/v1743748610');
+    
+    let finalPublicId = publicId;
+    
+    // If the public ID doesn't already have a version, add it at the proper location
+    if (!hasVersion && !finalPublicId.startsWith('v')) {
+      finalPublicId = `v1743748610/${finalPublicId}`;
+    }
+    
+    // Ensure there's no double prefixing
+    if (finalPublicId.startsWith('v1743748610/v1743748610/')) {
+      finalPublicId = finalPublicId.replace('v1743748610/v1743748610/', 'v1743748610/');
+    }
+    
+    let url = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformationString}${finalPublicId}`;
+    
+    // Add some telemetry to help debug image loading
+    console.log(`Generated Cloudinary URL for: ${publicId.substring(0, 30)}${publicId.length > 30 ? '...' : ''}`);
+    console.log(`URL: ${url}`);
+    
+    return url;
   } catch (error) {
     console.error('Error generating Cloudinary URL:', error);
-    return 'https://via.placeholder.com/800x600?text=Error+Loading+Image';
+    // Fallback to a simple URL without transformations in case of error
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
   }
 };
 
-// Helper function for video URLs
+/**
+ * Legacy function for backwards compatibility
+ */
+export const getCloudinaryUrl = generateCloudinaryUrl;
+
+/**
+ * Generate a Cloudinary URL for a video with the given public ID and options
+ */
 export const getCloudinaryVideoUrl = (
   publicId: string,
   options: CloudinaryVideoOptions = {}
-) => {
+): string => {
   const {
     format = 'auto',
     quality = 90,
@@ -232,11 +262,11 @@ export const checkCloudinaryAsset = async (publicId: string): Promise<boolean> =
  */
 export function getCloudinaryImageProps(publicId: string, options: CloudinaryImageOptions = {}) {
   return {
-    src: getCloudinaryUrl(publicId, options),
+    src: generateCloudinaryUrl(publicId, options),
     width: options.width || 800,
     height: options.height || 600,
     alt: "",
-    blurDataURL: getCloudinaryUrl(publicId, {
+    blurDataURL: generateCloudinaryUrl(publicId, {
       width: 10,
       quality: 30,
       format: 'webp'
@@ -285,7 +315,7 @@ export function getCloudinaryImageSrcSet(publicId: string, options: CloudinaryIm
   return widths
     .map(
       (width) =>
-        `${getCloudinaryUrl(publicId, { ...options, width })} ${width}w`
+        `${generateCloudinaryUrl(publicId, { ...options, width })} ${width}w`
     )
     .join(', ');
 }

@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import Image, { ImageProps } from 'next/image';
-import { getNextImageProps, getMediaUrl } from '@/lib/media/utils';
+import { getMediaUrl } from '@/lib/media/utils';
 import { MediaOptions } from '@/lib/media/types';
 import mediaRegistry from '../../lib/image-config';
+import { getCloudinaryUrl } from '@/lib/cloudinary';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'src' | 'width' | 'height'> {
   id: string;
   options?: MediaOptions;
   fallbackSrc?: string;
+  onError?: () => void;
+  onLoad?: () => void;
   fill?: boolean;
   showDebugInfo?: boolean;
 }
@@ -21,15 +24,43 @@ export default function OptimizedImage({
   fill = false,
   alt = '',
   showDebugInfo = false,
+  onError,
+  onLoad,
   ...props
 }: OptimizedImageProps) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<any>(null);
   
+  // Check if id is directly a Cloudinary path
+  const isDirectCloudinaryId = id && typeof id === 'string' && (
+    id.startsWith('logos/') || 
+    id.startsWith('global/logos/') ||
+    id.startsWith('hero/') || 
+    id.startsWith('articles/') ||
+    id.includes('allure_md') ||
+    id.includes('avatar')
+  );
+  
+  // Get cloudName from environment variable
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w';
+  
+  // Construct a direct Cloudinary URL for known path patterns
+  const directCloudinaryUrl = isDirectCloudinaryId 
+    ? getCloudinaryUrl(id, {
+        width: options.width || 800,
+        quality: options.quality || 'auto',
+        format: options.format || 'auto'
+      })
+    : null;
+  
+  // Try to get asset from registry or use direct path if it's a known pattern
   const asset = typeof id === 'string' ? mediaRegistry[id] : null;
   const defaultFallback = asset?.area ? `/images/placeholder-${asset.area}.jpg` : '/images/placeholder.jpg';
   const effectiveFallback = fallbackSrc || defaultFallback;
+  
+  // Default blur data URL for placeholder images
+  const defaultBlurDataURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFdgJCLNE5QQAAAABJRU5ErkJggg==';
   
   useEffect(() => {
     // Reset state when ID changes
@@ -41,47 +72,55 @@ export default function OptimizedImage({
       setDebugInfo({
         id,
         assetFound: !!asset,
-        publicId: asset?.publicId || 'unknown',
+        publicId: asset?.publicId || (isDirectCloudinaryId ? id : 'unknown'),
         area: asset?.area || 'unknown',
-        type: (asset as any)?.type || 'unknown'
+        type: (asset as any)?.type || 'unknown',
+        directCloudinaryUrl: directCloudinaryUrl
       });
     }
-  }, [id, asset, showDebugInfo]);
+  }, [id, asset, showDebugInfo, isDirectCloudinaryId, directCloudinaryUrl]);
   
-  // Get optimized image props - this may throw if the ID is not found
-  let imageProps;
-  try {
-    imageProps = getNextImageProps(id, {
-      ...options,
-      alt
-    });
-  } catch (err) {
-    console.error(`Error loading image props for ID: ${id}`, err);
-    // Use fallback immediately if getNextImageProps fails
-    imageProps = {
-      src: effectiveFallback,
-      width: options.width || asset?.dimensions?.width || 800,
-      height: options.height || asset?.dimensions?.height || 600,
-      alt: alt || asset?.description || 'Image not found',
-      blurDataURL: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFdgJCLNE5QQAAAABJRU5ErkJggg==',
-      placeholder: 'blur' as 'blur',
-    };
-  }
+  // Determine the image source
+  const imageSrc = React.useMemo(() => {
+    if (directCloudinaryUrl) {
+      return directCloudinaryUrl;
+    } else if (typeof id === 'string' && mediaRegistry[id]) {
+      // Fetch from image registry
+      const asset = mediaRegistry[id];
+      return getMediaUrl(asset.publicId, {
+        width: options.width || asset.dimensions?.width || 800,
+        quality: options.quality || asset.defaultOptions.quality,
+        format: asset.defaultOptions.format
+      });
+    } else if (typeof id === 'string' && (id.startsWith('http://') || id.startsWith('https://'))) {
+      // Direct URL provided
+      return id;
+    } else if (typeof id === 'object') {
+      // StaticImageData object
+      return id;
+    } else {
+      // Fallback to placeholder
+      return effectiveFallback;
+    }
+  }, [id, options.width, options.quality, directCloudinaryUrl, effectiveFallback]);
   
   // Handle error case
   const handleError = () => {
     console.warn(`Image load error for ID: ${id}`);
     setError(true);
     setLoading(false);
+    if (onError) {
+      onError();
+    }
   };
   
   // Handle load success
   const handleLoad = () => {
     setLoading(false);
+    if (onLoad) {
+      onLoad();
+    }
   };
-  
-  // Choose the right source - try from props first, then fallback if error
-  const src = error ? effectiveFallback : imageProps.src;
   
   // Render debug info if enabled
   const renderDebugInfo = () => {
@@ -107,6 +146,7 @@ export default function OptimizedImage({
         <div>Area: {debugInfo.area}</div>
         <div>Type: {debugInfo.type}</div>
         <div>Status: {error ? 'Error' : loading ? 'Loading' : 'Loaded'}</div>
+        {directCloudinaryUrl && <div>Direct: {directCloudinaryUrl.substring(0, 30)}...</div>}
       </div>
     );
   };
@@ -116,12 +156,12 @@ export default function OptimizedImage({
     return (
       <div style={{ position: 'relative' }}>
         <Image
-          src={src}
+          src={imageSrc}
           alt={alt}
           fill
           onError={handleError}
           onLoad={handleLoad}
-          blurDataURL={imageProps.blurDataURL}
+          blurDataURL={options.blurDataURL || defaultBlurDataURL}
           placeholder="blur"
           {...props}
         />
@@ -134,13 +174,13 @@ export default function OptimizedImage({
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <Image
-        src={src}
-        width={imageProps.width}
-        height={imageProps.height}
+        src={imageSrc}
+        width={options.width || asset?.dimensions?.width || 800}
+        height={options.height || asset?.dimensions?.height || 600}
         alt={alt}
         onError={handleError}
         onLoad={handleLoad}
-        blurDataURL={imageProps.blurDataURL}
+        blurDataURL={options.blurDataURL || defaultBlurDataURL}
         placeholder="blur"
         {...props}
       />
