@@ -1,108 +1,154 @@
 # Tasks: Allure MD Web Application
 
-## Overview
-This file documents the tasks required to complete the Allure MD web application, as parsed from the PRD using task-master. It serves as the source of truth for all task tracking.
-
-## Current Task Status
-
-| Task ID | Title | Status | Priority | Dependencies |
-|---------|-------|--------|----------|----------------|
-| 1 | Project Setup & Environment Configuration | Done | High | None |
-| 2 | Database Schema Implementation | Done | High | 1 |
-| 3 | Cloudinary Media System Integration | Done | High | 1 |
-| 4 | Article System Implementation | In Progress | Medium | 2, 3, 5 |
-| 5 | Authentication & User Management | Done | High | 2 |
-| 6 | Gallery System Implementation | Pending | Medium | 2, 3, 5 |
-| 7 | Admin Dashboard Development | Pending | Medium | 2, 3, 4, 5 |
-| 8 | Chat Integration | Pending | Low | 2, 3, 5 |
-| 9 | Scheduled Jobs & Automation | Pending | Low | 2, 5, 7 |
-| 10 | Test & Deploy | Pending | High | All |
-
-## Task Details
-
-### Task 1: Project Setup & Environment Configuration
-- **Description**: Set up the repository, development environment, and essential configurations.
-- **Status**: Done
-- **Priority**: High
-- **Dependencies**: None
-
-### Task 2: Database Schema Implementation
-- **Description**: Implement the database schema as defined in the PRD, including all required tables and relationships.
-- **Status**: Done
-- **Priority**: High
-- **Dependencies**: 1
-
-### Task 3: Cloudinary Media System Integration
-- **Description**: Integrate Cloudinary for image and video management, implement media components and utilities.
-- **Status**: Done
-- **Priority**: High
-- **Dependencies**: 1
-- **Implementation**: 
-  - Created enhanced Cloudinary components (CldImage, CldVideo)
-  - Implemented utility functions for transformations
-  - Created media service for database interaction
-  - Migrated from placeholder system to direct Cloudinary IDs
-  - Updated all components to support both legacy placeholders and direct IDs
-  - Created SQL function for efficient legacy placeholder lookups
-  - Implemented folder-based components (CloudinaryFolderImage, CloudinaryFolderGallery)
-  - Added utility functions for Cloudinary folder path handling
+## Active Tasks
 
 ### Task 4: Article System Implementation
-- **Description**: Build the article management system with categories, SEO optimization, and front-end displays.
-- **Status**: In Progress
-- **Priority**: Medium
-- **Dependencies**: 2, 3, 5
-- **Implementation**:
-  - ✅ Updated article components to use new Cloudinary components:
-    - ✅ ArticleContent component updated
-    - ✅ Articles list page updated
-    - ✅ Article detail page updated
-  - ✅ Implemented SEO optimization for articles
-  - ⏳ Enhancing article filtering and categorization
-  - ⏳ Updating admin interface for article management
-  - Started implementation of text-to-speech functionality
+**Status**: IN PROGRESS
+**Dependencies**: Task 3 (Cloudinary Media System Integration)
+**Description**: Update the article system to use the new Cloudinary media components and implement article management features.
 
-### Task 5: Authentication & User Management
-- **Description**: Implement user authentication, authorization, and profile management.
-- **Status**: Done
-- **Priority**: High
-- **Dependencies**: 2
-- **Implementation**:
-  - ✅ Set up Supabase Auth with email/password authentication
-  - ✅ Created user profile table with RLS policies
-  - ✅ Implemented login and signup forms with validation
-  - ✅ Set up role-based access control
-  - ✅ Created protected routes using Next.js middleware
-  - ✅ Implemented password reset functionality
-  - ✅ Created user profile management page
-  - ✅ Configured selective authentication (most pages public, admin and profile protected)
+**Subtasks**:
+1. ✅ Update article content component to use new Cloudinary components
+2. ✅ Update article list page to use new Cloudinary components 
+3. ✅ Update article detail page to use new Cloudinary components
+4. ✅ Implement SEO optimization for articles
+5. ⏳ Enhance article filtering and categorization
+6. ⏳ Complete admin interface for article management
+7. Add text-to-speech functionality for articles
+
+### Bug Fixes and Improvements
+**Status**: COMPLETED
+**Dependencies**: None
+**Description**: Address issues with Cloudinary integration and circular dependencies.
+
+**Subtasks**:
+1. ✅ Fix circular dependencies in Cloudinary component imports
+2. ✅ Improve URL construction for handling version numbers
+3. ✅ Add backward compatibility with legacy function names
+4. ✅ Resolve webpack module initialization errors
+
+## Completed Tasks
+
+### Task 1: Project Setup & Environment Configuration
+**Status**: COMPLETED
+**Dependencies**: None
+**Description**: Set up the basic project structure, install dependencies, and configure development environment.
+
+**Subtasks**:
+1. ✅ Initialize Next.js application with App Router
+2. ✅ Configure TailwindCSS and UI components
+3. ✅ Set up Supabase client
+4. ✅ Configure environment variables
+5. ✅ Set up basic folder structure
+6. ✅ Create essential utility functions
+7. ✅ Configure ESLint and Prettier
+
+### Task 2: Database Schema Implementation
+**Status**: COMPLETED
+**Dependencies**: Task 1 (Project Setup)
+**Description**: Create and configure the database schema according to the PRD specifications.
+
+**Subtasks**:
+1. ✅ Create media_assets table
+2. ✅ Create galleries table
+3. ✅ Create albums table
+4. ✅ Create cases table
+5. ✅ Create case_images table
+6. ✅ Implement Row Level Security policies
+7. ✅ Create migration scripts for existing data
+8. ✅ Execute migrations and verify data integrity
+
+### Task 3: Cloudinary Media System Integration
+**Status**: COMPLETED
+**Dependencies**: Task 2 (Database Schema)
+**Description**: Implement the Cloudinary media system as specified in the PRD.
+
+**Subtasks**:
+1. ✅ Create CldImage component
+2. ✅ Create CldVideo component
+3. ✅ Create utility functions for Cloudinary transformations
+4. ✅ Create OG image generation utilities
+5. ✅ Update Next.js configuration for Cloudinary
+6. ✅ Create media service to interact with the database
+7. ✅ Develop migration script from placeholder system
+8. ✅ Execute the migration script and verify data integrity
+9. ✅ Update hooks and components to support both legacy and direct IDs
+10. ✅ Create SQL function for efficient legacy placeholder lookups
+11. ✅ Implement folder-based Cloudinary components
+12. ✅ Fix circular dependencies between components
+13. ✅ Improve URL construction for version numbers
+14. ✅ Add backward compatibility with legacy function names
+
+### Task 5: Authentication System Implementation
+**Status**: COMPLETED
+**Dependencies**: Task 2 (Database Schema)
+**Description**: Implement user authentication and account management using Supabase Auth.
+
+**Subtasks**:
+1. ✅ Set up Supabase Auth with email/password authentication
+2. ✅ Create user profile table with additional fields
+3. ✅ Implement login form with validation
+4. ✅ Implement signup form with validation
+5. ✅ Set up role-based access control
+6. ✅ Create protected routes using Next.js middleware
+7. ✅ Implement password reset functionality
+8. ✅ Create user profile settings page
+9. ✅ Configure selective authentication (most pages public, admin and profile protected)
+
+## Upcoming Tasks
 
 ### Task 6: Gallery System Implementation
-- **Description**: Complete the gallery system with albums, cases, and case images.
-- **Status**: Pending
-- **Priority**: Medium
-- **Dependencies**: 2, 3, 5
+**Status**: PENDING
+**Dependencies**: Task 3 (Cloudinary Media System)
+**Description**: Update the gallery system to use the new Cloudinary media components and implement gallery management features.
+
+**Planned Subtasks**:
+1. Update gallery components to use new media components
+2. Create dynamic routes for galleries, albums, and cases
+3. Implement filtering and sorting options
+4. Add responsive design for mobile and desktop
+5. Create admin interface for gallery management
+6. Implement image upload and organization features
+7. Add SEO optimization for gallery pages
 
 ### Task 7: Admin Dashboard Development
-- **Description**: Create the admin dashboard for content management and site administration.
-- **Status**: Pending
-- **Priority**: Medium
-- **Dependencies**: 2, 3, 4, 5
+**Status**: PENDING
+**Dependencies**: Tasks 4, 5, 6
+**Description**: Develop the admin dashboard for content management, analytics, and user data.
 
-### Task 8: Chat Integration
-- **Description**: Implement the AI-powered chat system for patient inquiries.
-- **Status**: Pending
-- **Priority**: Low
-- **Dependencies**: 2, 3, 5
+**Planned Subtasks**:
+1. Create dashboard layout and navigation
+2. Implement content management interfaces
+3. Create analytics dashboard
+4. Build marketing tools
+5. Develop user data management interfaces
+6. Implement access controls and permissions
+7. Add activity logging and audit trails
 
-### Task 9: Scheduled Jobs & Automation
-- **Description**: Set up automated tasks for maintenance, data processing, and notifications.
-- **Status**: Pending
-- **Priority**: Low
-- **Dependencies**: 2, 5, 7
+### Task 8: Chatbot Implementation
+**Status**: PENDING 
+**Dependencies**: Task 5 (Authentication)
+**Description**: Implement the LLM-powered chatbot for real-time communication and task automation.
 
-### Task 10: Test & Deploy
-- **Description**: Comprehensive testing and deployment to production.
-- **Status**: Pending
-- **Priority**: High
-- **Dependencies**: All previous tasks 
+**Planned Subtasks**:
+1. Integrate OpenAI API
+2. Create chat interface
+3. Implement specialized query handling
+4. Create user profile integration
+5. Add appointment scheduling capabilities
+6. Implement event invitations
+7. Add provider communication features
+
+### Task 9: Performance Optimization
+**Status**: PENDING
+**Dependencies**: Tasks 3, 4, 6, 7, 8
+**Description**: Optimize application performance, caching, and image delivery.
+
+**Planned Subtasks**:
+1. Implement React Query for data fetching and caching
+2. Optimize image delivery
+3. Enhance loading performance
+4. Implement edge caching
+5. Add service worker for offline capabilities
+6. Optimize bundle size
+7. Implement performance monitoring 
