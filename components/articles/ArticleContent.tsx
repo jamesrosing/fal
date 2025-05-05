@@ -1,10 +1,11 @@
+'use client'
+
 import { Article } from '@/lib/types'
 import { format } from 'date-fns'
-import Image from 'next/image'
-import { getCloudinaryUrl } from '@/lib/cloudinary'
+import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
+import { extractImageNameFromPath } from '@/lib/cloudinary/folder-utils'
 import OptimizedImage from '@/components/media/OptimizedImage';
 import OptimizedVideo from '@/components/media/OptimizedVideo';
-
 
 const isValidDate = (dateString: string): boolean => {
   const date = new Date(dateString);
@@ -12,15 +13,9 @@ const isValidDate = (dateString: string): boolean => {
 };
 
 export default function ArticleContent({ article }: { article: Article }) {
-  // Convert the article image to a proper Cloudinary URL
-  const imageUrl = article.image ? 
-    getCloudinaryUrl(article.image, {
-      width: 1200,
-      height: 630,
-      crop: 'fill',
-      gravity: 'auto'
-    }) : 
-    null;
+  // Process the article image path
+  const articleImageFolder = 'articles';
+  const articleImageName = article.image ? extractImageNameFromPath(article.image) : null;
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-8 font-sans" itemScope itemType="http://schema.org/Article">
@@ -31,15 +26,18 @@ export default function ArticleContent({ article }: { article: Article }) {
             ? <time dateTime={article.created_at}>{format(new Date(article.created_at), 'MMMM d, yyyy')}</time>
             : <span>unknown date</span>}
         </div>
-        {imageUrl && (
+        {articleImageName && (
           <div className="mt-6">
-            <Image 
-              src={imageUrl} 
-              alt={article.title} 
-              width={1200} 
-              height={630} 
-              className="rounded-lg object-cover w-full h-auto" 
-              itemProp="image" 
+            <CloudinaryFolderImage
+              folder={articleImageFolder}
+              imageName={articleImageName}
+              alt={article.title}
+              width={1200}
+              height={630}
+              className="rounded-lg object-cover w-full h-auto"
+              crop="fill"
+              gravity="auto"
+              priority={true}
             />
           </div>
         )}
@@ -67,16 +65,14 @@ export default function ArticleContent({ article }: { article: Article }) {
               {block.type === 'heading' && <h2>{block.content}</h2>}
               {block.type === 'image' && (
                 <div className="my-8">
-                  <Image
-                    src={getCloudinaryUrl(block.content, {
-                      width: 800,
-                      height: 450,
-                      crop: 'fill'
-                    })}
+                  <CloudinaryFolderImage
+                    folder={articleImageFolder}
+                    imageName={extractImageNameFromPath(block.content)}
                     alt={block.metadata?.alt || 'Article image'}
                     width={800}
                     height={450}
                     className="rounded-lg"
+                    crop="fill"
                   />
                   {block.metadata?.caption && (
                     <p className="text-center text-sm text-muted-foreground mt-2">

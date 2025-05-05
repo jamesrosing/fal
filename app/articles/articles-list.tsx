@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Article, ArticleCategory, ARTICLE_CATEGORIES } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage';
+import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils';
 
 // Define the main category slugs we want to show in the menubar
 const MAIN_CATEGORY_SLUGS = ['latest-news', 'plastic-surgery', 'dermatology', 'medical-spa', 'functional-medicine', 'educational'];
@@ -222,11 +220,11 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
       {/* Articles Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {articles.map((article) => {
-          // Handle full URLs or just public IDs
-          const imageUrl = article.featured_image || article.image;
-          const formattedImageUrl = imageUrl?.includes('https://') 
-            ? imageUrl 
-            : mediaUrl(`articles/${imageUrl}`);
+          const imageIsCloudinaryUrl = article.featured_image && isCloudinaryUrl(article.featured_image);
+          const articleImageFolder = 'articles';
+          const articleImageName = article.featured_image ? 
+            (imageIsCloudinaryUrl ? extractImageNameFromPath(article.featured_image) : article.featured_image) : 
+            null;
           
           const publishDate = article.publishedAt || article.date || article.createdAt;
           const categoryName = article.categoryName || 
@@ -244,31 +242,47 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
             >
               <Link href={`/articles/${article.slug}`} className="block">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src={formattedImageUrl || "/placeholder-image.jpg"}
-                    alt={article.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <span className="inline-block px-2 py-1 mb-2 text-xs font-medium bg-white/20 backdrop-blur-md rounded-full text-white">
-                      {categoryName}
-                    </span>
-                    <h3 className="text-lg font-serif text-white">{article.title}</h3>
-                    <p className="mt-1 text-sm text-zinc-300 line-clamp-2">{article.excerpt}</p>
-                    <div className="mt-2 flex items-center text-xs text-zinc-400">
-                      <span>{new Date(publishDate || new Date()).toLocaleDateString()}</span>
-                      <span className="mx-1.5">•</span>
-                      <span>{article.readTime || article.reading_time ? `${article.readTime || article.reading_time} min` : '5 min read'}</span>
+                  {articleImageName ? (
+                    <CloudinaryFolderImage
+                      folder={articleImageFolder}
+                      imageName={articleImageName}
+                      alt={article.title}
+                      width={600}
+                      height={450}
+                      crop="fill"
+                      gravity="auto"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                      <span className="text-zinc-500">No image</span>
                     </div>
+                  )}
+                </div>
+                <div className="mt-4">
+                  <div className="text-sm font-medium text-zinc-400 mb-2">{categoryName}</div>
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-zinc-300 transition-colors">{article.title}</h3>
+                  <p className="text-zinc-400 text-sm line-clamp-2">{article.excerpt}</p>
+                  
+                  <div className="flex items-center mt-3 text-sm text-zinc-500">
+                    <span className="mr-2">
+                      {publishDate && new Date(publishDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                    {article.readTime && (
+                      <>
+                        <span className="mx-2">•</span>
+                        <span>{article.readTime}</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </Link>
             </motion.div>
-          );
+          )
         })}
       </div>
       

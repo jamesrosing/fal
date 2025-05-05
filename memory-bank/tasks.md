@@ -10,7 +10,7 @@ This file documents the tasks required to complete the Allure MD web application
 | 1 | Project Setup & Environment Configuration | Done | High | None |
 | 2 | Database Schema Implementation | Done | High | 1 |
 | 3 | Cloudinary Media System Integration | Done | High | 1 |
-| 4 | Article System Implementation | Pending | Medium | 2, 3, 5 |
+| 4 | Article System Implementation | In Progress | Medium | 2, 3, 5 |
 | 5 | Authentication & User Management | Done | High | 2 |
 | 6 | Gallery System Implementation | Pending | Medium | 2, 3, 5 |
 | 7 | Admin Dashboard Development | Pending | Medium | 2, 3, 4, 5 |
@@ -44,12 +44,23 @@ This file documents the tasks required to complete the Allure MD web application
   - Migrated from placeholder system to direct Cloudinary IDs
   - Updated all components to support both legacy placeholders and direct IDs
   - Created SQL function for efficient legacy placeholder lookups
+  - Implemented folder-based components (CloudinaryFolderImage, CloudinaryFolderGallery)
+  - Added utility functions for Cloudinary folder path handling
 
 ### Task 4: Article System Implementation
 - **Description**: Build the article management system with categories, SEO optimization, and front-end displays.
-- **Status**: Pending
+- **Status**: In Progress
 - **Priority**: Medium
 - **Dependencies**: 2, 3, 5
+- **Implementation**:
+  - ✅ Updated article components to use new Cloudinary components:
+    - ✅ ArticleContent component updated
+    - ✅ Articles list page updated
+    - ✅ Article detail page updated
+  - ✅ Implemented SEO optimization for articles
+  - ⏳ Enhancing article filtering and categorization
+  - ⏳ Updating admin interface for article management
+  - Started implementation of text-to-speech functionality
 
 ### Task 5: Authentication & User Management
 - **Description**: Implement user authentication, authorization, and profile management.

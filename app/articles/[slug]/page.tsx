@@ -1,18 +1,13 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { NavBar } from "@/components/nav-bar"
-import Image from "next/image"
-import { getCloudinaryUrl } from "@/lib/cloudinary"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { createClient } from '@supabase/supabase-js'
 import { Article } from "@/lib/types"
 import ArticleContent from "@/components/articles/ArticleContent"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
-
-
+import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
+import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils'
 
 type Props = {
   params: { slug: string }
@@ -152,6 +147,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: 'The requested article could not be found.'
     };
   }
+
+  // Process the article image
+  const articleImageFolder = 'articles';
+  const imageIsCloudinaryUrl = article.image && isCloudinaryUrl(article.image);
+  const articleImageName = article.image ? 
+    (imageIsCloudinaryUrl ? extractImageNameFromPath(article.image) : article.image) : 
+    null;
+  
+  const ogImageUrl = articleImageName ?
+    `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto,c_fill,w_1200,h_630/${process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || 'alluremd'}/${articleImageFolder}/${articleImageName}` :
+    undefined;
   
   return {
     title: article.title,
@@ -163,11 +169,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: article.publishedAt || article.date,
       modifiedTime: article.updatedAt,
       authors: article.author ? [article.author] : undefined,
-      images: article.image ? [
+      images: ogImageUrl ? [
         {
-          url: article.image.includes('https://') 
-            ? article.image 
-            : mediaUrl(`articles/${article.image}`),
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: article.title
@@ -186,12 +190,12 @@ export default async function ArticlePage({ params }: Props) {
 
   const relatedArticles = await getRelatedArticles(article);
   
-  // Prepare the image URL
-  const imageUrl = article.image 
-    ? (article.image.includes('https://') 
-      ? article.image 
-      : mediaUrl(`articles/${article.image}`)) 
-    : '/placeholder-image.jpg';
+  // Process the article image
+  const articleImageFolder = 'articles';
+  const imageIsCloudinaryUrl = article.image && isCloudinaryUrl(article.image);
+  const articleImageName = article.image ? 
+    (imageIsCloudinaryUrl ? extractImageNameFromPath(article.image) : article.image) : 
+    null;
   
   // Get the article category display name
   const categoryName = article.categoryName || article.category;
@@ -203,14 +207,21 @@ export default async function ArticlePage({ params }: Props) {
       {/* Article Hero */}
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
-          <Image
-            src={imageUrl}
-            alt={article.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
+          {articleImageName ? (
+            <CloudinaryFolderImage
+              folder={articleImageFolder}
+              imageName={articleImageName}
+              alt={article.title}
+              width={1920}
+              height={1080}
+              className="object-cover w-full h-full"
+              priority={true}
+              crop="fill"
+              gravity="auto"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-zinc-900 to-zinc-800" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         
@@ -248,7 +259,7 @@ export default async function ArticlePage({ params }: Props) {
                   day: 'numeric' 
                 })}</span>
                 <span className="w-2 h-2 rounded-full bg-gray-300"></span>
-                <span>{article.readTime || '5 min'} read</span>
+                <span>{article.readTime || '5 min read'}</span>
               </div>
             </motion.div>
           </div>
@@ -256,52 +267,49 @@ export default async function ArticlePage({ params }: Props) {
       </section>
       
       {/* Article Content */}
-      <section className="py-16 md:py-24 bg-zinc-900 text-white">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+      <section className="bg-white text-black py-16">
+        <div className="container mx-auto">
           <ArticleContent article={article} />
         </div>
       </section>
       
       {/* Related Articles */}
       {relatedArticles.length > 0 && (
-        <section className="py-16 md:py-24 bg-black text-white">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-            <div className="mb-12 text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Related Articles</h2>
-            </div>
+        <section className="bg-zinc-900 py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl md:text-3xl font-serif font-semibold text-white mb-8">Related Articles</h2>
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {relatedArticles.map((relatedArticle) => {
-                const relatedImageUrl = relatedArticle.image ? 
-                  (relatedArticle.image.includes('https://') 
-                    ? relatedArticle.image 
-                    : mediaUrl(`articles/${relatedArticle.image}`)) 
-                  : '/placeholder-image.jpg';
+              {relatedArticles.map(relatedArticle => {
+                const relatedImageIsCloudinaryUrl = relatedArticle.image && isCloudinaryUrl(relatedArticle.image);
+                const relatedImageName = relatedArticle.image ? 
+                  (relatedImageIsCloudinaryUrl ? extractImageNameFromPath(relatedArticle.image) : relatedArticle.image) : 
+                  null;
                 
                 return (
-                  <motion.div
-                    key={relatedArticle.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    viewport={{ once: true }}
-                    className="bg-zinc-800 rounded-lg overflow-hidden"
-                  >
-                    <Link href={`/articles/${relatedArticle.slug}`} className="block">
-                      <div className="relative h-40">
-                        <Image
-                          src={relatedImageUrl}
+                  <Link href={`/articles/${relatedArticle.slug}`} key={relatedArticle.id} className="group">
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg mb-4">
+                      {relatedImageName ? (
+                        <CloudinaryFolderImage
+                          folder={articleImageFolder}
+                          imageName={relatedImageName}
                           alt={relatedArticle.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
+                          width={600}
+                          height={450}
+                          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                          crop="fill"
                         />
-                      </div>
-                      <div className="p-4">
-                        <h3 className="text-lg font-bold mb-2">{relatedArticle.title}</h3>
-                        <p className="text-zinc-400 text-sm line-clamp-2">{relatedArticle.excerpt}</p>
-                      </div>
-                    </Link>
-                  </motion.div>
+                      ) : (
+                        <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                          <span className="text-zinc-500">No image</span>
+                        </div>
+                      )}
+                    </div>
+                    <h3 className="text-lg font-semibold text-white group-hover:text-zinc-300 transition-colors">
+                      {relatedArticle.title}
+                    </h3>
+                    <p className="text-zinc-400 text-sm mt-2 line-clamp-2">{relatedArticle.excerpt}</p>
+                  </Link>
                 );
               })}
             </div>
@@ -309,5 +317,5 @@ export default async function ArticlePage({ params }: Props) {
         </section>
       )}
     </main>
-  );
+  )
 } 

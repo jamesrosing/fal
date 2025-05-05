@@ -24,6 +24,8 @@ import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import CloudinaryMediaLibrary from '@/components/CloudinaryMediaLibrary';
 import { CloudinaryAsset } from '@/lib/cloudinary';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage';
+import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
@@ -73,8 +75,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
 
 
 // Function to check if a date string is valid
@@ -999,18 +999,22 @@ export function ArticleManager({ initialCategoryId }: ArticleManagerProps) {
                 
                 return (
                   <Card key={article.id} className="overflow-hidden">
-                    {article.featured_image ? (
-                      <div className="relative h-48 w-full">
-                        <CloudinaryImage
-                          publicId={article.featured_image}
-                          alt={article.title || 'Article image'}
-                          className="object-cover h-full w-full"
-                          fallbackSrc="/images/placeholder.jpg"
-                        />
-                      </div>
-                    ) : (
-                      <div className="bg-muted h-48 flex items-center justify-center">
-                        <FileImage className="w-8 h-8 text-muted-foreground" />
+                    {/* Image Preview */}
+                    {article.featured_image && (
+                      <div className="mb-4">
+                        <Label>Featured Image</Label>
+                        <div className="mt-2 rounded-md overflow-hidden border border-gray-200 dark:border-gray-800">
+                          <CloudinaryFolderImage
+                            folder="articles"
+                            imageName={extractImageNameFromPath(article.featured_image)}
+                            alt={article.title || "Article featured image"}
+                            width={800}
+                            height={450}
+                            className="w-full h-auto object-cover"
+                            crop="fill"
+                            gravity="auto"
+                          />
+                        </div>
                       </div>
                     )}
                     
