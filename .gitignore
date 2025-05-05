@@ -33,6 +33,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# TypeScript compiled output
+**/*.js.map
+lib/**/*.js
+app/**/*.js
+components/**/*.js
+hooks/**/*.js
+# Don't ignore these important JS config files
+!next.config.js
+!postcss.config.js
+!tailwind.config.js
+!eslint.config.js
+!.prettierrc.js
+!google-tag-manager.js
+# Keep these specific reference/template JS files
+!lib/image-config.js
+!lib/zenoti-client-template.js
 
 # Video files
 public/video/*.mp4

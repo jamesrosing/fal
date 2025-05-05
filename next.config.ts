@@ -1,115 +1,63 @@
-import type { NextConfig } from 'next'
-import bundleAnalyzer from '@next/bundle-analyzer'
+import { config } from 'dotenv'
+// Load environment variables from .env file
+config()
 
-const withBundleAnalyzer = bundleAnalyzer({
+// Dynamically import Sentry if available
+let withSentryConfig: any = (config: any) => config;
+try {
+  withSentryConfig = require('@sentry/nextjs').withSentryConfig;
+} catch (e) {
+  console.log('Sentry not installed, skipping Sentry integration');
+}
+
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 })
 
-const config: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    serverActions: {
-      bodySizeLimit: '20mb'
-    }
-  },
-  eslint: {
-    ignoreDuringBuilds: true
+    serverActions: true,
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'fal.media'
-      },
-      {
-        protocol: 'https',
-        hostname: '**.fal.run',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.blob.vercel-storage.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/**',
-      }
-    ],
+    domains: ['res.cloudinary.com', 'source.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
   },
-  env: {
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: 'dyrzyfg3w',
-  },
-  // Add webpack configuration to handle Node.js modules in the browser
-  webpack: (config, { isServer }) => {
-    // Handle Cloudinary Node.js dependencies
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        crypto: false,
-        stream: false,
-        os: false,
-        http: false,
-        https: false,
-        zlib: false,
-      };
-    }
-    return config;
-  },
-  // Enable TypeScript strict mode
-  typescript: {
-    ignoreBuildErrors: true
-  },
-  // Configure headers for security
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/(.*)',
         headers: [
           {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains'
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'DENY',
           },
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
-          }
-        ]
-      }
-    ]
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+        ],
+      },
+    ];
   },
-  // Ignore errors during build
-  onDemandEntries: {
-    // period (in ms) where the server will keep pages in the buffer
-    maxInactiveAge: 25 * 1000,
-    // number of pages that should be kept simultaneously without being disposed
-    pagesBufferLength: 2,
-  },
-  // Disable static export for now
-  output: 'standalone',
-  // Skip problematic pages
-  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
-  excludeDefaultMomentLocales: true,
-  distDir: '.next',
-  poweredByHeader: false,
-  // Add transpilePackages for next-cloudinary
-  transpilePackages: [],
-};
+}
 
-// Simple export without trying to use the plugin
-// Since we're directly using the CldImage component, we don't need the plugin
-export default withBundleAnalyzer(config);
+// For Sentry
+const sentryWebpackPluginOptions = {
+  silent: true,
+  dryRun: process.env.NODE_ENV !== 'production',
+}
+
+// Apply all the plugins
+export default withBundleAnalyzer(
+  withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+)

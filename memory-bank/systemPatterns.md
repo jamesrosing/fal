@@ -83,3 +83,280 @@ Galleries → Albums → Cases → Images
 3. **Loading States**: Consistent loading indicators for improved UX
 4. **Form Validation**: Client and server-side validation with clear error messages
 5. **API Responses**: Standardized response format across all endpoints 
+
+## SEO Architecture Patterns
+
+### Hybrid Rendering Strategy
+
+We use a contextual rendering approach based on content type:
+
+1. **Static Generation (SSG)** for core pages that don't change frequently:
+   - Homepage
+   - About pages
+   - Core procedure descriptions
+   - Physician profiles
+   - Contact information
+
+2. **Incremental Static Regeneration (ISR)** for content that updates periodically:
+   - Blog posts
+   - Testimonials
+   - Before/after galleries
+
+3. **Server-Side Rendering (SSR)** for personalized or frequently changing content:
+   - Search results
+   - Filtered galleries
+   - Appointment availability
+
+### SEO Component Architecture
+
+1. **Metadata Component Pattern**
+```tsx
+// app/procedures/[slug]/page.tsx
+import { notFound } from 'next/navigation'
+import { Metadata, ResolvingMetadata } from 'next'
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // Fetch data here
+  
+  return {
+    title: `${title} | Allure MD`,
+    description: description,
+    openGraph: {
+      images: [featuredImage],
+    },
+  }
+}
+```
+
+2. **Structured Data Pattern**
+```tsx
+// components/SchemaOrg.tsx
+export default function SchemaOrg({ 
+  procedureSchema = null,
+}) {
+  const practiceSchema = generatePracticeSchema()
+  const doctorSchema = generateDoctorSchema()
+  
+  const schemas = [practiceSchema, doctorSchema]
+  
+  if (procedureSchema) {
+    schemas.push(procedureSchema)
+  }
+  
+  return (
+    <>
+      {schemas.map((schema, i) => (
+        <script
+          key={`schema-${i}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+    </>
+  )
+}
+```
+
+3. **OpenGraph Image Generation Pattern**
+```tsx
+// app/procedures/[slug]/opengraph-image.tsx
+import { ImageResponse } from 'next/og'
+
+export const alt = 'Procedure Details'
+export const size = {
+  width: 1200,
+  height: 630,
+}
+export const contentType = 'image/png'
+
+export default async function OgImage({ params }) {
+  // Fetch data here
+  
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(to bottom, #0f766e, #0f5259)',
+          width: '100%',
+          height: '100%',
+          padding: '40px',
+        }}
+      >
+        <h1 style={{ color: 'white', fontSize: '64px', textAlign: 'center' }}>
+          {title}
+        </h1>
+        <p style={{ color: 'white', fontSize: '32px', opacity: 0.8 }}>
+          Allure MD Plastic Surgery & Dermatology
+        </p>
+      </div>
+    ),
+    { ...size }
+  )
+}
+```
+
+### User Experience Component Patterns
+
+1. **Before/After Comparison Pattern**
+```tsx
+// components/BeforeAfterSlider.tsx
+export default function BeforeAfterSlider({
+  beforeImage,
+  afterImage,
+  beforeAlt = 'Before procedure',
+  afterAlt = 'After procedure',
+}) {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  
+  // Implementation details...
+  
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full aspect-square md:aspect-video overflow-hidden rounded-lg cursor-ew-resize"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+    >
+      {/* Implementation details... */}
+    </div>
+  );
+}
+```
+
+2. **Multi-Step Form Pattern**
+```tsx
+// components/VirtualConsultation/index.tsx
+export default function VirtualConsultation() {
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  
+  // Form setup...
+  
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
+  
+  if (isSuccess) {
+    return <SuccessMessage />;
+  }
+  
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
+      <h2 className="text-2xl font-playfair mb-6">Virtual Consultation</h2>
+      
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {step === 1 && <StepOne />}
+        {step === 2 && <StepTwo />}
+        {step === 3 && <StepThree />}
+      </form>
+    </div>
+  );
+}
+```
+
+### Feature Flag Pattern
+
+```typescript
+// lib/featureFlags.ts
+export async function getFeatureFlags() {
+  const supabase = createServerSupabaseClient()
+  
+  const { data: flags, error } = await supabase
+    .from('feature_flags')
+    .select('*')
+  
+  if (error) {
+    console.error('Error fetching feature flags:', error)
+    return {}
+  }
+  
+  return flags.reduce((acc, flag) => {
+    acc[flag.name] = flag.enabled
+    return acc
+  }, {})
+}
+
+// Usage in a server component
+const flags = await getFeatureFlags()
+if (flags.newGalleryComponent) {
+  // Render new component
+} else {
+  // Render old component
+}
+```
+
+## Content Architecture Patterns
+
+### Procedure Content Structure
+```typescript
+// types/procedure.ts
+export interface Procedure {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle?: string;
+  summary: string;
+  description: string;
+  featuredImage: string;
+  thumbnailUrl: string;
+  metaTitle: string;
+  metaDescription: string;
+  benefits: string[];
+  faq: {
+    question: string;
+    answer: string;
+  }[];
+  beforeAfterGallery: {
+    id: string;
+    title: string;
+    before: string;
+    after: string;
+    description?: string;
+  }[];
+  relatedProcedures: {
+    id: string;
+    slug: string;
+    title: string;
+    thumbnailUrl: string;
+  }[];
+  doctors: {
+    id: string;
+    slug: string;
+    name: string;
+    title: string;
+    photoUrl: string;
+  }[];
+  categories: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+### Hierarchical URL Structure
+- `/`: Homepage
+- `/about`: About the practice
+- `/procedures`: All procedures
+- `/procedures/[category]`: Category pages (facial, breast, body)
+- `/procedures/[category]/[slug]`: Individual procedure pages
+- `/doctors`: Physician directory
+- `/doctors/[slug]`: Individual physician profiles
+- `/gallery`: Main gallery
+- `/gallery/[category]`: Gallery categories
+- `/gallery/[category]/[caseId]`: Individual before/after cases
+- `/blog`: Blog/educational content
+- `/blog/[category]`: Blog categories
+- `/blog/[slug]`: Individual blog posts
+
+### Keyword Implementation Pattern
+- Page titles: `[Primary Keyword] | [Brand Name]`
+- Meta descriptions: `[Primary Keyword] + [Unique Value Proposition] + [Call-to-Action]`
+- Content: Natural keyword integration with proper semantic HTML structure
+- Schema: Enhanced with targeted keywords
+- URL structure: Clean URLs with primary keywords 

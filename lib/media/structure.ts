@@ -5,7 +5,17 @@
  * It helps validate asset paths and provides a reference for where assets should be stored.
  */
 
-export const DIRECTORY_STRUCTURE = {
+export type DirectoryNode = {
+  [key: string]: DirectoryNode | null;
+}
+
+export type DirectoryStructure = {
+  public: DirectoryNode;
+  components: DirectoryNode;
+  cloudinary: DirectoryNode;
+}
+
+export const DIRECTORY_STRUCTURE: DirectoryStructure = {
   // Public directory structure for static assets
   public: {
     images: {
@@ -74,11 +84,11 @@ export const DIRECTORY_STRUCTURE = {
  * @param {string} type - The type of path (public, components, cloudinary)
  * @returns {boolean} - Whether the path is valid
  */
-export function validatePath(path, type = 'cloudinary') {
+export function validatePath(path: string, type: keyof DirectoryStructure = 'cloudinary'): boolean {
   if (!path) return false;
   
   const pathParts = path.split('/');
-  let currentLevel = DIRECTORY_STRUCTURE[type];
+  let currentLevel = DIRECTORY_STRUCTURE[type] as DirectoryNode | null;
   
   if (!currentLevel) return false;
   
@@ -98,7 +108,7 @@ export function validatePath(path, type = 'cloudinary') {
  * @param {string[]} pathParts - The parts of the path
  * @returns {string} - The generated path
  */
-export function generatePath(type, pathParts) {
+export function generatePath(type: keyof DirectoryStructure, pathParts: string[]): string {
   if (!pathParts || !pathParts.length) return '';
   
   // Validate the path

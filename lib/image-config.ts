@@ -1,6 +1,16 @@
 import { getCloudinaryUrl, ImageArea } from './cloudinary';
 import { MediaAsset } from './media/types';
 
+/**
+ * This file is intended to replace image-config.js.
+ * 
+ * The image-config.js file is auto-generated and contains all actual media assets.
+ * This TypeScript version provides type definitions and a structure to be used going forward.
+ * 
+ * DO NOT DELETE image-config.js until the migration to this TypeScript version is complete.
+ * The migration script and documentation still reference image-config.js.
+ */
+
 // Define the ImageAsset type
 export interface ImageAsset {
   id: string;
