@@ -1,46 +1,69 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import CldImage from '@/components/media/CldImage'
+import CldVideo from '@/components/media/CldVideo'
+import { getCloudinaryPublicId } from '@/lib/cloudinary'
 
 export function HeroSection() {
   // Use useMediaAsset hook for hero background
-  const { url: heroBackgroundUrl, isVideo } = useMediaAsset('homepage-hero-background', {
+  const { url: heroBackgroundUrl, isVideo, publicId } = useMediaAsset('homepage-hero-background', {
     width: 1920,
     quality: 90,
     format: 'auto',
     responsive: true
   });
+  
+  // Extract Cloudinary public ID from URL if available
+  const cloudinaryId = publicId || (heroBackgroundUrl ? getCloudinaryPublicId(heroBackgroundUrl) : null);
 
   return (
     <section className="relative min-h-screen bg-black">
       <div className="absolute inset-0">
-        {isVideo ? (
-          // Render video background when the asset is a video
-          <video
-            src={heroBackgroundUrl || ""}
-            autoPlay
-            loop
-            muted
-            playsInline
+        {isVideo && cloudinaryId ? (
+          // Render video background using CldVideo when the asset is a video
+          <CldVideo
+            publicId={cloudinaryId}
+            autoPlay={true}
+            loop={true}
+            muted={true}
+            controls={false}
+            width={1920}
+            height={1080}
             className="w-full h-full object-cover"
+            showLoading={false}
           />
-        ) : (
-          // Render image background when the asset is an image
-          <Image
-            src={heroBackgroundUrl || ""}
+        ) : cloudinaryId ? (
+          // Render image background using CldImage when the asset is an image
+          <CldImage
+            publicId={cloudinaryId}
             alt="Allure MD Hero Background"
             fill
             className="object-cover"
             sizes="100vw"
             priority
           />
-        )}
+        ) : heroBackgroundUrl ? (
+          // Fallback to regular image or video if not a Cloudinary asset
+          isVideo ? (
+            <video
+              src={heroBackgroundUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <img
+              src={heroBackgroundUrl}
+              alt="Allure MD Hero Background"
+              className="w-full h-full object-cover"
+            />
+          )
+        ) : null}
         <div className="absolute inset-0 bg-black/30" />
       </div>
       <div className="relative container mx-auto px-4 min-h-screen flex flex-col justify-center lg:px-8">

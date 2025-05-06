@@ -4,19 +4,22 @@ import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import UnifiedMedia from '@/components/media/UnifiedMedia'
+import CldImage from '@/components/media/CldImage'
+import { useState, useEffect } from 'react'
 
 type TeamMember = {
   placeholderId: string;
   alt: string;
   name: string;
   title: string;
+  publicId?: string;
 };
 
 export function TeamSection() {
   const isMobile = useIsMobile();
   
   // Define team members with placeholderIds
-  const teamMembers: TeamMember[] = [
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     {
       placeholderId: "team-provider-rosing",
       alt: "Dr. James Rosing",
@@ -41,7 +44,55 @@ export function TeamSection() {
       name: "Dr. Pooja Gidwani",
       title: "Functional Medicine"
     }
-  ];
+  ]);
+  
+  // Background image
+  const [backgroundPublicId, setBackgroundPublicId] = useState<string | null>(null);
+  
+  // Fetch public IDs for team member images and background
+  useEffect(() => {
+    async function fetchPublicIds() {
+      try {
+        // Fetch public ID for background image
+        const bgResponse = await fetch(`/api/media/homepage-team-background`);
+        if (bgResponse.ok) {
+          const bgData = await bgResponse.json();
+          setBackgroundPublicId(bgData.public_id || bgData.publicId);
+        }
+        
+        // Fetch public IDs for team member images
+        const updatedMembers = [...teamMembers];
+        let hasChanges = false;
+        
+        for (let i = 0; i < updatedMembers.length; i++) {
+          const member = updatedMembers[i];
+          try {
+            const response = await fetch(`/api/media/${member.placeholderId}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.public_id || data.publicId) {
+                updatedMembers[i] = {
+                  ...member,
+                  publicId: data.public_id || data.publicId
+                };
+                hasChanges = true;
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching public ID for ${member.placeholderId}:`, error);
+          }
+        }
+        
+        if (hasChanges) {
+          setTeamMembers(updatedMembers);
+        }
+      } catch (error) {
+        console.error("Error fetching public IDs:", error);
+      }
+    }
+    
+    fetchPublicIds();
+  }, []);
 
   // Mobile Layout
   if (isMobile) {
@@ -49,20 +100,34 @@ export function TeamSection() {
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          <UnifiedMedia 
-            placeholderId="homepage-team-background"
-            alt="Our Medical Team"
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-            mediaType="auto"
-            options={{
-              width: 1920,
-              quality: 80
-            }}
-            fallbackSrc="/images/global/placeholder-hero.jpg"
-          />
+          {backgroundPublicId ? (
+            <CldImage 
+              publicId={backgroundPublicId}
+              alt="Our Medical Team"
+              width={1920}
+              height={1080}
+              className="absolute inset-0 w-full h-full object-cover"
+              sizes="100vw"
+              priority
+              quality="auto"
+            />
+          ) : (
+            <UnifiedMedia 
+              placeholderId="homepage-team-background"
+              alt="Our Medical Team"
+              width={1920}
+              height={1080}
+              className="absolute inset-0 w-full h-full object-cover"
+              sizes="100vw"
+              priority
+              mediaType="auto"
+              options={{
+                width: 1920,
+                quality: 80
+              }}
+              fallbackSrc="/images/global/placeholder-hero.jpg"
+            />
+          )}
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -102,19 +167,34 @@ export function TeamSection() {
           {teamMembers.map((member, index) => (
             <div key={index} className="relative py-4">
               <div className="relative aspect-[3/4] overflow-hidden">
-                <UnifiedMedia
-                  placeholderId={member.placeholderId}
-                  alt={member.alt}
-                  fill={true}
-                  className="object-cover"
-                  sizes="50vw"
-                  options={{
-                    crop: 'fill',
-                    gravity: 'face',
-                    quality: 90
-                  }}
-                  fallbackSrc="/images/global/placeholder-team.jpg"
-                />
+                {member.publicId ? (
+                  <CldImage
+                    publicId={member.publicId}
+                    alt={member.alt}
+                    width={300}
+                    height={400}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    sizes="50vw"
+                    crop="fill"
+                    gravity="face"
+                    quality="auto"
+                  />
+                ) : (
+                  <UnifiedMedia
+                    placeholderId={member.placeholderId}
+                    alt={member.alt}
+                    width={300}
+                    height={400}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    sizes="50vw"
+                    options={{
+                      crop: 'fill',
+                      gravity: 'face',
+                      quality: 90
+                    }}
+                    fallbackSrc="/images/global/placeholder-team.jpg"
+                  />
+                )}
                 {/* Overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                 
@@ -180,19 +260,34 @@ export function TeamSection() {
                   viewport={{ once: true }}
                 >
                   <div className="relative aspect-[3/4] overflow-hidden group">
-                    <UnifiedMedia
-                      placeholderId={member.placeholderId}
-                      alt={member.alt}
-                      fill={true}
-                      className="object-cover transition-transform group-hover:scale-105 duration-700"
-                      sizes="(min-width: 1024px) 25vw, 50vw"
-                      options={{
-                        crop: 'fill',
-                        gravity: 'face',
-                        quality: 90
-                      }}
-                      fallbackSrc="/images/global/placeholder-team.jpg"
-                    />
+                    {member.publicId ? (
+                      <CldImage
+                        publicId={member.publicId}
+                        alt={member.alt}
+                        width={300}
+                        height={400}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        crop="fill"
+                        gravity="face"
+                        quality="auto"
+                      />
+                    ) : (
+                      <UnifiedMedia
+                        placeholderId={member.placeholderId}
+                        alt={member.alt}
+                        width={300}
+                        height={400}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        options={{
+                          crop: 'fill',
+                          gravity: 'face',
+                          quality: 90
+                        }}
+                        fallbackSrc="/images/global/placeholder-team.jpg"
+                      />
+                    )}
                     {/* Dark gradient overlay for text readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:opacity-60 transition-opacity" />
                     
@@ -211,19 +306,33 @@ export function TeamSection() {
       
       {/* Full-width background image with parallax effect */}
       <div className="relative h-[40vh]">
-        <UnifiedMedia
-          placeholderId="homepage-team-background"
-          alt="Team at Allure MD"
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw"
-          options={{
-            width: 1920,
-            quality: 80
-          }}
-          fallbackSrc="/images/global/placeholder-hero.jpg"
-        />
+        {backgroundPublicId ? (
+          <CldImage
+            publicId={backgroundPublicId}
+            alt="Team at Allure MD"
+            width={1920}
+            height={1080}
+            className="absolute inset-0 w-full h-full object-cover object-center"
+            priority
+            sizes="100vw"
+            quality="auto"
+          />
+        ) : (
+          <UnifiedMedia
+            placeholderId="homepage-team-background"
+            alt="Team at Allure MD"
+            width={1920}
+            height={1080}
+            className="absolute inset-0 w-full h-full object-cover object-center"
+            priority
+            sizes="100vw"
+            options={{
+              width: 1920,
+              quality: 80
+            }}
+            fallbackSrc="/images/global/placeholder-hero.jpg"
+          />
+        )}
         <div className="absolute inset-0 bg-black/40" />
         
         {/* Overlay call to action */}

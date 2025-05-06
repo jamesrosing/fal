@@ -656,4 +656,37 @@ export const isCloudinaryVideo = (publicId: string): boolean => {
                           publicId.includes('resource_type=video');
   
   return hasVideoExtension || isVideoResource;
-}; 
+};
+
+/**
+ * Extracts the Cloudinary public ID from a Cloudinary URL
+ * 
+ * @param url The Cloudinary URL to extract the public ID from
+ * @returns The extracted public ID or null if the URL is not a valid Cloudinary URL
+ * 
+ * @example
+ * // Returns "folder/image-name"
+ * getCloudinaryPublicId("https://res.cloudinary.com/demo/image/upload/folder/image-name.jpg")
+ */
+export function getCloudinaryPublicId(url: string): string | null {
+  if (!url) return null;
+  
+  try {
+    // Check if it's a Cloudinary URL
+    if (!url.includes('cloudinary.com')) return null;
+    
+    // Extract the public ID from the URL
+    const regex = /cloudinary\.com\/[^\/]+\/(?:image|video|raw)\/(?:upload|private|authenticated)\/(?:v\d+\/)?([^\.]+)/;
+    const match = url.match(regex);
+    
+    if (match && match[1]) {
+      // Remove any transformation parameters
+      return match[1].split('/').filter(part => !part.includes(',')).join('/');
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error extracting Cloudinary public ID:", error);
+    return null;
+  }
+} 

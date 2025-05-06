@@ -40,6 +40,13 @@ Based on the implementation progress:
   - ✅ Updated .gitignore to prevent compiled JS files from being committed
   - ✅ Added documentation to template files explaining their purpose
   - ✅ Made Sentry integration optional in next.config.ts
+- ✅ Next-Cloudinary components implementation is in progress:
+  - ✅ Created wrapper components around next-cloudinary (CldImage, CldVideo)
+  - ✅ Added enhanced functionality (loading states, error handling)
+  - ✅ Updated homepage components to use next-cloudinary
+  - ✅ Fixed width/fill property conflicts
+  - ✅ Created utility function to extract Cloudinary public IDs from URLs
+  - ⏳ Continuing to migrate remaining site sections to use next-cloudinary
 - Article system is being updated to use new Cloudinary components:
   - ✅ Article content component has been updated
   - ✅ Article list page has been updated
@@ -58,7 +65,9 @@ Based on the PRD and our progress, the following components still need to be imp
    - ✅ Create media service to interact with the database (COMPLETE)
    - ✅ Develop migration script from placeholder system (COMPLETE)
    - ✅ Execute the migration script to convert existing data (COMPLETE)
-   - ✅ Update application code to use the new Cloudinary components (COMPLETE)
+   - ⏳ Update application code to use the new Cloudinary components (IN PROGRESS)
+     - ✅ Updated homepage components (Hero, AboutSection, TeamSection)
+     - ⏳ Continuing to update other site sections
    - ✅ Implement folder-based Cloudinary components (COMPLETE)
    - ✅ Fix circular dependencies between components (COMPLETE)
    - ✅ Improve URL construction for version numbers (COMPLETE)
@@ -112,8 +121,9 @@ Based on the PRD and our progress, the following components still need to be imp
 
 - **Phase**: Implementation In Progress
 - **Progress**: ~75%
-- **Focus Area**: SEO Implementation, Task 4 (Article System Implementation), and General Code Cleanup
+- **Focus Area**: Next-Cloudinary Migration, SEO Implementation, and Article System Implementation
 - **Active Tasks**: 
+  - Migrating existing components to use next-cloudinary
   - Implementing SEO components and structured data
   - Updating article system to use new Cloudinary components
   - Enhancing article filtering and categorization
@@ -122,9 +132,10 @@ Based on the PRD and our progress, the following components still need to be imp
 - **Completed Tasks**: 
   - Task 1 - Project Setup & Environment Configuration
   - Task 2 - Database Schema Implementation
-  - Task 3 - Cloudinary Media System Integration
+  - Task 3.1 - Basic Cloudinary Media System Integration
   - Task 5 - Authentication & User Management
   - Basic SEO component implementation
+  - Fixing critical homepage issues with media components
 
 ## Key Achievements
 
@@ -137,9 +148,13 @@ Based on the PRD and our progress, the following components still need to be imp
 2. **Cloudinary Media System Integration**:
    - Implemented enhanced `CldImage` component with loading states and error handling
    - Implemented enhanced `CldVideo` component with similar enhancements
+   - Fixed critical homepage issues with media components
    - Added support for responsive images and videos
+   - Implemented getCloudinaryPublicId utility for URL processing
+   - Added enhanced error handling and fallback for missing assets
+   - Added backward compatibility with both direct publicIds and legacy placeholderIds
    - Created OG image generation utilities
-   - Implemented media service for database interaction
+   - Created media service for database interaction
    - Successfully executed migration script from placeholder system to direct Cloudinary IDs
    - Updated components and hooks to support both legacy placeholders and direct IDs
    - Created SQL function for efficient legacy placeholder lookups
@@ -181,7 +196,13 @@ Based on the PRD and our progress, the following components still need to be imp
 
 ## Next Immediate Actions
 
-1. Complete Phase 1 of SEO Implementation Plan:
+1. **Continue Next-Cloudinary Migration**:
+   - [ ] Identify and update remaining components that use old Cloudinary implementation
+   - [ ] Standardize on new CldImage and CldVideo components across all sections
+   - [ ] Ensure proper loading states and fallbacks for all media components
+   - [ ] Analyze performance impact of the migration on Core Web Vitals
+
+2. Complete Phase 1 of SEO Implementation Plan:
    - [ ] Run Lighthouse audits on key pages
    - [ ] Identify Core Web Vitals issues
    - [ ] Assess current URL structure and redirects
@@ -190,14 +211,6 @@ Based on the PRD and our progress, the following components still need to be imp
    - [ ] Set up canonical URLs
    - [ ] Configure robots.txt
    - [ ] Create XML sitemap
-
-2. Start Phase 2 of SEO Implementation Plan:
-   - [ ] Implement title tags with target keywords
-   - [ ] Create optimized meta descriptions 
-   - [ ] Add structured data to all procedure pages
-   - [ ] Implement OpenGraph metadata
-   - [ ] Add Twitter card metadata
-   - [ ] Configure dynamic OG images for social sharing
 
 3. Continue Article System Implementation:
    - [ ] Complete admin interface for article management
@@ -245,14 +258,14 @@ Based on the PRD and our progress, the following components still need to be imp
 ## Media System Improvements
 
 ### Completed
-- Cleaned up duplicate files in /lib/media directory, converting JavaScript to TypeScript
-- Updated .gitignore to prevent future TypeScript/JavaScript duplication issues
-- Added descriptive comments to remaining JavaScript files explaining their purpose
-- Implemented UnifiedMedia component to consolidate image/video rendering
-- Created MediaAdapter for backwards compatibility with existing components
-- Set up API endpoint for placeholder ID resolution (/api/media/[placeholderId])
-- Documented the new unified approach in docs/unified-media-system.md
-- Updated system patterns documentation with the new media architecture
+- ✅ Migrated homepage components to use next-cloudinary (CldImage, CldVideo)
+- ✅ Fixed critical homepage issues with placeholder ID resolution and component props
+- ✅ Created getCloudinaryPublicId utility to extract public IDs from URLs
+- ✅ Enhanced error handling and fallbacks for missing Cloudinary assets
+- ✅ Implemented hybrid approach for backward compatibility with legacy placeholders
+- ✅ Cleaned up duplicate files in /lib/media directory, converting JavaScript to TypeScript
+- ✅ Updated .gitignore to prevent future TypeScript/JavaScript duplication issues
+- ✅ Added descriptive comments to remaining JavaScript files explaining their purpose
 
 ### In Progress
 - Testing the unified media component on key pages

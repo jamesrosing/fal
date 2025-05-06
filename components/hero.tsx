@@ -5,8 +5,9 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CloudinaryVideo from '@/components/media/CloudinaryVideo'
+import CldVideo from '@/components/media/CldVideo'
 import UnifiedMedia from '@/components/media/UnifiedMedia'
+import CldImage from '@/components/media/CldImage'
 
 export function Hero() {
   const isMobile = useIsMobile();
@@ -15,24 +16,21 @@ export function Hero() {
   const videoPublicId = isMobile 
     ? "emsculpt/videos/hero/hero-480p-mp4" 
     : "emsculpt/videos/hero/hero-720p-mp4";
-  
-  // Poster image for the video
-  const posterPublicId = "hero/hero-poster";
 
   return (
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero Section">
       {/* Background Video */}
       <div className="absolute inset-0 bg-black">
-        <CloudinaryVideo
+        <CldVideo
           publicId={videoPublicId}
-          poster={posterPublicId}
           autoPlay={true}
           loop={true}
           muted={true}
           controls={false}
           className="object-cover w-full h-full"
-          preload="auto"
-          formats={['mp4']}
+          width={1920}
+          height={1080}
+          showLoading={false}
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
@@ -94,6 +92,7 @@ interface PageHeroProps {
   image: {
     path: string;
     alt: string;
+    publicId?: string;
   };
   children?: React.ReactNode;
 }
@@ -105,17 +104,53 @@ export function PageHero({
   image,
   children
 }: PageHeroProps) {
+  const [publicId, setPublicId] = React.useState<string | null>(image.publicId || null);
+  
+  // Define the function outside useEffect to avoid strict mode issues
+  async function fetchPublicId(imagePath: string) {
+    try {
+      const response = await fetch(`/api/media/${imagePath}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.public_id || data.publicId) {
+          setPublicId(data.public_id || data.publicId);
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching public ID for ${imagePath}:`, error);
+    }
+  }
+  
+  // Fetch the public ID for the image path if not provided
+  React.useEffect(() => {
+    if (!publicId) {
+      fetchPublicId(image.path);
+    }
+  }, [image.path, publicId]);
+  
   return (
     <section className="relative pt-20">
       <div className="relative aspect-[16/9] w-full">
-        <UnifiedMedia
-          placeholderId={image.path}
-          alt={image.alt}
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
+        {publicId ? (
+          <CldImage
+            publicId={publicId}
+            alt={image.alt}
+            width={1920}
+            height={1080} 
+            className="absolute inset-0 w-full h-full object-cover"
+            priority
+            sizes="100vw"
+          />
+        ) : (
+          <UnifiedMedia
+            placeholderId={image.path}
+            alt={image.alt}
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       </div>
       
