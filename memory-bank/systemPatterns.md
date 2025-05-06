@@ -113,250 +113,175 @@ We use a contextual rendering approach based on content type:
 ```tsx
 // app/procedures/[slug]/page.tsx
 import { notFound } from 'next/navigation'
-import { Metadata, ResolvingMetadata } from 'next'
+import { Metadata } from 'next'
+import { getProcedureBySlug } from '@/lib/procedures'
 
 export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
+  { params }: { params: { slug: string } }
 ): Promise<Metadata> {
-  // Fetch data here
+  const procedure = await getProcedureBySlug(params.slug)
+  if (!procedure) return notFound()
   
   return {
-    title: `${title} | Allure MD`,
-    description: description,
+    title: `${procedure.title} | Allure MD`,
+    description: procedure.metaDescription,
     openGraph: {
-      images: [featuredImage],
+      title: procedure.title,
+      description: procedure.metaDescription,
+      images: [procedure.featuredImage],
     },
   }
 }
 ```
 
-2. **Structured Data Pattern**
+2. **Schema.org Structured Data Pattern**
 ```tsx
-// components/SchemaOrg.tsx
-export default function SchemaOrg({ 
-  procedureSchema = null,
-}) {
-  const practiceSchema = generatePracticeSchema()
-  const doctorSchema = generateDoctorSchema()
-  
-  const schemas = [practiceSchema, doctorSchema]
-  
-  if (procedureSchema) {
-    schemas.push(procedureSchema)
+// components/StructuredData.tsx
+import { Procedure } from '@/types/procedures'
+
+export function ProcedureSchema({ procedure }: { procedure: Procedure }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalProcedure',
+    name: procedure.title,
+    description: procedure.description,
+    // ...additional fields
   }
   
   return (
-    <>
-      {schemas.map((schema, i) => (
-        <script
-          key={`schema-${i}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
-    </>
+    <script 
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
   )
 }
 ```
 
-3. **OpenGraph Image Generation Pattern**
+## Unified Media System
+
+We've implemented a consolidated media handling system using a single `UnifiedMedia` component that provides a consistent interface for all image and video content.
+
+### Media Component Architecture
+
+1. **UnifiedMedia Component**: The core component that handles all media rendering:
+
 ```tsx
-// app/procedures/[slug]/opengraph-image.tsx
-import { ImageResponse } from 'next/og'
-
-export const alt = 'Procedure Details'
-export const size = {
-  width: 1200,
-  height: 630,
-}
-export const contentType = 'image/png'
-
-export default async function OgImage({ params }) {
-  // Fetch data here
-  
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(to bottom, #0f766e, #0f5259)',
-          width: '100%',
-          height: '100%',
-          padding: '40px',
-        }}
-      >
-        <h1 style={{ color: 'white', fontSize: '64px', textAlign: 'center' }}>
-          {title}
-        </h1>
-        <p style={{ color: 'white', fontSize: '32px', opacity: 0.8 }}>
-          Allure MD Plastic Surgery & Dermatology
-        </p>
-      </div>
-    ),
-    { ...size }
-  )
-}
+<UnifiedMedia
+  placeholderId="home-hero"
+  alt="Welcome to Allure MD"
+  width={1200}
+  height={600}
+  priority
+/>
 ```
 
-### User Experience Component Patterns
-
-1. **Before/After Comparison Pattern**
-```tsx
-// components/BeforeAfterSlider.tsx
-export default function BeforeAfterSlider({
-  beforeImage,
-  afterImage,
-  beforeAlt = 'Before procedure',
-  afterAlt = 'After procedure',
-}) {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  
-  // Implementation details...
-  
-  return (
-    <div 
-      ref={containerRef}
-      className="relative w-full aspect-square md:aspect-video overflow-hidden rounded-lg cursor-ew-resize"
-      onMouseMove={handleMouseMove}
-      onTouchMove={handleTouchMove}
-    >
-      {/* Implementation details... */}
-    </div>
-  );
-}
+2. **Media Source Resolution Flow**:
+```
+placeholderId → API lookup → Media Asset → Cloudinary URL → Rendered Component
 ```
 
-2. **Multi-Step Form Pattern**
-```tsx
-// components/VirtualConsultation/index.tsx
-export default function VirtualConsultation() {
-  const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  
-  // Form setup...
-  
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
-  
-  if (isSuccess) {
-    return <SuccessMessage />;
-  }
-  
-  return (
-    <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-      <h2 className="text-2xl font-playfair mb-6">Virtual Consultation</h2>
-      
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {step === 1 && <StepOne />}
-        {step === 2 && <StepTwo />}
-        {step === 3 && <StepThree />}
-      </form>
-    </div>
-  );
-}
+3. **Backwards Compatibility Layer**:
+   The `MediaAdapter` component provides adapters for all previous media components, ensuring backward compatibility while transitioning to the unified approach.
+
+4. **Error Handling Pattern**:
+   All media components use a standardized error handling pattern with:
+   - Loading state visualization using Skeletons
+   - Fallback images when media fails to load
+   - Consistent error reporting to the console
+   - Retry mechanism for failed images
+
+5. **Three-Tier Media Identification**:
+   The system supports three ways to identify media:
+   - `placeholderId`: For content mapped in the registry or database
+   - `publicId`: For direct Cloudinary asset references
+   - `src`: For direct URL references
+
+This approach consolidates multiple overlapping components (UnifiedImage, CloudinaryImage, MediaImage, etc.) into a single, flexible component with standardized props and behavior.
+
+## Database Patterns
+
+### Supabase Row Level Security
+
+We implement robust security using Supabase Row Level Security (RLS) policies:
+
+```sql
+-- Example policy for protected tables
+CREATE POLICY "Allow authenticated read access"
+ON public.protected_table
+FOR SELECT
+TO authenticated
+USING (true);
 ```
 
-### Feature Flag Pattern
+### Efficient Query Patterns
+
+We use the following patterns for database access:
+
+1. **Optimistic Updates**: UI updates immediately while changes are sent to the database
+
+2. **Pagination with Cursors**: For efficient listing of large datasets
+
+3. **Join Aggregation**: When querying related data across tables:
 
 ```typescript
-// lib/featureFlags.ts
-export async function getFeatureFlags() {
-  const supabase = createServerSupabaseClient()
-  
-  const { data: flags, error } = await supabase
-    .from('feature_flags')
-    .select('*')
-  
-  if (error) {
-    console.error('Error fetching feature flags:', error)
-    return {}
-  }
-  
-  return flags.reduce((acc, flag) => {
-    acc[flag.name] = flag.enabled
-    return acc
-  }, {})
-}
+const { data } = await supabase
+  .from('gallery')
+  .select(`
+    id,
+    name,
+    description,
+    albums (
+      id,
+      title,
+      description,
+      cases (count)
+    )
+  `)
+```
 
-// Usage in a server component
-const flags = await getFeatureFlags()
-if (flags.newGalleryComponent) {
-  // Render new component
-} else {
-  // Render old component
+## Authentication Patterns
+
+### Auth Flow
+
+1. **Auth Modal**: Consistent login/signup UI across site
+2. **JWT with Refresh Tokens**: For secure authentication 
+3. **Role-Based Access Control**: Admin vs regular user capabilities
+
+## Client-Side Patterns
+
+### Form Handling
+
+We use a consistent pattern for forms with Zod validation:
+
+```tsx
+const formSchema = z.object({
+  name: z.string().min(2).max(50),
+  email: z.string().email(),
+  message: z.string().min(10),
+})
+
+export function ContactForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      message: '',
+    },
+  })
+  
+  // Form implementation
 }
 ```
 
-## Content Architecture Patterns
+### Data Fetching
 
-### Procedure Content Structure
-```typescript
-// types/procedure.ts
-export interface Procedure {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle?: string;
-  summary: string;
-  description: string;
-  featuredImage: string;
-  thumbnailUrl: string;
-  metaTitle: string;
-  metaDescription: string;
-  benefits: string[];
-  faq: {
-    question: string;
-    answer: string;
-  }[];
-  beforeAfterGallery: {
-    id: string;
-    title: string;
-    before: string;
-    after: string;
-    description?: string;
-  }[];
-  relatedProcedures: {
-    id: string;
-    slug: string;
-    title: string;
-    thumbnailUrl: string;
-  }[];
-  doctors: {
-    id: string;
-    slug: string;
-    name: string;
-    title: string;
-    photoUrl: string;
-  }[];
-  categories: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+Server components use direct Supabase queries, while client components use SWR for data fetching:
+
+```tsx
+// Client component data fetching
+const { data, error, isLoading } = useSWR(
+  `/api/articles?category=${category}`,
+  fetcher
+);
 ```
-
-### Hierarchical URL Structure
-- `/`: Homepage
-- `/about`: About the practice
-- `/procedures`: All procedures
-- `/procedures/[category]`: Category pages (facial, breast, body)
-- `/procedures/[category]/[slug]`: Individual procedure pages
-- `/doctors`: Physician directory
-- `/doctors/[slug]`: Individual physician profiles
-- `/gallery`: Main gallery
-- `/gallery/[category]`: Gallery categories
-- `/gallery/[category]/[caseId]`: Individual before/after cases
-- `/blog`: Blog/educational content
-- `/blog/[category]`: Blog categories
-- `/blog/[slug]`: Individual blog posts
-
-### Keyword Implementation Pattern
-- Page titles: `[Primary Keyword] | [Brand Name]`
-- Meta descriptions: `[Primary Keyword] + [Unique Value Proposition] + [Call-to-Action]`
-- Content: Natural keyword integration with proper semantic HTML structure
-- Schema: Enhanced with targeted keywords
-- URL structure: Clean URLs with primary keywords 

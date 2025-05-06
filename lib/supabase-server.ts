@@ -9,8 +9,8 @@ import { type CookieOptions } from '@supabase/ssr';
  * for server components and API routes
  */
 
-export function createServerComponentClient() {
-  const cookieStore = cookies();
+export async function createServerComponentClient() {
+  const cookieStore = await cookies();
   
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,7 +41,7 @@ export function createServerComponentClient() {
 
 // Wrapper function for API routes to create a server client
 export async function createRouteHandlerClient() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,11 +51,11 @@ export async function createRouteHandlerClient() {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: { path: string; maxAge: number; domain?: string }) {
+        set(name: string, value: string, options: CookieOptions) {
           // This won't work in route handlers, as they are read-only
           // This is just to satisfy the interface
         },
-        remove(name: string, options: { path: string; domain?: string }) {
+        remove(name: string, options: CookieOptions) {
           // This won't work in route handlers, as they are read-only
           // This is just to satisfy the interface
         },
@@ -65,7 +65,7 @@ export async function createRouteHandlerClient() {
 }
 
 // Create a Supabase service role client for admin operations
-export function createServiceRoleClient() {
+export async function createServiceRoleClient() {
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,

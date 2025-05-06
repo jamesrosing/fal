@@ -14,63 +14,77 @@ export function getMediaUrl(
   idOrPublicId: string,
   options: MediaOptions = {}
 ): string {
-  // Check if it's an asset ID first
-  const asset = mediaRegistry.getAsset(idOrPublicId);
-  let publicId = asset ? asset.publicId : idOrPublicId;
-  
-  // If already a full URL, return as is
-  if (publicId.startsWith('http')) {
-    return publicId;
-  }
-  
-  // Handle missing values
-  if (!publicId) {
-    console.warn('Empty publicId provided, returning placeholder');
+  // Safety check - handle undefined or null input
+  if (!idOrPublicId) {
+    console.warn('getMediaUrl: Empty or undefined publicId provided, returning placeholder');
     return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
   }
   
-  // Strip prefix for Cloudinary usage
-  if (publicId.startsWith('page:')) {
-    // Local file from /public/images/pages/
-    // Not suitable for Cloudinary - show placeholder
-    console.warn(`Image ${publicId} is a local file, not a Cloudinary image`);
-    return `/images/pages/${publicId.replace('page:', '')}`;
-  }
-  
-  if (publicId.startsWith('component:')) {
-    // Local file from component assets
-    // Not suitable for Cloudinary - show placeholder
-    console.warn(`Image ${publicId} is a component asset, not a Cloudinary image`);
-    return `/components/${publicId.replace('component:', '')}`;
-  }
-  
-  // For images
-  const {
-    width = asset?.defaultOptions.width || 'auto',
-    height = 'auto',
-    quality = asset?.defaultOptions.quality || 90,
-    format = asset?.defaultOptions.format || 'auto',
-    crop = 'scale',
-    gravity = 'auto',
-    resource_type = asset?.type || 'image'
-  } = options;
-  
-  // Use the centralized Cloudinary functions based on resource type
-  if (resource_type === 'video') {
-    return getCloudinaryVideoUrl(publicId, {
-      format: format as any,
-      quality: quality as any,
-      width: width !== 'auto' ? width as number : undefined
-    });
-  } else {
-    return getCloudinaryUrl(publicId, {
-      width: width !== 'auto' ? width as number : undefined,
-      height: height !== 'auto' ? height as number : undefined,
-      quality: quality as any,
-      format: format as any,
-      crop: crop as any,
-      gravity: gravity as any,
-    });
+  try {
+    // Check if it's an asset ID first
+    const asset = mediaRegistry.getAsset(idOrPublicId);
+    let publicId = asset ? asset.publicId : idOrPublicId;
+    
+    // Safety check again after registry lookup
+    if (!publicId) {
+      console.warn('getMediaUrl: Unable to resolve publicId from registry, returning placeholder');
+      return 'https://via.placeholder.com/800x600?text=Image+Not+Found';
+    }
+    
+    // If already a full URL, return as is
+    if (typeof publicId === 'string' && publicId.startsWith('http')) {
+      return publicId;
+    }
+    
+    // Handle special prefix cases
+    if (typeof publicId === 'string') {
+      // Strip prefix for Cloudinary usage
+      if (publicId.startsWith('page:')) {
+        // Local file from /public/images/pages/
+        // Not suitable for Cloudinary - show placeholder
+        console.warn(`getMediaUrl: Image ${publicId} is a local file, not a Cloudinary image`);
+        return `/images/pages/${publicId.replace('page:', '')}`;
+      }
+      
+      if (publicId.startsWith('component:')) {
+        // Local file from component assets
+        // Not suitable for Cloudinary - show placeholder
+        console.warn(`getMediaUrl: Image ${publicId} is a component asset, not a Cloudinary image`);
+        return `/components/${publicId.replace('component:', '')}`;
+      }
+    }
+    
+    // For images
+    const {
+      width = asset?.defaultOptions?.width || 'auto',
+      height = 'auto',
+      quality = asset?.defaultOptions?.quality || 90,
+      format = asset?.defaultOptions?.format || 'auto',
+      crop = 'scale',
+      gravity = 'auto',
+      resource_type = asset?.type || 'image'
+    } = options;
+    
+    // Use the centralized Cloudinary functions based on resource type
+    if (resource_type === 'video') {
+      return getCloudinaryVideoUrl(publicId, {
+        format: format as any,
+        quality: quality as any,
+        width: width !== 'auto' ? width as number : undefined
+      });
+    } else {
+      return getCloudinaryUrl(publicId, {
+        width: width !== 'auto' ? width as number : undefined,
+        height: height !== 'auto' ? height as number : undefined,
+        quality: quality as any,
+        format: format as any,
+        crop: crop as any,
+        gravity: gravity as any,
+      });
+    }
+  } catch (error) {
+    console.error('getMediaUrl: Error generating URL:', error);
+    return 'https://via.placeholder.com/800x600?text=Error+Loading+Image';
   }
 }
 

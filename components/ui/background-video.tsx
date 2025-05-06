@@ -1,19 +1,16 @@
 import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
 import Head from "next/head"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import UnifiedMedia from '@/components/media/UnifiedMedia'
 
 interface BackgroundVideoProps {
   poster: string;
   fallbackImage: string;
-  sources: {
+  sources?: {
     src: string;
     type: string;
     media?: string;
   }[];
-  videoId?: string; // Optional videoId for OptimizedVideo
+  videoId?: string; // Optional videoId for backward compatibility
   className?: string; // Optional className for styling
 }
 
@@ -36,148 +33,63 @@ export function BackgroundVideo({
     return () => setIsMounted(false)
   }, [])
 
-  useEffect(() => {
-    if (!isMounted) return
-
-    console.log("Video sources:", sources)
-    const video = videoRef.current
-    if (!video) return
-
-    const handleLoad = () => {
-      console.log("Video loaded successfully")
-      setIsVideoLoaded(true)
-    }
-
-    const handleError = (e: Event) => {
-      const videoElement = e.target as HTMLVideoElement
-      console.error("Video error:", {
-        event: e,
-        currentSrc: videoElement.currentSrc,
-        networkState: videoElement.networkState,
-        readyState: videoElement.readyState,
-        errorMessage: videoElement.error?.message
-      })
-      setErrorDetails(
-        `Error loading video: ${videoElement.error?.message || 'Unknown error'} ` +
-        `(Network state: ${videoElement.networkState}, Ready state: ${videoElement.readyState})`
-      )
-      setHasError(true)
-    }
-
-    const handleLoadStart = () => console.log("Video load started")
-    const handleProgress = () => console.log("Video loading in progress")
-    const handleCanPlay = () => console.log("Video can start playing")
-    const handleCanPlayThrough = () => console.log("Video can play through")
-
-    // Add all event listeners
-    video.addEventListener("loadstart", handleLoadStart)
-    video.addEventListener("progress", handleProgress)
-    video.addEventListener("canplay", handleCanPlay)
-    video.addEventListener("canplaythrough", handleCanPlayThrough)
-    video.addEventListener("loadeddata", handleLoad)
-    video.addEventListener("error", handleError)
-
-    // Start loading the video
-    video.load()
-
-    // Attempt to play when ready
-    const playPromise = video.play()
-    if (playPromise !== undefined) {
-      playPromise.catch((error) => {
-        console.error("Video autoplay failed:", error)
-        setErrorDetails(`Autoplay failed: ${error.message}`)
-      })
-    }
-
-    return () => {
-      video.removeEventListener("loadstart", handleLoadStart)
-      video.removeEventListener("progress", handleProgress)
-      video.removeEventListener("canplay", handleCanPlay)
-      video.removeEventListener("canplaythrough", handleCanPlayThrough)
-      video.removeEventListener("loadeddata", handleLoad)
-      video.removeEventListener("error", handleError)
-    }
-  }, [isMounted, sources])
-
-  // Show static image for SSR and if video fails
-  if (!isMounted || hasError) {
+  // When videoId is provided, use that directly with UnifiedMedia
+  if (videoId) {
     return (
       <div className="absolute inset-0">
-        {fallbackImage && (
-          <Image
-            src={fallbackImage}
-            alt="Background"
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-        )}
+        <UnifiedMedia
+          placeholderId={videoId}
+          mediaType="video"
+          fill
+          className={className || "object-cover w-full h-full"}
+          autoPlay
+          muted
+          loop
+          fallbackSrc={fallbackImage}
+          showLoading={true}
+          alt="Background video"
+        />
         <div className="absolute inset-0 bg-black/30" />
-        {errorDetails && (
-          <div className="absolute bottom-4 left-4 right-4 bg-red-500/80 text-white p-2 rounded text-sm">
-            {errorDetails}
-          </div>
-        )}
       </div>
-    )
+    );
   }
 
-  // Only render preload links if we have valid URLs
-  const hasValidPoster = poster && poster.trim() !== '';
-  const validSources = sources?.filter(source => source.src && source.src.trim() !== '') || [];
-
-  return (
-    <>
-      {isMounted && (
-        <Head>
-          {hasValidPoster && (
-            <link rel="preload" as="image" href={poster} />
-          )}
-          {validSources.map((source, index) => (
-            source.src && <link key={index} rel="preload" as="video" href={source.src} />
-          ))}
-        </Head>
-      )}
+  // When sources are provided, use the first source with UnifiedMedia
+  if (sources && sources.length > 0) {
+    // Extract the first source
+    const primarySource = sources[0];
+    
+    return (
       <div className="absolute inset-0">
-        {videoId ? (
-          // Use OptimizedVideo when videoId is provided
-          <OptimizedVideo 
-            id={videoId} 
-            options={{ autoPlay: true, muted: true, loop: true }} 
-            className={className || "object-cover w-full h-full"} 
-          />
-        ) : (
-          // Use default video implementation when no videoId is provided
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className={`w-full h-full object-cover ${className || ""}`}
-            poster={poster}
-          >
-            {validSources.map((source, index) => (
-              <source key={index} src={source.src} type={source.type} media={source.media} />
-            ))}
-            Your browser does not support HTML video.
-          </video>
-        )}
+        <UnifiedMedia
+          src={primarySource.src}
+          mediaType={primarySource.type.startsWith('video/') ? 'video' : 'image'}
+          fill
+          className={className || "object-cover w-full h-full"}
+          autoPlay
+          muted
+          loop
+          fallbackSrc={fallbackImage}
+          showLoading={true}
+          alt="Background media"
+        />
         <div className="absolute inset-0 bg-black/30" />
-        
-        {/* Show poster while video loads */}
-        {!isVideoLoaded && poster && (
-          <Image
-            src={poster}
-            alt="Video poster"
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-        )}
       </div>
-    </>
-  )
+    );
+  }
+
+  // Fallback to image if no video sources
+  return (
+    <div className="absolute inset-0">
+      <UnifiedMedia
+        src={fallbackImage}
+        alt="Background"
+        fill
+        priority
+        className="object-cover"
+        sizes="100vw"
+      />
+      <div className="absolute inset-0 bg-black/30" />
+    </div>
+  );
 } 

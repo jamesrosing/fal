@@ -1,0 +1,12 @@
+This is a placeholder image file indicator.
+
+To properly fix the missing image issue:
+
+1. Create a real placeholder image at:
+   - public/images/global/placeholder-image.jpg
+   - public/images/global/placeholder-team.jpg 
+   - public/images/global/placeholder-hero.jpg
+
+2. Or change the fallbackSrc in components/media/UnifiedMedia.tsx to point to an existing image.
+
+This file exists to indicate that placeholder images are needed for the UnifiedMedia component to function correctly. 

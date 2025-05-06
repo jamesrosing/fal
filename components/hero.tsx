@@ -3,65 +3,41 @@
 import React from 'react'
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { BackgroundVideo } from "@/components/ui/background-video"
 import Link from "next/link"
-import { getCloudinaryUrl, getCloudinaryVideoUrl } from "@/lib/cloudinary"
-import Image from 'next/image'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
-
-// TODO: Replace these URLs with your CDN URLs
-// Recommended: Use a CDN service like Cloudinary, Bunny.net, or Amazon S3 + CloudFront
-// Example CDN URL structure: https://your-cdn.com/videos/allure-md/hero-720p.webm
-const videoSources = [
-  {
-    src: getCloudinaryVideoUrl("emsculpt/videos/hero/hero-720p-mp4", {
-      format: "mp4",
-      width: 1280,
-      quality: 90
-    }),
-    type: "video/mp4",
-  },
-  {
-    src: getCloudinaryVideoUrl("emsculpt/videos/hero/hero-720p-webm", {
-      format: "webm",
-      width: 1280,
-      quality: 90
-    }),
-    type: "video/webm",
-  },
-]
-
-// Define Cloudinary URLs for poster and fallback images
-const posterImage = getCloudinaryUrl("hero/hero-poster", {
-  width: 1920,
-  height: 1080,
-  crop: 'fill',
-  gravity: 'auto',
-  format: 'auto' as any,
-  quality: 'auto' as any
-});
-
-const fallbackImage = getCloudinaryUrl("hero/hero-fallback", {
-  width: 1920,
-  height: 1080,
-  crop: 'fill',
-  gravity: 'auto',
-  format: 'auto' as any,
-  quality: 'auto' as any
-});
+import { useIsMobile } from "@/hooks/use-mobile"
+import CloudinaryVideo from '@/components/media/CloudinaryVideo'
+import UnifiedMedia from '@/components/media/UnifiedMedia'
 
 export function Hero() {
+  const isMobile = useIsMobile();
+  
+  // Choose the appropriate video based on device
+  const videoPublicId = isMobile 
+    ? "emsculpt/videos/hero/hero-480p-mp4" 
+    : "emsculpt/videos/hero/hero-720p-mp4";
+  
+  // Poster image for the video
+  const posterPublicId = "hero/hero-poster";
+
   return (
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero Section">
-      <BackgroundVideo
-        poster={posterImage}
-        fallbackImage={fallbackImage}
-        sources={videoSources}
-        className="object-cover"
-      />
+      {/* Background Video */}
+      <div className="absolute inset-0 bg-black">
+        <CloudinaryVideo
+          publicId={videoPublicId}
+          poster={posterPublicId}
+          autoPlay={true}
+          loop={true}
+          muted={true}
+          controls={false}
+          className="object-cover w-full h-full"
+          preload="auto"
+          formats={['mp4']}
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
 
+      {/* Content Overlay */}
       <div className="relative h-full flex items-center text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <motion.div
@@ -85,6 +61,7 @@ export function Hero() {
         </div>
       </div>
 
+      {/* Scroll Indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -128,19 +105,11 @@ export function PageHero({
   image,
   children
 }: PageHeroProps) {
-  // Handle full URLs or just public IDs
-  const imageUrl = image.path.includes('https://res.cloudinary.com') 
-    ? image.path 
-    : getCloudinaryUrl(image.path, {
-        format: 'auto' as any,
-        quality: 'auto' as any
-      });
-
   return (
     <section className="relative pt-20">
       <div className="relative aspect-[16/9] w-full">
-        <Image
-          src={imageUrl}
+        <UnifiedMedia
+          placeholderId={image.path}
           alt={image.alt}
           fill
           className="object-cover"

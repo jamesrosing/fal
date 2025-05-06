@@ -41,107 +41,42 @@ These fonts are loaded through Adobe Typekit's CDN and are configured in the Tai
 
 The default sans-serif font is set to Figgins Sans, and the default serif font is set to Miller Text.
 
-## Cloudinary Integration
+## Media Optimization
 
-The website uses Cloudinary for image and video management. The following components and utilities are available:
+### Cloudinary Integration
 
-### Environment Configuration
+We've implemented an optimized Cloudinary integration that provides:
 
-Make sure your `.env` file contains the following Cloudinary configuration:
+- **Consistent URL Generation**: Unified approach to generating Cloudinary URLs
+- **Optimized Components**: Improved CloudinaryImage and CloudinaryVideo components with error handling and performance optimizations
+- **SEO Enhancements**: Schema.org structured data for images and practice information
+- **Better Error Handling**: Smart retry logic and graceful fallbacks
+- **Responsive Design**: Optimized loading for different devices and screen sizes
 
-```env
-# Cloudinary Configuration
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
-CLOUDINARY_API_KEY=your-api-key
-CLOUDINARY_API_SECRET=your-api-secret
-CLOUDINARY_FOLDER=alluremd
-NEXT_PUBLIC_CLOUDINARY_FOLDER=alluremd
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your-upload-preset
+See [docs/cloudinary-optimization.md](docs/cloudinary-optimization.md) for full implementation details.
+
+```jsx
+// Example usage
+import CloudinaryImage from '@/components/media/CloudinaryImage';
+import CloudinaryVideo from '@/components/media/CloudinaryVideo';
+
+// Image with area preset
+<CloudinaryImage 
+  publicId="hero/main-image" 
+  area="hero"
+  alt="Hero image" 
+  priority={true}
+/>
+
+// Video with multiple formats
+<CloudinaryVideo 
+  publicId="videos/hero-video" 
+  formats={['mp4', 'webm']}
+  autoPlay
+  loop
+  muted
+/>
 ```
-
-### Components
-
-1. **CloudinaryFolderImage** - For rendering single images from Cloudinary folders:
-   ```jsx
-   import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage';
-   import { FOLDERS } from '@/lib/cloudinary/folder-utils';
-   
-   // Basic usage
-   <CloudinaryFolderImage
-     folder={FOLDERS.HOME}
-     alt="Home page image"
-     width={800}
-     height={600}
-   />
-   
-   // With image name
-   <CloudinaryFolderImage
-     folder={FOLDERS.SERVICES}
-     imageName="dermatology-hero"
-     alt="Dermatology Service"
-     width={1200}
-     height={600}
-     priority={true}
-   />
-   
-   // With advanced options
-   <CloudinaryFolderImage
-     folder={FOLDERS.TEAM}
-     alt="Team Member"
-     width={400}
-     height={500}
-     crop="thumb"
-     gravity="face"
-     quality={90}
-   />
-   ```
-
-2. **CloudinaryFolderGallery** - For rendering multiple images in a grid:
-   ```jsx
-   import CloudinaryFolderGallery from '@/components/media/CloudinaryFolderGallery';
-   import { FOLDERS } from '@/lib/cloudinary/folder-utils';
-   
-   // Define your gallery images
-   const galleryImages = [
-     { folder: FOLDERS.GALLERY + '/emsculpt', alt: 'Emsculpt Results' },
-     { folder: FOLDERS.GALLERY + '/facials', alt: 'Facial Results' },
-     // Add more images...
-   ];
-   
-   // Render gallery
-   <CloudinaryFolderGallery
-     images={galleryImages}
-     columns={3}
-     gap={16}
-     imageWidth={400}
-     imageHeight={300}
-   />
-   ```
-
-### Folder Structure
-
-Common folder paths are available as constants in `lib/cloudinary/folder-utils.ts`:
-
-```typescript
-// Import the constants
-import { FOLDERS } from '@/lib/cloudinary/folder-utils';
-
-// Use them in your component
-<CloudinaryFolderImage folder={FOLDERS.DERMATOLOGY} alt="Dermatology" />
-```
-
-### Helper Functions
-
-The `lib/cloudinary/folder-utils.ts` file also provides several utility functions:
-
-- `getCloudinaryUrl(publicId, transformations)` - Get a full Cloudinary URL
-- `getCloudinaryPath(folder, subfolder, filename)` - Construct a folder path
-- `getResponsiveSizes(baseWidth)` - Get responsive image sizes
-- `getCloudinarySrcSet(publicId, baseWidth)` - Generate a srcset string
-
-### Example Page
-
-An example page demonstrating all features is available at `/example/cloudinary-examples`.
 
 ## Adding Video Content
 

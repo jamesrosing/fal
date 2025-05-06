@@ -1,40 +1,13 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import { useMediaAsset } from '@/hooks/useMedia'
 import { useIsMobile } from "@/hooks/use-mobile"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import UnifiedMedia from '@/components/media/UnifiedMedia'
 
 export function AboutSection() {
   const isMobile = useIsMobile();
   
-  // Use the useMediaAsset hook for both team image and background
-  const { url: teamImageUrl, isLoading: isLoadingTeamImage } = useMediaAsset('allure-md-team-components-general-1')
-  const { url: backgroundUrl, isVideo, isLoading: isLoadingBackground } = useMediaAsset('homepage-about-background', {
-    width: 1920,
-    quality: 90,
-    format: 'auto',
-    responsive: true
-  });
-  
-  // Check if any media is still loading
-  const isLoading = isLoadingTeamImage || isLoadingBackground;
-  
-  // Display loading placeholder if media is still loading
-  if (isLoading) {
-    return (
-      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse">Loading...</div>
-        </div>
-      </section>
-    );
-  }
-
   // Mobile Layout: Text above, image below
   if (isMobile) {
     return (
@@ -70,25 +43,19 @@ export function AboutSection() {
 
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {isVideo ? (
-            <video
-              src={backgroundUrl || ""}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover object-[center_15%]"
-            />
-          ) : (
-            <Image 
-              src={backgroundUrl || ""} 
-              alt="Allure MD Medical Team" 
-              fill 
-              className="object-cover object-[center_15%]"
-              sizes="100vw"
-              priority
-            />
-          )}
+          <UnifiedMedia
+            placeholderId="homepage-about-background"
+            alt="Allure MD Medical Team"
+            fill
+            className="object-cover object-[center_15%]"
+            sizes="100vw"
+            priority
+            mediaType="auto"
+            options={{
+              width: 1920,
+              quality: 90
+            }}
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -101,25 +68,19 @@ export function AboutSection() {
     <section className="relative min-h-screen bg-black text-white">
       {/* Desktop Background Media */}
       <div className="absolute inset-0 group">
-        {isVideo ? (
-          <video
-            src={backgroundUrl || ""}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover object-[center_15%]"
-          />
-        ) : (
-          <Image
-            src={backgroundUrl || ""}
-            alt="Allure MD Medical Team"
-            fill
-            className="object-cover object-[center_15%]"
-            sizes="100vw"
-            priority
-          />
-        )}
+        <UnifiedMedia
+          placeholderId="homepage-about-background"
+          alt="Allure MD Medical Team"
+          fill
+          className="object-cover object-[center_15%]"
+          sizes="100vw"
+          priority
+          mediaType="auto"
+          options={{
+            width: 1920,
+            quality: 90
+          }}
+        />
         {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>

@@ -1,286 +1,250 @@
 # Unified Media System
 
+This document provides guidance on using the new Unified Media System for consistent image and video rendering across the application.
+
 ## Overview
 
-The Unified Media System provides a consistent, maintainable approach to handling images and videos throughout the application. It replaces the previous complex placeholder system with a streamlined architecture.
+The Unified Media System is a streamlined approach to handling media assets throughout the application. It consolidates multiple, overlapping image components into a single, versatile `UnifiedMedia` component that can handle various image and video sources, rendering optimizations, and fallback strategies.
 
-## Key Components
+Benefits:
+- Single source of truth for media rendering
+- Consistent error handling and loading states
+- Proper TypeScript type definitions
+- Support for images and videos
+- Compatible with all existing media sources (placeholder IDs, Cloudinary public IDs, direct URLs)
 
-### 1. Media Service
+## Core Components
 
-The core of the system is the `mediaService` singleton in `lib/services/media-service.ts`. This service handles:
+### UnifiedMedia
 
-- Resolving placeholder IDs to media assets
-- Generating optimized URLs
-- Managing media mappings
-- Creating responsive image/video sources
-
-```typescript
-// Example usage
-import { mediaService } from '@/lib/services/media-service';
-
-// Get media by placeholder ID
-const asset = await mediaService.getMediaByPlaceholderId('home-hero');
-
-// Get a complete URL with transformations
-const url = mediaService.getMediaUrl(asset, { width: 1200, quality: 80 });
-
-// Update a mapping
-await mediaService.updateMediaMapping('home-hero', 'cloudinary/public/id');
-```
-
-### 2. React Components
-
-Three core components provide easy-to-use interfaces for media:
-
-#### UnifiedImage
-
-A wrapper around Next.js Image for displaying images with optimizations.
+The primary component for rendering all media across the application:
 
 ```tsx
-<UnifiedImage
+import { UnifiedMedia } from '@/components/media/UnifiedMedia';
+
+// Using a placeholder ID (recommended)
+<UnifiedMedia
   placeholderId="home-hero"
-  alt="Home hero image"
+  alt="Welcome to Allure MD"
   width={1200}
   height={600}
   priority
 />
-```
 
-#### UnifiedVideo
+// Using a Cloudinary public ID directly
+<UnifiedMedia
+  publicId="folder/image-name"
+  alt="Direct Cloudinary image"
+  width={800}
+  height={400}
+  options={{ quality: 90, crop: 'fill' }}
+/>
 
-A video component with support for multiple formats, poster images, and responsive sources.
-
-```tsx
-<UnifiedVideo
-  placeholderId="home-video"
-  posterPlaceholderId="home-video-poster"
-  options={{ autoPlay: true, muted: true, loop: true }}
-  width={1200}
-  height={600}
+// Using a direct URL
+<UnifiedMedia
+  src="https://example.com/image.jpg"
+  alt="External image"
+  width={500}
+  height={300}
 />
 ```
 
-#### MediaRenderer
+### MediaAdapter
 
-A unified component that automatically detects the media type and renders the appropriate component.
+Provides backwards compatibility with all legacy components. This simplifies the migration process by allowing existing components to be replaced without changing their props:
 
 ```tsx
-<MediaRenderer
-  placeholderId="home-media"
-  alt="Home media"
-  width={1200}
-  height={600}
-  priority
+import { 
+  MediaImage, 
+  CloudinaryImage, 
+  UnifiedImage,
+  MediaRenderer
+} from '@/components/media/MediaAdapter';
+
+// Use the same props as the original components
+<MediaImage 
+  placeholderId="example-placeholder"
+  alt="Example image"
+  width={800}
+  height={400}
 />
 ```
 
-### 3. Unified API
+## Media Sources Priority
 
-A comprehensive API endpoint at `/api/unified-media` provides:
+The UnifiedMedia component resolves media sources in this order:
 
-- GET - Fetch media by placeholder ID
-- POST - Update media mappings
-- PUT - Upload new media
-- DELETE - Remove media mappings
+1. **Direct `src` URL**: Used as-is
+2. **Cloudinary `publicId`**: Transformed using Cloudinary URL utilities
+3. **`placeholderId`**: Resolved via API to either database mapping or registry entry
 
-API Reference:
+## Property Reference
 
-| Method | Endpoint | Query/Body | Description |
-|--------|----------|------------|-------------|
-| GET | `/api/unified-media?id=placeholder-id` | id | Get media by placeholder ID |
-| GET | `/api/unified-media?ids=id1,id2,id3` | ids | Get multiple media assets |
-| GET | `/api/unified-media?all=true` | all | Get all media assets |
-| POST | `/api/unified-media` | { placeholderId, cloudinaryId, metadata } | Update media mapping |
-| PUT | `/api/unified-media` | FormData with file, placeholderId | Upload new media |
-| DELETE | `/api/unified-media?id=placeholder-id` | id | Delete media mapping |
+### Key Properties
 
-## Architecture
+| Property | Type | Description |
+|----------|------|-------------|
+| `placeholderId` | string | Reference ID for media in the registry or database |
+| `publicId` | string | Direct Cloudinary asset ID |
+| `src` | string | Direct URL to media resource |
+| `mediaType` | 'image' \| 'video' \| 'auto' | Explicitly set the media type |
+| `alt` | string | Alt text for accessibility |
+| `width` | number | Width in pixels |
+| `height` | number | Height in pixels |
+| `fill` | boolean | Whether to fill the parent container |
+| `priority` | boolean | Whether to prioritize loading (for LCP) |
+| `options` | object | Cloudinary transformation options |
 
-```
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│                 │      │                 │      │                 │
-│  React          │      │  Media          │      │  Supabase       │
-│  Components     │──────▶  Service        │──────▶  Database       │
-│                 │      │                 │      │                 │
-└─────────────────┘      └────────┬────────┘      └─────────────────┘
-                                   │
-                                   │
-                         ┌─────────▼────────┐
-                         │                  │
-                         │  Cloudinary      │
-                         │                  │
-                         └──────────────────┘
-```
+### Video-specific Properties
 
-1. React components use the Media Service to resolve placeholder IDs
-2. Media Service checks in-memory registry first, then database
-3. Media Service generates optimized URLs with Cloudinary transformations
-4. Components receive the resolved assets and render appropriately
+| Property | Type | Description |
+|----------|------|-------------|
+| `autoPlay` | boolean | Whether to automatically play video |
+| `muted` | boolean | Whether to mute video |
+| `loop` | boolean | Whether to loop video |
+| `controls` | boolean | Whether to show video controls |
 
-## Database Schema
+### UI Enhancement Properties
 
-The media system uses two main tables:
-
-### media_assets
-
-Stores information about individual media assets:
-
-- `id`: UUID (primary key)
-- `cloudinary_id`: Cloudinary public ID
-- `type`: 'image' or 'video'
-- `title`: Display title
-- `alt_text`: Alt text for accessibility
-- `metadata`: JSON metadata
-- `width`: Original width
-- `height`: Original height
-- `format`: File format
-- `created_at`: Timestamp
-- `updated_at`: Timestamp
-
-### media_mappings
-
-Maps placeholder IDs to media assets:
-
-- `id`: UUID (primary key)
-- `placeholder_id`: Unique identifier for the placeholder
-- `media_id`: Foreign key to media_assets.id
-- `created_at`: Timestamp
-- `updated_at`: Timestamp
+| Property | Type | Description |
+|----------|------|-------------|
+| `expandOnHover` | boolean | Whether to apply a scale effect on hover |
+| `showLoading` | boolean | Whether to show loading skeleton |
+| `fallbackSrc` | string | Fallback image URL if the main source fails |
+| `className` | string | CSS class for the media element |
+| `containerClassName` | string | CSS class for the containing div |
 
 ## Migration Guide
 
-### 1. Replace OptimizedImage with UnifiedImage
+To migrate existing components to the Unified Media System:
+
+### Option 1: Drop-in Replacement (Easiest)
+
+Import the appropriate adapter from `MediaAdapter.tsx`:
 
 ```tsx
 // Before
-<OptimizedImage
-  id="hero-image"
-  alt="Hero"
+import { CloudinaryImage } from '@/components/CloudinaryImage';
+
+// After 
+import { CloudinaryImage } from '@/components/media/MediaAdapter';
+```
+
+This will continue to work with the same props as before.
+
+### Option 2: Direct Migration to UnifiedMedia
+
+For new code or when refactoring:
+
+```tsx
+// Before
+import { MediaRenderer } from '@/components/media/MediaRenderer';
+
+<MediaRenderer 
+  placeholderId="home-hero" 
+  alt="Home hero"
   width={1200}
   height={600}
 />
 
 // After
-<UnifiedImage
-  placeholderId="hero-image"
-  alt="Hero"
+import { UnifiedMedia } from '@/components/media/UnifiedMedia';
+
+<UnifiedMedia
+  placeholderId="home-hero"
+  alt="Home hero"
   width={1200}
   height={600}
 />
 ```
 
-### 2. Replace OptimizedVideo with UnifiedVideo
+## Examples
+
+### Basic Image
 
 ```tsx
-// Before
-<OptimizedVideo
-  id="hero-video"
-  posterSrc="poster.jpg"
-  options={{ autoPlay: true }}
-/>
-
-// After
-<UnifiedVideo
-  placeholderId="hero-video"
-  posterPlaceholderId="hero-video-poster"
-  options={{ autoPlay: true }}
+<UnifiedMedia
+  placeholderId="home-hero"
+  alt="Welcome to Allure MD"
+  width={1200}
+  height={600}
+  priority
 />
 ```
 
-### 3. Use MediaRenderer for Dynamic Content
+### Responsive Image with Fill
 
 ```tsx
-<MediaRenderer
-  placeholderId="dynamic-content"
-  alt="Dynamic content"
+<div className="relative w-full h-96">
+  <UnifiedMedia
+    placeholderId="service-background"
+    alt="Plastic Surgery Services"
+    fill
+    sizes="100vw"
+    className="object-cover"
+  />
+</div>
+```
+
+### Video with Controls
+
+```tsx
+<UnifiedMedia
+  placeholderId="procedure-video"
+  mediaType="video"
   width={800}
-  height={600}
+  height={450}
+  controls={true}
+  autoPlay={false}
 />
 ```
 
-### 4. Update API calls
+### Image with Cloudinary Transformations
+
+```tsx
+<UnifiedMedia
+  publicId="procedures/breast-augmentation/before-after-1"
+  alt="Before and after breast augmentation"
+  width={600}
+  height={400}
+  options={{
+    crop: 'fill',
+    gravity: 'face',
+    quality: 90,
+    format: 'auto'
+  }}
+/>
+```
+
+## API Reference
+
+### Media Asset API
+
+The UnifiedMedia component uses an API to resolve placeholder IDs:
 
 ```typescript
-// Before
-const response = await fetch(`/api/media?placeholderId=${id}`);
-
-// After
-const response = await fetch(`/api/unified-media?id=${id}`);
+// Get media asset by placeholder ID
+const asset = await fetch(`/api/media/${encodeURIComponent('home-hero')}`).then(res => res.json());
 ```
+
+This API first checks for a database mapping, then falls back to the registry.
 
 ## Best Practices
 
-1. **Always provide alt text** for accessibility
-
-2. **Use width and height attributes** to prevent layout shifts
-
-3. **Use the priority prop** for above-the-fold images
-
-4. **Use proper sizing** to avoid loading oversized images
-   - Set `sizes` attribute to match your layout
-   - Use responsive breakpoints for different device sizes
-
-5. **Use MediaRenderer** when you're not sure of the media type
-
-6. **Organize media** in Cloudinary using consistent folder structures
-
-7. **Use descriptive placeholder IDs** that reflect the content's purpose
-
-8. **Add detailed metadata** for better searchability and management
-
-## Advanced Usage
-
-### Responsive Images
-
-```tsx
-<UnifiedImage
-  placeholderId="hero-image"
-  alt="Hero"
-  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  fill
-/>
-```
-
-### Video with Custom Options
-
-```tsx
-<UnifiedVideo
-  placeholderId="product-video"
-  options={{
-    autoPlay: false,
-    controls: true,
-    muted: false,
-    loop: false,
-    quality: 90
-  }}
-  width={800}
-  height={450}
-/>
-```
-
-### Upload New Media
-
-```typescript
-const formData = new FormData();
-formData.append('file', fileInput.files[0]);
-formData.append('placeholderId', 'new-hero-image');
-formData.append('folder', 'heroes');
-
-const response = await fetch('/api/unified-media', {
-  method: 'PUT',
-  body: formData
-});
-```
+1. **Use placeholder IDs for content that changes**: This allows content managers to update the media without code changes.
+2. **Use direct Cloudinary public IDs for static assets**: When you know the exact asset, this provides better performance.
+3. **Set proper dimensions**: Always provide `width` and `height` to avoid layout shifts.
+4. **Use `priority` for above-the-fold images**: This improves LCP scores.
+5. **Provide meaningful `alt` text**: Important for accessibility.
+6. **Use responsive sizing**: Implement `fill` and proper `sizes` attribute for responsive layouts.
+7. **Add fallback images**: Use `fallbackSrc` to handle loading errors gracefully.
 
 ## Troubleshooting
 
-1. **Image Not Found**: Check that the placeholder ID exists in the database
+If images are not displaying properly:
 
-2. **Video Not Playing**: Ensure the video is properly formatted for web (MP4/WebM)
-
-3. **Media Not Loading**: Check the network tab for API errors
-
-4. **Poor Performance**: Check the image dimensions and format; use WebP where possible
-
-5. **Missing Alt Text**: Always set the alt attribute or alt_text in the metadata
+1. **Check the placeholder ID**: Ensure it exists in the registry or database.
+2. **Verify Cloudinary public ID**: Make sure the asset exists in your Cloudinary account.
+3. **Check the API response**: Inspect the response from `/api/media/[placeholderId]`.
+4. **Examine browser network tab**: Look for 404 errors or other issues with image loading.
+5. **Check console errors**: The component logs detailed error messages.

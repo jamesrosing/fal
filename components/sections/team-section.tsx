@@ -1,16 +1,12 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
-import { useMediaAsset } from "@/hooks/useMedia"
 import { useIsMobile } from "@/hooks/use-mobile"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import UnifiedMedia from '@/components/media/UnifiedMedia'
 
 type TeamMember = {
-  src: string;
+  placeholderId: string;
   alt: string;
   name: string;
   title: string;
@@ -19,88 +15,33 @@ type TeamMember = {
 export function TeamSection() {
   const isMobile = useIsMobile();
   
-  // Use useMediaAsset hook for each team member image
-  const { url: drRosingImageUrl, isLoading: isLoadingRosing } = useMediaAsset('team-provider-rosing', {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'face',
-    quality: 90
-  });
-  
-  const { url: drPearoseImageUrl, isLoading: isLoadingPearose } = useMediaAsset('team-provider-pearose', {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'face',
-    quality: 90
-  });
-  
-  const { url: juliaImageUrl, isLoading: isLoadingJulia } = useMediaAsset('team-provider-julia', {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'face',
-    quality: 90
-  });
-  
-  const { url: drGidwaniImageUrl, isLoading: isLoadingGidwani } = useMediaAsset('team-provider-gidwani', {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'face',
-    quality: 90
-  });
-
-  // Get a background image for the team section
-  const { url: teamBackgroundUrl, isVideo, isLoading: isLoadingBackground } = useMediaAsset('homepage-team-background', {
-    width: 1920,
-    quality: 80,
-    format: 'auto',
-    responsive: true
-  });
-
-  // Check if any images are still loading
-  const isLoading = isLoadingRosing || isLoadingPearose || isLoadingJulia || isLoadingGidwani || isLoadingBackground;
-
-  // Define team images
-  const teamImages: TeamMember[] = [
+  // Define team members with placeholderIds
+  const teamMembers: TeamMember[] = [
     {
-      src: drRosingImageUrl || "",
+      placeholderId: "team-provider-rosing",
       alt: "Dr. James Rosing",
       name: "Dr. James Rosing",
       title: "Plastic Surgeon"
     },
     {
-      src: drPearoseImageUrl || "",
+      placeholderId: "team-provider-pearose",
       alt: "Susan Pearose, Dermatology Specialist",
       name: "Susan Pearose",
       title: "Dermatology Specialist"
     },
     {
-      src: juliaImageUrl || "",
+      placeholderId: "team-provider-julia",
       alt: "Julia, Medical Esthetician",
       name: "Julia",
       title: "Medical Esthetician"
     },
     {
-      src: drGidwaniImageUrl || "",
+      placeholderId: "team-provider-gidwani",
       alt: "Dr. Pooja Gidwani",
       name: "Dr. Pooja Gidwani",
       title: "Functional Medicine"
     }
   ];
-
-  // Display loading placeholder if media is still loading
-  if (isLoading) {
-    return (
-      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse">Loading team profiles...</div>
-        </div>
-      </section>
-    );
-  }
 
   // Mobile Layout
   if (isMobile) {
@@ -108,25 +49,20 @@ export function TeamSection() {
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {isVideo ? (
-            <video
-              src={teamBackgroundUrl || drRosingImageUrl || ""}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Image 
-              src={teamBackgroundUrl || drRosingImageUrl || ""} 
-              alt="Our Medical Team" 
-              fill 
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
-          )}
+          <UnifiedMedia 
+            placeholderId="homepage-team-background"
+            alt="Our Medical Team"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+            mediaType="auto"
+            options={{
+              width: 1920,
+              quality: 80
+            }}
+            fallbackSrc="/images/global/placeholder-hero.jpg"
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -163,15 +99,21 @@ export function TeamSection() {
         
         {/* Team Grid - 2x2 with 3:4 aspect ratio */}
         <div className="grid grid-cols-2 gap-1 bg-black py-8">
-          {teamImages.map((member, index) => (
+          {teamMembers.map((member, index) => (
             <div key={index} className="relative py-4">
               <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src={member.src}
+                <UnifiedMedia
+                  placeholderId={member.placeholderId}
                   alt={member.alt}
-                  fill
+                  fill={true}
                   className="object-cover"
                   sizes="50vw"
+                  options={{
+                    crop: 'fill',
+                    gravity: 'face',
+                    quality: 90
+                  }}
+                  fallbackSrc="/images/global/placeholder-team.jpg"
                 />
                 {/* Overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -202,96 +144,105 @@ export function TeamSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="flex flex-col justify-center lg:w-1/2"
+              className="max-w-md"
             >
-              <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">OUR TEAM</h2>
-              <h3 className="text-[clamp(2rem,4vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Our Team</h2>
+              <h3 className="text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif mb-8">
                 Expert care from trusted professionals
               </h3>
-              <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+              <div className="space-y-6 text-lg font-cerebri font-light">
                 <p>
                   Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
-                  decades of combined experience in aesthetic medicine. We are committed to delivering exceptional results
-                  while ensuring your comfort and safety.
+                  decades of combined experience in aesthetic medicine.
                 </p>
-              </div>
-              <div className="mt-8 space-y-4">
-                <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                <p>
+                  We are committed to delivering exceptional results while ensuring your comfort and safety throughout every
+                  procedure and treatment.
+                </p>
+                <div className="space-y-4">
+                  <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+                  <br />
+                  <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
+                  <br />
+                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+                </div>
               </div>
             </motion.div>
-
-            {/* Right side - Team photos in 2x2 grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="lg:w-1/2"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                {teamImages.map((member, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className="relative"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden">
-                      <Image
-                        src={member.src}
-                        alt={member.alt}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                      />
-                      {/* Gradient overlay for text legibility */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                      
-                      {/* Name and title positioned at bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                        <h4 className="text-base font-medium">{member.name}</h4>
-                        <p className="text-sm text-gray-300">{member.title}</p>
-                      </div>
+            
+            {/* Right side - Team images grid in 2x2 layout */}
+            <div className="grid grid-cols-2 gap-2 flex-1">
+              {teamMembers.map((member, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden group">
+                    <UnifiedMedia
+                      placeholderId={member.placeholderId}
+                      alt={member.alt}
+                      fill={true}
+                      className="object-cover transition-transform group-hover:scale-105 duration-700"
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      options={{
+                        crop: 'fill',
+                        gravity: 'face',
+                        quality: 90
+                      }}
+                      fallbackSrc="/images/global/placeholder-team.jpg"
+                    />
+                    {/* Dark gradient overlay for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:opacity-60 transition-opacity" />
+                    
+                    {/* Provider name and title */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform transition-transform duration-300 group-hover:translate-y-0">
+                      <h4 className="text-md lg:text-lg font-cerebri font-medium">{member.name}</h4>
+                      <p className="text-sm text-gray-300">{member.title}</p>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Background image/video section - moved to bottom */}
-      <div className="relative w-full h-[40vh] md:h-[50vh]">
-        {isVideo ? (
-          <video
-            src={teamBackgroundUrl || ""}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover object-top"
-          />
-        ) : (
-          <Image 
-            src={teamBackgroundUrl || ""} 
-            alt="Our Medical Team" 
-            fill 
-            className="object-cover object-top"
-            sizes="100vw"
-            priority
-          />
-        )}
-        {/* Subtle overlay */}
-        <div className="absolute inset-0 bg-black/30" />
+      {/* Full-width background image with parallax effect */}
+      <div className="relative h-[40vh]">
+        <UnifiedMedia
+          placeholderId="homepage-team-background"
+          alt="Team at Allure MD"
+          fill
+          className="object-cover object-center"
+          priority
+          sizes="100vw"
+          options={{
+            width: 1920,
+            quality: 80
+          }}
+          fallbackSrc="/images/global/placeholder-hero.jpg"
+        />
+        <div className="absolute inset-0 bg-black/40" />
+        
+        {/* Overlay call to action */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center text-white px-4"
+          >
+            <h3 className="text-3xl md:text-4xl font-serif mb-4">Your journey to confidence begins here</h3>
+            <LearnMoreButton href="/appointment">
+              Schedule Your Consultation
+            </LearnMoreButton>
+          </motion.div>
+        </div>
       </div>
     </section>
-  )
+  );
 }
 

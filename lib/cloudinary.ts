@@ -46,6 +46,7 @@ export interface CloudinaryImageOptions {
   format?: string;
   crop?: string;
   gravity?: string;
+  effect?: string;
   simplifiedMode?: boolean;
   resource_type?: 'image' | 'video' | 'auto' | 'raw';
   blurDataURL?: string;
