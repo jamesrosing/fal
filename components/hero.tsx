@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import CldVideo from '@/components/media/CldVideo'
-import UnifiedMedia from '@/components/media/UnifiedMedia'
 import CldImage from '@/components/media/CldImage'
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function Hero() {
   const isMobile = useIsMobile();
@@ -23,7 +23,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-black">
         <CldVideo
           publicId={videoPublicId}
-          autoPlay={true}
+          autoplay={true}
           loop={true}
           muted={true}
           controls={false}
@@ -105,6 +105,8 @@ export function PageHero({
   children
 }: PageHeroProps) {
   const [publicId, setPublicId] = React.useState<string | null>(image.publicId || null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(publicId ? false : true);
+  const [error, setError] = React.useState<boolean>(false);
   
   // Define the function outside useEffect to avoid strict mode issues
   async function fetchPublicId(imagePath: string) {
@@ -114,24 +116,39 @@ export function PageHero({
         const data = await response.json();
         if (data.public_id || data.publicId) {
           setPublicId(data.public_id || data.publicId);
+          setIsLoading(false);
+        } else {
+          // No valid publicId found
+          setError(true);
+          setIsLoading(false);
         }
+      } else {
+        // API error
+        setError(true);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error(`Error fetching public ID for ${imagePath}:`, error);
+      setError(true);
+      setIsLoading(false);
     }
   }
   
   // Fetch the public ID for the image path if not provided
   React.useEffect(() => {
-    if (!publicId) {
+    if (!publicId && !error) {
       fetchPublicId(image.path);
     }
-  }, [image.path, publicId]);
+  }, [image.path, publicId, error]);
   
   return (
     <section className="relative pt-20">
       <div className="relative aspect-[16/9] w-full">
-        {publicId ? (
+        {isLoading ? (
+          <Skeleton 
+            className="absolute inset-0 w-full h-full object-cover" 
+          />
+        ) : publicId ? (
           <CldImage
             publicId={publicId}
             alt={image.alt}
@@ -142,14 +159,10 @@ export function PageHero({
             sizes="100vw"
           />
         ) : (
-          <UnifiedMedia
-            placeholderId={image.path}
-            alt={image.alt}
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
+          // Fallback image when no publicId is available
+          <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">Image not available</span>
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       </div>

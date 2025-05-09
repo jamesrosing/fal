@@ -8,7 +8,7 @@ interface CldEnhancedVideoProps {
   publicId: string;
   width?: number;
   height?: number;
-  autoPlay?: boolean;
+  autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
   controls?: boolean;
@@ -44,7 +44,7 @@ export default function CldVideo({
   publicId,
   width = 800,
   height = 450,
-  autoPlay = false,
+  autoplay = false,
   loop = false,
   muted = false,
   controls = true,
@@ -69,7 +69,7 @@ export default function CldVideo({
         width={width}
         height={height}
         controls={controls}
-        autoPlay={autoPlay}
+        autoPlay={autoplay}
         loop={loop}
         muted={muted}
         className={className}
@@ -95,7 +95,7 @@ export default function CldVideo({
         width={width}
         height={height}
         src={publicId}
-        autoPlay={autoPlay}
+        autoplay={autoplay}
         loop={loop}
         muted={muted}
         controls={controls}
