@@ -54,7 +54,7 @@ export default function ShapeScalePage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/body-analysis-hero.jpg" alt="ShapeScale Body Analysis Services" priority fill />
+          <CldImage publicId="medical-spa/body-analysis-hero.jpg" alt="ShapeScale Body Analysis Services" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

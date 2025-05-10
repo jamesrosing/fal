@@ -673,7 +673,7 @@ export default function ContactPage() {
         {/* Hero Section */}
         <section className="relative">
           <div className="relative aspect-[16/9] w-full">
-            <OptimizedImage id="hero/1441-1401-avocado-avenue.jpg" alt="Contact Allure MD"   priority fill />
+            <CldImage publicId="hero/1441-1401-avocado-avenue.jpg" alt="Contact Allure MD"   priority fill />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           </div>
           

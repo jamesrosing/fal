@@ -54,7 +54,7 @@ export default function EmsculptPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/emsculpt-hero.jpg" alt="EMSCULPT Services" priority fill />
+          <CldImage publicId="medical-spa/emsculpt-hero.jpg" alt="EMSCULPT Services" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

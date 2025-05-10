@@ -74,7 +74,7 @@ export default function EczemaPage() {
       {/* Hero Section */}
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
-          <OptimizedImage id="services-dermatology/hero/dermatology-eczema.png" alt="Eczema Treatment Services"   priority fill />
+          <CldImage publicId="services-dermatology/hero/dermatology-eczema.png" alt="Eczema Treatment Services"   priority fill />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         

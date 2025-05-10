@@ -65,7 +65,7 @@ export default function EstheticianServicesPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/facial-treatments-hero.jpg" alt="Esthetician Services" priority fill />
+          <CldImage publicId="medical-spa/facial-treatments-hero.jpg" alt="Esthetician Services" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

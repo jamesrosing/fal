@@ -165,7 +165,7 @@ export default function PlasticSurgery() {
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-1/3">
                 <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md">
-                  <OptimizedImage id="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill />
+                  <CldImage publicId="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill />
                 </div>
               </div>
               <div className="w-full md:w-2/3">

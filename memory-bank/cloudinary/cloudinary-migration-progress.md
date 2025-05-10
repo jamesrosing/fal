@@ -51,12 +51,26 @@ Components now follow this general pattern:
 - These endpoints return publicIds that map to Cloudinary assets
 - This maintains backward compatibility while enabling full Cloudinary features
 
-## Next Steps
+## Next Steps: Final Phase
 
-1. **Continue API Refinement**: Ensure all API endpoints consistently return Cloudinary publicIds
-2. **Complete Component Migration**: Identify any remaining components still using old patterns
-3. **Testing**: Verify image rendering quality and performance with Cloudinary
-4. **Cleanup Migration Scripts**: Update or archive scripts that are no longer needed
+We've created a comprehensive plan for the final phase of migration. Key activities include:
+
+1. **Replace OptimizedImage Usage**: 
+   - Created `finish-cloudinary-migration.js` script to automate replacement
+   - Will update all remaining service pages and other components
+   - Convert all `id` props to `publicId` props
+
+2. **Testing and Verification**:
+   - Verify all images render correctly after migration
+   - Check performance and optimization benefits
+   - Ensure responsive behavior is maintained
+
+3. **Documentation and Cleanup**:
+   - Remove `OptimizedImage.tsx` after confirming all references are updated
+   - Update documentation to reflect new component structure
+   - Create examples for future reference
+
+See the full implementation plan in `docs/cloudinary-migration-final-phase.md`.
 
 ## Benefits
 

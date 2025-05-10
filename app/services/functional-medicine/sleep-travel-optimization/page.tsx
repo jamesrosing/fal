@@ -74,7 +74,7 @@ export default function SleepTravelPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="articles/categories/functional-medicine-sleep.png" alt="Sleep & Travel Optimization Services"   priority fill />
+          <CldImage publicId="articles/categories/functional-medicine-sleep.png" alt="Sleep & Travel Optimization Services"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

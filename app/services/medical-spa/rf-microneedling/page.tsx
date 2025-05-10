@@ -65,7 +65,7 @@ export default function RFMicroneedlingPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/skin-rejuvenation-hero.jpg" alt="RF Microneedling Treatments" priority fill />
+          <CldImage publicId="medical-spa/skin-rejuvenation-hero.jpg" alt="RF Microneedling Treatments" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

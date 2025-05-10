@@ -65,7 +65,7 @@ export default function InjectablesPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/injectables-hero.jpg" alt="Injectable Treatments"   priority fill />
+          <CldImage publicId="medical-spa/injectables-hero.jpg" alt="Injectable Treatments"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

@@ -70,7 +70,7 @@ export default function FinancingPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="financing/hero.jpg" alt="Financing Options"   priority fill />
+          <CldImage publicId="financing/hero.jpg" alt="Financing Options"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

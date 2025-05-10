@@ -74,7 +74,7 @@ export default function AcnePage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="services-dermatology/hero/dermatology-acne.png" alt="Acne Treatment Services"   priority fill />
+          <CldImage publicId="services-dermatology/hero/dermatology-acne.png" alt="Acne Treatment Services"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

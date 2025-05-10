@@ -87,7 +87,7 @@ export default function FunctionalMedicine() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <OptimizedImage id="articles/categories/functional-medicine-hero.png" alt="Functional Medicine at Allure MD"   priority fill />
+          <CldImage publicId="articles/categories/functional-medicine-hero.png" alt="Functional Medicine at Allure MD"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

@@ -65,7 +65,7 @@ export default function SkinLasersPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="medical-spa/laser-treatments-hero.jpg" alt="Skin Laser Treatments" priority fill />
+          <CldImage publicId="medical-spa/laser-treatments-hero.jpg" alt="Skin Laser Treatments" priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

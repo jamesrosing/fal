@@ -43,7 +43,7 @@ export default function ReviewsPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill />
+          <CldImage publicId="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

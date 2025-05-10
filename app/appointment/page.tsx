@@ -27,7 +27,7 @@ export default function AppointmentPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] lg:h-[50vh]">
         <div className="absolute inset-0">
-          <OptimizedImage id="hero/appointment-hero.jpg" alt="Schedule an Appointment"   priority fill />
+          <CldImage publicId="hero/appointment-hero.jpg" alt="Schedule an Appointment"   priority fill />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
