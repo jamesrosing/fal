@@ -71,11 +71,66 @@ Galleries → Albums → Cases → Images
 - **Cases**: Individual patient cases with before/after results
 - **Images**: Individual images within a case
 
-## Media System Implementation
-- Direct use of Cloudinary public IDs
-- Leverage of next-cloudinary components
-- Server-side optimization
-- Responsive image implementation
+## Media Handling System
+
+We've implemented a Cloudinary-based media system that leverages Cloudinary's advanced image and video optimization capabilities:
+
+### Cloudinary Integration
+
+1. **CldImage Component**: Primary component for rendering optimized images:
+```jsx
+<CldImage
+  publicId="folder/image-name"
+  alt="Image description"
+  width={800}
+  height={600}
+  crop="fill"
+  gravity="auto"
+  quality="auto"
+/>
+```
+
+2. **CldVideo Component**: Handles video rendering with optimizations:
+```jsx
+<CldVideo
+  publicId="folder/video-name"
+  width={800}
+  height={450}
+  autoPlay
+  muted
+  loop
+/>
+```
+
+3. **Adapter Pattern**: We use adapter components to handle different media sources:
+   - `MediaAdapter`: Adapts between Cloudinary and regular media sources
+   - `MediaRenderer`: Renders media based on mediaType
+
+4. **API Layer**: Media placeholderIds are mapped to Cloudinary publicIds through API endpoints:
+```
+/api/media/[placeholderId] → { publicId: "cloudinary/path/image" }
+```
+
+### Migration Pattern
+
+Components use a conditional rendering pattern to handle the transition:
+```jsx
+{publicId ? (
+  <CldImage publicId={publicId} {...props} />
+) : (
+  <Image src="/fallback.jpg" {...props} />
+)}
+```
+
+### Benefits
+
+- Automatic responsive images
+- Advanced transformations (crop, resize, quality)
+- Format optimization (WebP, AVIF)
+- Lazy loading and progressive loading
+- Integration with Next.js image optimization
+
+This approach consolidates our previous fragmented media handling into a streamlined system that leverages Cloudinary's CDN and optimization capabilities.
 
 ## Standardized Approaches
 1. **Authentication Flow**: Consistent authentication across public/private routes

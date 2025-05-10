@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, AlertCircle, RefreshCw, Server, Settings, Info } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 export default function ZenotiAdminPage() {

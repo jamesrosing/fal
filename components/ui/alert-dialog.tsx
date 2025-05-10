@@ -5,8 +5,8 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 const AlertDialog = AlertDialogPrimitive.Root

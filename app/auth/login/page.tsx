@@ -13,8 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from "sonner"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

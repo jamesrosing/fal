@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useMediaAsset } from "@/hooks/useMedia"
 import { CldVideoPlayer } from 'next-cloudinary'
+import 'next-cloudinary/dist/cld-video-player.css'
 import { getCloudinaryPublicId } from '@/lib/cloudinary'
 import { useIsMobile } from "@/hooks/use-mobile"
 
@@ -25,7 +26,7 @@ export function HeroSection() {
             src={videoPublicId}
             width="100%"
             height="100%"
-            autoplay={true}
+            autoplay ={true}
             muted={true}
             loop={true}
             controls={false}

@@ -10,8 +10,8 @@ import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import Head from "next/head"
 import axios from 'axios'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 /// <reference path="../../types/maps.d.ts" />

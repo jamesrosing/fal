@@ -4,8 +4,8 @@ import { Article } from '@/lib/types'
 import { format } from 'date-fns'
 import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
 import { extractImageNameFromPath } from '@/lib/cloudinary/folder-utils'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 const isValidDate = (dateString: string): boolean => {
   const date = new Date(dateString);

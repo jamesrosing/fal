@@ -13,10 +13,10 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { placeholderId: string } }
+  context: { params: { placeholderId: string } }
 ) {
-  const placeholderId = params.placeholderId;
-  const searchParams = await request.nextUrl.searchParams;
+  const placeholderId = context.params.placeholderId;
+  const searchParams = request.nextUrl.searchParams;
   
   // Parse optional parameters with defaults
   const width = parseInt(searchParams.get('width') || '1920', 10);

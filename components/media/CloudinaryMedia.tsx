@@ -1,10 +1,10 @@
 "use client";
 
 import React from 'react';
-import { CldImage } from 'next-cloudinary';
+import { CldImage as NextCldImage } from 'next-cloudinary';
 import Image from 'next/image';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import CldImage from './CldImage';
+import CldVideo from './CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -233,7 +233,7 @@ export function CloudinaryImage({
   // Use Cloudinary Image with fill mode if requested
   if (fill) {
     return (
-      <CldImage
+      <NextCldImage
         src={src}
         alt={alt}
         width={width}
@@ -250,7 +250,7 @@ export function CloudinaryImage({
   
   // Standard rendering
   return (
-    <CldImage
+    <NextCldImage
       src={src}
       alt={alt}
       width={width}
@@ -323,22 +323,44 @@ export function CloudinaryVideo({
 export function CloudinaryMedia({
   id,
   type,
+  alt,
+  autoPlay,
+  loop,
+  muted,
+  controls,
   ...props
-}: { id: string; type?: 'image' | 'video' } & Record<string, any>) {
+}: { 
+  id: string; 
+  type?: 'image' | 'video';
+  alt?: string;
+  autoPlay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  controls?: boolean;
+} & Record<string, any>) {
   // Auto-detect type if not provided
   const detectedType = type || (
     id.match(/\.(mp4|webm|mov|avi)$/i) ? 'video' : 'image'
   );
   
+  // Convert the ID to a Cloudinary path
+  const cloudinaryId = getCloudinaryPath(id);
+  
   if (detectedType === 'video') {
-    return <CloudinaryVideo id={id} {...props} />;
+    return (
+      <CldVideo 
+        publicId={cloudinaryId} 
+        autoPlay={autoPlay} 
+        loop={loop} 
+        muted={muted} 
+        controls={controls} 
+        {...props} 
+      />
+    );
   }
   
-  return <CloudinaryImage id={id} {...props} />;
+  return <CldImage publicId={cloudinaryId} alt={alt || id} {...props} />;
 }
 
-export default {
-  CloudinaryImage,
-  CloudinaryVideo,
-  CloudinaryMedia
-}; 
+// Default export
+export default CloudinaryMedia; 

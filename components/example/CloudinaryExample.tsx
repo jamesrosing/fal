@@ -61,7 +61,7 @@ export default function CloudinaryExample() {
                 width={300}
                 height={200}
                 className="rounded shadow-md"
-                fallbackSrc="/images/global/icons/image-placeholder.svg"
+                fallbacksrc="images/global/icons/image-placeholder.svg"
               />
               <code className="mt-2 text-xs bg-gray-100 p-1 rounded">placeholder</code>
             </div>
@@ -80,7 +80,7 @@ export default function CloudinaryExample() {
             width={640}
             height={360}
             controls={true}
-            fallbackSrc="/images/global/icons/video-placeholder.svg"
+            fallbacksrc="images/global/icons/video-placeholder.svg"
           />
           <code className="mt-2 text-xs bg-gray-100 p-1 rounded">placeholder-video</code>
         </CardContent>

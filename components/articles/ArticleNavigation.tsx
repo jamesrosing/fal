@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Article } from '@/lib/types'
 import { fetchAdjacentArticles } from '@/lib/api'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 export default function ArticleNavigation({ currentArticleId }: { currentArticleId: number }) {

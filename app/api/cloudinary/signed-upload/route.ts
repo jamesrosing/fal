@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { v2 as cloudinary } from 'cloudinary';
 
-export const runtime = 'edge';
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
 /**
  * API route to generate Cloudinary upload signatures
@@ -9,62 +16,35 @@ export const runtime = 'edge';
  * @see https://cloudinary.com/documentation/upload_images#generating_authentication_signatures
  */
 export async function POST(request: NextRequest) {
-  console.log('Processing signed upload request');
-  
-  // Check for required environment variables
-  if (!process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    console.error('Missing Cloudinary credentials');
-    return NextResponse.json(
-      { error: 'Server configuration error - missing Cloudinary credentials' },
-      { status: 500 }
-    );
-  }
-
   try {
-    // Extract parameters from request
-    const formData = await request.formData();
-    const params: Record<string, string> = {};
+    // Parse the request body
+    const body = await request.json();
+    const { folder = 'uploads' } = body;
     
-    // Convert FormData to plain object
-    formData.forEach((value, key) => {
-      if (typeof value === 'string') {
-        params[key] = value;
-      }
-    });
+    // Create the timestamp for the signature
+    const timestamp = Math.round(new Date().getTime() / 1000);
     
-    console.log('Request parameters:', params);
-
-    // Create parameters to sign - include ALL parameters from the original request
-    // This is critical for the signature to match what Cloudinary expects
-    const timestamp = params.timestamp || Math.floor(Date.now() / 1000).toString();
+    // Generate the signature for the given parameters
+    // This will allow direct upload to Cloudinary with our credentials
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp,
+        folder,
+      },
+      process.env.CLOUDINARY_API_SECRET || ''
+    );
     
-    // Create a new object with all original parameters plus timestamp
-    const paramsToSign: Record<string, string> = {
-      ...params,  // Include all original parameters (folder, tags, source, etc.)
-      timestamp   // Add or update the timestamp
-    };
-    
-    // Don't include the api_key in the parameters to sign - we'll add it separately
-    delete paramsToSign.api_key;
-    
-    // Generate signature
-    const signature = await generateSignature(paramsToSign);
-    console.log('Generated signature for string:', paramsToSign);
-
-    // Return all needed parameters for the upload
+    // Return the signature, timestamp, and API key
     return NextResponse.json({
       signature,
       timestamp,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     });
   } catch (error) {
-    console.error('Error generating signature:', error);
+    console.error('Error generating Cloudinary signature:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to generate signature', 
-        details: error instanceof Error ? error.message : String(error) 
-      },
+      { error: 'Failed to generate Cloudinary signature' },
       { status: 500 }
     );
   }

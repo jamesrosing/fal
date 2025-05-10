@@ -1,7 +1,7 @@
 import { SimpleHero } from '@/components/Hero/Hero';
 import { MediaContentSection } from '@/components/layouts/TwoColumnLayout';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import { OptimizedVideo } from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 import { MediaRenderer } from '@/components/media/MediaRenderer';
 
 export const metadata = {

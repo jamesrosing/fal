@@ -7,8 +7,8 @@ import Link from "next/link"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 

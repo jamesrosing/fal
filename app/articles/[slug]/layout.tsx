@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { articles } from "@/lib/articles"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 type Props = {

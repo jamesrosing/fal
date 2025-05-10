@@ -46,8 +46,8 @@ import { Label } from "@/components/ui/label"
 import type { FileRejection, DropEvent } from 'react-dropzone'
 import { toast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 interface CloudinaryImage {

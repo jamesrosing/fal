@@ -7,8 +7,8 @@ import { handleMediaUpload } from '@/app/admin/media/actions';
 import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import { CldImage } from 'next-cloudinary';
 import { Image as ImageIcon } from 'lucide-react';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 // Upload preset is only used as a fallback if needed

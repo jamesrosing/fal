@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import Head from "next/head"
-import UnifiedMedia from '@/components/media/UnifiedMedia'
+import CldImage from '@/components/media/CldImage'
+import CldVideo from '@/components/media/CldVideo'
+import Image from 'next/image'
 
 interface BackgroundVideoProps {
-  poster: string;
+  poster?: string;
   fallbackImage: string;
   sources?: {
     src: string;
@@ -12,6 +14,7 @@ interface BackgroundVideoProps {
   }[];
   videoId?: string; // Optional videoId for backward compatibility
   className?: string; // Optional className for styling
+  publicId?: string; // Added Cloudinary publicId
 }
 
 export function BackgroundVideo({ 
@@ -19,7 +22,8 @@ export function BackgroundVideo({
   fallbackImage, 
   sources,
   videoId,
-  className 
+  className,
+  publicId
 }: BackgroundVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
@@ -33,55 +37,102 @@ export function BackgroundVideo({
     return () => setIsMounted(false)
   }, [])
 
-  // When videoId is provided, use that directly with UnifiedMedia
+  // When publicId is provided, use that directly with Cloudinary components
+  if (publicId) {
+    // Determine if it's video or image based on the public_id path or extension
+    const isVideo = publicId.includes('/video/') || /\.(mp4|webm|ogv|mov)$/i.test(publicId);
+    
+    if (isVideo) {
+      return (
+        <div className="absolute inset-0">
+          <CldVideo
+            publicId={publicId}
+            className={className || "object-cover w-full h-full"}
+            autoPlay
+            muted
+            loop
+            alt="Background video"
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+      );
+    } else {
+      return (
+        <div className="absolute inset-0">
+          <CldImage
+            publicId={publicId}
+            alt="Background image"
+            width={1920}
+            height={1080}
+            className={className || "object-cover w-full h-full"}
+            sizes="100vw"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+      );
+    }
+  }
+
+  // When videoId is provided, fallback to image since we don't use placeholderIds anymore
   if (videoId) {
+    console.warn('Using videoId is deprecated. Please use publicId instead.');
     return (
       <div className="absolute inset-0">
-        <UnifiedMedia
-          placeholderId={videoId}
-          mediaType="video"
+        <Image
+          src={fallbackImage}
+          alt="Background image"
           fill
           className={className || "object-cover w-full h-full"}
-          autoPlay
-          muted
-          loop
-          fallbackSrc={fallbackImage}
-          showLoading={true}
-          alt="Background video"
+          sizes="100vw"
+          priority
         />
         <div className="absolute inset-0 bg-black/30" />
       </div>
     );
   }
 
-  // When sources are provided, use the first source with UnifiedMedia
+  // When sources are provided, use the first source
   if (sources && sources.length > 0) {
     // Extract the first source
     const primarySource = sources[0];
+    const isVideo = primarySource.type.startsWith('video/');
     
-    return (
-      <div className="absolute inset-0">
-        <UnifiedMedia
-          src={primarySource.src}
-          mediaType={primarySource.type.startsWith('video/') ? 'video' : 'image'}
-          fill
-          className={className || "object-cover w-full h-full"}
-          autoPlay
-          muted
-          loop
-          fallbackSrc={fallbackImage}
-          showLoading={true}
-          alt="Background media"
-        />
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
-    );
+    if (isVideo) {
+      return (
+        <div className="absolute inset-0">
+          <video
+            src={primarySource.src}
+            className={className || "object-cover w-full h-full absolute inset-0"}
+            autoPlay
+            muted
+            loop
+            poster={poster}
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+      );
+    } else {
+      return (
+        <div className="absolute inset-0">
+          <Image
+            src={primarySource.src}
+            alt="Background media"
+            fill
+            className={className || "object-cover w-full h-full"}
+            sizes="100vw"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
+      );
+    }
   }
 
   // Fallback to image if no video sources
   return (
     <div className="absolute inset-0">
-      <UnifiedMedia
+      <Image
         src={fallbackImage}
         alt="Background"
         fill

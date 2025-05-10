@@ -64,9 +64,10 @@ async function getMediaByPlaceholderId(placeholderId: string) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { placeholderId: string } }
+  context: { params: { placeholderId: string } }
 ) {
-  const { placeholderId } = params;
+  // Get the parameters in a Next.js 13+ compatible way
+  const placeholderId = context.params.placeholderId;
   
   if (!placeholderId) {
     return NextResponse.json(
@@ -97,7 +98,7 @@ export async function GET(
     }
 
     // If we get here, the placeholder ID wasn't found anywhere
-    console.error(`No media asset found for placeholderId: ${placeholderId}`);
+    console.log(`No media asset found for placeholderId: ${placeholderId}`);
     return NextResponse.json(
       { error: `No media asset found for placeholderId: ${placeholderId}` },
       { status: 404 }
@@ -113,9 +114,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { placeholderId: string } }
+  context: { params: { placeholderId: string } }
 ) {
-  const placeholderId = params.placeholderId;
+  // Get the parameters in a Next.js 13+ compatible way
+  const placeholderId = context.params.placeholderId;
   
   if (!placeholderId) {
     return NextResponse.json(

@@ -19,9 +19,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
   ChevronRight,
   FileImage,
   Folder,
@@ -267,15 +264,14 @@ export function SiteMediaManager({ initialActivePageId }: SiteMediaManagerProps)
                             <p className="text-xs text-muted-foreground">{placeholder.area}</p>
                           </div>
                           <Badge variant="outline">
-                            {placeholder.dimensions.width} × {placeholder.dimensions.height}
+                            {placeholder.dimensions.width} Ã— {placeholder.dimensions.height}
                           </Badge>
                         </div>
                         
                         <div className="p-4">
                           {placeholder.publicId ? (
                             <div className="relative">
-                              <CloudinaryImage
-                                publicId={placeholder.publicId}
+                              <CldImage publicId={placeholder.publicId}
                                 alt={placeholder.name}
                                 options={{
                                   width: placeholder.dimensions.width,
@@ -546,3 +542,4 @@ function getMockSiteStructure(): SitePage[] {
     }
   ];
 } 
+

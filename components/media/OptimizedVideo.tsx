@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getVideoSources } from '@/lib/media/utils';
 import { VideoOptions } from '@/lib/media/types';
-import OptimizedImage from '@/components/media/OptimizedImage';
+import { CldImage } from '../components/media/CldImage';
 
 interface OptimizedVideoProps {
   id: string;

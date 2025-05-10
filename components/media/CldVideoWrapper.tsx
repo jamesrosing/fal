@@ -1,13 +1,14 @@
 'use client';
 
 import { CldVideoPlayer } from 'next-cloudinary';
+import 'next-cloudinary/dist/cld-video-player.css'
 import { useState } from 'react';
 
 export interface CldVideoWrapperProps {
   publicId: string;
   width?: number | string;
   height?: number | string;
-  autoPlay?: boolean;
+  autoplay?: boolean;
   loop?: boolean;
   muted?: boolean;
   controls?: boolean;
@@ -22,7 +23,7 @@ export function CldVideoWrapper({
   publicId,
   width = 'auto',
   height = 'auto',
-  autoPlay = false,
+  autoplay = false,
   loop = false,
   muted = true,
   controls = true,
@@ -46,7 +47,7 @@ export function CldVideoWrapper({
             width: typeof width === 'string' ? width : undefined,
             height: typeof height === 'string' ? height : undefined
           }}
-          autoPlay={autoPlay}
+          autoplay ={autoplay}
           loop={loop}
           muted={muted}
           controls={controls}
@@ -82,7 +83,7 @@ export function CldVideoWrapper({
       height={height}
       src={publicId}
       className={className}
-      autoPlay={autoPlay}
+      autoplay ={autoplay}
       loop={loop}
       muted={muted}
       controls={controls}
@@ -93,3 +94,4 @@ export function CldVideoWrapper({
 }
 
 export default CldVideoWrapper; 
+

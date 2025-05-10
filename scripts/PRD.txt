@@ -1,0 +1,75 @@
+# 📚 Allure MD Next.js Web Application with Supabase & Cloudinary 
+
+A modern, mobile-first, flat-design, SEO-optimized web application built with the latest Next.js (app router), Supabase, TailwindCSS, Framer Motion, and Cloudinary. Designed for dynamic image organization, advanced filtering, and efficient management of various medical Articles, as well as Galleries, Albums, Cases, and Images. Modern LLM trained chatbot for answering both general medical questions and specific queries pertaining to our practice and task completion, e.g., scheduling appointments. Users may create profiles where they can then schedule appointments, see appointment history, receive invitations to exclusive events and communicate via chat with providers.
+
+## 🚀 Project Overview
+
+### Goal
+Build a web app focused on:
+
+- Speed & Scalability
+- SEO Optimization
+- Seamless Mobile Experience
+- Efficient Image Delivery via Cloudinary
+- Metadata Management in Supabase
+- A cutting-edge chatbot powered by a modern **Large Language Model (LLM)**
+- Users can:
+    - Read articles
+    - Watch videos
+    - View a gallery of images and video content
+    - Bookmark content
+    - Learn about the medical practice and provider details
+    - Create a profile by logging in with:
+        - First name
+        - Last name
+        - Email
+        - Cell phone number
+        - Password
+
+### Key Features
+- 📱 Mobile-First Design
+- 🎨 Flat, Modern UI
+- 📈 SEO Optimization: Includes meta tags, sitemap, and structured data.
+- 📊 Dynamic Organization: Galleries → Albums → Cases → Images
+- 🏷️ Tagging & Filtering System
+- 🖼️ Bulk Image Uploads
+- 🛡️ Admin Dashboard: Manage Galleries, Albums, Cases, and Images.
+- 🚀 Fast Load Times with Cloudinary Image CDN
+- Secure Auth System: Powered by Supabase Authentication.
+- A cutting-edge chatbot powered by a modern **Large Language Model (LLM)**
+
+## Feature Requirements
+
+### Cloudinary Media System Implementation
+
+#### Overview
+The Cloudinary integration for Allure MD will use industry best practices for Next.js and Cloudinary:
+
+1. **Direct use of Cloudinary public IDs**: Use public IDs directly in components instead of custom placeholder system
+2. **Next Cloudinary components**: Leverage official `next-cloudinary` package with `CldImage` and `CldVideo` components
+3. **Optimized metadata**: Store Cloudinary metadata in database for improved asset management
+4. **Native transformations**: Use Cloudinary's transformation URLs directly for optimization
+5. **Server-side optimization**: Implement Next.js server-side image optimization
+
+## Current Implementation Tasks
+
+### API Endpoint Consolidation
+- Migrate legacy Cloudinary API routes to new consolidated endpoints
+- Update client-side code to use the new endpoints
+- Remove deprecated routes after successful migration
+- Ensure proper error handling and validation
+- Improve logging and debugging capabilities
+
+### Media Component Standardization
+- Implement consistent CldImage and CldVideo components
+- Update existing components to use the new standardized components
+- Add proper TypeScript typing throughout the codebase
+- Implement improved error handling for media loading
+- Create comprehensive documentation for the new media system
+
+### Database Integration
+- Create database schema for storing media metadata
+- Implement functions to save and retrieve media metadata
+- Create migration scripts for existing media assets
+- Add validation and error handling for database operations
+- Implement caching for frequently accessed media metadata 

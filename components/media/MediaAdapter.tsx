@@ -1,128 +1,153 @@
 "use client";
 
 import React from 'react';
-import UnifiedMedia from './UnifiedMedia';
-import { ImageProps } from 'next/image';
+import CldImage from './CldImage';
+import CldVideo from './CldVideo';
+import Image from 'next/image';
 
-// Define the props types directly here since we're providing compatibility
-// with components that might not be available or are being replaced
-
-type CloudinaryImageProps = {
-  publicId: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-  [key: string]: any;
-};
-
-type MediaImageProps = {
-  assetId: string;
-  alt?: string;
-  className?: string;
-  width?: number;
-  height?: number;
-  priority?: boolean;
-  [key: string]: any;
-};
-
-type UnifiedImageProps = {
+// Define the component props
+interface MediaAdapterProps {
   src?: string;
-  alt?: string;
-  placeholderId?: string;
+  publicId?: string;
+  alt: string;
   width?: number;
   height?: number;
-  [key: string]: any;
-};
+  fill?: boolean;
+  priority?: boolean;
+  className?: string;
+  sizes?: string;
+  mediaType?: 'image' | 'video';
+  fallbackSrc?: string;
+  autoPlay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  controls?: boolean;
+  options?: any;
+}
 
-// This adapter component provides backward compatibility with existing components
-// It can handle props from CloudinaryImage, MediaImage, or UnifiedImage components
-
-type MediaAdapterProps = 
-  | (CloudinaryImageProps & { componentType: 'CloudinaryImage' })
-  | (MediaImageProps & { componentType: 'MediaImage' })
-  | (UnifiedImageProps & { componentType: 'UnifiedImage' });
-
-const MediaAdapter: React.FC<MediaAdapterProps> = (props) => {
-  const { componentType, ...restProps } = props;
-
-  // Handle CloudinaryImage props
-  if (componentType === 'CloudinaryImage') {
-    const { publicId, alt, width, height, ...otherProps } = restProps as CloudinaryImageProps;
-    return (
-      <UnifiedMedia
-        src={publicId} 
-        alt={alt || 'Image'}
-        width={width}
-        height={height}
-        {...otherProps}
-      />
-    );
-  }
-
-  // Handle MediaImage props
-  if (componentType === 'MediaImage') {
-    const { 
-      assetId, 
-      alt, 
-      className,
-      width, 
-      height,
-      priority,
-      ...otherProps 
-    } = restProps as MediaImageProps;
-    
-    return (
-      <UnifiedMedia
-        placeholderId={assetId}
-        alt={alt || 'Image'}
-        className={className}
-        width={width}
-        height={height}
-        priority={priority}
-        {...otherProps}
-      />
-    );
-  }
-
-  // Handle UnifiedImage props
-  if (componentType === 'UnifiedImage') {
-    const { 
-      src, 
-      alt, 
-      placeholderId,
-      width, 
-      height,
-      ...otherProps 
-    } = restProps as UnifiedImageProps;
-    
-    // If placeholderId is provided, use that
-    if (placeholderId) {
+/**
+ * MediaAdapter component - A simpler replacement for UnifiedMedia
+ * 
+ * This component adapts to different types of media sources:
+ * - Cloudinary public IDs via CldImage/CldVideo
+ * - Regular image URLs via Next Image
+ * - Video files via HTML video element
+ */
+export default function MediaAdapter({
+  src,
+  publicId,
+  alt,
+  width = 800,
+  height = 600,
+  fill = false,
+  priority = false,
+  className = '',
+  sizes = '100vw',
+  mediaType = 'image',
+  fallbackSrc = '/images/placeholder.jpg',
+  autoPlay = true,
+  muted = true,
+  loop = true,
+  controls = false,
+  options = {}
+}: MediaAdapterProps) {
+  // If publicId is provided, use Cloudinary components
+  if (publicId) {
+    if (mediaType === 'video') {
       return (
-        <UnifiedMedia
-          placeholderId={placeholderId}
-          alt={alt || 'Image'}
+        <CldVideo
+          publicId={publicId}
           width={width}
           height={height}
-          {...otherProps}
+          className={className}
+          autoPlay={autoPlay}
+          muted={muted}
+          loop={loop}
+          controls={controls}
+          alt={alt}
+          {...options}
         />
       );
     }
     
-    // Otherwise use src directly
     return (
-      <UnifiedMedia
-        src={src}
-        alt={alt || 'Image'}
+      <CldImage
+        publicId={publicId}
+        alt={alt}
         width={width}
         height={height}
-        {...otherProps}
+        priority={priority}
+        className={className}
+        sizes={sizes}
+        {...options}
       />
     );
   }
-
-  // This should never happen if the componentType is correctly specified
-  console.error('Invalid componentType provided to MediaAdapter:', componentType);
-  return null;
-};
-
-export default MediaAdapter; 
+  
+  // If we have a direct URL
+  if (src) {
+    if (mediaType === 'video') {
+      return (
+        <video
+          src={src}
+          width={width}
+          height={height}
+          className={className}
+          autoPlay={autoPlay}
+          muted={muted}
+          loop={loop}
+          controls={controls}
+        />
+      );
+    }
+    
+    if (fill) {
+      return (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className={className}
+          sizes={sizes}
+          priority={priority}
+        />
+      );
+    }
+    
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        sizes={sizes}
+        priority={priority}
+      />
+    );
+  }
+  
+  // Fallback
+  if (fill) {
+    return (
+      <Image
+        src={fallbackSrc}
+        alt={alt}
+        fill
+        className={className}
+        sizes={sizes}
+      />
+    );
+  }
+  
+  return (
+    <Image
+      src={fallbackSrc}
+      alt={alt}
+      width={width}
+      height={height}
+      className={className}
+      sizes={sizes}
+    />
+  );
+} 

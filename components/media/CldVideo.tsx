@@ -1,6 +1,7 @@
 'use client';
 
 import { CldVideoPlayer } from 'next-cloudinary';
+import 'next-cloudinary/dist/cld-video-player.css';
 import { useState } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -9,6 +10,7 @@ interface CldEnhancedVideoProps {
   width?: number;
   height?: number;
   autoplay?: boolean;
+  autoPlay?: boolean;
   loop?: boolean;
   muted?: boolean;
   controls?: boolean;
@@ -21,6 +23,7 @@ interface CldEnhancedVideoProps {
     width?: number;
     crop?: string;
   }[];
+  [key: string]: any;
 }
 
 /**
@@ -45,6 +48,7 @@ export default function CldVideo({
   width = 800,
   height = 450,
   autoplay = false,
+  autoPlay,
   loop = false,
   muted = false,
   controls = true,
@@ -57,7 +61,20 @@ export default function CldVideo({
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Handle error state
+  const shouldAutoplay = autoPlay !== undefined ? autoPlay : autoplay;
+
+  const formattedPublicId = publicId.startsWith('/') ? publicId.substring(1) : publicId;
+
+  const handleLoad = () => {
+    setLoading(false);
+  };
+
+  const handleError = () => {
+    console.error(`Failed to load Cloudinary video: ${publicId}`);
+    setError(true);
+    setLoading(false);
+  };
+
   if (error) {
     if (!fallbackSrc) {
       return null;
@@ -69,7 +86,7 @@ export default function CldVideo({
         width={width}
         height={height}
         controls={controls}
-        autoPlay={autoplay}
+        autoPlay={shouldAutoplay}
         loop={loop}
         muted={muted}
         className={className}
@@ -79,32 +96,33 @@ export default function CldVideo({
   }
   
   return (
-    <>
+    <div className="relative">
       {loading && showLoading && (
-        <Skeleton 
-          className={`rounded overflow-hidden ${className}`}
-          style={{ 
-            width: width || '100%', 
-            height: height || 'auto', 
-            aspectRatio: width && height ? width / height : undefined 
-          }}
-        />
+        <Skeleton className={`absolute inset-0 ${className}`} />
       )}
       <CldVideoPlayer
-        id={`video-${publicId.replace(/\//g, '-')}`}
-        width={width}
-        height={height}
-        src={publicId}
-        autoplay={autoplay}
+        id={`video-${publicId.replace(/[^a-zA-Z0-9]/g, '-')}`}
+        src={formattedPublicId}
+        width={width ? `${width}px` : "100%"}
+        height={height ? `${height}px` : "100%"}
+        autoplay={shouldAutoplay}
         loop={loop}
         muted={muted}
         controls={controls}
-        className={`${className} ${loading ? 'opacity-0' : 'opacity-100'}`}
-        onError={() => setError(true)}
-        onPlay={() => setLoading(false)}
-        transformation={transformation}
+        className={`${className} ${loading ? 'invisible' : 'visible'}`}
+        onPlay={handleLoad}
+        onError={handleError}
+        transformation={transformation ? {
+          quality: transformation[0]?.quality || "auto",
+          height: transformation[0]?.height || height,
+          width: transformation[0]?.width || width,
+          crop: transformation[0]?.crop || "fill"
+        } : {
+          quality: "auto",
+          crop: "fill"
+        }}
         {...props}
       />
-    </>
+    </div>
   );
 } 

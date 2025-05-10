@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 interface VideoLoaderProps {

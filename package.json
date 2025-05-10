@@ -40,7 +40,13 @@
     "media:structure": ".\\scripts\\create-media-structure.bat",
     "media:align": "node scripts/align-cloudinary-structure.js",
     "media:update-paths": "node scripts/update-component-paths.js",
-    "media:full-sync": "npm run media:align && npm run media:update-paths"
+    "media:full-sync": "npm run media:align && npm run media:update-paths",
+    "cloudinary:migrate-db": "ts-node scripts/migrate-media-to-cloudinary.ts",
+    "cloudinary:migrate-code": "ts-node scripts/cloudinary-code-migration.ts",
+    "cloudinary:migrate-code-dry": "ts-node scripts/cloudinary-code-migration.ts --dry-run",
+    "cloudinary:cleanup": "ts-node scripts/cleanup-legacy-media.ts",
+    "cloudinary:cleanup-dry": "ts-node scripts/cleanup-legacy-media.ts --dry-run",
+    "cloudinary:migration": "npm run cloudinary:migrate-db && npm run cloudinary:migrate-code && npm run cloudinary:cleanup"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.38.0",
@@ -111,6 +117,7 @@
     "react-markdown": "^10.0.1",
     "react-router-dom": "^7.1.5",
     "react-syntax-highlighter": "^15.6.1",
+    "sentry": "^0.1.2",
     "server-only": "^0.0.1",
     "sharp": "^0.33.5",
     "sonner": "^2.0.3",

@@ -2,53 +2,44 @@
 
 import React from 'react';
 import { mediaService } from '@/lib/services/media-service';
-import UnifiedImage from './UnifiedImage';
-import UnifiedVideo from './UnifiedVideo';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
-
+import CldImage from './CldImage';
+import CldVideo from './CldVideo';
 
 interface MediaRendererProps {
-  placeholderId: string;
+  publicId: string;
+  mediaType: 'image' | 'video';
   alt?: string;
-  className?: string;
   width?: number;
   height?: number;
+  className?: string;
   fill?: boolean;
   priority?: boolean;
   sizes?: string;
+  
+  // Video-specific props
   autoPlay?: boolean;
   muted?: boolean;
   loop?: boolean;
   controls?: boolean;
-  quality?: number;
-  fallbackSrc?: string;
-  showLoading?: boolean;
+  
+  // Other options
+  quality?: number | string;
+  options?: Record<string, any>;
 }
 
 /**
- * MediaRenderer - A universal component for rendering any media type
+ * MediaRenderer component - A utility for rendering media based on type
  * 
- * Features:
- * - Automatically detects media type (image/video)
- * - Applies appropriate rendering component
- * - Unified props interface for both images and videos
- * 
- * @example
- * <MediaRenderer
- *   placeholderId="home-hero-media"
- *   alt="Home hero media"
- *   width={1200}
- *   height={600}
- *   priority
- * />
+ * This component simplified from the previous version to work directly with Cloudinary
+ * It automatically selects between CldImage and CldVideo based on mediaType
  */
 export default function MediaRenderer({
-  placeholderId,
+  publicId,
+  mediaType,
   alt = '',
+  width = 800,
+  height = 600,
   className = '',
-  width,
-  height,
   fill = false,
   priority = false,
   sizes = '100vw',
@@ -56,73 +47,48 @@ export default function MediaRenderer({
   muted = true,
   loop = true,
   controls = false,
-  quality = 80,
-  fallbackSrc,
-  showLoading = true
+  quality = 'auto',
+  options = {}
 }: MediaRendererProps) {
-  // State to track the media type (initially unknown)
-  const [mediaType, setMediaType] = React.useState<'image' | 'video' | 'unknown'>('unknown');
+  if (!publicId) {
+    console.warn('MediaRenderer: No publicId provided');
+    return null;
+  }
   
-  // Fetch the media type on component mount
-  React.useEffect(() => {
-    let isMounted = true;
-    
-    async function detectMediaType() {
-      try {
-        const asset = await mediaService.getMediaByPlaceholderId(placeholderId);
-        if (isMounted && asset) {
-          setMediaType(asset.type as 'image' | 'video');
-        }
-      } catch (err) {
-        console.error(`Error detecting media type for ${placeholderId}:`, err);
-        if (isMounted) {
-          setMediaType('unknown');
-        }
-      }
-    }
-    
-    detectMediaType();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [placeholderId]);
-  
-  // Render the appropriate component based on media type
-  if (mediaType === 'video') {
+  // Render image
+  if (mediaType === 'image') {
     return (
-      <UnifiedVideo
-        placeholderId={placeholderId}
-        options={{
-          autoPlay,
-          muted,
-          loop,
-          controls,
-          quality
-        }}
-        className={className}
+      <CldImage
+        publicId={publicId}
+        alt={alt}
         width={width}
         height={height}
-        fallbackSrc={fallbackSrc}
-        showLoading={showLoading}
+        className={className}
+        priority={priority}
+        sizes={sizes}
+        quality={quality}
+        {...options}
       />
     );
   }
   
-  // For images or unknown media type (default to image)
-  return (
-    <UnifiedImage
-      placeholderId={placeholderId}
-      alt={alt}
-      className={className}
-      width={width}
-      height={height}
-      fill={fill}
-      priority={priority}
-      sizes={sizes}
-      options={{ quality }}
-      fallbackSrc={fallbackSrc}
-      showLoading={showLoading}
-    />
-  );
+  // Render video
+  if (mediaType === 'video') {
+    return (
+      <CldVideo
+        publicId={publicId}
+        width={width}
+        height={height}
+        className={className}
+        autoPlay={autoPlay}
+        muted={muted}
+        loop={loop}
+        controls={controls}
+        alt={alt}
+        {...options}
+      />
+    );
+  }
+  
+  return null;
 }

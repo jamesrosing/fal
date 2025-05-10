@@ -3,9 +3,9 @@
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import UnifiedMedia from '@/components/media/UnifiedMedia'
 import CldImage from '@/components/media/CldImage'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 type TeamMember = {
   placeholderId: string;
@@ -112,20 +112,14 @@ export function TeamSection() {
               quality="auto"
             />
           ) : (
-            <UnifiedMedia 
-              placeholderId="homepage-team-background"
+            <Image 
+              src="/images/global/placeholder-hero.jpg"
               alt="Our Medical Team"
               width={1920}
               height={1080}
               className="absolute inset-0 w-full h-full object-cover"
               sizes="100vw"
               priority
-              mediaType="auto"
-              options={{
-                width: 1920,
-                quality: 80
-              }}
-              fallbackSrc="/images/global/placeholder-hero.jpg"
             />
           )}
           {/* Subtle overlay for readability */}
@@ -180,28 +174,22 @@ export function TeamSection() {
                     quality="auto"
                   />
                 ) : (
-                  <UnifiedMedia
-                    placeholderId={member.placeholderId}
+                  <Image
+                    src="/images/global/placeholder-team.jpg"
                     alt={member.alt}
                     width={300}
                     height={400}
                     className="absolute inset-0 w-full h-full object-cover"
                     sizes="50vw"
-                    options={{
-                      crop: 'fill',
-                      gravity: 'face',
-                      quality: 90
-                    }}
-                    fallbackSrc="/images/global/placeholder-team.jpg"
                   />
                 )}
                 {/* Overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                 
-                {/* Provider name and title */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                  <h4 className="text-sm font-cerebri font-medium">{member.name}</h4>
-                  <p className="text-xs text-gray-300">{member.title}</p>
+                {/* Name and title at bottom */}
+                <div className="absolute bottom-0 left-0 w-full p-4">
+                  <h4 className="text-lg font-serif text-white mb-0">{member.name}</h4>
+                  <p className="text-sm font-cerebri text-gray-200">{member.title}</p>
                 </div>
               </div>
             </div>
@@ -211,145 +199,103 @@ export function TeamSection() {
     );
   }
 
-  // Desktop Layout
+  // Desktop layout - Full width layout with image on the right and text on the left
   return (
-    <section className="bg-black text-white">
-      {/* Content section with text and team grid */}
-      <div className="bg-black">
-        <div className="container mx-auto px-4 py-16">
-          <div className="flex flex-col lg:flex-row w-full gap-12">
-            {/* Left side - Text content */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="max-w-md"
-            >
-              <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Our Team</h2>
-              <h3 className="text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif mb-8">
-                Expert care from trusted professionals
-              </h3>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
-                  decades of combined experience in aesthetic medicine.
-                </p>
-                <p>
-                  We are committed to delivering exceptional results while ensuring your comfort and safety throughout every
-                  procedure and treatment.
-                </p>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/about">Learn About Our Practice</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                </div>
-              </div>
-            </motion.div>
-            
-            {/* Right side - Team images grid in 2x2 layout */}
-            <div className="grid grid-cols-2 gap-2 flex-1">
-              {teamMembers.map((member, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden group">
-                    {member.publicId ? (
-                      <CldImage
-                        publicId={member.publicId}
-                        alt={member.alt}
-                        width={300}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
-                        sizes="(min-width: 1024px) 25vw, 50vw"
-                        crop="fill"
-                        gravity="face"
-                        quality="auto"
-                      />
-                    ) : (
-                      <UnifiedMedia
-                        placeholderId={member.placeholderId}
-                        alt={member.alt}
-                        width={300}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105 duration-700"
-                        sizes="(min-width: 1024px) 25vw, 50vw"
-                        options={{
-                          crop: 'fill',
-                          gravity: 'face',
-                          quality: 90
-                        }}
-                        fallbackSrc="/images/global/placeholder-team.jpg"
-                      />
-                    )}
-                    {/* Dark gradient overlay for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:opacity-60 transition-opacity" />
-                    
-                    {/* Provider name and title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform transition-transform duration-300 group-hover:translate-y-0">
-                      <h4 className="text-md lg:text-lg font-cerebri font-medium">{member.name}</h4>
-                      <p className="text-sm text-gray-300">{member.title}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+    <section className="bg-black text-white overflow-hidden">
+      <div className="flex flex-col lg:flex-row">
+        {/* Left Column - Content */}
+        <div className="lg:w-1/2 px-4 py-12 lg:p-24 flex items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Our Team</h2>
+            <h3 className="text-[clamp(2.5rem,5vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              Expert care from trusted professionals
+            </h3>
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+              <p>
+                Our team of board-certified physicians, licensed medical professionals, and skilled aestheticians brings
+                decades of combined experience in aesthetic medicine.
+              </p>
+              <p>
+                We are committed to delivering exceptional results while ensuring your comfort and safety. Each team member
+                is dedicated to helping you achieve your aesthetic goals and enhancing your natural beauty.
+              </p>
             </div>
-          </div>
+            <div className="mt-8 space-y-4">
+              <LearnMoreButton href="/team">Meet Our Team</LearnMoreButton>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Column - Team portrait grid */}
+        <div className="lg:w-1/2 grid grid-cols-2 gap-0.5">
+          {teamMembers.map((member, index) => (
+            <div key={index} className="relative aspect-square overflow-hidden">
+              {member.publicId ? (
+                <CldImage
+                  publicId={member.publicId}
+                  alt={member.alt}
+                  width={600}
+                  height={600}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  sizes="50vw"
+                  crop="fill"
+                  gravity="face"
+                  quality="auto"
+                />
+              ) : (
+                <Image
+                  src="/images/global/placeholder-team.jpg"
+                  alt={member.alt}
+                  width={600}
+                  height={600}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  sizes="50vw"
+                />
+              )}
+              
+              {/* Gradient overlay for text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+              
+              {/* Name and title */}
+              <div className="absolute bottom-0 left-0 w-full p-4">
+                <h4 className="text-xl font-serif text-white mb-0.5">{member.name}</h4>
+                <p className="text-sm font-cerebri text-gray-200">{member.title}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
       
-      {/* Full-width background image with parallax effect */}
-      <div className="relative h-[40vh]">
+      {/* Full-width background image section as visual separator */}
+      <div className="h-64 lg:h-96 w-full relative">
         {backgroundPublicId ? (
-          <CldImage
+          <CldImage 
             publicId={backgroundPublicId}
-            alt="Team at Allure MD"
+            alt="Our Medical Team"
             width={1920}
-            height={1080}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            priority
+            height={600}
+            className="absolute inset-0 w-full h-full object-cover"
             sizes="100vw"
+            crop="fill"
+            gravity="auto"
             quality="auto"
           />
         ) : (
-          <UnifiedMedia
-            placeholderId="homepage-team-background"
-            alt="Team at Allure MD"
+          <Image 
+            src="/images/global/placeholder-hero.jpg"
+            alt="Our Medical Team"
             width={1920}
-            height={1080}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            priority
+            height={600}
+            className="absolute inset-0 w-full h-full object-cover"
             sizes="100vw"
-            options={{
-              width: 1920,
-              quality: 80
-            }}
-            fallbackSrc="/images/global/placeholder-hero.jpg"
           />
         )}
-        <div className="absolute inset-0 bg-black/40" />
-        
-        {/* Overlay call to action */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center text-white px-4"
-          >
-            <h3 className="text-3xl md:text-4xl font-serif mb-4">Your journey to confidence begins here</h3>
-            <LearnMoreButton href="/appointment">
-              Schedule Your Consultation
-            </LearnMoreButton>
-          </motion.div>
-        </div>
+        <div className="absolute inset-0 bg-black/30" />
       </div>
     </section>
   );

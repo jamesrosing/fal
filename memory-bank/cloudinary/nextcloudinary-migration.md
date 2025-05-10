@@ -1,5 +1,45 @@
 # Migration Guide: Custom Cloudinary to next-cloudinary
 
+## Big Bang Migration Strategy
+
+We've adopted a comprehensive "Big Bang" approach to migrate from our custom Cloudinary implementation to the standard next-cloudinary components. This approach involves:
+
+### Migration Components
+
+1. **Database Migration** (`migrate-media-to-cloudinary.js`)
+   - Maps placeholder IDs to Cloudinary public IDs
+   - Migrates static registry assets to the media_assets table
+   - Handles legacy media_assets_old table data if it exists
+   - Generates a JSON mapping file for the code migration script
+
+2. **Code Migration** (`cloudinary-code-migration.ts`)
+   - Scans codebase for files using placeholder components or placeholderId props
+   - Replaces imports of placeholder components with CldImage/CldVideo
+   - Converts placeholderId props to publicId props
+   - Updates component tags in JSX code
+   - Creates backups of files before modifications
+   - Adds TODO comments for dynamic placeholderId props that need manual review
+
+3. **Legacy Cleanup** (`cleanup-legacy-media.ts`)
+   - Checks for remaining references to legacy components
+   - Creates backups of files before deletion
+   - Removes legacy components, services, and configurations
+   - Provides database cleanup instructions
+
+### Implementation Challenges
+
+- Module system mismatch (ES modules vs CommonJS) in migration scripts
+- TypeScript type safety issues requiring proper annotations
+- Windows compatibility for grep-based file search commands
+- Need for manual review of dynamic placeholderId props
+
+### Migration Execution Sequence
+
+1. First: Run `migrate-media-to-cloudinary.js` to handle database migration
+2. Second: Run `cloudinary-code-migration.ts` to update component references
+3. Third: Run `cleanup-legacy-media.ts` to remove legacy components
+4. Finally: Manually verify and fix any remaining issues or TODO comments
+
 Your project already has the `next-cloudinary` package installed but isn't using its components yet. This guide will help you migrate from your custom Cloudinary implementation to the standard next-cloudinary approach.
 
 ## Step 1: Configure Environment Variables

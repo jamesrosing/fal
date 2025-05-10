@@ -1,73 +1,84 @@
-# Active Context: Next-Cloudinary Implementation and Media System Migration
+# Active Context: Cloudinary Media System Migration
 
 ## Current Focus
 
-We're currently migrating the project from custom Cloudinary implementations to standard next-cloudinary components, while fixing errors in the process. Current focus areas include:
+We're implementing a comprehensive migration to Cloudinary using a Big Bang Migration strategy, with these key components:
 
-1. **Next-Cloudinary Components Implementation**
-   - ✅ Created CldImage component as a wrapper around next-cloudinary's CldImage
-   - ✅ Created CldVideo component as a wrapper around next-cloudinary's CldVideoPlayer
-   - ✅ Created CldImageWrapper and CldVideoWrapper components for backward compatibility
-   - ✅ Created CldUploadWidget and CldMediaLibrary components
-   - ✅ Fixed prop validation in CldImage and CldVideo components
-   - ✅ Fixed homepage component issues using the new components
-   - Next steps: Continue migrating other sections of the site to use the new components
+1. **Migration Scripts**
+   - ✅ Created `migrate-media-to-cloudinary.js` for database migration to map placeholders to Cloudinary public IDs
+   - ✅ Created `cloudinary-code-migration.ts` for updating component references to use Cloudinary components
+   - ✅ Created `cleanup-legacy-media.ts` for removing legacy components after successful migration
+   - ⏳ In progress: Fixing TypeScript type issues in migration scripts
+   - ⏳ In progress: Creating PowerShell-compatible versions of search commands
 
-2. **Media Source Resolution**
-   - ✅ Enhanced the placeholder ID resolution API for better error handling
-   - ✅ Added fallback mappings for common missing placeholders
-   - ✅ Implemented getCloudinaryPublicId utility to extract public IDs from URLs
-   - ✅ Added dynamic publicId fetching in components that previously used placeholderIds
-   - Next steps: Complete the migration of remaining components to use direct Cloudinary public IDs
+2. **Cloudinary Components**
+   - ✅ Using existing well-implemented Cloudinary components: CldImage, CldVideo, CldUploadWidget
+   - ✅ Implemented secure uploads via `app/api/cloudinary/signed-upload/route.ts`
+   - ✅ Configured environment variables in `next.config.ts`
 
-3. **SEO Optimizations**
-   - Continuing to implement structured data for key pages
-   - Optimizing meta descriptions and titles for procedure pages
-   - Implementing OG images for improved social sharing
+3. **Migration Strategy**
+   - ✅ Designed mapping strategy between placeholder IDs and Cloudinary public IDs
+   - ✅ Created plan to update component references and props (placeholderId → publicId)
+   - ✅ Established process for removing legacy media components after verification
 
 ## Recent Decisions
 
-- **Migration to next-cloudinary**: We've decided to migrate from custom Cloudinary implementation to the standard next-cloudinary components, which provide better optimization and maintenance.
-- **Component Architecture**: Created wrapper components (CldImage, CldVideo) around the next-cloudinary components to provide enhanced functionality like loading states and error handling.
-- **Width/Height vs. Fill**: Resolved conflicts between "width/height" and "fill" properties by standardizing on width/height properties in all CldImage components to prevent Next.js errors.
-- **Backward Compatibility**: Implemented a hybrid approach where components can use both direct publicIds and legacy placeholderIds, with automatic fetching of publicIds when only placeholderIds are provided.
+- **Big Bang Migration Approach**: We've decided to use a comprehensive migration strategy that handles database migration, code updates, and cleanup in coordinated steps.
+- **Leveraging Existing Components**: We're using the existing well-implemented Cloudinary components (CldImage, CldVideo, CldUploadWidget) rather than creating duplicates.
+- **Script-Based Migration**: Created multiple specialized scripts to handle different aspects of the migration.
 
 ## Key Challenges
 
-1. **Component Prop Compatibility**: 
-   - CldImage doesn't support the "fill" property like Next.js Image
-   - CldVideo doesn't support the "poster" property in the same way as standard HTML video
-   - Solution: Modified component props and styling to achieve the same visual result
+1. **Module System Mismatch**: 
+   - ES modules vs CommonJS compatibility issues in migration scripts
+   - Need to adapt import/require statements for proper execution
 
-2. **Missing Placeholder Mappings**: 
-   - Several placeholderIds in the codebase were returning 404 errors (e.g., homepage-about-background)
-   - Solution: Set default publicIds and implemented API fetching with fallbacks
+2. **TypeScript Type Safety**: 
+   - Static type checking issues in migration scripts
+   - Need to add proper type annotations to migration functions
 
-3. **Cloudinary URL Structure**:
-   - Ensuring correct URL construction for various Cloudinary resources
-   - Implemented getCloudinaryPublicId utility to properly extract public IDs from URLs
+3. **Windows Compatibility**:
+   - Need to adapt grep-based search commands for Windows PowerShell
+   - Creating fallback search methods for file discovery
+
+## Implementation Flow
+
+1. **Database Migration** (`migrate-media-to-cloudinary.js`)
+   - Migrate static registry assets to the media_assets table
+   - Check for and migrate legacy media_assets_old table if it exists
+   - Generate publicId mapping file for migration script
+
+2. **Code Migration** (`cloudinary-code-migration.ts`)
+   - Find files with placeholder components and placeholderId props
+   - Replace imports of placeholder components with CldImage/CldVideo
+   - Convert placeholderId props to publicId
+   - Update component tags in JSX
+
+3. **Legacy Cleanup** (`cleanup-legacy-media.ts`)
+   - Check for remaining references to legacy components
+   - Create backups of files before deleting
+   - Remove legacy components, services, and configurations
 
 ## Next Steps
 
-1. **Continue Migration**:
-   - Identify and update remaining components that use the old Cloudinary implementation
-   - Standardize on the new CldImage and CldVideo components across the site
+1. **Fix Migration Scripts**:
+   - Address TypeScript linting issues in cloudinary-code-migration.ts
+   - Create type-safe interfaces for migration functions
+   - Adapt grep commands for Windows PowerShell compatibility
 
-2. **Performance Analysis**: 
-   - Analyze performance with Lighthouse after implementing next-cloudinary
-   - Ensure Core Web Vitals remain strong after the migration
+2. **Run Migration Scripts**:
+   - Execute database migration first (migrate-media-to-cloudinary.js)
+   - Run code migration next (cloudinary-code-migration.ts)
+   - Perform legacy cleanup last (cleanup-legacy-media.ts)
 
-3. **Documentation**: 
-   - Update component documentation to highlight the new system
-   - Create examples for developers to follow when implementing media components
-
-4. **Integration Testing**: 
-   - Test the new components on all major page types to ensure proper rendering
-   - Verify responsive behavior across different device sizes
+3. **Verify and Test**:
+   - Review dynamically generated TODO comments in migrated files
+   - Convert remaining dynamic placeholderId props to publicId
+   - Test all components to ensure proper rendering and responsiveness
 
 ## Current Considerations
 
-- Finding the right balance between component flexibility and standardization
-- Ensuring consistent loading states and error handling across all media components
-- Maintaining backward compatibility with existing code during the transition period
-- Preparing for future upgrades of the next-cloudinary package 
+- Finding the right balance between automated migration and manual review
+- Ensuring backward compatibility during the transition period
+- Handling dynamic placeholderId props that require context-specific conversion
+- Adapting file search logic for Windows environment 

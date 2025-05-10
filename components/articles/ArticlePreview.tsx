@@ -4,8 +4,8 @@ import { Article } from '@/lib/supabase';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 interface ArticlePreviewProps {

@@ -3,8 +3,8 @@
 import { useState } from "react"
 import ImageUploader from "@/components/image-uploader"
 import ImageDisplay from "@/components/image-display"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 export default function UploadPage() {

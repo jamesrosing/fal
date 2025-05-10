@@ -7,8 +7,8 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'react-hot-toast'
 import { Article } from '@/lib/types'
 import { Skeleton } from '@/components/ui/skeleton'
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 export default function ArticleList({ initialArticles }: { initialArticles: Article[] }) {

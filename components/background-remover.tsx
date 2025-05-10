@@ -3,8 +3,8 @@
 import { useState } from "react"
 import ImageUploader from "./image-uploader"
 import ImageDisplay from "./image-display"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import { CldImage } from '../components/media/CldImage';
+import { CldVideo } from '../components/media/CldVideo';
 
 
 interface ProcessedImage {

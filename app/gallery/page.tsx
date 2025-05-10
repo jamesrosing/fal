@@ -5,8 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { Share2, Heart } from "lucide-react"
 import { NavBar } from "@/components/nav-bar"
-import OptimizedImage from '@/components/media/OptimizedImage';
-import OptimizedVideo from '@/components/media/OptimizedVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 interface GalleryCollection {
@@ -60,7 +60,15 @@ export default function GalleryPage() {
       <NavBar />
       {/* Hero Section */}
       <div className="relative h-[70vh] w-full">
-        <OptimizedImage id="/images/gallery/hero.jpg" alt="Gallery Hero"   priority fill />
+        <CldImage 
+          publicId="/images/gallery/hero.jpg" 
+          alt="Gallery Hero" 
+          priority 
+          width={1920}
+          height={1080}
+          crop="fill"
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="container mx-auto max-w-6xl">
