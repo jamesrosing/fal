@@ -61,14 +61,17 @@ export default function CldImage({
       return null;
     }
     
+    // For fallbacks that aren't Cloudinary images, use src directly
     return (
-      <NextCloudinaryImage 
+      <img 
         src={fallbackSrc}
         alt={alt}
         width={width}
         height={height}
-        sizes={sizes}
         className={className}
+        style={{
+          objectFit: crop === 'fill' ? 'cover' : 'contain',
+        }}
         {...props}
       />
     );
@@ -87,14 +90,20 @@ export default function CldImage({
         />
       )}
       <NextCloudinaryImage
-        src={publicId}
+        publicId={publicId}
         alt={alt}
         width={width}
         height={height}
         sizes={sizes}
         className={`${className} ${loading ? 'hidden' : ''}`}
-        onError={() => setError(true)}
-        onLoad={() => setLoading(false)}
+        onError={(e) => {
+          console.error(`Error loading Cloudinary image: ${publicId}`, e);
+          setError(true);
+        }}
+        onLoad={() => {
+          console.log(`Successfully loaded Cloudinary image: ${publicId}`);
+          setLoading(false);
+        }}
         crop={crop}
         gravity={gravity}
         quality={quality}

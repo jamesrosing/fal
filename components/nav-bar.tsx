@@ -350,14 +350,13 @@ export function NavBar() {
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="relative w-40 h-12">
-              <CldImage 
-                publicId="global/logos/allure_md_plastic_surgery_dermatology_white_logo.png" 
-                alt="ALLURE MD" 
-                priority 
+              {/* Using direct Image component with Cloudinary URL as a fallback */}
+              <img 
+                src="https://res.cloudinary.com/dyrzyfg3w/image/upload/v1743748610/global/logos/allure_md_plastic_surgery_dermatology_white_logo.png" 
+                alt="ALLURE MD PLASTIC SURGERY + DERMATOLOGY" 
                 width={160}
                 height={48}
-                crop="fill"
-                className="object-contain"
+                className="object-contain w-full h-full"
               />
             </div>
           </Link>
@@ -420,7 +419,7 @@ export function NavBar() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "md:hidden p-2 text-white rounded-lg bg-white/10 hover:bg-white/20 transition-colors",
+                    "md:hidden p-1 text-white rounded-lg bg-white/10 hover:bg-white/20 transition-colors z-50",
                     isScrolled ? "hover:text-white" : "hover:text-white"
                   )}
                 >

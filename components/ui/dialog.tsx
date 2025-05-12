@@ -5,8 +5,6 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
 
 
 const Dialog = DialogPrimitive.Root
