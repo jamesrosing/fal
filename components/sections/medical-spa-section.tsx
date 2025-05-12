@@ -1,15 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
-import { useMediaAsset } from "@/hooks/useMedia"
 import { useState } from "react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
+import CldImage from "@/components/media/CldImage"
 
 type TabItem = {
   name: string;
@@ -21,13 +17,8 @@ export function MedicalSpaSection() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const isMobile = useIsMobile();
   
-  // Use the useMediaAsset hook to get the media url
-  const { url: backgroundUrl, isVideo, isLoading } = useMediaAsset('homepage-medical-spa-background', {
-    width: 1920,
-    quality: 80,
-    format: 'auto',
-    responsive: true
-  });
+  // Use direct Cloudinary public ID
+  const backgroundPublicId = "homepage-medical-spa-background";
 
   // Tab data
   const tabs: TabItem[] = [
@@ -73,42 +64,23 @@ export function MedicalSpaSection() {
     </div>
   );
 
-  // Display loading placeholder if media is still loading
-  if (isLoading) {
-    return (
-      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse">Loading...</div>
-        </div>
-      </section>
-    );
-  }
-
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (
       <section className="relative bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {isVideo ? (
-            <video
-              src={backgroundUrl || ""}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Image 
-              src={backgroundUrl || ""} 
-              alt="Medical Spa Services" 
-              fill 
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
-          )}
+          <CldImage 
+            publicId={backgroundPublicId} 
+            alt="Medical Spa Services" 
+            width={1080}
+            height={607} // 16:9 aspect ratio
+            className="w-full h-full object-cover"
+            sizes="100vw"
+            crop="fill"
+            priority
+            showLoading={true}
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
         </div>
@@ -152,27 +124,17 @@ export function MedicalSpaSection() {
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        {isVideo ? (
-          // Render video background when the asset is a video
-          <video
-            src={backgroundUrl || ""}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          // Render image background when the asset is an image
-          <Image
-            src={backgroundUrl || ""}
-            alt="Medical Spa Services"
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
-        )}
+        <CldImage
+          publicId={backgroundPublicId}
+          alt="Medical Spa Services"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
+          sizes="100vw"
+          crop="fill"
+          priority
+          showLoading={true}
+        />
         {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>
@@ -204,7 +166,7 @@ export function MedicalSpaSection() {
         </motion.div>
       </div>
       
-      {/* Bottom Tab Navigation (Desktop) */}
+      {/* Bottom Tab Navigation (Desktop) - absolute positioned */}
       {desktopTabNavigation}
     </section>
   )

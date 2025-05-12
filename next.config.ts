@@ -21,12 +21,16 @@ const nextConfig = {
     // Next.js 15 has different experimental options
   },
   images: {
-    domains: ['res.cloudinary.com', 'source.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
         pathname: '/**',
       },
     ],

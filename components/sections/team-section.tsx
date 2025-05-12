@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { CldImage } from 'next-cloudinary'
+import CldImage from "@/components/media/CldImage"
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
@@ -102,25 +102,20 @@ export function TeamSection() {
         <div className="relative w-full aspect-[16/9]">
           {backgroundPublicId ? (
             <CldImage 
-              src={backgroundPublicId}
+              publicId={backgroundPublicId}
               alt="Our Medical Team"
               width={1920}
               height={1080}
               className="absolute inset-0 w-full h-full object-cover"
               sizes="100vw"
+              crop="fill"
               priority
-              quality="auto"
+              quality={90}
             />
           ) : (
-            <Image 
-              src="/images/global/placeholder-hero.jpg"
-              alt="Our Medical Team"
-              width={1920}
-              height={1080}
-              className="absolute inset-0 w-full h-full object-cover"
-              sizes="100vw"
-              priority
-            />
+            <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+              <p className="text-gray-500">Image not available</p>
+            </div>
           )}
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/30" />
@@ -163,7 +158,7 @@ export function TeamSection() {
               <div className="relative aspect-[3/4] overflow-hidden">
                 {member.publicId ? (
                   <CldImage
-                    src={member.publicId}
+                    publicId={member.publicId}
                     alt={member.alt}
                     width={300}
                     height={400}
@@ -171,17 +166,12 @@ export function TeamSection() {
                     sizes="50vw"
                     crop="fill"
                     gravity="face"
-                    quality="auto"
+                    quality={90}
                   />
                 ) : (
-                  <Image
-                    src="/images/global/placeholder-team.jpg"
-                    alt={member.alt}
-                    width={300}
-                    height={400}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    sizes="50vw"
-                  />
+                  <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+                    <p className="text-gray-500">Image not available</p>
+                  </div>
                 )}
                 {/* Overlay for text legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -237,7 +227,7 @@ export function TeamSection() {
             <div key={index} className="relative aspect-square overflow-hidden">
               {member.publicId ? (
                 <CldImage
-                  src={member.publicId}
+                  publicId={member.publicId}
                   alt={member.alt}
                   width={600}
                   height={600}
@@ -245,17 +235,12 @@ export function TeamSection() {
                   sizes="50vw"
                   crop="fill"
                   gravity="face"
-                  quality="auto"
+                  quality={90}
                 />
               ) : (
-                <Image
-                  src="/images/global/placeholder-team.jpg"
-                  alt={member.alt}
-                  width={600}
-                  height={600}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  sizes="50vw"
-                />
+                <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+                  <p className="text-gray-500">Image not available</p>
+                </div>
               )}
               
               {/* Gradient overlay for text legibility */}
@@ -275,7 +260,7 @@ export function TeamSection() {
       <div className="h-64 lg:h-96 w-full relative">
         {backgroundPublicId ? (
           <CldImage 
-            src={backgroundPublicId}
+            publicId={backgroundPublicId}
             alt="Our Medical Team"
             width={1920}
             height={600}
@@ -283,17 +268,12 @@ export function TeamSection() {
             sizes="100vw"
             crop="fill"
             gravity="auto"
-            quality="auto"
+            quality={90}
           />
         ) : (
-          <Image 
-            src="/images/global/placeholder-hero.jpg"
-            alt="Our Medical Team"
-            width={1920}
-            height={600}
-            className="absolute inset-0 w-full h-full object-cover"
-            sizes="100vw"
-          />
+          <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+            <p className="text-gray-500">Image not available</p>
+          </div>
         )}
         <div className="absolute inset-0 bg-black/30" />
       </div>

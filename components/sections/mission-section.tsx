@@ -1,65 +1,34 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
-import { useMediaAsset } from "@/hooks/useMedia"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
+import CldImage from "@/components/media/CldImage"
 
 export function MissionSection() {
   const isMobile = useIsMobile();
   
-  // Use the useMediaAsset hook to fetch the media with improved quality
-  const { url: backgroundUrl, isVideo, isLoading } = useMediaAsset('homepage-mission-background', {
-    width: isMobile ? 1080 : 1920, // Higher resolution for mobile
-    quality: 90, // Increased quality
-    format: 'webp', // Explicitly use webp for better compression/quality ratio
-    responsive: true
-  });
-
-  // Display loading placeholder if media is still loading
-  if (isLoading) {
-    return (
-      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse">Loading...</div>
-        </div>
-      </section>
-    );
-  }
-
+  // Directly use a Cloudinary public ID instead of useMediaAsset hook
+  const backgroundPublicId = "homepage-mission-background"; // This should be updated with the actual public ID
+  
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {isVideo && backgroundUrl ? (
-            <video
-              src={backgroundUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : backgroundUrl ? (
-            <Image 
-              src={backgroundUrl} 
-              alt="Mission background" 
-              fill 
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-              <p className="text-gray-500">Image not available</p>
-            </div>
-          )}
+          <CldImage 
+            publicId={backgroundPublicId} 
+            alt="Mission background" 
+            width={1080}
+            height={607} // Aspect ratio 16:9
+            className="object-cover w-full h-full"
+            sizes="100vw"
+            crop="fill"
+            priority
+            quality={90}
+            showLoading={true}
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
         </div>
@@ -99,29 +68,18 @@ export function MissionSection() {
     <section className="relative bg-black text-white">
       {/* Add background media with dark overlay */}
       <div className="absolute inset-0 z-0">
-        {isVideo && backgroundUrl ? (
-          <video
-            src={backgroundUrl}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        ) : backgroundUrl ? (
-          <Image 
-            src={backgroundUrl} 
-            alt="Mission background" 
-            fill 
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-            <p className="text-gray-500">Image not available</p>
-          </div>
-        )}
+        <CldImage 
+          publicId={backgroundPublicId} 
+          alt="Mission background" 
+          width={1920}
+          height={1080}
+          className="object-cover w-full h-full"
+          sizes="100vw"
+          crop="fill"
+          priority
+          quality={90}
+          showLoading={true}
+        />
         {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>

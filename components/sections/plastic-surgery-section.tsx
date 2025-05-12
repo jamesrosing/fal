@@ -1,39 +1,16 @@
 "use client"
 
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { LearnMoreButton } from "../ui/learn-more-button"
-import { useMediaAsset } from "@/hooks/useMedia"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
+import CldImage from "@/components/media/CldImage"
 
 export function PlasticSurgerySection() {
   const isMobile = useIsMobile();
   
-  // Use the useMediaAsset hook to get the media url with responsive options
-  const { url: backgroundUrl, srcSet, isVideo, isLoading } = useMediaAsset('homepage-plastic-surgery-background', {
-    width: 1920,
-    quality: 80,
-    format: 'auto',
-    responsive: true
-  });
-
-  // Display loading placeholder if media is still loading
-  if (isLoading) {
-    return (
-      <section className="relative min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse">Loading...</div>
-        </div>
-      </section>
-    );
-  }
-
-  // Define a fallback image URL to prevent empty string errors
-  const fallbackImageUrl = "/images/placeholder.jpg";
-  const safeBackgroundUrl = backgroundUrl || fallbackImageUrl;
+  // Directly use the provided Cloudinary public ID
+  // Make sure to use the full public ID pattern including folder structure
+  const backgroundPublicId = "t1qslw49kdlnmgoqst5h";
 
   // Mobile Layout: Image on top, text below
   if (isMobile) {
@@ -41,25 +18,17 @@ export function PlasticSurgerySection() {
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {isVideo ? (
-            <video
-              src={safeBackgroundUrl}
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <Image 
-              src={safeBackgroundUrl} 
-              alt="Plastic Surgery at Allure MD" 
-              fill 
-              className="object-cover"
-              sizes="100vw"
-              priority
-            />
-          )}
+          <CldImage 
+            publicId={backgroundPublicId} 
+            alt="Plastic Surgery at Allure MD" 
+            width={1080}
+            height={607} // 16:9 aspect ratio
+            className="object-cover w-full h-full"
+            sizes="100vw"
+            crop="fill"
+            priority
+            showLoading={true}
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
         </div>
@@ -101,27 +70,17 @@ export function PlasticSurgerySection() {
   return (
     <section className="relative h-screen bg-black text-white">
       <div className="absolute inset-0">
-        {isVideo ? (
-          // Render video background when the asset is a video
-          <video
-            src={safeBackgroundUrl}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          // Render image background when the asset is an image
-          <Image
-            src={safeBackgroundUrl}
-            alt="Plastic Surgery at Allure MD"
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        )}
+        <CldImage
+          publicId={backgroundPublicId}
+          alt="Plastic Surgery at Allure MD"
+          width={1920}
+          height={1080}
+          className="object-cover w-full h-full"
+          sizes="100vw"
+          crop="fill"
+          priority
+          showLoading={true}
+        />
         {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>

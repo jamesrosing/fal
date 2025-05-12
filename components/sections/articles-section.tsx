@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import Image from "next/image"
 import Link from "next/link"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
-
-
+import CldImage from "@/components/media/CldImage"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 export function ArticlesSection() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
+  
+  // Use direct Cloudinary public ID
+  const backgroundPublicId = "homepage-articles-background";
 
   useEffect(() => {
     async function fetchArticles() {
@@ -39,100 +39,99 @@ export function ArticlesSection() {
     fetchArticles();
   }, []);
 
+  // Mobile Layout: Image on top, text below
+  if (isMobile) {
+    return (
+      <section className="bg-black text-white">
+        {/* Media container with preserved aspect ratio */}
+        <div className="relative w-full aspect-[16/9]">
+          <CldImage 
+            publicId={backgroundPublicId} 
+            alt="Allure MD Articles" 
+            width={1080}
+            height={607} // 16:9 aspect ratio
+            className="w-full h-full object-cover"
+            sizes="100vw"
+            crop="fill"
+            priority
+            showLoading={true}
+          />
+          {/* Subtle overlay for readability */}
+          <div className="absolute inset-0 bg-black/20" />
+        </div>
+        
+        {/* Text content below image */}
+        <div className="px-4 py-12 bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto"
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Articles</h2>
+            <h3 className="text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              Insights and education from our experts
+            </h3>
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+              <p>
+                Explore our collection of articles covering the latest advancements in aesthetic medicine,
+                skincare tips, treatment options, and more. Our experts regularly share their knowledge to help
+                you make informed decisions about your health and beauty journey.
+              </p>
+            </div>
+            <div className="mt-8">
+              <LearnMoreButton href="/articles">Explore Our Articles</LearnMoreButton>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    );
+  }
+
+  // Desktop Layout
   return (
-    <section className="relative py-24 bg-black text-white">
-      <div className="container mx-auto px-4">
+    <section className="relative min-h-screen bg-black text-white">
+      <div className="absolute inset-0">
+        <CldImage
+          publicId={backgroundPublicId}
+          alt="Allure MD Articles"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
+          sizes="100vw"
+          crop="fill"
+          priority
+          showLoading={true}
+        />
+        {/* Dark gradient overlay that fades from right to left for text on the right */}
+        <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-transparent" />
+      </div>
+      
+      <div className="relative container mx-auto px-4 py-32 lg:px-8 lg:py-48 min-h-screen flex items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto text-center mb-16"
+          className="ml-auto max-w-2xl text-right"
         >
-          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-300">
-            Latest Articles
-          </h2>
-          <h3 className="mb-8 text-[clamp(2rem,4vw,3rem)] leading-none tracking-tight font-serif text-white">
-            Stay informed with Allure MD
+          <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Articles</h2>
+          <h3 className="text-[clamp(2.5rem,5vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
+            Insights and education from our experts
           </h3>
+          <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+            <p>
+              Explore our collection of articles covering the latest advancements in aesthetic medicine,
+              skincare tips, treatment options, and more. Our experts regularly share their knowledge to help
+              you make informed decisions about your health and beauty journey.
+            </p>
+          </div>
+          <div className="mt-10">
+            <LearnMoreButton href="/articles">Explore Our Articles</LearnMoreButton>
+          </div>
         </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {loading ? (
-            // Loading skeletons
-            Array(3).fill(0).map((_, i) => (
-              <div key={i} className="group relative flex flex-col overflow-hidden border border-zinc-800 bg-black h-[450px]">
-                <div className="relative w-full aspect-[4/3]">
-                  <Skeleton className="w-full h-full" />
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <Skeleton className="h-4 w-1/3 mb-4" />
-                  <Skeleton className="h-6 w-full mb-4" />
-                  <Skeleton className="h-20 w-full mb-4" />
-                  <div className="mt-auto">
-                    <Skeleton className="h-10 w-32" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            articles.map((article, index) => {
-              // Handle full URLs or just public IDs
-              const imageUrl = article.featured_image || article.image;
-              const formattedImageUrl = imageUrl?.includes('https://') 
-                ? imageUrl 
-                : mediaUrl(`articles/${imageUrl}`);
-                
-              return (
-                <motion.div
-                  key={article.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                  viewport={{ once: true }}
-                  className="group relative flex flex-col overflow-hidden border border-zinc-800 bg-black transition-colors duration-300 hover:border-zinc-700"
-                >
-                  <div className="relative w-full aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={formattedImageUrl || "/placeholder-image.jpg"}
-                      alt={article.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="p-6 flex flex-col flex-1">
-                    <p className="text-sm font-cerebri text-zinc-400">
-                      {new Date(article.published_at || article.created_at || '').toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <Link href={`/articles/${article.slug}`} className="mt-3 block">
-                      <h3 className="text-xl font-serif text-white transition-colors duration-300 group-hover:text-zinc-300">
-                        {article.title}
-                      </h3>
-                      <p className="mt-3 text-base font-cerebri font-light text-zinc-400 line-clamp-2">
-                        {article.excerpt}
-                      </p>
-                    </Link>
-                    <div className="mt-6 mt-auto">
-                      <LearnMoreButton href={`/articles/${article.slug}`}>
-                        Read Article
-                      </LearnMoreButton>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })
-          )}
-        </div>
-
-        <div className="text-center mt-12">
-          <LearnMoreButton href="/articles">View All Articles</LearnMoreButton>
-        </div>
       </div>
     </section>
-  )
+  );
 } 

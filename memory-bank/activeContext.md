@@ -5,158 +5,147 @@
 We're implementing a comprehensive migration to Cloudinary using a Big Bang Migration strategy, with these key components:
 
 1. **Migration Scripts**
-   - ✅ Created `migrate-media-to-cloudinary.js` for database migration to map placeholders to Cloudinary public IDs
-   - ✅ Created `cloudinary-code-migration.ts` for updating component references to use Cloudinary components
-   - ✅ Created `cleanup-legacy-media.ts` for removing legacy components after successful migration
-   - ⏳ In progress: Fixing TypeScript type issues in migration scripts
-   - ⏳ In progress: Creating PowerShell-compatible versions of search commands
+   - ✅ Created `migrate-components.js` to update placeholder-based component references to use standard CldImage/CldVideo components
+   - ✅ Created `update-database-schema.js` for migrating database to use direct public IDs
+   - ✅ Created `migration-status.js` to track migration progress
 
-2. **Cloudinary Components**
-   - ✅ Using existing well-implemented Cloudinary components: CldImage, CldVideo, CldUploadWidget
-   - ✅ Implemented secure uploads via `app/api/cloudinary/signed-upload/route.ts`
-   - ✅ Configured environment variables in `next.config.ts`
-   - ✅ Successfully implemented responsive Cloudinary video background on the homepage hero section
-   - ✅ Replaced original Hero component with enhanced HeroSection using CldVideoPlayer
+2. **Direct Cloudinary API**
+   - ✅ Implemented new API endpoints in `/app/api/cloudinary` for direct access to Cloudinary assets
+   - ✅ Created asset endpoints that work with direct public IDs rather than placeholder IDs
+   - ✅ Created responsive image and transformation endpoints for client-side usage
+   - ✅ Removed legacy placeholder-based API endpoints that are no longer needed
 
-3. **Migration Strategy**
-   - ✅ Designed mapping strategy between placeholder IDs and Cloudinary public IDs
-   - ✅ Created plan to update component references and props (placeholderId → publicId)
-   - ✅ Established process for removing legacy media components after verification
+3. **Standard Cloudinary Components**
+   - ✅ Using the established components in `@/components/media` directory (CldImage, CldVideo, etc.)
+   - ✅ Created migration guide in `CLOUDINARY-DIRECT-USAGE.md` for developer reference
+   - ✅ Established direct public ID usage pattern to avoid indirection
+
+4. **Complete Migration Strategy**
+   - ✅ Implemented direct public ID approach, abandoning backward compatibility with placeholders
+   - ✅ Created legacy bridge API for transitional support if needed
 
 ## Recent Decisions
 
-- **Big Bang Migration Approach**: We've decided to use a comprehensive migration strategy that handles database migration, code updates, and cleanup in coordinated steps.
-- **Leveraging Existing Components**: We're using the existing well-implemented Cloudinary components (CldImage, CldVideo, CldUploadWidget) rather than creating duplicates.
-- **Script-Based Migration**: Created multiple specialized scripts to handle different aspects of the migration.
-- **Cloudinary Video Implementation**: Successfully implemented responsive video background using Cloudinary's CldVideoPlayer component with direct publicId references rather than API-based resolution.
-- **Mobile/Desktop Conditional Rendering**: Instead of using CSS media queries, we're using React's conditional rendering with device detection for better video performance and resource management.
-
-## Key Challenges
-
-1. **Module System Mismatch**: 
-   - ES modules vs CommonJS compatibility issues in migration scripts
-   - Need to adapt import/require statements for proper execution
-
-2. **TypeScript Type Safety**: 
-   - Static type checking issues in migration scripts
-   - Need to add proper type annotations to migration functions
-
-3. **Windows Compatibility**:
-   - Need to adapt grep-based search commands for Windows PowerShell
-   - Creating fallback search methods for file discovery
-
-4. **Cloudinary Video Issues**:
-   - ✅ Fixed issues with Cloudinary video transformation parameters causing playback failures
-   - ✅ Resolved mobile/desktop video responsive rendering with proper conditional component rendering
-   - ✅ Fixed CSS styling issues to ensure videos properly fill the screen on all devices
-   - ✅ Improved mobile UX with enhanced hamburger menu icon and navigation
+- **Use Existing Components**: We're using the already-implemented components in `components/media` that wrap the next-cloudinary library with enhanced features.
+- **Direct Public ID Approach**: We've decided to completely abandon backward compatibility with placeholder IDs and use Cloudinary public IDs directly in all components and API calls.
+- **Script-Based Migration**: Created specialized scripts to handle different aspects of the migration, including component updates and database schema changes.
+- **API Structure Simplification**: Restructured the API to use a simpler, more direct approach with Cloudinary public IDs.
 
 ## Implementation Flow
 
-1. **Database Migration** (`migrate-media-to-cloudinary.js`)
-   - Migrate static registry assets to the media_assets table
-   - Check for and migrate legacy media_assets_old table if it exists
-   - Generate publicId mapping file for migration script
+1. **Database Schema Update** (`update-database-schema.js`)
+   - Migrate the media_assets table to use public_id as the primary identifier
+   - Store legacy placeholder IDs in metadata for reference if needed
+   - Generate a map of placeholder IDs to public IDs for component migration
 
-2. **Code Migration** (`cloudinary-code-migration.ts`)
-   - Find files with placeholder components and placeholderId props
-   - Replace imports of placeholder components with CldImage/CldVideo
-   - Convert placeholderId props to publicId
-   - Update component tags in JSX
+2. **Component Migration** (`migrate-components.js`)
+   - Replace UnifiedMedia components with CldImage or CldVideo components
+   - Update import statements to include imports from '@/components/media'
+   - Convert placeholderId props to publicId props with direct Cloudinary public IDs
+   - Update API fetch calls to use the new cloudinary endpoints
 
-3. **Legacy Cleanup** (`cleanup-legacy-media.ts`)
-   - Check for remaining references to legacy components
-   - Create backups of files before deleting
-   - Remove legacy components, services, and configurations
+3. **Migration Status Tracking** (`migration-status.js`)
+   - Analyze codebase to identify components that still need migration
+   - Generate a report showing migration progress
+   - Identify priority files for manual migration
+
+## API Structure
+
+1. **/api/cloudinary/asset/[publicId]**
+   - Direct asset retrieval by Cloudinary public ID
+   - Handles both images and videos
+   - Returns metadata from database if available
+
+2. **/api/cloudinary/responsive/[publicId]**
+   - Generates responsive image URLs for different screen sizes
+   - Returns srcSet and sizes information for images
+
+3. **/api/cloudinary/transform**
+   - Applies transformations to Cloudinary assets
+   - Supports all standard Cloudinary transformation options
+
+4. **/api/cloudinary/assets/register**
+   - Registers or updates a Cloudinary asset in the database
+   - Stores metadata, alt text, dimensions, etc.
+
+5. **/api/cloudinary/assets/list**
+   - Lists all Cloudinary assets from the database
+   - Supports filtering by type, folder, etc.
+
+6. **/api/cloudinary/legacy-bridge**
+   - Transitional endpoint that accepts placeholderId and redirects to the appropriate direct asset
 
 ## Next Steps
 
-1. **Fix Migration Scripts**:
-   - Address TypeScript linting issues in cloudinary-code-migration.ts
-   - Create type-safe interfaces for migration functions
-   - Adapt grep commands for Windows PowerShell compatibility
+1. **Run Migration Scripts**:
+   - Execute database schema update first
+   - Run component migration script
+   - Verify migration with status reporter
 
-2. **Run Migration Scripts**:
-   - Execute database migration first (migrate-media-to-cloudinary.js)
-   - Run code migration next (cloudinary-code-migration.ts)
-   - Perform legacy cleanup last (cleanup-legacy-media.ts)
+2. **Manual Review**:
+   - Review high-priority files identified by the migration status reporter
+   - Manually update any components that couldn't be automatically migrated
+   - Test all components to ensure proper rendering
 
-3. **Verify and Test**:
-   - Review dynamically generated TODO comments in migrated files
-   - Convert remaining dynamic placeholderId props to publicId
-   - Test all components to ensure proper rendering and responsiveness
+3. **Production Deployment**:
+   - Deploy the new API structure
+   - Remove legacy placeholder API endpoints
+   - Update documentation for developers
 
-## Current Considerations
+## Cloudinary Best Practices
 
-- Finding the right balance between automated migration and manual review
-- Ensuring backward compatibility during the transition period
-- Handling dynamic placeholderId props that require context-specific conversion
-- Adapting file search logic for Windows environment 
-
-## Cloudinary Video Best Practices
-
-Based on our successful hero section implementation, we've identified these best practices for Cloudinary video:
-
-1. **Direct PublicId Usage**: Use the Cloudinary publicId directly in the CldVideoPlayer component's `src` prop rather than API-based resolution for reliability and performance.
-
-2. **Device-Specific Videos**: Use React's conditional rendering to serve different video resolutions based on device type:
+1. **Use Standard Components**: Always use our standard components from `@/components/media`:
    ```jsx
-   {isMobile ? (
-     <CldVideoPlayer 
-       id="mobile-video" 
-       src="emsculpt/videos/hero/hero-480p-mp4"
-       // ... props
-     />
-   ) : (
-     <CldVideoPlayer 
-       id="desktop-video" 
-       src="emsculpt/videos/hero/hero-720p-mp4"
-       // ... props
-     />
-   )}
+   import { CldImage, CldVideo, MediaAdapter } from '@/components/media';
    ```
 
-3. **Minimal Transformations**: Avoid complex transformations directly in the CldVideoPlayer component. If transformations are needed, use them sparingly and follow Cloudinary's recommendations.
-
-4. **CSS Styling**: Use styled-jsx to ensure videos properly fill their containers:
+2. **Direct PublicId Usage**: Use the Cloudinary publicId directly in components:
    ```jsx
-   <style jsx global>{`
-     .cld-video-player {
-       position: absolute !important;
-       width: 100% !important;
-       height: 100% !important;
-       object-fit: cover !important;
-     }
-   `}</style>
-   ```
-
-5. **Fallback Handling**: Include error handling and placeholders for when videos fail to load or during initial loading state.
-
-6. **Player Configuration**: Set essential player options for background videos:
-   ```jsx
-   <CldVideoPlayer
-     src="video-public-id"
-     width="100%"
-     height="100%"
-     autoplay={true}
-     loop={true}
-     muted={true}
-     controls={false}
-     // Additional settings
+   <CldImage 
+     publicId="folder/image-name" 
+     width={800} 
+     height={600} 
+     alt="Description" 
    />
    ```
 
-7. **Unique Player IDs**: Always provide unique ID attributes to each CldVideoPlayer to avoid conflicts:
-   ```jsx
-   <CldVideoPlayer id="hero-video-desktop" ... />
-   <CldVideoPlayer id="hero-video-mobile" ... />
+3. **API URL Encoding**: When calling APIs with public IDs, encode the ID and replace slashes with pipes:
+   ```js
+   const encodedId = encodeURIComponent("folder/image-name").replace(/\//g, '|');
+   fetch(`/api/cloudinary/asset/${encodedId}`);
    ```
-   
-8. **Container Styling**: Ensure proper container styling to maintain aspect ratio and positioning:
+
+4. **Responsive Images**: Use the sizes attribute for responsive behavior:
    ```jsx
-   <section className="relative w-full h-screen overflow-hidden">
-     <div className="absolute inset-0 w-full h-full">
-       <CldVideoPlayer ... />
-     </div>
-   </section>
-   ``` 
+   <CldImage
+     publicId="folder/image-name"
+     width={1200}
+     height={800}
+     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+     alt="Description"
+   />
+   ```
+
+5. **Video Configuration**: Use appropriate video settings based on context:
+   ```jsx
+   <CldVideo
+     publicId="folder/video-name"
+     width={800}
+     height={600}
+     autoPlay={true}
+     loop={true}
+     muted={true}
+     controls={false} // For background videos
+   />
+   ```
+
+6. **Type-Based Media Rendering**: For dynamic content, use MediaAdapter:
+   ```jsx
+   <MediaAdapter
+     mediaType={item.type} // "image" or "video"
+     publicId={item.publicId}
+     alt={item.alt}
+     width={800}
+     height={600}
+   />
+   ```
