@@ -420,11 +420,15 @@ export function NavBar() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "md:hidden h-16 px-4 text-white",
-                    isScrolled ? "hover:text-gray-300" : "hover:text-gray-200"
+                    "md:hidden p-2 text-white rounded-lg bg-white/10 hover:bg-white/20 transition-colors",
+                    isScrolled ? "hover:text-white" : "hover:text-white"
                   )}
                 >
-                  <Menu className="h-6 w-6" />
+                  <div className="w-10 h-10 flex flex-col justify-center items-center gap-1.5">
+                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
+                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
+                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
+                  </div>
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </DialogTrigger>

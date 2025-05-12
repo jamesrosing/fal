@@ -1,121 +1,143 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { CldVideoPlayer } from 'next-cloudinary'
 import 'next-cloudinary/dist/cld-video-player.css'
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Skeleton } from "@/components/ui/skeleton"
 
 export function HeroSection() {
   const isMobile = useIsMobile();
   
-  // Define video paths and fallback direct publicIds
-  const defaultVideoPath = isMobile ? "videos/hero/mobile" : "videos/hero/desktop";
-  const fallbackPublicId = isMobile 
-    ? "emsculpt/videos/hero/hero-480p-mp4" 
-    : "emsculpt/videos/hero/hero-720p-mp4";
+  // Define video public IDs
+  const mobileVideoId = "emsculpt/videos/hero/hero-480p-mp4";
+  const desktopVideoId = "emsculpt/videos/hero/hero-720p-mp4";
   
-  // State management for API resolution
-  const [publicId, setPublicId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  
-  // Define the function to fetch publicId from path
-  async function fetchPublicId(videoPath: string) {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/media/${videoPath}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.public_id || data.publicId) {
-          setPublicId(data.public_id || data.publicId);
-          setIsLoading(false);
-        } else {
-          // No valid publicId found, use fallback
-          console.warn(`No valid publicId found for ${videoPath}, using fallback`);
-          setPublicId(fallbackPublicId);
-          setIsLoading(false);
-        }
-      } else {
-        // API error, use fallback
-        console.warn(`API error for ${videoPath}, using fallback`);
-        setPublicId(fallbackPublicId);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error(`Error fetching public ID for ${videoPath}:`, error);
-      setPublicId(fallbackPublicId);
-      setIsLoading(false);
-    }
-  }
-  
-  // Fetch the public ID on component mount
-  useEffect(() => {
-    fetchPublicId(defaultVideoPath);
-  }, [defaultVideoPath]);
-
   return (
-    <section className="relative min-h-screen bg-black">
-      {/* Video Background Container */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {isLoading ? (
-          // Show skeleton while loading
-          <div className="absolute inset-0 bg-gray-900">
-            <Skeleton className="w-full h-full" />
-          </div>
-        ) : publicId ? (
-          // Show video player when publicId is available
-          <div style={{ position: 'absolute', width: '100%', height: '100%', overflow: 'hidden' }}>
+    <section className="relative w-full h-screen overflow-hidden bg-black">
+      {/* Full-screen video container - Using conditional rendering based on device */}
+      <div className="absolute inset-0 w-full h-full">
+        {isMobile ? (
+          // Mobile Video Player
+          <div className="absolute inset-0">
             <CldVideoPlayer
-              src={publicId}
-              width="100%"
-              height="100%"
+              id="hero-video-mobile"
+              src={mobileVideoId}
+              width="480"
+              height="854"
               autoplay={true}
               muted={true}
               loop={true}
               controls={false}
-              transformation={{
-                width: 1920,
-                height: 1080,
-                crop: "fill",
-                gravity: "auto",
-                quality: "auto"
-              }}
             />
           </div>
         ) : (
-          // Fallback when there's an error and no publicId
-          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center">
-            <span className="text-gray-400">Video not available</span>
+          // Desktop Video Player
+          <div className="absolute inset-0">
+            <CldVideoPlayer
+              id="hero-video-desktop"
+              src={desktopVideoId}
+              width="1920" 
+              height="1080"
+              autoplay={true}
+              muted={true}
+              loop={true}
+              controls={false}
+            />
           </div>
         )}
+        
+        {/* Global styling for the video player to ensure it fills the screen */}
+        <style jsx global>{`
+          /* Make video player container fill available space */
+          .cld-video-player {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            max-height: none !important;
+            overflow: hidden !important;
+          }
+          
+          /* Make the actual video element cover the container */
+          .cld-video-player video {
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+          }
+          
+          /* Ensure video.js elements don't break the layout */
+          .cld-video-player .vjs-tech {
+            object-fit: cover !important;
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+          }
+          
+          /* Hide control bar completely */
+          .cld-video-player .vjs-control-bar {
+            display: none !important;
+          }
+          
+          /* Ensure video wrapper takes full size */
+          .cld-video-player-wrapper,
+          .cld-video-player .vjs-tech,
+          .cld-video-player .vjs-poster {
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            object-fit: cover !important;
+            background-size: cover !important;
+          }
+          
+          /* Fix mobile specific issues */
+          @media (max-width: 768px) {
+            .cld-video-player,
+            .cld-video-player video,
+            .cld-video-player .vjs-tech {
+              object-position: center !important;
+            }
+          }
+        `}</style>
+        
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/30" />
       </div>
       
-      {/* Content Container - Left-aligned */}
-      <div className="relative container mx-auto px-4 min-h-screen flex flex-col justify-center items-start lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:max-w-[50%] text-white text-left"
-        >
-          <h1 className="mb-8 text-[clamp(2.5rem,6vw,4.5rem)] leading-none tracking-tight font-light">
-            Advanced Aesthetic Medicine
-          </h1>
-          <div className="space-y-6 text-lg font-light">
-            <p>
-              Where artistry meets science
-            </p>
-            <div className="space-y-4">
-              <LearnMoreButton href="/about">About Allure MD</LearnMoreButton>
-              <br />
-              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+      {/* Content Container */}
+      <div className="relative h-screen flex items-center">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="w-full lg:max-w-[50%] text-white text-left"
+          >
+            <h1 className="mb-8 text-[clamp(2.5rem,6vw,4.5rem)] leading-none tracking-tight font-light">
+              Advanced Aesthetic Medicine
+            </h1>
+            <div className="space-y-6 text-lg font-light">
+              <p>
+                Where artistry meets science
+              </p>
+              <div className="space-y-4">
+                <LearnMoreButton href="/about">About Allure MD</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   )

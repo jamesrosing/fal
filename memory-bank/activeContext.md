@@ -15,6 +15,8 @@ We're implementing a comprehensive migration to Cloudinary using a Big Bang Migr
    - ✅ Using existing well-implemented Cloudinary components: CldImage, CldVideo, CldUploadWidget
    - ✅ Implemented secure uploads via `app/api/cloudinary/signed-upload/route.ts`
    - ✅ Configured environment variables in `next.config.ts`
+   - ✅ Successfully implemented responsive Cloudinary video background on the homepage hero section
+   - ✅ Replaced original Hero component with enhanced HeroSection using CldVideoPlayer
 
 3. **Migration Strategy**
    - ✅ Designed mapping strategy between placeholder IDs and Cloudinary public IDs
@@ -26,6 +28,8 @@ We're implementing a comprehensive migration to Cloudinary using a Big Bang Migr
 - **Big Bang Migration Approach**: We've decided to use a comprehensive migration strategy that handles database migration, code updates, and cleanup in coordinated steps.
 - **Leveraging Existing Components**: We're using the existing well-implemented Cloudinary components (CldImage, CldVideo, CldUploadWidget) rather than creating duplicates.
 - **Script-Based Migration**: Created multiple specialized scripts to handle different aspects of the migration.
+- **Cloudinary Video Implementation**: Successfully implemented responsive video background using Cloudinary's CldVideoPlayer component with direct publicId references rather than API-based resolution.
+- **Mobile/Desktop Conditional Rendering**: Instead of using CSS media queries, we're using React's conditional rendering with device detection for better video performance and resource management.
 
 ## Key Challenges
 
@@ -40,6 +44,12 @@ We're implementing a comprehensive migration to Cloudinary using a Big Bang Migr
 3. **Windows Compatibility**:
    - Need to adapt grep-based search commands for Windows PowerShell
    - Creating fallback search methods for file discovery
+
+4. **Cloudinary Video Issues**:
+   - ✅ Fixed issues with Cloudinary video transformation parameters causing playback failures
+   - ✅ Resolved mobile/desktop video responsive rendering with proper conditional component rendering
+   - ✅ Fixed CSS styling issues to ensure videos properly fill the screen on all devices
+   - ✅ Improved mobile UX with enhanced hamburger menu icon and navigation
 
 ## Implementation Flow
 
@@ -82,3 +92,71 @@ We're implementing a comprehensive migration to Cloudinary using a Big Bang Migr
 - Ensuring backward compatibility during the transition period
 - Handling dynamic placeholderId props that require context-specific conversion
 - Adapting file search logic for Windows environment 
+
+## Cloudinary Video Best Practices
+
+Based on our successful hero section implementation, we've identified these best practices for Cloudinary video:
+
+1. **Direct PublicId Usage**: Use the Cloudinary publicId directly in the CldVideoPlayer component's `src` prop rather than API-based resolution for reliability and performance.
+
+2. **Device-Specific Videos**: Use React's conditional rendering to serve different video resolutions based on device type:
+   ```jsx
+   {isMobile ? (
+     <CldVideoPlayer 
+       id="mobile-video" 
+       src="emsculpt/videos/hero/hero-480p-mp4"
+       // ... props
+     />
+   ) : (
+     <CldVideoPlayer 
+       id="desktop-video" 
+       src="emsculpt/videos/hero/hero-720p-mp4"
+       // ... props
+     />
+   )}
+   ```
+
+3. **Minimal Transformations**: Avoid complex transformations directly in the CldVideoPlayer component. If transformations are needed, use them sparingly and follow Cloudinary's recommendations.
+
+4. **CSS Styling**: Use styled-jsx to ensure videos properly fill their containers:
+   ```jsx
+   <style jsx global>{`
+     .cld-video-player {
+       position: absolute !important;
+       width: 100% !important;
+       height: 100% !important;
+       object-fit: cover !important;
+     }
+   `}</style>
+   ```
+
+5. **Fallback Handling**: Include error handling and placeholders for when videos fail to load or during initial loading state.
+
+6. **Player Configuration**: Set essential player options for background videos:
+   ```jsx
+   <CldVideoPlayer
+     src="video-public-id"
+     width="100%"
+     height="100%"
+     autoplay={true}
+     loop={true}
+     muted={true}
+     controls={false}
+     // Additional settings
+   />
+   ```
+
+7. **Unique Player IDs**: Always provide unique ID attributes to each CldVideoPlayer to avoid conflicts:
+   ```jsx
+   <CldVideoPlayer id="hero-video-desktop" ... />
+   <CldVideoPlayer id="hero-video-mobile" ... />
+   ```
+   
+8. **Container Styling**: Ensure proper container styling to maintain aspect ratio and positioning:
+   ```jsx
+   <section className="relative w-full h-screen overflow-hidden">
+     <div className="absolute inset-0 w-full h-full">
+       <CldVideoPlayer ... />
+     </div>
+   </section>
+   ``` 
