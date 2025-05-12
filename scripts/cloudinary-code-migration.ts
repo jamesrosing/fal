@@ -23,7 +23,7 @@ const PLACEHOLDER_COMPONENTS = [
 
 // Load placeholder to publicId mapping
 const MAPPING_FILE = path.join(PROJECT_ROOT, 'cloudinary-replacement-map.json');
-let placeholderMap = {};
+let placeholderMap: Record<string, string> = {};
 
 try {
   if (fs.existsSync(MAPPING_FILE)) {
@@ -39,7 +39,7 @@ try {
   process.exit(1);
 }
 
-async function findFilesWithPlaceholders() {
+async function findFilesWithPlaceholders(): Promise<string[]> {
   // Find all TSX and JSX files that use placeholder components
   const componentsPattern = PLACEHOLDER_COMPONENTS.join('|');
   const grepPattern = `import.*(?:${componentsPattern}).*from|<(?:${componentsPattern})`;
@@ -65,7 +65,7 @@ async function findFilesWithPlaceholders() {
   }
 }
 
-async function findFilesWithPlaceholderId() {
+async function findFilesWithPlaceholderId(): Promise<string[]> {
   // Find all TSX and JSX files that use placeholderId prop
   const grepPattern = 'placeholderId=';
   
@@ -90,7 +90,13 @@ async function findFilesWithPlaceholderId() {
   }
 }
 
-function analyzeComponent(filePath) {
+function analyzeComponent(filePath: string): {
+  imports: number;
+  placeholderProps: number;
+  hasImports: boolean;
+  hasPlaceholderProps: boolean;
+  content: string;
+} {
   const content = fs.readFileSync(filePath, 'utf8');
   
   // Count placeholder component imports
@@ -110,7 +116,7 @@ function analyzeComponent(filePath) {
   };
 }
 
-function replaceImports(content) {
+function replaceImports(content: string): string {
   // Replace imports of placeholder components with CldImage/CldVideo
   let newContent = content;
   
@@ -129,7 +135,7 @@ function replaceImports(content) {
   return newContent;
 }
 
-function convertPlaceholderProps(content) {
+function convertPlaceholderProps(content: string): string {
   let newContent = content;
   
   // Replace static placeholderId props with publicId
@@ -152,7 +158,7 @@ function convertPlaceholderProps(content) {
     newContent = `// TODO: CLOUDINARY MIGRATION - This file contains dynamic placeholderId props that need manual migration\n${newContent}`;
     
     // Add comments next to each dynamic prop
-    matches.forEach(match => {
+    matches.forEach((match: string) => {
       const commentedMatch = `${match} {/* TODO: CLOUDINARY MIGRATION - Convert to publicId */}`;
       newContent = newContent.replace(match, commentedMatch);
     });
@@ -161,7 +167,7 @@ function convertPlaceholderProps(content) {
   return newContent;
 }
 
-async function migrateComponent(filePath) {
+async function migrateComponent(filePath: string): Promise<boolean> {
   try {
     const analysis = analyzeComponent(filePath);
     
@@ -222,7 +228,7 @@ async function migrateComponent(filePath) {
   }
 }
 
-async function cleanupLegacyComponents() {
+async function cleanupLegacyComponents(): Promise<void> {
   const filesToDelete = [
     path.join(COMPONENTS_DIR, 'media/UnifiedImage.tsx'),
     path.join(COMPONENTS_DIR, 'media/OptimizedImage.tsx'),
@@ -238,7 +244,7 @@ async function cleanupLegacyComponents() {
   console.log('Legacy components to delete:');
   filesToDelete.forEach(file => console.log(`- ${file}`));
   
-  const createBackupFiles = () => {
+  const createBackupFiles = (): string => {
     const backupDir = path.join(PROJECT_ROOT, 'backup', new Date().toISOString().split('T')[0]);
     
     if (!fs.existsSync(backupDir)) {
@@ -287,7 +293,7 @@ async function cleanupLegacyComponents() {
   });
 }
 
-async function main() {
+async function main(): Promise<void> {
   const isDryRun = process.argv.includes('--dry-run');
   console.log(`Running in ${isDryRun ? 'DRY RUN' : 'LIVE'} mode`);
   
@@ -325,4 +331,4 @@ async function main() {
   }
 }
 
-main().catch(console.error); 
+main().catch(console.error);

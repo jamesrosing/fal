@@ -24,9 +24,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -115,4 +112,5 @@ export function NavUser({
     </SidebarMenu>
   )
 }
+
 

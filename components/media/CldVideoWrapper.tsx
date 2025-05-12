@@ -47,7 +47,7 @@ export function CldVideoWrapper({
             width: typeof width === 'string' ? width : undefined,
             height: typeof height === 'string' ? height : undefined
           }}
-          autoplay ={autoplay}
+          autoPlay={autoplay}
           loop={loop}
           muted={muted}
           controls={controls}
@@ -83,7 +83,7 @@ export function CldVideoWrapper({
       height={height}
       src={publicId}
       className={className}
-      autoplay ={autoplay}
+      autoPlay={autoplay}
       loop={loop}
       muted={muted}
       controls={controls}
@@ -93,5 +93,4 @@ export function CldVideoWrapper({
   );
 }
 
-export default CldVideoWrapper; 
-
+export default CldVideoWrapper;

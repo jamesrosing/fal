@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from '@/components/media/CldImage'
+import { CldImage } from 'next-cloudinary'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
@@ -102,7 +102,7 @@ export function TeamSection() {
         <div className="relative w-full aspect-[16/9]">
           {backgroundPublicId ? (
             <CldImage 
-              publicId={backgroundPublicId}
+              src={backgroundPublicId}
               alt="Our Medical Team"
               width={1920}
               height={1080}
@@ -163,7 +163,7 @@ export function TeamSection() {
               <div className="relative aspect-[3/4] overflow-hidden">
                 {member.publicId ? (
                   <CldImage
-                    publicId={member.publicId}
+                    src={member.publicId}
                     alt={member.alt}
                     width={300}
                     height={400}
@@ -237,7 +237,7 @@ export function TeamSection() {
             <div key={index} className="relative aspect-square overflow-hidden">
               {member.publicId ? (
                 <CldImage
-                  publicId={member.publicId}
+                  src={member.publicId}
                   alt={member.alt}
                   width={600}
                   height={600}
@@ -275,7 +275,7 @@ export function TeamSection() {
       <div className="h-64 lg:h-96 w-full relative">
         {backgroundPublicId ? (
           <CldImage 
-            publicId={backgroundPublicId}
+            src={backgroundPublicId}
             alt="Our Medical Team"
             width={1920}
             height={600}
