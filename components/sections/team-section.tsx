@@ -157,20 +157,7 @@ export function TeamSection() {
 
   // Desktop layout - Full width layout with image on the right and text on the left
   return (
-    <section className="bg-black text-white overflow-hidden">
-      {/* Full-width background image section moved to the top as visual introduction */}
-      <div className="h-80 lg:h-[32rem] w-full relative">
-        <Image 
-          src={backgroundImageUrl}
-          alt="Our Medical Team"
-          width={1920}
-          height={1080}
-          className="absolute inset-0 w-full h-full object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
-      
+    <section className="bg-black text-white overflow-hidden">      
       <div className="flex flex-col lg:flex-row">
         {/* Left Column - Content */}
         <div className="lg:w-1/2 px-4 py-12 lg:p-24 flex items-center">
