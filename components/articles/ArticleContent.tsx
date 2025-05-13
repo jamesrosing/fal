@@ -1,11 +1,9 @@
 'use client'
 
-import { Article } from '@/lib/types'
+import type { Article, ArticleContent } from '@/lib/types'
 import { format } from 'date-fns'
 import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
 import { extractImageNameFromPath } from '@/lib/cloudinary/folder-utils'
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
 
 const isValidDate = (dateString: string): boolean => {
   const date = new Date(dateString);
@@ -46,7 +44,7 @@ export default function ArticleContent({ article }: { article: Article }) {
       <div className="prose prose-lg dark:prose-invert max-w-none text-foreground" itemProp="articleBody">
         {typeof article.content === 'string' ? (
           // Handle plain text content
-          article.content.split('\n\n').map((paragraph, index) => {
+          article.content.split('\n\n').map((paragraph: string, index: number) => {
             if (paragraph.startsWith('# ')) {
               return <h2 key={index} className="text-3xl font-bold mt-8 mb-4 font-serif">{paragraph.slice(2)}</h2>
             } else if (paragraph.startsWith('## ')) {
@@ -59,7 +57,7 @@ export default function ArticleContent({ article }: { article: Article }) {
           })
         ) : Array.isArray(article.content) ? (
           // Handle structured content blocks
-          article.content.map((block, index) => (
+          article.content.map((block: ArticleContent, index: number) => (
             <div key={index} className="mb-8">
               {block.type === 'paragraph' && <p>{block.content}</p>}
               {block.type === 'heading' && <h2>{block.content}</h2>}
@@ -83,7 +81,7 @@ export default function ArticleContent({ article }: { article: Article }) {
               )}
               {block.type === 'list' && (
                 <ul className="list-disc pl-6">
-                  {block.content.split('\n').map((item, i) => (
+                  {block.content.split('\n').map((item: string, i: number) => (
                     <li key={i}>{item}</li>
                   ))}
                 </ul>

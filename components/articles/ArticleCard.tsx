@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Card, CardContent } from "@/components/ui/card"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { AspectRatio } from "../../components/ui/aspect-ratio"
 import { cn } from "@/lib/utils"
 import type { Article } from '@/lib/types'
 import { Bookmark, Share2 } from 'lucide-react'

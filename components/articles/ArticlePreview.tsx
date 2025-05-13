@@ -1,11 +1,9 @@
 'use client';
 
-import { Article } from '@/lib/supabase';
+import type { Article, ArticleContent } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
 
 
 interface ArticlePreviewProps {
@@ -59,7 +57,7 @@ export function ArticlePreview({ article, categoryName }: ArticlePreviewProps) {
 
       {/* Content */}
       <div className="prose prose-lg max-w-none">
-        {article.content.map((block, index) => {
+        {article.content && Array.isArray(article.content) && article.content.map((block: ArticleContent, index: number) => {
           switch (block.type) {
             case 'paragraph':
               return (
@@ -95,13 +93,13 @@ export function ArticlePreview({ article, categoryName }: ArticlePreviewProps) {
             case 'list':
               return block.metadata?.ordered ? (
                 <ol key={index} className="list-decimal pl-6 my-6">
-                  {block.content.split('\n').map((item, i) => (
+                  {block.content.split('\n').map((item: string, i: number) => (
                     <li key={i}>{item}</li>
                   ))}
                 </ol>
               ) : (
                 <ul key={index} className="list-disc pl-6 my-6">
-                  {block.content.split('\n').map((item, i) => (
+                  {block.content.split('\n').map((item: string, i: number) => (
                     <li key={i}>{item}</li>
                   ))}
                 </ul>
@@ -113,10 +111,10 @@ export function ArticlePreview({ article, categoryName }: ArticlePreviewProps) {
       </div>
 
       {/* Meta */}
-      {article.meta_keywords && article.meta_keywords.length > 0 && (
+      {article.meta_keywords && Array.isArray(article.meta_keywords) && article.meta_keywords.length > 0 && (
         <div className="mt-8 pt-8 border-t">
           <div className="flex flex-wrap gap-2">
-            {article.meta_keywords.map((keyword) => (
+            {article.meta_keywords.map((keyword: string) => (
               <Badge key={keyword} variant="secondary">
                 {keyword}
               </Badge>
