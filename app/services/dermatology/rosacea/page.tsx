@@ -4,8 +4,8 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 const treatments = [
@@ -74,7 +74,17 @@ export default function RosaceaPage() {
       {/* Hero Section */}
       <section className="relative pt-20">
         <div className="relative aspect-[16/9] w-full">
-          <CldImage publicId="services-dermatology/hero/dermatology-rosacea.png" alt="Rosacea Treatment Services"   priority fill />
+          <CldImage 
+            src="services/dermatology/dermatology-rosacea" 
+            alt="Rosacea Treatment Services" 
+            priority 
+            fill 
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w', // Use your Cloudinary cloud name
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         </div>
         

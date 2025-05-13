@@ -12,20 +12,23 @@
 2. ✅ Update article list page to use new Cloudinary components 
 3. ✅ Update article detail page to use new Cloudinary components
 4. ✅ Implement SEO optimization for articles
-5. ⏳ Enhance article filtering and categorization
+5. ✅ Enhance article filtering and categorization
 6. ⏳ Complete admin interface for article management
-7. Add text-to-speech functionality for articles
+7. ⏳ Add text-to-speech functionality for articles
 
-### Bug Fixes and Improvements
-**Status**: COMPLETED
-**Dependencies**: None
-**Description**: Address issues with Cloudinary integration and circular dependencies.
+### Task 6: Gallery System Implementation
+**Status**: IN PROGRESS
+**Dependencies**: Task 3 (Cloudinary Media System)
+**Description**: Update the gallery system to use the new Cloudinary media components and implement gallery management features.
 
 **Subtasks**:
-1. ✅ Fix circular dependencies in Cloudinary component imports
-2. ✅ Improve URL construction for handling version numbers
-3. ✅ Add backward compatibility with legacy function names
-4. ✅ Resolve webpack module initialization errors
+1. ✅ Update gallery components to use new media components
+2. ⏳ Create dynamic routes for galleries, albums, and cases
+3. ⏳ Implement filtering and sorting options
+4. ⏳ Add responsive design for mobile and desktop
+5. ⏳ Create admin interface for gallery management
+6. ⏳ Implement image upload and organization features
+7. ⏳ Add SEO optimization for gallery pages
 
 ## Completed Tasks
 
@@ -78,6 +81,7 @@
 12. ✅ Fix circular dependencies between components
 13. ✅ Improve URL construction for version numbers
 14. ✅ Add backward compatibility with legacy function names
+15. ✅ Remove transitional media components in favor of direct Cloudinary integration
 
 ### Task 5: Authentication System Implementation
 **Status**: COMPLETED
@@ -95,21 +99,18 @@
 8. ✅ Create user profile settings page
 9. ✅ Configure selective authentication (most pages public, admin and profile protected)
 
+### Bug Fixes and Improvements
+**Status**: COMPLETED
+**Dependencies**: None
+**Description**: Address issues with Cloudinary integration and circular dependencies.
+
+**Subtasks**:
+1. ✅ Fix circular dependencies in Cloudinary component imports
+2. ✅ Improve URL construction for handling version numbers
+3. ✅ Add backward compatibility with legacy function names
+4. ✅ Resolve webpack module initialization errors
+
 ## Upcoming Tasks
-
-### Task 6: Gallery System Implementation
-**Status**: PENDING
-**Dependencies**: Task 3 (Cloudinary Media System)
-**Description**: Update the gallery system to use the new Cloudinary media components and implement gallery management features.
-
-**Planned Subtasks**:
-1. Update gallery components to use new media components
-2. Create dynamic routes for galleries, albums, and cases
-3. Implement filtering and sorting options
-4. Add responsive design for mobile and desktop
-5. Create admin interface for gallery management
-6. Implement image upload and organization features
-7. Add SEO optimization for gallery pages
 
 ### Task 7: Admin Dashboard Development
 **Status**: PENDING

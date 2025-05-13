@@ -1,7 +1,7 @@
 'use client';
 
 import { CldImage as NextCloudinaryImage } from 'next-cloudinary';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CldEnhancedImageProps {
@@ -47,8 +47,8 @@ interface CldEnhancedImageProps {
 export default function CldImage({
   src,
   alt,
-  width = 800,
-  height = 600,
+  width,
+  height,
   priority = false,
   sizes = '100vw',
   className = '',
@@ -64,6 +64,24 @@ export default function CldImage({
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Set default width and height only if fill is false
+  const imgWidth = !fill ? (width || 800) : undefined;
+  const imgHeight = !fill ? (height || 600) : undefined;
+
+  // Memoized error handler
+  const handleError = useCallback((e: any) => {
+    // Use only in development mode or with a DEBUG flag
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error loading Cloudinary image: ${src}`, e);
+    }
+    setError(true);
+  }, [src]);
+  
+  // Memoized load handler
+  const handleLoad = useCallback(() => {
+    setLoading(false);
+  }, []);
+
   // Handle error state
   if (error) {
     if (!fallbackSrc) {
@@ -75,8 +93,8 @@ export default function CldImage({
       <img 
         src={fallbackSrc}
         alt={alt}
-        width={width}
-        height={height}
+        width={imgWidth}
+        height={imgHeight}
         className={className}
         style={{
           objectFit: crop === 'fill' ? 'cover' : 'contain',
@@ -92,27 +110,21 @@ export default function CldImage({
         <Skeleton 
           className={`rounded overflow-hidden ${className}`}
           style={{ 
-            width: width || '100%', 
-            height: height || 'auto', 
-            aspectRatio: width && height ? width / height : undefined 
+            width: fill ? '100%' : (imgWidth || '100%'), 
+            height: fill ? '100%' : (imgHeight || 'auto'), 
+            aspectRatio: (!fill && imgWidth && imgHeight) ? imgWidth / imgHeight : undefined 
           }}
         />
       )}
       <NextCloudinaryImage
         src={src}
         alt={alt}
-        width={width}
-        height={height}
+        width={imgWidth}
+        height={imgHeight}
         sizes={sizes}
         className={`${className} ${loading ? 'hidden' : ''}`}
-        onError={(e) => {
-          console.error(`Error loading Cloudinary image: ${src}`, e);
-          setError(true);
-        }}
-        onLoad={() => {
-          console.log(`Successfully loaded Cloudinary image: ${src}`);
-          setLoading(false);
-        }}
+        onError={handleError}
+        onLoad={handleLoad}
         crop={crop}
         gravity={gravity}
         quality={quality}

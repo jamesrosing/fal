@@ -17,9 +17,12 @@ export function mediaUrl(id: string, options: MediaOptions = {}): string {
  */
 export function mediaId(id: string): string {
   // Clean up the ID to ensure it's formatted correctly
-  return id
+  const cleanId = id
     .replace(/\.\w+$/, '') // Remove file extension
     .replace(/^\/|\/$/g, ''); // Remove leading/trailing slashes
+  
+  // For usage with next/image component, paths need to start with a slash
+  return '/' + cleanId;
 }
 
 /**

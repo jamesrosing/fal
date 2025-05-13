@@ -73,54 +73,81 @@ Galleries → Albums → Cases → Images
 
 ## Media Handling System
 
-We've implemented a Cloudinary-based media system that leverages Cloudinary's advanced image and video optimization capabilities:
+We've implemented a Cloudinary-based media system using next-cloudinary components with enhanced features:
 
 ### Cloudinary Integration
 
-1. **CldImage Component**: Primary component for rendering optimized images:
+1. **CldImage Component**: Primary component for rendering optimized images with enhanced features:
 ```jsx
 <CldImage
-  publicId="folder/image-name"
+  src="folder/image-name"
   alt="Image description"
   width={800}
   height={600}
   crop="fill"
   gravity="auto"
   quality="auto"
+  className="rounded-lg"
+  showLoading={true}
+  fallbackSrc="/fallback-image.jpg"
 />
 ```
 
 2. **CldVideo Component**: Handles video rendering with optimizations:
 ```jsx
 <CldVideo
-  publicId="folder/video-name"
+  src="folder/video-name"
   width={800}
   height={450}
   autoPlay
   muted
   loop
+  controls={false}
+  className="w-full"
+  showLoading={true}
 />
 ```
 
-3. **Adapter Pattern**: We use adapter components to handle different media sources:
-   - `MediaAdapter`: Adapts between Cloudinary and regular media sources
-   - `MediaRenderer`: Renders media based on mediaType
-
-4. **API Layer**: Media placeholderIds are mapped to Cloudinary publicIds through API endpoints:
-```
-/api/media/[placeholderId] → { publicId: "cloudinary/path/image" }
-```
-
-### Migration Pattern
-
-Components use a conditional rendering pattern to handle the transition:
+3. **Folder-Based Components**: Specialized components for folder-organized content:
 ```jsx
-{publicId ? (
-  <CldImage publicId={publicId} {...props} />
-) : (
-  <Image src="/fallback.jpg" {...props} />
-)}
+<CloudinaryFolderImage
+  folder="articles"
+  imageName="article-image-name"
+  width={800}
+  height={600}
+  alt="Article image"
+  className="rounded-lg"
+/>
+
+<CloudinaryFolderGallery
+  folder="gallery/plastic-surgery"
+  layout="grid"
+  columns={3}
+  gap={4}
+  className="my-8"
+/>
 ```
+
+4. **Adapter Pattern**: We use adapter components to handle different media sources:
+   - `MediaAdapter`: Determines the appropriate component based on mediaType
+   - `MediaRenderer`: Renders media with proper dimensions and attributes
+
+5. **API Layer**: Direct Cloudinary asset access through API endpoints:
+```
+/api/cloudinary/asset/[publicId] → Cloudinary asset details
+/api/cloudinary/responsive/[publicId] → Responsive image URLs
+/api/cloudinary/transform → Transformation operations
+```
+
+### Enhanced Features
+
+Our custom wrapper components add these features to the base next-cloudinary components:
+
+1. **Loading States**: Skeleton placeholders during image loading
+2. **Error Handling**: Graceful fallbacks for missing images
+3. **Responsive Sizing**: Automatic sizing based on device
+4. **Optimization Controls**: Format, quality, and transformation settings
+5. **Lazy Loading**: Performance optimization for off-screen images
 
 ### Benefits
 
@@ -129,8 +156,9 @@ Components use a conditional rendering pattern to handle the transition:
 - Format optimization (WebP, AVIF)
 - Lazy loading and progressive loading
 - Integration with Next.js image optimization
-
-This approach consolidates our previous fragmented media handling into a streamlined system that leverages Cloudinary's CDN and optimization capabilities.
+- Reduced bundle size with streamlined components
+- Better TypeScript type safety
+- Simplified component API
 
 ## Standardized Approaches
 1. **Authentication Flow**: Consistent authentication across public/private routes
@@ -211,47 +239,6 @@ export function ProcedureSchema({ procedure }: { procedure: Procedure }) {
   )
 }
 ```
-
-## Unified Media System
-
-We've implemented a consolidated media handling system using a single `UnifiedMedia` component that provides a consistent interface for all image and video content.
-
-### Media Component Architecture
-
-1. **UnifiedMedia Component**: The core component that handles all media rendering:
-
-```tsx
-<UnifiedMedia
-  placeholderId="home-hero"
-  alt="Welcome to Allure MD"
-  width={1200}
-  height={600}
-  priority
-/>
-```
-
-2. **Media Source Resolution Flow**:
-```
-placeholderId → API lookup → Media Asset → Cloudinary URL → Rendered Component
-```
-
-3. **Backwards Compatibility Layer**:
-   The `MediaAdapter` component provides adapters for all previous media components, ensuring backward compatibility while transitioning to the unified approach.
-
-4. **Error Handling Pattern**:
-   All media components use a standardized error handling pattern with:
-   - Loading state visualization using Skeletons
-   - Fallback images when media fails to load
-   - Consistent error reporting to the console
-   - Retry mechanism for failed images
-
-5. **Three-Tier Media Identification**:
-   The system supports three ways to identify media:
-   - `placeholderId`: For content mapped in the registry or database
-   - `publicId`: For direct Cloudinary asset references
-   - `src`: For direct URL references
-
-This approach consolidates multiple overlapping components (UnifiedImage, CloudinaryImage, MediaImage, etc.) into a single, flexible component with standardized props and behavior.
 
 ## Database Patterns
 

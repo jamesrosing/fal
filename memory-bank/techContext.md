@@ -128,10 +128,13 @@ The application uses a comprehensive database schema with the following key tabl
 ## Integration Points
 
 ### Cloudinary Integration
-- Direct use of Cloudinary public IDs
-- CldImage and CldVideo components
-- Server-side image optimization
-- Responsive images with srcset
+- Direct integration with next-cloudinary library
+- Enhanced CldImage and CldVideo components with loading states and error handling
+- Folder-based component organization (CloudinaryFolderImage, CloudinaryFolderGallery)
+- API endpoints for asset retrieval and transformations
+- Responsive image delivery with automatic format optimization
+- Video optimization with device-specific quality settings
+- Integration with Next.js for improved performance
 
 ### Supabase Integration
 - Authentication
@@ -156,7 +159,7 @@ The application uses a comprehensive database schema with the following key tabl
 - **Server-Side Rendering (SSR)**: For personalized content (search results, filtered galleries)
 
 ### Performance Optimization
-- **Image Optimization**: Using Next.js Image component with Cloudinary loader
+- **Image Optimization**: Using next-cloudinary components with enhanced features
 - **Font Optimization**: Next.js built-in font optimization with Google Fonts
 - **Code Splitting**: Dynamic imports for components not needed immediately
 - **Bundle Analysis**: @next/bundle-analyzer for identifying optimization opportunities
@@ -173,37 +176,73 @@ The application uses a comprehensive database schema with the following key tabl
 
 ## Development Technical Approaches
 
-### Cloudinary Integration Enhancements
+### Cloudinary Integration
 ```tsx
-// Enhanced Cloudinary image component with optimizations
-const cloudinaryLoader = ({ src, width, quality }) => {
-  const params = ['f_auto', 'c_limit', `w_${width}`, `q_${quality || 'auto'}`]
-  return `https://res.cloudinary.com/your-cloud-name/image/upload/${params.join(',')}/${src}`
-}
-
-export default function OptimizedImage({ 
-  src, 
-  alt, 
-  width, 
-  height, 
-  sizes = '100vw',
-  className,
+// Enhanced CldImage component with loading state and error handling
+export default function CldImage({
+  src,
+  alt,
+  width = 800,
+  height = 600,
   priority = false,
-  ...props 
-}) {
+  sizes = '100vw',
+  className = '',
+  crop = 'fill',
+  gravity = 'auto',
+  quality = 'auto',
+  fallbackSrc = '/placeholder-image.jpg',
+  showLoading = true,
+  ...props
+}: CldEnhancedImageProps) {
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Handle error state
+  if (error) {
+    if (!fallbackSrc) return null;
+    
+    return (
+      <img 
+        src={fallbackSrc}
+        alt={alt}
+        width={width}
+        height={height}
+        className={className}
+        style={{ objectFit: crop === 'fill' ? 'cover' : 'contain' }}
+        {...props}
+      />
+    );
+  }
+  
   return (
-    <Image
-      loader={cloudinaryLoader}
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      sizes={sizes}
-      className={className}
-      priority={priority}
-      {...props}
-    />
-  )
+    <>
+      {loading && showLoading && (
+        <Skeleton 
+          className={`rounded overflow-hidden ${className}`}
+          style={{ 
+            width: width || '100%', 
+            height: height || 'auto', 
+            aspectRatio: width && height ? width / height : undefined 
+          }}
+        />
+      )}
+      <NextCloudinaryImage
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes={sizes}
+        className={`${className} ${loading ? 'hidden' : ''}`}
+        onError={() => setError(true)}
+        onLoad={() => setLoading(false)}
+        crop={crop}
+        gravity={gravity}
+        quality={quality}
+        format="auto"
+        {...props}
+      />
+    </>
+  );
 }
 ```
 
