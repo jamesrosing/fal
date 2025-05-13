@@ -121,6 +121,7 @@ export function MedicalSpaSection() {
   // Desktop Layout
   return (
     <section className="relative min-h-screen bg-black text-white">
+      {/* Desktop Background Media */}
       <div className="absolute inset-0">
         <Image
           src={imageUrl}
@@ -130,18 +131,22 @@ export function MedicalSpaSection() {
           sizes="100vw"
           priority
         />
-        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+        {/* Dark gradient overlay that fades from left to right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
       </div>
-      <div className="relative container mx-auto px-4 py-24 lg:px-8">
+      
+      {/* Desktop Text Content - positioned at bottom left */}
+      <div className="relative container mx-auto px-4 min-h-screen flex items-end">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="w-full lg:max-w-[50%] flex flex-col min-h-[800px] justify-center"
+          className="max-w-[50%] text-white py-24"
         >
-          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Medical Spa</h2>
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+            Medical Spa
+          </h2>
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Rejuvenation treatments for face and body
           </h3>
@@ -164,6 +169,6 @@ export function MedicalSpaSection() {
       {/* Bottom Tab Navigation (Desktop) - absolute positioned */}
       {desktopTabNavigation}
     </section>
-  )
+  );
 }
 

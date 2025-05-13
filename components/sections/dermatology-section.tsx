@@ -73,25 +73,26 @@ export function DermatologySection() {
           sizes="100vw"
           priority
         />
-        {/* Dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+        {/* Dark gradient overlay that fades from left to right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
       </div>
-      
-      <div className="relative container mx-auto px-4 py-24 lg:px-8">
+
+      {/* Desktop Text Content - positioned at bottom left */}
+      <div className="relative container mx-auto px-4 min-h-screen flex items-end">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="w-full lg:max-w-[50%] flex flex-col min-h-[800px] justify-center"
+          className="max-w-[50%] text-white py-24"
         >
-          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-gray-300">
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
             Dermatology
           </h2>
-          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif text-white">
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             Medical dermatology that gets results
           </h3>
-          <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+          <div className="space-y-6 text-base font-cerebri font-light">
             <p>
               Our medical dermatology services are designed to help you achieve and maintain healthy, beautiful skin. 
               From acne to rosacea, psoriasis to eczema, we diagnose and treat a wide range of skin conditions with 

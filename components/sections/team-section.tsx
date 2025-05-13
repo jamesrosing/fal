@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import CldImage from "@/components/media/CldImage"
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 
 type TeamMember = {
@@ -13,6 +13,7 @@ type TeamMember = {
   name: string;
   title: string;
   imageId?: string;
+  imageUrl?: string;
 };
 
 export function TeamSection() {
@@ -21,71 +22,37 @@ export function TeamSection() {
   // Direct Cloudinary URL for the background image
   const backgroundImageUrl = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741580119/team-background.jpg";
   
-  // Define team members with placeholderIds
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
+  // Define team members with direct Cloudinary URLs
+  const teamMembers: TeamMember[] = [
     {
       placeholderId: "team-provider-rosing",
       alt: "Dr. James Rosing",
       name: "Dr. James Rosing",
-      title: "Plastic Surgeon"
+      title: "Plastic Surgeon",
+      imageUrl: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739253558/team-provider-rosing.jpg"
     },
     {
       placeholderId: "team-provider-pearose",
       alt: "Susan Pearose, Dermatology Specialist",
       name: "Susan Pearose",
-      title: "Dermatology Specialist"
+      title: "Dermatology Specialist",
+      imageUrl: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739232148/susan-pearose-pa-c-dermatology-director.jpg"
     },
     {
       placeholderId: "team-provider-julia",
-      alt: "Julia, Medical Esthetician",
-      name: "Julia",
-      title: "Medical Esthetician"
+      alt: "Julia Bandy, Medical Esthetician",
+      name: "Julia Bandy",
+      title: "Medical Esthetician",
+      imageUrl: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739232348/julia-bandy-medical-spa-director.jpg"
     },
     {
       placeholderId: "team-provider-gidwani",
       alt: "Dr. Pooja Gidwani",
       name: "Dr. Pooja Gidwani",
-      title: "Functional Medicine"
+      title: "Functional Medicine",
+      imageUrl: "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739232323/pooja-gidwani-md-functional-medicine-director.jpg"
     }
-  ]);
-  
-  // Fetch public IDs for team member images
-  useEffect(() => {
-    async function fetchPublicIds() {
-      try {
-        // Fetch public IDs for team member images
-        const updatedMembers = [...teamMembers];
-        let hasChanges = false;
-        
-        for (let i = 0; i < updatedMembers.length; i++) {
-          const member = updatedMembers[i];
-          try {
-            const response = await fetch(`/api/media/${member.placeholderId}`);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.public_id || data.publicId) {
-                updatedMembers[i] = {
-                  ...member,
-                  imageId: data.public_id || data.publicId
-                };
-                hasChanges = true;
-              }
-            }
-          } catch (error) {
-            console.error(`Error fetching public ID for ${member.placeholderId}:`, error);
-          }
-        }
-        
-        if (hasChanges) {
-          setTeamMembers(updatedMembers);
-        }
-      } catch (error) {
-        console.error("Error fetching public IDs:", error);
-      }
-    }
-    
-    fetchPublicIds();
-  }, []);
+    ];    // Using direct Cloudinary URLs for team member images, no need to fetch
 
   // Mobile Layout
   if (isMobile) {
@@ -141,7 +108,16 @@ export function TeamSection() {
           {teamMembers.map((member, index) => (
             <div key={index} className="relative py-4">
               <div className="relative aspect-[3/4] overflow-hidden">
-                {member.imageId ? (
+                {member.imageUrl ? (
+                  <Image
+                    src={member.imageUrl}
+                    alt={member.alt}
+                    width={300}
+                    height={400}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    sizes="50vw"
+                  />
+                ) : member.imageId ? (
                   <CldImage
                     src={member.imageId}
                     alt={member.alt}
@@ -182,6 +158,19 @@ export function TeamSection() {
   // Desktop layout - Full width layout with image on the right and text on the left
   return (
     <section className="bg-black text-white overflow-hidden">
+      {/* Full-width background image section moved to the top as visual introduction */}
+      <div className="h-80 lg:h-[32rem] w-full relative">
+        <Image 
+          src={backgroundImageUrl}
+          alt="Our Medical Team"
+          width={1920}
+          height={1080}
+          className="absolute inset-0 w-full h-full object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+      
       <div className="flex flex-col lg:flex-row">
         {/* Left Column - Content */}
         <div className="lg:w-1/2 px-4 py-12 lg:p-24 flex items-center">
@@ -215,7 +204,16 @@ export function TeamSection() {
         <div className="lg:w-1/2 grid grid-cols-2 gap-0.5">
           {teamMembers.map((member, index) => (
             <div key={index} className="relative aspect-square overflow-hidden">
-              {member.imageId ? (
+              {member.imageUrl ? (
+                <Image
+                  src={member.imageUrl}
+                  alt={member.alt}
+                  width={600}
+                  height={600}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  sizes="50vw"
+                />
+              ) : member.imageId ? (
                 <CldImage
                   src={member.imageId}
                   alt={member.alt}
@@ -249,19 +247,6 @@ export function TeamSection() {
             </div>
           ))}
         </div>
-      </div>
-      
-      {/* Full-width background image section as visual separator */}
-      <div className="h-64 lg:h-96 w-full relative">
-        <Image 
-          src={backgroundImageUrl}
-          alt="Our Medical Team"
-          width={1920}
-          height={600}
-          className="absolute inset-0 w-full h-full object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/30" />
       </div>
     </section>
   );

@@ -66,6 +66,7 @@ export function FunctionalMedicineSection() {
   // Desktop Layout
   return (
     <section className="relative min-h-screen bg-black text-white">
+      {/* Desktop Background Media */}
       <div className="absolute inset-0">
         <Image
           src={imageUrl}
@@ -75,35 +76,38 @@ export function FunctionalMedicineSection() {
           sizes="100vw"
           priority
         />
-        {/* Dark gradient overlay that fades from right to left for text on the right */}
-        <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-transparent" />
+        {/* Dark gradient overlay that fades from left to right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
       </div>
-      
-      <div className="relative container mx-auto px-4 py-32 lg:px-8 lg:py-48 min-h-screen flex items-center">
+
+      {/* Desktop Text Content - positioned at bottom left */}
+      <div className="relative container mx-auto px-4 min-h-screen flex items-end">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="ml-auto max-w-2xl text-right"
+          className="max-w-[50%] text-white py-24"
         >
-          <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Functional Medicine</h2>
-          <h3 className="text-[clamp(2.5rem,5vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
+          <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+            Functional Medicine
+          </h2>
+          <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">
             A holistic approach to health and wellness
           </h3>
-          <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
+          <div className="space-y-6 text-base font-cerebri font-light">
             <p>
               Our functional medicine approach targets the root cause of health concerns rather than just treating symptoms.
               Through comprehensive testing and personalized protocols, we address hormonal imbalances, gut health,
               nutritional deficiencies, and other factors that influence your overall wellbeing.
             </p>
-          </div>
-          <div className="mt-10 space-y-4">
-            <LearnMoreButton href="/team">Meet Dr. Gidwani</LearnMoreButton>
-            <br />
-            <LearnMoreButton href="/services/functional-medicine">Explore Functional Medicine Services</LearnMoreButton>
-            <br />
-            <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            <div className="space-y-4">
+              <LearnMoreButton href="/team">Meet Dr. Gidwani</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/services/functional-medicine">Explore Functional Medicine Services</LearnMoreButton>
+              <br />
+              <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
+            </div>
           </div>
         </motion.div>
       </div>
