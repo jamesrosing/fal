@@ -10,9 +10,7 @@ import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import Head from "next/head"
 import axios from 'axios'
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
+import CldImage from '@/components/media/CldImage'
 
 /// <reference path="../../types/maps.d.ts" />
 
@@ -673,7 +671,17 @@ export default function ContactPage() {
         {/* Hero Section */}
         <section className="relative">
           <div className="relative aspect-[16/9] w-full">
-            <CldImage publicId="hero/1441-1401-avocado-avenue.jpg" alt="Contact Allure MD"   priority fill />
+            <CldImage 
+              src="hero/1441-1401-avocado-avenue.jpg" 
+              alt="Contact Allure MD" 
+              priority 
+              fill 
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
           </div>
           

@@ -5,7 +5,7 @@ import { LearnMoreButton } from "../ui/learn-more-button"
 import { useState } from "react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from "@/components/media/CldImage"
+import Image from "next/image"
 
 type TabItem = {
   name: string;
@@ -17,8 +17,8 @@ export function MedicalSpaSection() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const isMobile = useIsMobile();
   
-  // Use direct Cloudinary public ID
-  const backgroundPublicId = "homepage-medical-spa-background";
+  // Full Cloudinary URL for background image
+  const imageUrl = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741816764/main-page/sections/medical-spa-section/3R8A0806-Enhanced-NR_pp.jpg";
 
   // Tab data
   const tabs: TabItem[] = [
@@ -70,16 +70,14 @@ export function MedicalSpaSection() {
       <section className="relative bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          <CldImage 
-            publicId={backgroundPublicId} 
+          <Image 
+            src={imageUrl} 
             alt="Medical Spa Services" 
             width={1080}
             height={607} // 16:9 aspect ratio
-            className="w-full h-full object-cover"
+            className="object-cover w-full h-full"
             sizes="100vw"
-            crop="fill"
             priority
-            showLoading={true}
           />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
@@ -124,16 +122,13 @@ export function MedicalSpaSection() {
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <CldImage
-          publicId={backgroundPublicId}
+        <Image
+          src={imageUrl}
           alt="Medical Spa Services"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
           sizes="100vw"
-          crop="fill"
           priority
-          showLoading={true}
         />
         {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
@@ -144,7 +139,7 @@ export function MedicalSpaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="w-full lg:max-w-[50%] flex flex-col min-h-[800px] justify-end"
+          className="w-full lg:max-w-[50%] flex flex-col min-h-[800px] justify-center"
         >
           <h2 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">Medical Spa</h2>
           <h3 className="mb-8 text-[clamp(2rem,4vw,3.5rem)] leading-none tracking-tight font-serif">

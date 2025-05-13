@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CldEnhancedImageProps {
-  publicId: string;
+  src: string;
   alt: string;
   width?: number;
   height?: number;
@@ -17,6 +17,12 @@ interface CldEnhancedImageProps {
   quality?: number | string;
   fallbackSrc?: string;
   showLoading?: boolean;
+  fill?: boolean;
+  config?: {
+    cloud?: {
+      cloudName?: string;
+    };
+  };
 }
 
 /**
@@ -30,15 +36,16 @@ interface CldEnhancedImageProps {
  * 
  * @example
  * <CldImage
- *   publicId="folder/image-name"
+ *   src="folder/image-name"
  *   alt="Description of the image"
  *   width={1200}
  *   height={600}
  *   priority
+ *   config={{ cloud: { cloudName: 'your-cloud-name' } }} <!-- Optional: override default cloud name -->
  * />
  */
 export default function CldImage({
-  publicId,
+  src,
   alt,
   width = 800,
   height = 600,
@@ -50,6 +57,8 @@ export default function CldImage({
   quality = 'auto',
   fallbackSrc = '/placeholder-image.jpg',
   showLoading = true,
+  fill = false,
+  config,
   ...props
 }: CldEnhancedImageProps) {
   const [error, setError] = useState(false);
@@ -90,24 +99,26 @@ export default function CldImage({
         />
       )}
       <NextCloudinaryImage
-        publicId={publicId}
+        src={src}
         alt={alt}
         width={width}
         height={height}
         sizes={sizes}
         className={`${className} ${loading ? 'hidden' : ''}`}
         onError={(e) => {
-          console.error(`Error loading Cloudinary image: ${publicId}`, e);
+          console.error(`Error loading Cloudinary image: ${src}`, e);
           setError(true);
         }}
         onLoad={() => {
-          console.log(`Successfully loaded Cloudinary image: ${publicId}`);
+          console.log(`Successfully loaded Cloudinary image: ${src}`);
           setLoading(false);
         }}
         crop={crop}
         gravity={gravity}
         quality={quality}
         format="auto"
+        config={config}
+        fill={fill}
         {...props}
       />
     </>

@@ -11,30 +11,12 @@ export function MissionSection() {
   // Directly use a Cloudinary public ID instead of useMediaAsset hook
   const backgroundPublicId = "homepage-mission-background"; // This should be updated with the actual public ID
   
-  // Mobile Layout: Image on top, text below
+  // Mobile Layout: Only text content with reduced padding
   if (isMobile) {
     return (
       <section className="bg-black text-white">
-        {/* Media container with preserved aspect ratio */}
-        <div className="relative w-full aspect-[16/9]">
-          <CldImage 
-            publicId={backgroundPublicId} 
-            alt="Mission background" 
-            width={1080}
-            height={607} // Aspect ratio 16:9
-            className="object-cover w-full h-full"
-            sizes="100vw"
-            crop="fill"
-            priority
-            quality={90}
-            showLoading={true}
-          />
-          {/* Subtle overlay for readability */}
-          <div className="absolute inset-0 bg-black/20" />
-        </div>
-        
-        {/* Text content below image - separate from media overlay */}
-        <div className="px-4 py-12 bg-black"> 
+        {/* Text content with reduced padding */}
+        <div className="px-4 py-10 bg-black"> 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -63,28 +45,10 @@ export function MissionSection() {
     );
   }
 
-  // Desktop Layout: Text over background with gradient
+  // Desktop Layout: Just text content with reduced padding
   return (
-    <section className="relative bg-black text-white">
-      {/* Add background media with dark overlay */}
-      <div className="absolute inset-0 z-0">
-        <CldImage 
-          publicId={backgroundPublicId} 
-          alt="Mission background" 
-          width={1920}
-          height={1080}
-          className="object-cover w-full h-full"
-          sizes="100vw"
-          crop="fill"
-          priority
-          quality={90}
-          showLoading={true}
-        />
-        {/* Dark gradient overlay that fades from left (where text is) to right (fully transparent) */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-      </div>
-      
-      <div className="container mx-auto px-4 py-32 lg:px-8 lg:py-48 relative z-10">
+    <section className="bg-black text-white">
+      <div className="container mx-auto px-4 py-16 lg:px-8 lg:py-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

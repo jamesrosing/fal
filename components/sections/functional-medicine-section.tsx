@@ -3,13 +3,13 @@
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from "@/components/media/CldImage"
+import Image from "next/image"
 
 export function FunctionalMedicineSection() {
   const isMobile = useIsMobile();
   
-  // Use direct Cloudinary public ID
-  const backgroundPublicId = "homepage-functional-medicine-background";
+  // Full Cloudinary URL for the image
+  const imageUrl = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741816689/main-page/sections/functional-medicine-section/3R8A0702.jpg";
 
   // Mobile Layout: Image on top, text below
   if (isMobile) {
@@ -17,16 +17,14 @@ export function FunctionalMedicineSection() {
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          <CldImage 
-            publicId={backgroundPublicId} 
+          <Image 
+            src={imageUrl} 
             alt="Functional Medicine at Allure MD" 
             width={1080}
             height={607} // 16:9 aspect ratio
             className="w-full h-full object-cover"
             sizes="100vw"
-            crop="fill"
             priority
-            showLoading={true}
           />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
@@ -69,16 +67,13 @@ export function FunctionalMedicineSection() {
   return (
     <section className="relative min-h-screen bg-black text-white">
       <div className="absolute inset-0">
-        <CldImage
-          publicId={backgroundPublicId}
+        <Image
+          src={imageUrl}
           alt="Functional Medicine at Allure MD"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
           sizes="100vw"
-          crop="fill"
           priority
-          showLoading={true}
         />
         {/* Dark gradient overlay that fades from right to left for text on the right */}
         <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-transparent" />

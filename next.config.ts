@@ -37,7 +37,7 @@ const nextConfig = {
   },
   transpilePackages: ['next-cloudinary'],
   env: {
-    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w',
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   },
@@ -74,7 +74,7 @@ const sentryWebpackPluginOptions = {
   dryRun: process.env.NODE_ENV !== 'production',
 }
 
-// Apply all the plugins
+// Apply all the plugins - remove withNextCloudinary
 export default withBundleAnalyzer(
   withSentryConfig(nextConfig, sentryWebpackPluginOptions)
 )

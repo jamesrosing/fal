@@ -12,11 +12,14 @@ type TeamMember = {
   alt: string;
   name: string;
   title: string;
-  publicId?: string;
+  imageId?: string;
 };
 
 export function TeamSection() {
   const isMobile = useIsMobile();
+  
+  // Direct Cloudinary URL for the background image
+  const backgroundImageUrl = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1741580119/team-background.jpg";
   
   // Define team members with placeholderIds
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
@@ -46,20 +49,10 @@ export function TeamSection() {
     }
   ]);
   
-  // Background image
-  const [backgroundPublicId, setBackgroundPublicId] = useState<string | null>(null);
-  
-  // Fetch public IDs for team member images and background
+  // Fetch public IDs for team member images
   useEffect(() => {
     async function fetchPublicIds() {
       try {
-        // Fetch public ID for background image
-        const bgResponse = await fetch(`/api/media/homepage-team-background`);
-        if (bgResponse.ok) {
-          const bgData = await bgResponse.json();
-          setBackgroundPublicId(bgData.public_id || bgData.publicId);
-        }
-        
         // Fetch public IDs for team member images
         const updatedMembers = [...teamMembers];
         let hasChanges = false;
@@ -73,7 +66,7 @@ export function TeamSection() {
               if (data.public_id || data.publicId) {
                 updatedMembers[i] = {
                   ...member,
-                  publicId: data.public_id || data.publicId
+                  imageId: data.public_id || data.publicId
                 };
                 hasChanges = true;
               }
@@ -100,23 +93,15 @@ export function TeamSection() {
       <section className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          {backgroundPublicId ? (
-            <CldImage 
-              publicId={backgroundPublicId}
-              alt="Our Medical Team"
-              width={1920}
-              height={1080}
-              className="absolute inset-0 w-full h-full object-cover"
-              sizes="100vw"
-              crop="fill"
-              priority
-              quality={90}
-            />
-          ) : (
-            <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
-              <p className="text-gray-500">Image not available</p>
-            </div>
-          )}
+          <Image 
+            src={backgroundImageUrl}
+            alt="Our Medical Team"
+            width={1920}
+            height={1080}
+            className="absolute inset-0 w-full h-full object-cover"
+            sizes="100vw"
+            priority
+          />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/30" />
         </div>
@@ -156,9 +141,9 @@ export function TeamSection() {
           {teamMembers.map((member, index) => (
             <div key={index} className="relative py-4">
               <div className="relative aspect-[3/4] overflow-hidden">
-                {member.publicId ? (
+                {member.imageId ? (
                   <CldImage
-                    publicId={member.publicId}
+                    src={member.imageId}
                     alt={member.alt}
                     width={300}
                     height={400}
@@ -167,6 +152,11 @@ export function TeamSection() {
                     crop="fill"
                     gravity="face"
                     quality={90}
+                    config={{
+                      cloud: {
+                        cloudName: 'dyrzyfg3w'
+                      }
+                    }}
                   />
                 ) : (
                   <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
@@ -225,9 +215,9 @@ export function TeamSection() {
         <div className="lg:w-1/2 grid grid-cols-2 gap-0.5">
           {teamMembers.map((member, index) => (
             <div key={index} className="relative aspect-square overflow-hidden">
-              {member.publicId ? (
+              {member.imageId ? (
                 <CldImage
-                  publicId={member.publicId}
+                  src={member.imageId}
                   alt={member.alt}
                   width={600}
                   height={600}
@@ -236,6 +226,11 @@ export function TeamSection() {
                   crop="fill"
                   gravity="face"
                   quality={90}
+                  config={{
+                    cloud: {
+                      cloudName: 'dyrzyfg3w'
+                    }
+                  }}
                 />
               ) : (
                 <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
@@ -258,23 +253,14 @@ export function TeamSection() {
       
       {/* Full-width background image section as visual separator */}
       <div className="h-64 lg:h-96 w-full relative">
-        {backgroundPublicId ? (
-          <CldImage 
-            publicId={backgroundPublicId}
-            alt="Our Medical Team"
-            width={1920}
-            height={600}
-            className="absolute inset-0 w-full h-full object-cover"
-            sizes="100vw"
-            crop="fill"
-            gravity="auto"
-            quality={90}
-          />
-        ) : (
-          <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
-            <p className="text-gray-500">Image not available</p>
-          </div>
-        )}
+        <Image 
+          src={backgroundImageUrl}
+          alt="Our Medical Team"
+          width={1920}
+          height={600}
+          className="absolute inset-0 w-full h-full object-cover"
+          sizes="100vw"
+        />
         <div className="absolute inset-0 bg-black/30" />
       </div>
     </section>

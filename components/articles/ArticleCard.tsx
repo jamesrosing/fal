@@ -4,12 +4,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
 import { cn } from "@/lib/utils"
 import type { Article } from '@/lib/types'
-import { Bookmark, Headphones, Share2 } from 'lucide-react'
-import AudioPlayer from '@/components/AudioPlayer'
+import { Bookmark, Share2 } from 'lucide-react'
 import { getCloudinaryUrl } from '@/lib/cloudinary'
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
 
 type ArticleCardProps = {
   article: Article;
@@ -51,7 +47,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           "text-sm text-muted-foreground",
           "line-clamp-4 leading-normal font-sans"
         )}>
-          {article.snippet}
+          {article.excerpt}
         </p>
         <div className="flex justify-between items-center mt-4">
           <Link href={`/article/${article.id}`} className="text-sm font-medium text-primary hover:underline">

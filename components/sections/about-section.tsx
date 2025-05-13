@@ -3,32 +3,13 @@
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from '@/components/media/CldImage'
-import { useState, useEffect } from 'react'
+import Image from "next/image"
 
 export function AboutSection() {
   const isMobile = useIsMobile();
-  // Use a state variable to store the background image public ID
-  const [backgroundPublicId, setBackgroundPublicId] = useState<string>("about/background");
   
-  // Fetch the public ID for the background image if needed
-  useEffect(() => {
-    async function fetchPublicId() {
-      try {
-        const response = await fetch(`/api/media/homepage-about-background`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.public_id || data.publicId) {
-            setBackgroundPublicId(data.public_id || data.publicId);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching public ID:', error);
-      }
-    }
-    
-    fetchPublicId();
-  }, []);
+  // Full Cloudinary URL for the image
+  const imageUrl = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1739333317/home/hero/hero-about.jpg";
   
   // Mobile Layout: Text above, image below
   if (isMobile) {
@@ -65,8 +46,8 @@ export function AboutSection() {
 
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
-          <CldImage
-            publicId={backgroundPublicId}
+          <Image
+            src={imageUrl}
             alt="Allure MD Medical Team"
             width={1920}
             height={1080}
@@ -86,12 +67,11 @@ export function AboutSection() {
     <section className="relative min-h-screen bg-black text-white">
       {/* Desktop Background Media */}
       <div className="absolute inset-0 group">
-        <CldImage
-          publicId={backgroundPublicId}
+        <Image
+          src={imageUrl}
           alt="Allure MD Medical Team"
-          width={1920}
-          height={1080}
-          className="absolute inset-0 w-full h-full object-cover object-[center_15%]"
+          fill
+          className="object-cover object-[center_15%]"
           sizes="100vw"
           priority
         />

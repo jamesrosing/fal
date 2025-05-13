@@ -3,19 +3,36 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { CldImage } from "next-cloudinary"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
-import CldImage from "@/components/media/CldImage"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { ArticleCard } from "../articles/ArticleCard"
 
-export function ArticlesSection() {
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true);
-  const isMobile = useIsMobile();
+export default function ArticlesSection() {
+  const [loading, setLoading] = useState(true)
+  const [articles, setArticles] = useState<Article[]>([])
+  const [isMobile, setIsMobile] = useState(false)
   
-  // Use direct Cloudinary public ID
-  const backgroundPublicId = "homepage-articles-background";
+  // Default background image public ID - update with your actual image
+  const backgroundPublicId = "allure-md/articles/background" 
+
+  // Check for mobile screen size
+  useEffect(() => {
+    // Function to check if screen is mobile
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    // Initial check
+    checkIsMobile()
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIsMobile)
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
 
   useEffect(() => {
     async function fetchArticles() {
@@ -46,7 +63,7 @@ export function ArticlesSection() {
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
           <CldImage 
-            publicId={backgroundPublicId} 
+            src={backgroundPublicId} 
             alt="Allure MD Articles" 
             width={1080}
             height={607} // 16:9 aspect ratio
@@ -54,7 +71,6 @@ export function ArticlesSection() {
             sizes="100vw"
             crop="fill"
             priority
-            showLoading={true}
           />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />
@@ -91,46 +107,55 @@ export function ArticlesSection() {
 
   // Desktop Layout
   return (
-    <section className="relative min-h-screen bg-black text-white">
-      <div className="absolute inset-0">
-        <CldImage
-          publicId={backgroundPublicId}
-          alt="Allure MD Articles"
-          width={1920}
-          height={1080}
-          className="w-full h-full object-cover"
-          sizes="100vw"
-          crop="fill"
-          priority
-          showLoading={true}
-        />
-        {/* Dark gradient overlay that fades from right to left for text on the right */}
-        <div className="absolute inset-0 bg-gradient-to-l from-black/60 via-black/30 to-transparent" />
-      </div>
-      
-      <div className="relative container mx-auto px-4 py-32 lg:px-8 lg:py-48 min-h-screen flex items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="ml-auto max-w-2xl text-right"
-        >
-          <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Articles</h2>
-          <h3 className="text-[clamp(2.5rem,5vw,3.5rem)] leading-tight tracking-tight font-serif text-white mb-8">
-            Insights and education from our experts
-          </h3>
-          <div className="space-y-6 text-base font-cerebri font-light text-gray-200">
-            <p>
-              Explore our collection of articles covering the latest advancements in aesthetic medicine,
-              skincare tips, treatment options, and more. Our experts regularly share their knowledge to help
-              you make informed decisions about your health and beauty journey.
-            </p>
-          </div>
-          <div className="mt-10">
-            <LearnMoreButton href="/articles">Explore Our Articles</LearnMoreButton>
-          </div>
-        </motion.div>
+    <section className="bg-black text-white py-16 lg:py-24">
+      <div className="container mx-auto px-4">
+        {/* Centered Text Header */}
+        <div className="text-center mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto max-w-2xl"
+          >
+            <h2 className="text-sm font-cerebri font-normal uppercase tracking-wide text-gray-300 mb-5">Articles</h2>
+            <h3 className="text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tight font-serif text-white mb-8">
+              Insights and education from our experts
+            </h3>
+            <div className="space-y-6 text-base font-cerebri font-light text-gray-200 max-w-xl mx-auto">
+              <p>
+                Explore our collection of articles covering the latest advancements in aesthetic medicine,
+                skincare tips, treatment options, and more. Our experts regularly share their knowledge to help
+                you make informed decisions about your health and beauty journey.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* Article Cards - 3 columns on desktop, 1 on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {loading ? (
+            // Loading skeletons
+            Array(3).fill(0).map((_, i) => (
+              <div key={`skeleton-${i}`} className="flex flex-col h-full">
+                <Skeleton className="h-48 w-full mb-4" />
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-2/3" />
+              </div>
+            ))
+          ) : (
+            // Actual article cards
+            articles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))
+          )}
+        </div>
+        
+        <div className="text-center mt-12">
+          <LearnMoreButton href="/articles">View All Articles</LearnMoreButton>
+        </div>
       </div>
     </section>
   );
