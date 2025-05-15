@@ -8,6 +8,9 @@ We're implementing the Gallery System while also continuing work on the article 
    - ✅ Updated gallery components to use new Cloudinary components
    - ✅ Fixed gallery hero image display using direct Cloudinary URLs
    - ✅ Implemented responsive design for gallery pages on mobile and desktop
+   - ✅ Fixed merge conflicts in gallery slug page components
+   - ✅ Enhanced error handling for Supabase database queries
+   - ✅ Added fallback data for gallery pages when database returns empty results
    - ⏳ Creating dynamic routes for galleries, albums, and cases
    - ⏳ Implementing filtering and sorting options
    - ⏳ Creating admin interface for gallery management
@@ -18,10 +21,11 @@ We're implementing the Gallery System while also continuing work on the article 
    - ✅ Updated article detail page to use new Cloudinary components
    - ✅ Implemented SEO optimization for articles
    - ✅ Enhanced article filtering and categorization
+   - ✅ Fixed duplicate category display in articles page filtering
    - ⏳ Completing admin interface for article management
    - ⏳ Adding text-to-speech functionality for articles
 
-2. **Cloudinary Media System Integration** (COMPLETED)
+3. **Cloudinary Media System Integration** (COMPLETED)
    - ✅ Implemented new API endpoints in `/app/api/cloudinary` for direct access to Cloudinary assets
    - ✅ Created asset endpoints that work with direct public IDs rather than placeholder IDs
    - ✅ Created responsive image and transformation endpoints for client-side usage
@@ -33,12 +37,16 @@ We're implementing the Gallery System while also continuing work on the article 
 
 ## Recent Decisions
 
+- **Database Schema Adaptation**: Updated Supabase queries to use created_at for sorting instead of display_order, which doesn't exist in the database schema.
+- **Error Handling Enhancement**: Implemented comprehensive error handling with better logging and user-friendly fallbacks in the gallery system.
+- **Fallback Data Strategy**: Added mock/fallback gallery data for situations when the database returns empty results, providing a better user experience.
 - **Gallery Implementation Approach**: Using direct Cloudinary URLs for gallery images rather than the CldImage component to resolve rendering issues.
 - **Mobile-First Responsive Design**: Implemented 16:9 aspect ratio on mobile for gallery hero section while using percentage-based height on larger screens.
 - **Image Positioning Control**: Using inline style with objectPosition to fine-tune image focal points rather than relying on Cloudinary's gravity parameter.
 - **Completed Cloudinary Component Consolidation**: Removed transitional media components in favor of direct Cloudinary integration.
 - **Article System Enhancement**: Completed improvements to article filtering, categorization, and now focusing on admin interface development.
 - **Advanced Article Filtering**: Implemented more sophisticated article filtering options including tag filtering, search functionality, and subcategory filtering with clean URL parameter handling.
+- **Fixed Duplicate Categories**: Resolved issue with duplicate categories appearing in article filtering section by implementing deduplication with Maps and Sets.
 
 ## Implementation Flow
 
@@ -46,6 +54,9 @@ We're implementing the Gallery System while also continuing work on the article 
    - ✅ Update gallery components to use new media components
    - ✅ Fix gallery hero image using direct Cloudinary URLs
    - ✅ Implement responsive design for mobile and desktop
+   - ✅ Fix merge conflicts and parsing errors in gallery components
+   - ✅ Enhance error handling for database queries
+   - ✅ Add fallback data strategy for empty results
    - Create dynamic routes for galleries, albums, and cases
    - Implement filtering and sorting options
    - Create admin interface for gallery management
@@ -54,6 +65,7 @@ We're implementing the Gallery System while also continuing work on the article 
 2. **Article Content Enhancement**
    - ✅ Enhance article filtering and categorization with tag support
    - ✅ Implement a more robust search functionality
+   - ✅ Fix duplicate category display in filtering section
    - Create improved admin interface for article management
    - Add text-to-speech functionality for articles
 
@@ -79,6 +91,18 @@ We're implementing the Gallery System while also continuing work on the article 
    - `/api/articles/[id]`: Get, update, and delete specific articles
    - `/api/articles/categories`: Manage article categories
    - `/api/articles/featured`: Get featured articles
+
+## Gallery System Structure
+
+1. **Frontend Components**
+   - `app/gallery/page.tsx`: Main gallery listing page
+   - `app/gallery/[...slug]/page.tsx`: Dynamic routes for galleries, albums, and cases
+   - `app/gallery/[...slug]/layout.tsx`: Layout for gallery pages with error handling
+
+2. **Database Integration**
+   - Uses Supabase queries with enhanced error handling
+   - Adapts to available database schema (using created_at instead of display_order)
+   - Provides fallback data when database is unavailable
 
 ## Next Steps
 
@@ -160,4 +184,70 @@ We're implementing the Gallery System while also continuing work on the article 
      width={800}
      height={600}
    />
+   ```
+
+## Database Error Handling Best Practices
+
+1. **Comprehensive Error Handling**: Always wrap Supabase queries in try/catch blocks:
+   ```typescript
+   try {
+     const { data, error } = await supabase.from('table').select('*');
+     if (error) throw error;
+     return data;
+   } catch (error) {
+     console.error('Error fetching data:', error);
+     return []; // Return sensible default
+   }
+   ```
+
+2. **Detailed Error Logging**: Log specific error information for debugging:
+   ```typescript
+   function handleError(error, operation) {
+     console.error(`Error during ${operation}:`, error);
+     console.error('Details:', JSON.stringify(error, null, 2));
+   }
+   ```
+
+3. **Fallback Data Strategy**: Provide mock data when database queries fail:
+   ```typescript
+   const FALLBACK_DATA = [
+     { id: "1", title: "Example Item", description: "Fallback description" }
+   ];
+   
+   // In your fetch function
+   try {
+     const data = await fetchFromDatabase();
+     return data.length > 0 ? data : FALLBACK_DATA;
+   } catch (error) {
+     console.error('Error:', error);
+     return FALLBACK_DATA;
+   }
+   ```
+
+4. **Database Schema Adaptation**: Design queries to adapt to the actual database schema:
+   ```typescript
+   // Check if column exists in the database schema
+   if (hasColumn(table, 'display_order')) {
+     query = query.order('display_order', { ascending: true });
+   } else {
+     query = query.order('created_at', { ascending: false });
+   }
+   ```
+
+5. **Progressive Enhancement**: Build UI that degrades gracefully with minimal data:
+   ```jsx
+   // Component that works with minimal data
+   function ItemCard({ item }) {
+     return (
+       <div>
+         <h3>{item.title || 'Untitled Item'}</h3>
+         {item.description && <p>{item.description}</p>}
+         {item.imageUrl ? (
+           <img src={item.imageUrl} alt={item.title} />
+         ) : (
+           <div className="placeholder-image">No Image</div>
+         )}
+       </div>
+     );
+   }
    ```
