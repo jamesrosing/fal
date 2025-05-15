@@ -1,6 +1,42 @@
 import { getGalleries, getAlbumsByGallery, getCasesByAlbum, getCase } from "@/lib/supabase"
 import GalleryPage from "./page"
 import { notFound } from "next/navigation"
+import { createClient } from '@supabase/supabase-js'
+
+// Fallback data for when the database is empty or unavailable
+const FALLBACK_GALLERIES = [
+  {
+    id: "plastic-surgery",
+    title: "Plastic Surgery",
+    description: "Before and after examples of various plastic surgery procedures.",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "dermatology",
+    title: "Dermatology",
+    description: "Skin treatments and dermatological procedures.",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "medical-spa",
+    title: "Medical Spa",
+    description: "Non-surgical cosmetic treatments for face and body.",
+    created_at: new Date().toISOString()
+  }
+];
+
+// Create a fallback Supabase client for error handling
+const createFallbackClient = () => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.error('Supabase environment variables are not set');
+    return null;
+  }
+  
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+};
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,24 +50,49 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
   const slugParams = await Promise.resolve(params.slug || []);
   const [collectionId, albumId, caseId] = slugParams;
 
-  // If no slug, show main gallery page
-  if (!slugParams || slugParams.length === 0) {
+  // Function to safely fetch galleries with fallback
+  async function safeGetGalleries() {
     try {
-      const galleries = await getGalleries();
-      return <GalleryPage galleries={galleries} />;
+      return await getGalleries();
     } catch (error) {
       console.error('Error fetching galleries:', error);
-      return <GalleryPage galleries={[]} />;
+      
+      // Try with fallback client
+      const fallbackClient = createFallbackClient();
+      if (fallbackClient) {
+        try {
+          const { data } = await fallbackClient
+            .from('galleries')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (data && data.length > 0) {
+            return data;
+          }
+        } catch (fallbackError) {
+          console.error('Fallback gallery fetch failed:', fallbackError);
+        }
+      }
+      
+      // If all else fails, return mock data
+      console.log('Using fallback gallery data');
+      return FALLBACK_GALLERIES;
     }
+  }
+
+  // If no slug, show main gallery page
+  if (!slugParams || slugParams.length === 0) {
+    const galleries = await safeGetGalleries();
+    return <GalleryPage galleries={galleries.length > 0 ? galleries : FALLBACK_GALLERIES} />;
   }
 
   try {
     // Fetch all galleries
-    const galleries = await getGalleries();
+    const galleries = await safeGetGalleries();
     
     if (!galleries || galleries.length === 0) {
       console.error('No galleries found');
-      return <GalleryPage galleries={[]} />;
+      return <GalleryPage galleries={FALLBACK_GALLERIES} />;
     }
     
     // Check if the requested collection exists
@@ -44,14 +105,15 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
       notFound();
     }
     
-    // Get albums for the requested gallery
-    const albums = await getAlbumsByGallery(collectionId);
-    
-    if (!albums || albums.length === 0) {
-      console.error(`No albums found for gallery: ${collectionId}`);
-      return <GalleryPage galleries={galleries} albums={[]} />;
+    // Get albums for the requested gallery - with safety wrapper
+    let albums = [];
+    try {
+      albums = await getAlbumsByGallery(collectionId);
+    } catch (albumError) {
+      console.error(`Error fetching albums for gallery ${collectionId}:`, albumError);
+      // Continue with empty albums array
     }
-
+    
     // If we have a case ID (UUID format), fetch case data
     if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
       try {
@@ -103,7 +165,7 @@ export default async function GalleryLayout({ children, params }: LayoutProps) {
 
   } catch (error) {
     console.error('Error fetching data:', error);
-    // Return a basic gallery page with empty data instead of immediately showing 404
-    return <GalleryPage galleries={[]} />;
+    // Return a basic gallery page with fallback data instead of immediately showing 404
+    return <GalleryPage galleries={FALLBACK_GALLERIES} />;
   }
 } 

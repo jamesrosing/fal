@@ -18,9 +18,14 @@ export function createClient() {
 
 // Create a Supabase client for server components and API routes
 export function createServerClient() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.error('Supabase environment variables are not set');
+    throw new Error('Supabase environment variables are missing');
+  }
+
   return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   )
 }
 
@@ -55,7 +60,6 @@ export interface Gallery {
   title: string;
   description: string;
   created_at: string;
-  display_order?: number;
 }
 
 export interface Album {
@@ -64,7 +68,6 @@ export interface Album {
   title: string;
   description: string;
   created_at: string;
-  display_order?: number;
 }
 
 export interface Case {
@@ -74,7 +77,6 @@ export interface Case {
   description: string;
   metadata: Record<string, any>;
   created_at: string;
-  display_order?: number;
 }
 
 export interface Image {
@@ -138,102 +140,180 @@ export interface ArticleCategory {
   updated_at: string;
 }
 
+// Utility for handling various error types safely
+function handleSupabaseError(error: any, operation: string): void {
+  if (!error) return;
+  
+  let errorMessage = 'Unknown error';
+  if (typeof error === 'string') {
+    errorMessage = error;
+  } else if (error.message) {
+    errorMessage = error.message;
+  } else if (error.error) {
+    errorMessage = error.error;
+  }
+  
+  console.error(`Error during ${operation}:`, errorMessage);
+  console.error('Full error:', JSON.stringify(error, null, 2));
+}
+
 // Helper functions for database operations
 export async function getGalleries() {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('galleries')
-    .select('*')
-    .order('display_order', { ascending: true });
-  
-  if (error) {
-    console.error('Error fetching galleries:', error);
-    throw error;
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    const { data, error } = await supabase
+      .from('galleries')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      handleSupabaseError(error, 'getGalleries');
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    handleSupabaseError(error, 'getGalleries');
+    return [];
   }
-  return data || [];
 }
 
 export async function getGalleryByTitle(title: string) {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('galleries')
-    .select('*')
-    .eq('title', title)
-    .single();
-  
-  if (error) {
-    console.error('Error fetching gallery by title:', error);
-    throw error;
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    const { data, error } = await supabase
+      .from('galleries')
+      .select('*')
+      .eq('title', title)
+      .single();
+    
+    if (error) {
+      handleSupabaseError(error, `getGalleryByTitle: ${title}`);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    handleSupabaseError(error, `getGalleryByTitle: ${title}`);
+    return null;
   }
-  return data;
 }
 
 export async function getAlbumsByGallery(galleryIdOrTitle: string) {
-  const supabase = createServerClient();
-  // First try to get albums by gallery ID
-  let { data, error } = await supabase
-    .from('albums')
-    .select('*')
-    .eq('gallery_id', galleryIdOrTitle)
-    .order('display_order', { ascending: true });
-  
-  if (error) {
-    console.error('Error fetching albums by gallery ID:', error);
-    throw error;
-  }
-  
-  // If no albums found, try to get the gallery by title
-  if (data && data.length === 0) {
-    try {
-      const gallery = await getGalleryByTitle(galleryIdOrTitle);
-      
-      if (!gallery) throw new Error('Gallery not found');
-      
-      const result = await supabase
-        .from('albums')
-        .select('*')
-        .eq('gallery_id', gallery.id)
-        .order('display_order', { ascending: true });
-      
-      if (result.error) throw result.error;
-      data = result.data;
-    } catch (err) {
-      console.error('Error fetching albums by gallery title:', err);
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    // First try to get albums by gallery ID
+    let { data, error } = await supabase
+      .from('albums')
+      .select('*')
+      .eq('gallery_id', galleryIdOrTitle)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      handleSupabaseError(error, `getAlbumsByGallery(ID): ${galleryIdOrTitle}`);
       return [];
     }
+    
+    // If no albums found, try to get the gallery by title
+    if (data && data.length === 0) {
+      try {
+        const gallery = await getGalleryByTitle(galleryIdOrTitle);
+        
+        if (!gallery) {
+          console.error(`Gallery not found: ${galleryIdOrTitle}`);
+          return [];
+        }
+        
+        const result = await supabase
+          .from('albums')
+          .select('*')
+          .eq('gallery_id', gallery.id)
+          .order('created_at', { ascending: false });
+        
+        if (result.error) {
+          handleSupabaseError(result.error, `getAlbumsByGallery(title): ${galleryIdOrTitle}`);
+          return [];
+        }
+        
+        data = result.data;
+      } catch (err) {
+        handleSupabaseError(err, `getAlbumsByGallery(title-fallback): ${galleryIdOrTitle}`);
+        return [];
+      }
+    }
+    
+    return data || [];
+  } catch (error) {
+    handleSupabaseError(error, `getAlbumsByGallery: ${galleryIdOrTitle}`);
+    return [];
   }
-  
-  return data || [];
 }
 
 export async function getCasesByAlbum(albumId: string) {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*, images(*)')
-    .eq('album_id', albumId)
-    .order('display_order', { ascending: true });
-  
-  if (error) {
-    console.error('Error fetching cases by album:', error);
-    throw error;
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    const { data, error } = await supabase
+      .from('cases')
+      .select('*, images(*)')
+      .eq('album_id', albumId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      handleSupabaseError(error, `getCasesByAlbum: ${albumId}`);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    handleSupabaseError(error, `getCasesByAlbum: ${albumId}`);
+    return [];
   }
-  return data || [];
 }
 
 export async function getCase(caseId: string) {
-  const supabase = createServerClient();
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*, images(*)')
-    .eq('id', caseId)
-    .single();
-  
-  if (error) {
-    console.error('Error fetching case:', error);
-    throw error;
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    const { data, error } = await supabase
+      .from('cases')
+      .select('*, images(*)')
+      .eq('id', caseId)
+      .single();
+    
+    if (error) {
+      handleSupabaseError(error, `getCase: ${caseId}`);
+      return null;
+    }
+    
+    return data;
+  } catch (error) {
+    handleSupabaseError(error, `getCase: ${caseId}`);
+    return null;
   }
-  return data;
 }
 
 export async function getCaseById(caseId: string) {

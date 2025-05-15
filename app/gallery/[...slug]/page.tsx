@@ -19,13 +19,8 @@ import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import { Gallery, Album, Case, Image as GalleryImage } from "@/lib/supabase"
 import { Share2, Heart } from "lucide-react"
-<<<<<<< HEAD
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
-=======
 import CldImage from '@/components/media/CldImage'
 import CldVideo from '@/components/media/CldVideo'
->>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
 
 
 interface PageProps {

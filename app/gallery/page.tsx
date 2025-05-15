@@ -58,25 +58,6 @@ export default function GalleryPage() {
     <main className="min-h-screen bg-black flex flex-col pt-16">
       {/* NavBar is now fixed in its component, so we don't need a container for it */}
       <NavBar />
-<<<<<<< HEAD
-      {/* Hero Section */}
-      <div className="relative h-[70vh] w-full">
-        <CldImage publicId="/images/gallery/hero.jpg" 
-          alt="Gallery Hero" 
-          priority 
-          width={1920}
-          height={1080}
-          crop="fill"
-          className="w-full h-full object-cover"
-        / config={{
-          cloud: {
-            cloudName: 'dyrzyfg3w'
-          }
-        }}>
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="container mx-auto max-w-6xl">
-=======
       
       {/* Mobile-first Hero Section with 16:9 aspect ratio - properly positioned below navbar */}
       <div className="w-full">
@@ -110,7 +91,6 @@ export default function GalleryPage() {
         {/* Text content below image for mobile */}
         <div className="p-6 bg-black md:hidden">
           <div className="container mx-auto">
->>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
             <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">Gallery</h1>
             <h2 className="mb-4 text-4xl leading-none tracking-tight font-serif text-white">Before & After Transformations</h2>
             <div className="space-y-4 text-base font-cerebri font-light">

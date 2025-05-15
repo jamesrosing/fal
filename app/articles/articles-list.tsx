@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, X } from 'lucide-react';
 
 // Define the main category slugs we want to show in the menubar
+// Ensure no duplicates are present in this list
 const MAIN_CATEGORY_SLUGS = ['latest-news', 'plastic-surgery', 'dermatology', 'medical-spa', 'functional-medicine', 'educational'];
 
 // Fallback categories in case API fails
@@ -57,7 +58,18 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
             throw new Error('Failed to fetch categories');
           }
           categoriesData = await categoriesResponse.json();
-          setCategories(categoriesData);
+          
+          // Ensure no duplicate categories by using a Map with slug as key
+          const uniqueCategoriesMap = new Map();
+          categoriesData.forEach((category: any) => {
+            if (!uniqueCategoriesMap.has(category.slug)) {
+              uniqueCategoriesMap.set(category.slug, category);
+            }
+          });
+          
+          // Convert back to array
+          const uniqueCategories = Array.from(uniqueCategoriesMap.values());
+          setCategories(uniqueCategories);
         } catch (categoryError) {
           console.error('Error fetching categories:', categoryError);
           // Fall back to predefined categories
@@ -178,11 +190,24 @@ export function ArticlesList({ searchParams }: ArticlesListProps) {
     fetchData();
   }, [searchParams]);
   
-  // Get main categories for menubar
+  // Get main categories for menubar, ensuring no duplicates
   const mainCategories = [
     { id: 'all', slug: 'all', name: 'All Articles' },
-    ...categories.filter((cat: any) => MAIN_CATEGORY_SLUGS.includes(cat.slug))
+    // Filter the categories to include only those in MAIN_CATEGORY_SLUGS 
+    // and ensure no duplicates by using a Set for the slugs
   ];
+  
+  // Create a Set to keep track of slugs we've already added
+  const addedSlugs = new Set(['all']);
+  
+  // Add categories in the specified order without duplicates
+  MAIN_CATEGORY_SLUGS.forEach(slug => {
+    const category = categories.find((cat: any) => cat.slug === slug);
+    if (category && !addedSlugs.has(category.slug)) {
+      mainCategories.push(category);
+      addedSlugs.add(category.slug);
+    }
+  });
 
   // Handle subcategory change
   const handleSubcategoryChange = (value: string) => {
