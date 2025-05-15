@@ -59,7 +59,7 @@ export default function ArticlesSection() {
   // Mobile Layout: Image on top, text below
   if (isMobile) {
     return (
-      <section className="bg-black text-white">
+      <div className="bg-black text-white">
         {/* Media container with preserved aspect ratio */}
         <div className="relative w-full aspect-[16/9]">
           <CldImage 
@@ -106,13 +106,13 @@ export default function ArticlesSection() {
             </div>
           </motion.div>
         </div>
-      </section>
+      </div>
     );
   }
 
   // Desktop Layout
   return (
-    <section className="bg-black text-white py-16 lg:py-24">
+    <div className="bg-black text-white py-16 lg:py-24">
       <div className="container mx-auto px-4">
         {/* Centered Text Header */}
         <div className="text-center mb-12 md:mb-16">
@@ -162,6 +162,6 @@ export default function ArticlesSection() {
           <LearnMoreButton href="/articles">View All Articles</LearnMoreButton>
         </div>
       </div>
-    </section>
+    </div>
   );
 } 

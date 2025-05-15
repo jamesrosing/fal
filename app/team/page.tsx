@@ -113,23 +113,42 @@ export default function Team() {
   useEffect(() => {
     async function fetchTeamMembers() {
       try {
-        const response = await fetch('/api/team')
-        if (!response.ok) throw new Error('Failed to fetch team members')
+        console.log('Fetching team members...');
+        const response = await fetch('/api/team');
         
-        const data = await response.json()
+        if (!response.ok) {
+          console.error('Error response from API:', response.status, response.statusText);
+          const errorText = await response.text();
+          console.error('Error details:', errorText);
+          throw new Error(`Failed to fetch team members: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('Team members data received:', data);
+        
+        if (!Array.isArray(data)) {
+          console.error('Expected array data but got:', typeof data);
+          throw new Error('Invalid data format received');
+        }
         
         // Split into providers and staff based on the string value 'true'/'false'
-        setProviders(data.filter((member: TeamMember) => member.is_provider === 'true'))
-        setStaff(data.filter((member: TeamMember) => member.is_provider === 'false'))
+        const providersData = data.filter((member: TeamMember) => member.is_provider === 'true');
+        const staffData = data.filter((member: TeamMember) => member.is_provider === 'false');
+        
+        console.log(`Found ${providersData.length} providers and ${staffData.length} staff members`);
+        
+        setProviders(providersData);
+        setStaff(staffData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load team members')
+        console.error('Error in fetchTeamMembers:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load team members');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchTeamMembers()
-  }, [])
+    fetchTeamMembers();
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>

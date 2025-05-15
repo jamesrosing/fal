@@ -23,12 +23,13 @@
 
 **Subtasks**:
 1. ✅ Update gallery components to use new media components
-2. ⏳ Create dynamic routes for galleries, albums, and cases
-3. ⏳ Implement filtering and sorting options
-4. ⏳ Add responsive design for mobile and desktop
-5. ⏳ Create admin interface for gallery management
-6. ⏳ Implement image upload and organization features
-7. ⏳ Add SEO optimization for gallery pages
+2. ✅ Fix gallery hero image using direct Cloudinary URLs
+3. ✅ Implement responsive design for mobile and desktop
+4. ⏳ Create dynamic routes for galleries, albums, and cases
+5. ⏳ Implement filtering and sorting options
+6. ⏳ Create admin interface for gallery management
+7. ⏳ Implement image upload and organization features
+8. ⏳ Add SEO optimization for gallery pages
 
 ## Completed Tasks
 

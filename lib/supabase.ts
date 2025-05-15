@@ -1,11 +1,19 @@
 import { createBrowserClient } from '@supabase/ssr'
+<<<<<<< HEAD
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+=======
+import { createClient as createServerClientBase } from '@supabase/supabase-js'
+>>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
 
 /**
  * Supabase Client
  * 
  * This module provides functions to create Supabase clients
+<<<<<<< HEAD
  * for interacting with the Supabase database.
+=======
+ * for interacting with the Supabase database from both client and server components.
+>>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
  */
 
 // Create a Supabase client for client components
@@ -16,9 +24,15 @@ export function createClient() {
   )
 }
 
+<<<<<<< HEAD
 // Create a Supabase client for server components and API routes
 export function createServerClient() {
   return createSupabaseClient(
+=======
+// Create a Supabase client for server components
+export function createServerClient() {
+  return createServerClientBase(
+>>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
@@ -55,6 +69,7 @@ export interface Gallery {
   title: string;
   description: string;
   created_at: string;
+  display_order?: number;
 }
 
 export interface Album {
@@ -63,6 +78,7 @@ export interface Album {
   title: string;
   description: string;
   created_at: string;
+  display_order?: number;
 }
 
 export interface Case {
@@ -72,6 +88,7 @@ export interface Case {
   description: string;
   metadata: Record<string, any>;
   created_at: string;
+  display_order?: number;
 }
 
 export interface Image {
@@ -137,30 +154,36 @@ export interface ArticleCategory {
 
 // Helper functions for database operations
 export async function getGalleries() {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('galleries')
     .select('*')
     .order('display_order', { ascending: true });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching galleries:', error);
+    throw error;
+  }
   return data || [];
 }
 
 export async function getGalleryByTitle(title: string) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('galleries')
     .select('*')
     .eq('title', title)
     .single();
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching gallery by title:', error);
+    throw error;
+  }
   return data;
 }
 
 export async function getAlbumsByGallery(galleryIdOrTitle: string) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   // First try to get albums by gallery ID
   let { data, error } = await supabase
     .from('albums')
@@ -168,7 +191,10 @@ export async function getAlbumsByGallery(galleryIdOrTitle: string) {
     .eq('gallery_id', galleryIdOrTitle)
     .order('display_order', { ascending: true });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching albums by gallery ID:', error);
+    throw error;
+  }
   
   // If no albums found, try to get the gallery by title
   if (data && data.length === 0) {
@@ -195,39 +221,37 @@ export async function getAlbumsByGallery(galleryIdOrTitle: string) {
 }
 
 export async function getCasesByAlbum(albumId: string) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('cases')
     .select('*, images(*)')
     .eq('album_id', albumId)
     .order('display_order', { ascending: true });
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching cases by album:', error);
+    throw error;
+  }
   return data || [];
 }
 
 export async function getCase(caseId: string) {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from('cases')
     .select('*, images(*)')
     .eq('id', caseId)
     .single();
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching case:', error);
+    throw error;
+  }
   return data;
 }
 
 export async function getCaseById(caseId: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from('cases')
-    .select('*, images(*)')
-    .eq('id', caseId)
-    .single();
-  
-  if (error) throw error;
-  return data;
+  return getCase(caseId);
 }
 
 function compareByDate(a: any, b: any) {
