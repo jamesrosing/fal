@@ -1,19 +1,11 @@
 import { createBrowserClient } from '@supabase/ssr'
-<<<<<<< HEAD
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-=======
-import { createClient as createServerClientBase } from '@supabase/supabase-js'
->>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
 
 /**
  * Supabase Client
  * 
  * This module provides functions to create Supabase clients
-<<<<<<< HEAD
- * for interacting with the Supabase database.
-=======
  * for interacting with the Supabase database from both client and server components.
->>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
  */
 
 // Create a Supabase client for client components
@@ -24,15 +16,9 @@ export function createClient() {
   )
 }
 
-<<<<<<< HEAD
 // Create a Supabase client for server components and API routes
 export function createServerClient() {
   return createSupabaseClient(
-=======
-// Create a Supabase client for server components
-export function createServerClient() {
-  return createServerClientBase(
->>>>>>> ecde2445f05d07368d4dabdef7ef14430ac7f63a
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
@@ -124,7 +110,7 @@ export interface Article {
   author_id: string;
   category_id: string;
   subcategory?: string;
-  status: 'draft' | 'published' | 'archived';
+  is_draft: boolean; // Changed from 'status' to match database schema
   featured_image?: string;
   featured_video?: string;
   meta_description?: string;

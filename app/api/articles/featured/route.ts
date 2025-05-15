@@ -84,7 +84,7 @@ export async function GET(request: Request) {
       const { data: articleData, error: articlesError } = await supabase
         .from('articles')
         .select('*')
-        .eq('status', 'published')
+        .eq('is_draft', false)
         .order('published_at', { ascending: false })
         .limit(limit);
 
@@ -141,7 +141,7 @@ export async function GET(request: Request) {
           date: article.published_at || article.created_at,
           author: article.author_id, // You might need to join with authors table later
           readTime: article.reading_time ? `${article.reading_time} min` : undefined,
-          status: article.status,
+          status: article.is_draft ? 'draft' : 'published',
           publishedAt: article.published_at,
           createdAt: article.created_at,
           updatedAt: article.updated_at,

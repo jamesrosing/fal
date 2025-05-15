@@ -22,7 +22,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
   const { toast } = useToast()
   const isDevelopment = process.env.NODE_ENV === 'development'
   const assetId = `team-${member.name.toLowerCase().replace(/\s+/g, '-')}`
-  const placeholderId = `team-${member.is_provider ? 'provider' : 'staff'}-${member.id}`
+  const placeholderId = `team-${member.is_provider === 'true' ? 'provider' : 'staff'}-${member.id}`
 
   // Use the useMediaAsset hook to get the image URL
   const { url: memberImageUrl, isLoading } = useMediaAsset(placeholderId, {
