@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { getCloudinaryUrl } from '@/lib/cloudinary';
 import styles from './SiteMediaManager.module.css';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 /**
@@ -156,8 +156,7 @@ export const SiteMediaManager: React.FC<SiteMediaManagerProps> = ({
               >
                 <div className={styles.mediaPreview}>
                   {/* Use CldImage for optimized image delivery */}
-                  <CldImage
-                    width={placeholder.dimensions.width}
+                  <CldImage width={placeholder.dimensions.width}
                     height={placeholder.dimensions.height}
                     src={placeholder.id}
                     alt={placeholder.name}
@@ -170,7 +169,11 @@ export const SiteMediaManager: React.FC<SiteMediaManagerProps> = ({
                     })}
                     sizes={placeholder.cloudinary.responsive.sizes}
                     className={styles.previewImage}
-                  />
+                  / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
                 </div>
                 <div className={styles.mediaInfo}>
                   <h3>{placeholder.name}</h3>
@@ -198,15 +201,18 @@ export const SiteMediaManager: React.FC<SiteMediaManagerProps> = ({
             <p>{selectedPlaceholder.description}</p>
             
             <div className={styles.detailPreview}>
-              <CldImage
-                width={selectedPlaceholder.dimensions.width}
+              <CldImage width={selectedPlaceholder.dimensions.width}
                 height={selectedPlaceholder.dimensions.height}
                 src={selectedPlaceholder.id}
                 alt={selectedPlaceholder.name}
                 format="auto"
                 quality="auto"
                 className={styles.fullPreviewImage}
-              />
+              / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
             </div>
             
             <div className={styles.detailInfo}>

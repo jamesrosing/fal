@@ -45,29 +45,35 @@ export function BackgroundVideo({
     if (isVideo) {
       return (
         <div className="absolute inset-0">
-          <CldVideo
-            publicId={publicId}
+          <CldVideo src={publicId}
             className={className || "object-cover w-full h-full"}
             autoPlay
             muted
             loop
             alt="Background video"
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <div className="absolute inset-0 bg-black/30" />
         </div>
       );
     } else {
       return (
         <div className="absolute inset-0">
-          <CldImage
-            publicId={publicId}
+          <CldImage src={publicId}
             alt="Background image"
             width={1920}
             height={1080}
             className={className || "object-cover w-full h-full"}
             sizes="100vw"
             priority
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <div className="absolute inset-0 bg-black/30" />
         </div>
       );

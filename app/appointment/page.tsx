@@ -6,8 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { AppointmentScheduler } from "@/components/scheduling/AppointmentScheduler"
 import { Suspense } from "react"
 import { Loader2 } from "lucide-react"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 function LoadingScheduler() {
@@ -27,7 +27,11 @@ export default function AppointmentPage() {
       {/* Hero Section */}
       <section className="relative h-[40vh] lg:h-[50vh]">
         <div className="absolute inset-0">
-          <CldImage publicId="hero/appointment-hero.jpg" alt="Schedule an Appointment"   priority fill />
+          <CldImage publicId="hero/appointment-hero.jpg" alt="Schedule an Appointment"   priority fill / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

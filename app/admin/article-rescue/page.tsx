@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, AlertCircle, CheckCircle } from 'lucide-react';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 export default function ArticleRescuePage() {

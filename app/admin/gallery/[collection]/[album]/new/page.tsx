@@ -13,8 +13,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { uploadToCloudinary } from '@/lib/cloudinary';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 interface Collection {

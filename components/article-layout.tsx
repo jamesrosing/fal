@@ -10,8 +10,8 @@ import { Section } from "@/components/ui/section"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import Head from "next/head"
 import { Footer } from "./footer"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 

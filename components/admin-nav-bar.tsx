@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 export function AdminNavBar() {

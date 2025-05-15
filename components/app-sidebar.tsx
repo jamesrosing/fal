@@ -12,8 +12,8 @@
   import { Button } from "./ui/button"
   import { ThemeToggle } from "./theme-toggle"
   import { ScrollArea } from "./ui/scroll-area"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
   const data = {

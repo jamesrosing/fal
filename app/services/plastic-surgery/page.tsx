@@ -1,16 +1,15 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import { CloudinaryImage } from '@/components/media/CloudinaryMedia'
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
-
-
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -63,19 +62,36 @@ export default function PlasticSurgery() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="bg-black">
+      <section className="relative h-screen">
+        <div className="absolute inset-0">
+          <CldImage 
+            src="services/plastic-surgery/plastic-surgery-hero" 
+            alt="Plastic Surgery at Allure MD" 
+            priority 
+            fill 
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+        
         {/* Mobile Hero with Image on top + Text below */}
         <div className="lg:hidden">
           {/* Media container with full width */}
           <div className="relative w-full aspect-[16/9]">
-            <CloudinaryImage 
-              id="page:services/plastic-surgery/plastic-surgery-hero.jpg" 
+            <CldImage 
+              src="services/plastic-surgery/plastic-surgery-hero" 
               alt="Plastic Surgery at Allure MD" 
               priority 
               fill 
-              width={1920}
-              height={1080}
-              className="object-cover"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
             />
             <div className="absolute inset-0 bg-black/50" />
           </div>
@@ -112,14 +128,16 @@ export default function PlasticSurgery() {
         {/* Desktop Hero with Text over Image */}
         <div className="hidden lg:block relative h-screen">
           <div className="absolute inset-0">
-            <CloudinaryImage 
-              id="page:services/plastic-surgery/plastic-surgery-hero.jpg" 
+            <CldImage 
+              src="services/plastic-surgery/plastic-surgery-hero" 
               alt="Plastic Surgery at Allure MD" 
               priority 
               fill 
-              width={1920}
-              height={1080}
-              className="object-cover"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
             />
             <div className="absolute inset-0 bg-black/50" />
           </div>
@@ -173,14 +191,19 @@ export default function PlasticSurgery() {
                   <div className="lg:hidden">
                     {/* Full-width image container */}
                     <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] aspect-[4/3]">
-                      <CloudinaryImage
-                        id={category.imageId}
+                      <CldImage
+                        src={category.imageId}
                         alt={category.category}
                         fill
                         width={800}
                         height={600}
                         className="object-cover"
                         sizes="100vw"
+                        config={{
+                          cloud: {
+                            cloudName: 'dyrzyfg3w'
+                          }
+                        }}
                       />
                     </div>
                     
@@ -212,14 +235,19 @@ export default function PlasticSurgery() {
                   } gap-10 items-center px-4 lg:px-0`}>
                     <div className="w-1/2">
                       <div className="relative aspect-[4/3] w-full">
-                        <CloudinaryImage
-                          id={category.imageId}
+                        <CldImage
+                          src={category.imageId}
                           alt={category.category}
                           fill
                           width={800}
                           height={600}
                           className="object-cover w-full h-full"
                           sizes="50vw"
+                          config={{
+                            cloud: {
+                              cloudName: 'dyrzyfg3w'
+                            }
+                          }}
                         />
                       </div>
                     </div>

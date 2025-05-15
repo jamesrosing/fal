@@ -13,37 +13,42 @@ export default function CloudinaryTestPage() {
         {/* Basic Image Test */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">1. Basic Image</h2>
-          <CldImage
-            src="emsculpt/hero-image"
+          <CldImage src="emsculpt/hero-image"
             width={400}
             height={300}
             alt="Emsculpt Hero Image"
             sizes="100vw"
             preserveTransformations
             loading="lazy"
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <p className="mt-2 text-sm text-gray-600">Basic implementation with width/height</p>
         </div>
         
         {/* Responsive Image Test */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">2. Responsive Image</h2>
-          <CldImage
-            src="emsculpt/hero-image"
+          <CldImage src="emsculpt/hero-image"
             width={600}
             height={400}
             alt="Responsive Emsculpt Hero"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <p className="mt-2 text-sm text-gray-600">Responsive image with sizes attribute</p>
         </div>
         
         {/* Transformed Image Test */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">3. Transformed Image</h2>
-          <CldImage
-            src="services/medical-spa/skin-lasers/hero"
+          <CldImage src="services/medical-spa/skin-lasers/hero"
             width={400}
             height={300}
             alt="Skin Lasers Hero with Transformations"
@@ -51,7 +56,11 @@ export default function CloudinaryTestPage() {
             gravity="auto"
             quality="auto"
             format="auto"
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <p className="mt-2 text-sm text-gray-600">With transformations (crop, gravity, quality)</p>
         </div>
         

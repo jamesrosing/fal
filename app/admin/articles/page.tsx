@@ -2,8 +2,8 @@
 
 import { ArticleManager } from '@/components/ArticleManager';
 import { Toaster } from '@/components/ui/toaster';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 /**

@@ -33,8 +33,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage'
+import CldVideo from '@/components/media/CldVideo'
 
 
 export default function TeamPage() {

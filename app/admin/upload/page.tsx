@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Trash } from "lucide-react"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/image-config"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 interface UploadedImage {

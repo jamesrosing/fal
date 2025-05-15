@@ -4,8 +4,8 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { Star } from "lucide-react"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 const reviews = [
@@ -43,7 +43,11 @@ export default function ReviewsPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <CldImage publicId="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill />
+          <CldImage publicId="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

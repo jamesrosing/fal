@@ -58,8 +58,7 @@ export default function MediaRenderer({
   // Render image
   if (mediaType === 'image') {
     return (
-      <CldImage
-        publicId={publicId}
+      <CldImage src={publicId}
         alt={alt}
         width={width}
         height={height}
@@ -68,15 +67,18 @@ export default function MediaRenderer({
         sizes={sizes}
         quality={quality}
         {...options}
-      />
+      / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
     );
   }
   
   // Render video
   if (mediaType === 'video') {
     return (
-      <CldVideo
-        publicId={publicId}
+      <CldVideo src={publicId}
         width={width}
         height={height}
         className={className}
@@ -86,7 +88,11 @@ export default function MediaRenderer({
         controls={controls}
         alt={alt}
         {...options}
-      />
+      / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
     );
   }
   

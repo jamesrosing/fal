@@ -8,8 +8,8 @@ import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { CloudinaryImage } from '@/components/CloudinaryImage'
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -165,7 +165,11 @@ export default function PlasticSurgery() {
             <div className="flex flex-col md:flex-row gap-12 items-center">
               <div className="w-full md:w-1/3">
                 <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md">
-                  <CldImage publicId="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill />
+                  <CldImage publicId="team/dr-james-rosing-portrait.jpg" alt="Dr. James Rosing"    fill / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
                 </div>
               </div>
               <div className="w-full md:w-2/3">

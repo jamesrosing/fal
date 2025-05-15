@@ -17,8 +17,8 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { uploadToCloudinary } from '@/lib/cloudinary';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 interface RichTextEditorProps {

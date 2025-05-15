@@ -82,8 +82,7 @@ export function CldImageWrapper({
   }
 
   return (
-    <CldImage
-      src={publicId}
+    <CldImage src={publicId}
       alt={alt}
       width={finalWidth || 800}
       height={finalHeight || 600}
@@ -93,7 +92,11 @@ export function CldImageWrapper({
       loading={priority ? 'eager' : 'lazy'}
       priority={priority}
       className={`${className} ${expandOnHover ? 'transition-transform hover:scale-105' : ''}`}
-      onError={() => setError(true)}
+      onError={() = config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}> setError(true)}
     />
   );
 }

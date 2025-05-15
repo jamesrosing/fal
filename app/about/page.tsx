@@ -6,8 +6,8 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useMediaAsset, MediaHookResult } from '@/hooks/useMedia'
 import { useIsMobile } from "@/hooks/use-mobile"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 // Define types for better type safety
@@ -314,7 +314,11 @@ export default function AboutPage() {
                 <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-lg">
                   {/* Special case for operating room - use the panoramic image shared by user */}
                   {facility.title === "State-of-the-Art Operating Rooms" ? (
-                    <CldImage publicId="operating_room.jpg" alt=""    fill />
+                    <CldImage publicId="operating_room.jpg" alt=""    fill / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
                   ) : (
                     <>
                       {facilityMediaHooks[facility.mediaKey]?.url && (

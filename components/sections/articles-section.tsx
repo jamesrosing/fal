@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { CldImage } from "next-cloudinary"
+import CldImage from '@/components/media/CldImage'
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Article } from "@/lib/types"
@@ -71,6 +71,11 @@ export default function ArticlesSection() {
             sizes="100vw"
             crop="fill"
             priority
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
           />
           {/* Subtle overlay for readability */}
           <div className="absolute inset-0 bg-black/20" />

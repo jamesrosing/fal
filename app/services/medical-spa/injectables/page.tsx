@@ -4,8 +4,8 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -65,7 +65,11 @@ export default function InjectablesPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <CldImage publicId="medical-spa/injectables-hero.jpg" alt="Injectable Treatments"   priority fill />
+          <CldImage publicId="medical-spa/injectables-hero.jpg" alt="Injectable Treatments"   priority fill / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

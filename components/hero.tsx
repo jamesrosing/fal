@@ -21,8 +21,7 @@ export function Hero() {
     <section className="relative h-screen w-full overflow-hidden" aria-label="Hero Section">
       {/* Background Video */}
       <div className="absolute inset-0 bg-black">
-        <CldVideo
-          publicId={videoPublicId}
+        <CldVideo src={videoPublicId}
           autoplay={true}
           loop={true}
           muted={true}
@@ -31,7 +30,11 @@ export function Hero() {
           width={1920}
           height={1080}
           showLoading={false}
-        />
+        / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
         <div className="absolute inset-0 bg-black/30" />
       </div>
 
@@ -149,15 +152,18 @@ export function PageHero({
             className="absolute inset-0 w-full h-full object-cover" 
           />
         ) : publicId ? (
-          <CldImage
-            publicId={publicId}
+          <CldImage src={publicId}
             alt={image.alt}
             width={1920}
             height={1080} 
             className="absolute inset-0 w-full h-full object-cover"
             priority
             sizes="100vw"
-          />
+          / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
         ) : (
           // Fallback image when no publicId is available
           <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">

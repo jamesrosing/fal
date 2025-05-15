@@ -1,22 +1,96 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
 // GET all team members
 export async function GET() {
+  console.log('GET /api/team: Starting request')
+  
   try {
-    const { data: teamMembers, error } = await createClient()
+    // Create the client without using the utility function
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    
+    console.log('GET /api/team: Supabase client created')
+    
+    // Check if we can connect to Supabase
+    const { data: health, error: healthError } = await supabase.from('team_members').select('count(*)')
+    
+    if (healthError) {
+      console.error('GET /api/team: Health check failed:', healthError)
+      return NextResponse.json(
+        { error: `Database connection error: ${healthError.message}` },
+        { status: 500 }
+      )
+    }
+    
+    console.log('GET /api/team: Health check successful:', health)
+    
+    // Fetch the actual data
+    const { data: teamMembers, error } = await supabase
       .from('team_members')
       .select('*')
       .order('order', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('GET /api/team: Failed to fetch team members:', error)
+      throw error
+    }
+
+    console.log(`GET /api/team: Successfully fetched ${teamMembers?.length || 0} team members`)
+    
+    // Return sample data if there are no team members
+    if (!teamMembers || teamMembers.length === 0) {
+      console.log('GET /api/team: No team members found, returning sample data')
+      
+      const sampleData = [
+        {
+          id: '1',
+          name: 'Dr. Jane Smith',
+          title: 'MD, FACS',
+          role: 'Plastic Surgeon',
+          description: 'Board-certified plastic surgeon with over 15 years of experience.',
+          order: 1,
+          is_provider: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          image_url: 'https://placehold.co/600x800?text=Dr.+Jane+Smith'
+        },
+        {
+          id: '2',
+          name: 'Dr. Michael Johnson',
+          title: 'MD',
+          role: 'Dermatologist',
+          description: 'Specializing in medical and cosmetic dermatology.',
+          order: 2,
+          is_provider: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          image_url: 'https://placehold.co/600x800?text=Dr.+Michael+Johnson'
+        },
+        {
+          id: '3',
+          name: 'Sarah Thompson',
+          role: 'Patient Coordinator',
+          description: 'Helping patients navigate their aesthetic journey.',
+          order: 3,
+          is_provider: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          image_url: 'https://placehold.co/600x800?text=Sarah+Thompson'
+        }
+      ]
+      
+      return NextResponse.json(sampleData)
+    }
 
     return NextResponse.json(teamMembers)
   } catch (error) {
-    console.error('Error fetching team members:', error)
+    console.error('GET /api/team: Error fetching team members:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch team members' },
+      { error: error instanceof Error ? error.message : 'Failed to fetch team members' },
       { status: 500 }
     )
   }
@@ -31,7 +105,10 @@ export async function POST(request: Request) {
     let result
     if (id) {
       // Update existing team member
-      const { data, error } = await createClient()
+      const { data, error } = await createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
         .from('team_members')
         .update(teamMemberData)
         .eq('id', id)
@@ -42,7 +119,10 @@ export async function POST(request: Request) {
       result = data
     } else {
       // Create new team member
-      const { data, error } = await createClient()
+      const { data, error } = await createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
         .from('team_members')
         .insert(teamMemberData)
         .select()
@@ -93,7 +173,10 @@ export async function PATCH(request: Request) {
     console.log('Starting team member update process:', { id, updates })
 
     // First, try to get all team members to verify connection
-    const { data: allMembers, error: listError } = await createClient()
+    const { data: allMembers, error: listError } = await createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
       .from('team_members')
       .select('id, name, image_url')
 
@@ -112,7 +195,10 @@ export async function PATCH(request: Request) {
     })))
 
     // Check if member exists
-    const { data: existingMember, error: checkError } = await createClient()
+    const { data: existingMember, error: checkError } = await createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
       .from('team_members')
       .select('*')
       .eq('id', id)
@@ -136,7 +222,10 @@ export async function PATCH(request: Request) {
     console.log('Found existing member:', existingMember[0])
 
     // Perform the update
-    const { error: updateError } = await createClient()
+    const { error: updateError } = await createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
       .from('team_members')
       .update({
         ...updates,
@@ -153,7 +242,10 @@ export async function PATCH(request: Request) {
     }
 
     // Fetch the updated record
-    const { data: updatedMember, error: getError } = await createClient()
+    const { data: updatedMember, error: getError } = await createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
       .from('team_members')
       .select('*')
       .eq('id', id)
@@ -200,7 +292,10 @@ export async function DELETE(request: Request) {
       )
     }
 
-    const { error } = await createClient()
+    const { error } = await createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
       .from('team_members')
       .delete()
       .eq('id', id)

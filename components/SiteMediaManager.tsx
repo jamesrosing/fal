@@ -271,7 +271,7 @@ export function SiteMediaManager({ initialActivePageId }: SiteMediaManagerProps)
                         <div className="p-4">
                           {placeholder.publicId ? (
                             <div className="relative">
-                              <CldImage publicId={placeholder.publicId}
+                              <CldImage src={placeholder.publicId}
                                 alt={placeholder.name}
                                 options={{
                                   width: placeholder.dimensions.width,
@@ -279,7 +279,11 @@ export function SiteMediaManager({ initialActivePageId }: SiteMediaManagerProps)
                                   crop: 'fill'
                                 }}
                                 className="w-full rounded-md"
-                              />
+                              / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
                               <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/60 rounded-md">
                                 <CloudinaryUploader
                                   area={placeholder.area}

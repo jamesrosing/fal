@@ -55,8 +55,7 @@ export default function MediaAdapter({
   if (publicId) {
     if (mediaType === 'video') {
       return (
-        <CldVideo
-          publicId={publicId}
+        <CldVideo src={publicId}
           width={width}
           height={height}
           className={className}
@@ -66,13 +65,16 @@ export default function MediaAdapter({
           controls={controls}
           alt={alt}
           {...options}
-        />
+        / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
       );
     }
     
     return (
-      <CldImage
-        publicId={publicId}
+      <CldImage src={publicId}
         alt={alt}
         width={width}
         height={height}
@@ -80,7 +82,11 @@ export default function MediaAdapter({
         className={className}
         sizes={sizes}
         {...options}
-      />
+      / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
     );
   }
   

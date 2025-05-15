@@ -11,8 +11,8 @@ import { Copy, Upload } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import { useMediaAsset } from "@/hooks/useMedia"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage'
+import CldVideo from '@/components/media/CldVideo'
 
 
 function TeamMemberCard({ member, isPhysician = false }: { 
@@ -118,9 +118,9 @@ export default function Team() {
         
         const data = await response.json()
         
-        // Split into providers and staff
-        setProviders(data.filter((member: TeamMember) => member.is_provider))
-        setStaff(data.filter((member: TeamMember) => !member.is_provider))
+        // Split into providers and staff based on the string value 'true'/'false'
+        setProviders(data.filter((member: TeamMember) => member.is_provider === 'true'))
+        setStaff(data.filter((member: TeamMember) => member.is_provider === 'false'))
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load team members')
       } finally {

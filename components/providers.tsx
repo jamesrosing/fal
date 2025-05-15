@@ -2,8 +2,8 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { ThemeProvider } from "@/providers/theme-provider"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 export function Providers({ children }: { children: React.ReactNode }) {

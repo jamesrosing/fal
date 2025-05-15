@@ -348,18 +348,25 @@ export function CloudinaryMedia({
   
   if (detectedType === 'video') {
     return (
-      <CldVideo 
-        publicId={cloudinaryId} 
+      <CldVideo src={cloudinaryId} 
         autoPlay={autoPlay} 
         loop={loop} 
         muted={muted} 
         controls={controls} 
         {...props} 
-      />
+      / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
     );
   }
   
-  return <CldImage publicId={cloudinaryId} alt={alt || id} {...props} />;
+  return <CldImage src={cloudinaryId} alt={alt || id} {...props} / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>;
 }
 
 // Default export

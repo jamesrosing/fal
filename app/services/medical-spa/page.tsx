@@ -7,9 +7,8 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -95,9 +94,16 @@ export default function MedicalSpa() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <CloudinaryImage
-            publicId="services-medical-spa/hero/medical-spa-hero"
-            alt="Medical Spa at Allure MD"
+          <CldImage 
+            src="services/medical-spa/medical-spa-hero" 
+            alt="Medical Spa at Allure MD" 
+            priority 
+            fill 
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>

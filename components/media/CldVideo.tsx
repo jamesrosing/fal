@@ -37,12 +37,15 @@ interface CldEnhancedVideoProps {
  * - Supports responsive videos
  * 
  * @example
- * <CldVideo
- *   publicId="folder/video-name"
+ * <CldVideo *   publicId="folder/video-name"
  *   width={1200}
  *   height={675}
  *   controls
- * />
+ * / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
  */
 export default function CldVideo({
   publicId,

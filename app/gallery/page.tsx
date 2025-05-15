@@ -60,15 +60,18 @@ export default function GalleryPage() {
       <NavBar />
       {/* Hero Section */}
       <div className="relative h-[70vh] w-full">
-        <CldImage 
-          publicId="/images/gallery/hero.jpg" 
+        <CldImage publicId="/images/gallery/hero.jpg" 
           alt="Gallery Hero" 
           priority 
           width={1920}
           height={1080}
           crop="fill"
           className="w-full h-full object-cover"
-        />
+        / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
         <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="container mx-auto max-w-6xl">

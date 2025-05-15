@@ -7,8 +7,8 @@ import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -87,7 +87,17 @@ export default function FunctionalMedicine() {
       {/* Hero Section */}
       <section className="relative h-screen">
         <div className="absolute inset-0">
-          <CldImage publicId="articles/categories/functional-medicine-hero.png" alt="Functional Medicine at Allure MD"   priority fill />
+          <CldImage 
+            src="services/functional-medicine/functional-medicine-hero" 
+            alt="Functional Medicine at Allure MD" 
+            priority 
+            fill 
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

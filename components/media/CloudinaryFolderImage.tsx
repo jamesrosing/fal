@@ -69,8 +69,7 @@ export default function CloudinaryFolderImage({
   }, [publicId]);
   
   return (
-    <CldImage
-      publicId={publicId}
+    <CldImage src={publicId}
       alt={alt}
       width={width}
       height={height}
@@ -82,6 +81,10 @@ export default function CloudinaryFolderImage({
       priority={priority}
       fallbackSrc={fallback}
       showLoading={true}
-    />
+    / config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}>
   );
 } 

@@ -7,8 +7,8 @@ import { handleMediaUpload } from '@/app/admin/media/actions';
 import { CloudinaryUploader } from '@/components/CloudinaryUploader';
 import { CldImage } from 'next-cloudinary';
 import { Image as ImageIcon } from 'lucide-react';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 // Upload preset is only used as a fallback if needed
@@ -185,13 +185,16 @@ export default function VisualMediaManager() {
     // Default to image rendering
     return position.currentImage ? (
       <div className="relative w-full aspect-video bg-gray-100 rounded-md overflow-hidden">
-        <CldImage
-          src={position.currentImage}
+        <CldImage src={position.currentImage}
           width={320}
           height={180}
           className="w-full h-full object-cover"
           alt={position.name}
-          onError={(e) => {
+          onError={(e) = config={{
+          cloud: {
+            cloudName: 'dyrzyfg3w'
+          }
+        }}> {
             console.warn(`Failed to load image: ${position.currentImage}`);
             // Replace with fallback image or placeholder
             const target = e.target as HTMLImageElement;

@@ -6,8 +6,8 @@ import {
   CloudinaryAsset 
 } from '@/lib/cloudinary';
 import { toast } from '@/components/ui/use-toast';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 

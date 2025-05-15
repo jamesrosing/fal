@@ -9,8 +9,8 @@ import { ArrowLeft, Plus, ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getCasesByAlbum, getAlbumsByGallery } from '@/lib/supabase';
-import { CldImage } from '../components/media/CldImage';
-import { CldVideo } from '../components/media/CldVideo';
+import CldImage from '@/components/media/CldImage';
+import CldVideo from '@/components/media/CldVideo';
 
 
 interface Album {
