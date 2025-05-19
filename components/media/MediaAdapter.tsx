@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import CldImage from './CldImage';
 import CldVideo from './CldVideo';
 import Image from 'next/image';
@@ -32,6 +32,8 @@ interface MediaAdapterProps {
  * - Cloudinary public IDs via CldImage/CldVideo
  * - Regular image URLs via Next Image
  * - Video files via HTML video element
+ * 
+ * Property conflicts are properly handled (e.g., fill vs width/height)
  */
 export default function MediaAdapter({
   src,
@@ -51,42 +53,50 @@ export default function MediaAdapter({
   controls = false,
   options = {}
 }: MediaAdapterProps) {
+  // Enhanced cloudinary configuration
+  const cloudinaryConfig = useMemo(() => ({
+    cloud: { cloudName: 'dyrzyfg3w' }
+  }), []);
+  
+  // Determine if we should use width/height props based on fill value
+  const dimensionProps = useMemo(() => {
+    if (fill) {
+      return {}; // Don't use width/height when fill is true
+    }
+    return { width, height };
+  }, [fill, width, height]);
+  
   // If publicId is provided, use Cloudinary components
   if (publicId) {
     if (mediaType === 'video') {
       return (
-        <CldVideo src={publicId}
-          width={width}
-          height={height}
+        <CldVideo 
+          publicId={publicId}
+          {...dimensionProps}
           className={className}
           autoPlay={autoPlay}
           muted={muted}
           loop={loop}
           controls={controls}
-          alt={alt}
+          fill={fill}
+          config={cloudinaryConfig}
           {...options}
-        / config={{
-          cloud: {
-            cloudName: 'dyrzyfg3w'
-          }
-        }}>
+        />
       );
     }
     
     return (
-      <CldImage src={publicId}
+      <CldImage 
+        src={publicId}
         alt={alt}
-        width={width}
-        height={height}
+        {...dimensionProps}
         priority={priority}
         className={className}
         sizes={sizes}
+        fill={fill}
+        config={cloudinaryConfig}
         {...options}
-      / config={{
-          cloud: {
-            cloudName: 'dyrzyfg3w'
-          }
-        }}>
+      />
     );
   }
   
@@ -96,13 +106,13 @@ export default function MediaAdapter({
       return (
         <video
           src={src}
-          width={width}
-          height={height}
+          {...(!fill ? { width, height } : {})}
           className={className}
           autoPlay={autoPlay}
           muted={muted}
           loop={loop}
           controls={controls}
+          style={fill ? { width: '100%', height: '100%', objectFit: 'cover' } : undefined}
         />
       );
     }

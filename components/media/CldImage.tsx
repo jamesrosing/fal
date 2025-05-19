@@ -1,7 +1,7 @@
 'use client';
 
 import { CldImage as NextCloudinaryImage } from 'next-cloudinary';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CldEnhancedImageProps {
@@ -33,6 +33,7 @@ interface CldEnhancedImageProps {
  * - Handles loading and error states
  * - Supports responsive images
  * - Provides fallback for missing images
+ * - Correctly handles fill vs width/height property conflicts
  * 
  * @example
  * <CldImage
@@ -64,9 +65,28 @@ export default function CldImage({
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // If fill is true, width and height should not be passed to NextCloudinaryImage
   // Set default width and height only if fill is false
-  const imgWidth = !fill ? (width || 800) : undefined;
-  const imgHeight = !fill ? (height || 600) : undefined;
+  const imgWidth = useMemo(() => {
+    return !fill ? (width || 800) : undefined;
+  }, [fill, width]);
+  
+  const imgHeight = useMemo(() => {
+    return !fill ? (height || 600) : undefined;
+  }, [fill, height]);
+
+  // For development warning about conflicting props
+  useMemo(() => {
+    if (process.env.NODE_ENV === 'development' && fill && (width || height)) {
+      console.warn(
+        `Warning: Both 'fill' and 'width/height' props provided to CldImage for src="${src}". ` +
+        `When 'fill' is used, 'width' and 'height' are ignored. Using 'fill=${fill}'.`
+      );
+    }
+  }, [fill, width, height, src]);
+
+  // Memoized image config
+  const imageConfig = useMemo(() => config, [JSON.stringify(config)]);
 
   // Memoized error handler
   const handleError = useCallback((e: any) => {
@@ -82,13 +102,28 @@ export default function CldImage({
     setLoading(false);
   }, []);
 
+  // Memoize aspect ratio calculation for skeleton
+  const aspectRatio = useMemo(() => {
+    if (!fill && imgWidth && imgHeight) {
+      return imgWidth / imgHeight;
+    }
+    return undefined;
+  }, [fill, imgWidth, imgHeight]);
+
+  // Memoize skeleton style
+  const skeletonStyle = useMemo(() => ({
+    width: fill ? '100%' : (imgWidth ? `${imgWidth}px` : '100%'), 
+    height: fill ? '100%' : (imgHeight ? `${imgHeight}px` : 'auto'), 
+    aspectRatio
+  }), [fill, imgWidth, imgHeight, aspectRatio]);
+
   // Handle error state
   if (error) {
     if (!fallbackSrc) {
       return null;
     }
     
-    // For fallbacks that aren't Cloudinary images, use src directly
+    // For fallbacks that aren't Cloudinary images, use img directly
     return (
       <img 
         src={fallbackSrc}
@@ -98,6 +133,7 @@ export default function CldImage({
         className={className}
         style={{
           objectFit: crop === 'fill' ? 'cover' : 'contain',
+          ...(fill ? { width: '100%', height: '100%', objectFit: 'cover' } : {})
         }}
         {...props}
       />
@@ -109,11 +145,7 @@ export default function CldImage({
       {loading && showLoading && (
         <Skeleton 
           className={`rounded overflow-hidden ${className}`}
-          style={{ 
-            width: fill ? '100%' : (imgWidth || '100%'), 
-            height: fill ? '100%' : (imgHeight || 'auto'), 
-            aspectRatio: (!fill && imgWidth && imgHeight) ? imgWidth / imgHeight : undefined 
-          }}
+          style={skeletonStyle}
         />
       )}
       <NextCloudinaryImage
@@ -122,14 +154,14 @@ export default function CldImage({
         width={imgWidth}
         height={imgHeight}
         sizes={sizes}
-        className={`${className} ${loading ? 'hidden' : ''}`}
+        className={`${className} ${loading ? 'invisible' : 'visible'}`}
         onError={handleError}
         onLoad={handleLoad}
         crop={crop}
         gravity={gravity}
         quality={quality}
         format="auto"
-        config={config}
+        config={imageConfig}
         fill={fill}
         {...props}
       />

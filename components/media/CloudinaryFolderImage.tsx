@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CldImage from './CldImage';
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,6 +20,7 @@ interface FolderImageProps {
   crop?: 'fill' | 'scale' | 'fit' | 'pad' | 'thumb' | 'crop';
   gravity?: 'auto' | 'face' | 'center' | 'north' | 'south' | 'east' | 'west';
   fallback?: string;
+  fill?: boolean;
 }
 
 /**
@@ -43,6 +44,13 @@ interface FolderImageProps {
  *   height={1080}
  *   priority
  * />
+ * 
+ * // Render a fill image that takes up 100% of its container
+ * <CloudinaryFolderImage
+ *   folder="pages/home/background"
+ *   alt="Background Image"
+ *   fill
+ * />
  */
 export default function CloudinaryFolderImage({
   folder,
@@ -56,24 +64,42 @@ export default function CloudinaryFolderImage({
   quality = 'auto',
   crop = 'fill',
   gravity = 'auto',
-  fallback = '/images/global/placeholder-image.jpg'
+  fallback = '/images/global/placeholder-image.jpg',
+  fill = false
 }: FolderImageProps) {
   // Format the public ID correctly (with folder path)
-  const publicId = imageName
-    ? `${CLOUDINARY_FOLDER}/${folder}/${imageName}`
-    : `${CLOUDINARY_FOLDER}/${folder}`;
+  const publicId = useMemo(() => {
+    return imageName
+      ? `${CLOUDINARY_FOLDER}/${folder}/${imageName}`
+      : `${CLOUDINARY_FOLDER}/${folder}`;
+  }, [folder, imageName]);
   
-  // Log the public ID for debugging
+  // Memoize cloudinary config
+  const cloudinaryConfig = useMemo(() => ({
+    cloud: { cloudName: 'dyrzyfg3w' }
+  }), []);
+  
+  // Determine dimension props based on fill
+  const dimensionProps = useMemo(() => {
+    if (fill) {
+      // When using fill, don't pass width/height
+      return {};
+    }
+    return { width, height };
+  }, [fill, width, height]);
+  
+  // Log the public ID for debugging only in development
   useEffect(() => {
-    console.log(`Rendering Cloudinary image: ${publicId}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Rendering Cloudinary image: ${publicId}`);
+    }
   }, [publicId]);
   
   return (
     <CldImage 
       src={publicId}
       alt={alt}
-      width={width}
-      height={height}
+      {...dimensionProps}
       sizes={sizes}
       className={className}
       crop={crop}
@@ -82,11 +108,8 @@ export default function CloudinaryFolderImage({
       priority={priority}
       fallbackSrc={fallback}
       showLoading={true}
-      config={{
-        cloud: {
-          cloudName: 'dyrzyfg3w'
-        }
-      }}
+      fill={fill}
+      config={cloudinaryConfig}
     />
   );
 } 

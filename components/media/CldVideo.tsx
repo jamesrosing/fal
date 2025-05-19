@@ -2,7 +2,7 @@
 
 import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CldEnhancedVideoProps {
@@ -70,9 +70,20 @@ export default function CldVideo({
   const videoWidth = !fill ? (width || 800) : undefined;
   const videoHeight = !fill ? (height || 450) : undefined;
 
-  const shouldAutoplay = autoPlay !== undefined ? autoPlay : autoplay;
+  // Memoize this value to prevent re-renders
+  const shouldAutoplay = useMemo(() => 
+    autoPlay !== undefined ? autoPlay : autoplay
+  , [autoPlay, autoplay]);
 
-  const formattedPublicId = publicId.startsWith('/') ? publicId.substring(1) : publicId;
+  // Memoize the formatted publicId to prevent re-renders
+  const formattedPublicId = useMemo(() => 
+    publicId.startsWith('/') ? publicId.substring(1) : publicId
+  , [publicId]);
+
+  // Create a stable videoId
+  const videoId = useMemo(() => 
+    `video-${formattedPublicId.replace(/[^a-zA-Z0-9]/g, '-')}`
+  , [formattedPublicId]);
 
   // Memoized load handler
   const handleLoad = useCallback(() => {
@@ -88,6 +99,37 @@ export default function CldVideo({
     setLoading(false);
   }, [publicId]);
 
+  // Memoize transformation object to prevent re-renders
+  const transformationObj = useMemo(() => {
+    if (transformation.length > 0) {
+      return {
+        quality: transformation[0]?.quality || "auto",
+        height: transformation[0]?.height || videoHeight,
+        width: transformation[0]?.width || videoWidth,
+        crop: transformation[0]?.crop || "fill"
+      };
+    }
+    return {
+      quality: "auto",
+      crop: "fill"
+    };
+  }, [
+    // Stringify the transformation array to create a stable dependency
+    JSON.stringify(transformation),
+    videoHeight,
+    videoWidth
+  ]);
+
+  // Memoize the width and height strings
+  const widthStr = useMemo(() => 
+    fill ? "100%" : (videoWidth ? `${videoWidth}px` : "100%")
+  , [fill, videoWidth]);
+
+  const heightStr = useMemo(() => 
+    fill ? "100%" : (videoHeight ? `${videoHeight}px` : "100%")
+  , [fill, videoHeight]);
+
+  // Handle error case
   if (error) {
     if (!fallbackSrc) {
       return null;
@@ -115,10 +157,10 @@ export default function CldVideo({
         <Skeleton className={`absolute inset-0 ${className}`} />
       )}
       <CldVideoPlayer
-        id={`video-${publicId.replace(/[^a-zA-Z0-9]/g, '-')}`}
+        id={videoId}
         src={formattedPublicId}
-        width={fill ? "100%" : (videoWidth ? `${videoWidth}px` : "100%")}
-        height={fill ? "100%" : (videoHeight ? `${videoHeight}px` : "100%")}
+        width={widthStr}
+        height={heightStr}
         autoplay={shouldAutoplay}
         loop={loop}
         muted={muted}
@@ -126,15 +168,7 @@ export default function CldVideo({
         className={`${className} ${loading ? 'invisible' : 'visible'}`}
         onPlay={handleLoad}
         onError={handleError}
-        transformation={transformation.length > 0 ? {
-          quality: transformation[0]?.quality || "auto",
-          height: transformation[0]?.height || videoHeight,
-          width: transformation[0]?.width || videoWidth,
-          crop: transformation[0]?.crop || "fill"
-        } : {
-          quality: "auto",
-          crop: "fill"
-        }}
+        transformation={transformationObj}
         {...props}
       />
     </div>
