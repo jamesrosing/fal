@@ -17,8 +17,8 @@ const sampleTeamMembers = [
     title: 'MD, FACS',
     role: 'Plastic Surgeon',
     description: 'Board-certified plastic surgeon with over 15 years of experience.',
-    order: '1',
-    is_provider: 'true',
+    order: 1,
+    is_provider: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     image_url: 'https://placehold.co/600x800?text=Dr.+Jane+Smith'
@@ -29,8 +29,8 @@ const sampleTeamMembers = [
     title: 'MD',
     role: 'Dermatologist',
     description: 'Specializing in medical and cosmetic dermatology.',
-    order: '2',
-    is_provider: 'true',
+    order: 2,
+    is_provider: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     image_url: 'https://placehold.co/600x800?text=Dr.+Michael+Johnson'
@@ -40,8 +40,8 @@ const sampleTeamMembers = [
     name: 'Sarah Thompson',
     role: 'Patient Coordinator',
     description: 'Helping patients navigate their aesthetic journey.',
-    order: '3',
-    is_provider: 'false',
+    order: 3,
+    is_provider: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     image_url: 'https://placehold.co/600x800?text=Sarah+Thompson'
@@ -78,7 +78,14 @@ export async function GET() {
       return NextResponse.json(sampleTeamMembers)
     }
 
-    return NextResponse.json(data)
+    // Convert types to match TeamMember interface
+    const formattedData = data.map(member => ({
+      ...member,
+      order: typeof member.order === 'string' ? parseInt(member.order, 10) : member.order,
+      is_provider: member.is_provider === 'true' || member.is_provider === true
+    }))
+
+    return NextResponse.json(formattedData)
   } catch (error) {
     console.error('GET /api/team: Error fetching team members:', error)
     console.log('GET /api/team: Returning sample data due to error')

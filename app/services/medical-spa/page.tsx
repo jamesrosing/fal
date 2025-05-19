@@ -92,13 +92,16 @@ export default function MedicalSpa() {
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative h-screen">
-        <div className="absolute inset-0">
+      <section className="relative pt-20">
+        {/* Container with reduced height (40vh) */}
+        <div className="relative w-full h-[40vh] md:h-[40vh] lg:h-[40vh]">
           <CldImage 
             src="services/medical-spa/medical-spa-hero" 
             alt="Medical Spa at Allure MD" 
             priority 
             fill 
+            className="object-cover"
+            sizes="100vw"
             config={{
               cloud: {
                 cloudName: 'dyrzyfg3w'
@@ -108,33 +111,32 @@ export default function MedicalSpa() {
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="max-w-3xl text-white"
-            >
-              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                Medical Spa
-              </h1>
-              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Luxury meets advanced aesthetics
-              </h2>
-              <div className="space-y-6 text-lg font-cerebri font-light">
-                <p>
-                  Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD&apos;s Medical Spa.
-                  Our expert team delivers personalized care using the latest technologies and techniques.
-                </p>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
-                </div>
+        {/* Content positioned below hero image on mobile, overlaying on desktop */}
+        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl text-white"
+          >
+            <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+              Medical Spa
+            </h1>
+            <h2 className="mb-6 text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-tight font-serif">
+              Luxury meets advanced aesthetics
+            </h2>
+            <div className="space-y-4 text-base lg:text-lg font-cerebri font-light">
+              <p>
+                Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD&apos;s Medical Spa.
+                Our expert team delivers personalized care using the latest technologies and techniques.
+              </p>
+              <div className="space-y-4 pt-2">
+                <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

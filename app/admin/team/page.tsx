@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { TeamMemberImageUpload } from "@/components/team-member-image-upload"
+import { CldUploadWidgetWrapper } from "@/components/media/CldUploadWidget"
 import { TeamMember } from "@/lib/supabase"
 import { Plus, Edit, Trash } from "lucide-react"
 import {
@@ -43,12 +43,13 @@ export default function TeamPage() {
   const [error, setError] = useState<string | null>(null)
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({
-    name: "",
-    title: "",
-    role: "",
-    description: "",
+    name: '',
+    title: '',
+    role: '',
+    description: '',
+    image_url: '',
     order: 0,
-    is_provider: false,
+    is_provider: false
   })
 
   useEffect(() => {
@@ -56,13 +57,25 @@ export default function TeamPage() {
   }, [])
 
   const fetchTeamMembers = async () => {
+    setLoading(true)
     try {
       const response = await fetch('/api/team')
-      if (!response.ok) throw new Error('Failed to fetch team members')
+      if (!response.ok) {
+        throw new Error('Failed to fetch team members')
+      }
       const data = await response.json()
-      setTeamMembers(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load team members')
+      
+      // Transform API data to ensure correct types
+      const transformedData = data.map((member: any) => ({
+        ...member,
+        order: typeof member.order === 'string' ? parseInt(member.order, 10) : member.order,
+        is_provider: member.is_provider === 'true' || member.is_provider === true
+      }))
+      
+      setTeamMembers(transformedData)
+    } catch (error) {
+      console.error('Error fetching team members:', error)
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -86,6 +99,7 @@ export default function TeamPage() {
         title: "",
         role: "",
         description: "",
+        image_url: "",
         order: 0,
         is_provider: false,
       })
@@ -231,7 +245,7 @@ export default function TeamPage() {
                 <Card key={member.id}>
                   <CardHeader>
                     <CardTitle>{member.name}</CardTitle>
-                    <CardDescription>{member.role}</CardDescription>
+                    <CardDescription>{member.role || ''}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {member.image_url ? (
@@ -247,9 +261,22 @@ export default function TeamPage() {
                         <p className="text-muted-foreground">No image</p>
                       </div>
                     )}
-                    <TeamMemberImageUpload
-                      teamMember={member}
-                      onUploadComplete={handleImageUploaded}
+                    <CldUploadWidgetWrapper
+                      onUpload={(result) => {
+                        const updatedMember = {
+                          ...member,
+                          image_url: result.secure_url
+                        };
+                        handleUpdateMember(updatedMember);
+                        handleImageUploaded(updatedMember);
+                      }}
+                      buttonText="Upload Image"
+                      variant="outline"
+                      className="w-full"
+                      options={{
+                        folder: `team/headshots/`,
+                        tags: [`team`, `headshot`, member.name.toLowerCase().replace(/\s+/g, '-')]
+                      }}
                     />
                   </CardContent>
                   <CardFooter className="flex justify-between">
@@ -270,15 +297,21 @@ export default function TeamPage() {
                             <Input
                               id="edit-name"
                               value={editingMember?.name || member.name}
-                              onChange={(e) => setEditingMember(prev => ({ ...prev!, name: e.target.value }))}
+                              onChange={(e) => setEditingMember({
+                                ...(editingMember || member),
+                                name: e.target.value
+                              })}
                             />
                           </div>
                           <div>
                             <Label htmlFor="edit-title">Title</Label>
                             <Input
                               id="edit-title"
-                              value={editingMember?.title || member.title}
-                              onChange={(e) => setEditingMember(prev => ({ ...prev!, title: e.target.value }))}
+                              value={editingMember?.title || member.title || ''}
+                              onChange={(e) => setEditingMember({
+                                ...(editingMember || member),
+                                title: e.target.value || null
+                              })}
                             />
                           </div>
                           <div>
@@ -286,7 +319,10 @@ export default function TeamPage() {
                             <Input
                               id="edit-role"
                               value={editingMember?.role || member.role}
-                              onChange={(e) => setEditingMember(prev => ({ ...prev!, role: e.target.value }))}
+                              onChange={(e) => setEditingMember({
+                                ...(editingMember || member),
+                                role: e.target.value
+                              })}
                             />
                           </div>
                           <div>
@@ -294,7 +330,10 @@ export default function TeamPage() {
                             <Input
                               id="edit-description"
                               value={editingMember?.description || member.description}
-                              onChange={(e) => setEditingMember(prev => ({ ...prev!, description: e.target.value }))}
+                              onChange={(e) => setEditingMember({
+                                ...(editingMember || member),
+                                description: e.target.value
+                              })}
                             />
                           </div>
                           <div>
@@ -302,15 +341,21 @@ export default function TeamPage() {
                             <Input
                               id="edit-order"
                               type="number"
-                              value={editingMember?.order || member.order}
-                              onChange={(e) => setEditingMember(prev => ({ ...prev!, order: parseInt(e.target.value) || 0 }))}
+                              value={editingMember?.order ?? member.order}
+                              onChange={(e) => setEditingMember({
+                                ...(editingMember || member),
+                                order: parseInt(e.target.value) || 0
+                              })}
                             />
                           </div>
                           <div className="flex items-center space-x-2">
                             <Switch
                               id="edit-is_provider"
-                              checked={editingMember?.is_provider || member.is_provider}
-                              onCheckedChange={(checked) => setEditingMember(prev => ({ ...prev!, is_provider: checked }))}
+                              checked={editingMember?.is_provider ?? member.is_provider}
+                              onCheckedChange={(checked) => setEditingMember({
+                                ...(editingMember || member),
+                                is_provider: checked
+                              })}
                             />
                             <Label htmlFor="edit-is_provider">Is Provider</Label>
                           </div>

@@ -96,8 +96,8 @@ export type TeamMember = {
   role: string;
   image_url: string;
   description: string;
-  order: string;
-  is_provider: string;
+  order: number;
+  is_provider: boolean;
   created_at: string;
   updated_at: string;
 };

@@ -60,10 +60,8 @@ function shouldRedirectPath(pathname: string, search: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
-  // In Next.js 15, nextUrl itself is not a Promise, only its components might be
-  const pathname = request.nextUrl.pathname;
-  const search = request.nextUrl.search;
-  
+  const { pathname } = request.nextUrl
+
   // Create a response
   const response = NextResponse.next();
   
@@ -97,10 +95,14 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
   
-  // Check if route requires authentication (admin routes)
+  // Check if path requires authentication (admin routes)
   if (PROTECTED_ADMIN_ROUTES.some(route => pathname.startsWith(route))) {
+    // Log to help debug redirects
+    console.log('Admin route detected:', pathname);
+    
     // If no session, redirect to login
     if (!session) {
+      console.log('No session, redirecting to login');
       const url = request.nextUrl.clone();
       url.pathname = '/auth/login';
       url.searchParams.set('redirect', pathname);
@@ -115,18 +117,16 @@ export async function middleware(request: NextRequest) {
         .eq('id', session.user.id)
         .single();
       
-      if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
-        // User doesn't have admin privileges
-        const url = request.nextUrl.clone();
-        url.pathname = '/';
-        return NextResponse.redirect(url);
+      console.log('User profile for admin check:', profile);
+      
+      if (!profile || profile.role !== 'admin') {
+        console.log('User is not an admin, redirecting to homepage');
+        return NextResponse.redirect(new URL('/', request.url));
       }
     } catch (error) {
-      console.error('Error checking user role:', error);
-      // On error, redirect to login for safety
-      const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
-      return NextResponse.redirect(url);
+      console.error('Error checking admin role:', error);
+      // Redirect to homepage on error
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
   
@@ -148,7 +148,7 @@ export async function middleware(request: NextRequest) {
     const isIncompletePath = INCOMPLETE_PATHS.some(path => pathname.startsWith(path));
     
     // Check if the path with query parameters should be redirected
-    const shouldRedirectQueryPath = shouldRedirectPath(pathname, search);
+    const shouldRedirectQueryPath = shouldRedirectPath(pathname, request.nextUrl.search);
     
     if (isIncompletePath || shouldRedirectQueryPath) {
       // Create a new URL for the under-construction page
@@ -158,6 +158,13 @@ export async function middleware(request: NextRequest) {
       url.search = '';
       return NextResponse.redirect(url);
     }
+  }
+  
+  // Add redirect for old plastic surgery page to new path
+  if (pathname === '/plastic-surgery') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/services/plastic-surgery';
+    return NextResponse.redirect(url);
   }
   
   return response;

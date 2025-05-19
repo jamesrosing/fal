@@ -22,7 +22,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectPath = searchParams.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,9 +47,19 @@ export default function LoginPage() {
       // Successful login
       toast.success("Logged in successfully")
       
-      // Redirect to the original destination or dashboard
-      router.push(redirectPath)
-      router.refresh()
+      // Get the redirect path from query parameters
+      const redirectPath = searchParams.get('redirect') || '/'
+      console.log("Redirecting to:", redirectPath)
+      
+      // Ensure we have the latest session before redirecting
+      await supabase.auth.getSession()
+      
+      // Add a small delay to ensure session is properly set
+      setTimeout(() => {
+        // Redirect to the original destination or dashboard
+        router.push(redirectPath)
+        router.refresh()
+      }, 500)
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in")
       console.error("Login error:", error)

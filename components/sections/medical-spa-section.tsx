@@ -22,9 +22,9 @@ export function MedicalSpaSection() {
 
   // Tab data
   const tabs: TabItem[] = [
-    { name: "Facial Treatments", link: "/medical-spa/facial-treatments" },
-    { name: "Body Contouring", link: "/medical-spa/body-contouring" },
-    { name: "Cosmetic Injections", link: "/medical-spa/cosmetic-injections" }
+    { name: "Facial Treatments", link: "/services/medical-spa/esthetician-services" },
+    { name: "Body Contouring", link: "/services/medical-spa/emsculpt" },
+    { name: "Cosmetic Injections", link: "/services/medical-spa/cosmetic-injections" }
   ];
   
   // Desktop tab navigation with absolute positioning
@@ -105,7 +105,7 @@ export function MedicalSpaSection() {
             <div className="mt-8 space-y-4">
               <LearnMoreButton href="/team">Meet Our Aestheticians</LearnMoreButton>
               <br />
-              <LearnMoreButton href="/medical-spa">Explore Medical Spa Services</LearnMoreButton>
+              <LearnMoreButton href="/services/medical-spa">Explore Medical Spa Services</LearnMoreButton>
               <br />
               <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
             </div>
@@ -158,7 +158,7 @@ export function MedicalSpaSection() {
             <div className="space-y-4">
               <LearnMoreButton href="/team">Meet Our Aestheticians</LearnMoreButton>
               <br />
-              <LearnMoreButton href="/medical-spa">Explore Medical Spa Services</LearnMoreButton>
+              <LearnMoreButton href="/services/medical-spa">Explore Medical Spa Services</LearnMoreButton>
               <br />
               <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
             </div>

@@ -6,9 +6,6 @@ import { NavBar } from "@/components/nav-bar"
 import { LearnMoreButton } from "@/components/ui/learn-more-button"
 import CldImage from '@/components/media/CldImage';
 import CldVideo from '@/components/media/CldVideo';
-import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
-
-
 
 const treatments = [
   {
@@ -20,7 +17,7 @@ const treatments = [
       "Custom mask application",
       "Relaxing facial massage"
     ],
-    image: mediaId("medical-spa/signature-facial")
+    image: "medical-spa/signature-facial"
   },
   {
     title: "HydraFacial",
@@ -31,7 +28,7 @@ const treatments = [
       "Hydration infusion",
       "Custom boosters available"
     ],
-    image: mediaId("medical-spa/hydrafacial")
+    image: "medical-spa/hydrafacial"
   },
   {
     title: "Microneedling",
@@ -42,7 +39,7 @@ const treatments = [
       "Scar reduction",
       "Texture improvement"
     ],
-    image: mediaId("medical-spa/microneedling")
+    image: "medical-spa/microneedling"
   },
   {
     title: "Oxygen Facial",
@@ -53,7 +50,7 @@ const treatments = [
       "Instant brightening",
       "Red carpet ready results"
     ],
-    image: mediaId("medical-spa/oxygen-facial")
+    image: "medical-spa/oxygen-facial"
   }
 ]
 
@@ -65,11 +62,18 @@ export default function EstheticianServicesPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <CldImage publicId="medical-spa/facial-treatments-hero.jpg" alt="Esthetician Services" priority fill / config={{
-          cloud: {
-            cloudName: 'dyrzyfg3w'
-          }
-        }}>
+          <CldImage 
+            src="medical-spa/facial-treatments-hero" 
+            alt="Esthetician Services" 
+            priority 
+            fill 
+            className="object-cover"
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         
@@ -117,12 +121,17 @@ export default function EstheticianServicesPage() {
               >
                 <div className="w-full lg:w-1/2">
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
-                    <Image
+                    <CldImage
                       src={treatment.image}
                       alt={treatment.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
+                      config={{
+                        cloud: {
+                          cloudName: 'dyrzyfg3w'
+                        }
+                      }}
                     />
                   </div>
                 </div>

@@ -21,28 +21,23 @@ function TeamMemberCard({ member, isPhysician = false }: {
 }) {
   const { toast } = useToast()
   const isDevelopment = process.env.NODE_ENV === 'development'
-  const assetId = `team-${member.name.toLowerCase().replace(/\s+/g, '-')}`
-  const placeholderId = `team-${member.is_provider === 'true' ? 'provider' : 'staff'}-${member.id}`
-
-  // Use the useMediaAsset hook to get the image URL
-  const { url: memberImageUrl, isLoading } = useMediaAsset(placeholderId, {
-    width: 600,
-    height: 800,
-    crop: 'fill',
-    gravity: 'face',
-    quality: 90
-  });
+  
+  // Convert member name to a standardized format for Cloudinary path
+  const memberSlug = member.name.toLowerCase().replace(/\s+/g, '-')
+  
+  // Define Cloudinary image path based on whether this is a provider or staff
+  const cloudinaryPath = `team/headshots/${memberSlug}`
+  
+  // Use direct image URL if available, otherwise use Cloudinary
+  const imageUrl = member.image_url || `https://res.cloudinary.com/dyrzyfg3w/image/upload/v1743748610/${cloudinaryPath}`
 
   const copyAssetId = () => {
-    navigator.clipboard.writeText(placeholderId)
+    navigator.clipboard.writeText(cloudinaryPath)
     toast({
-      title: "Placeholder ID copied",
-      description: `Copied "${placeholderId}" to clipboard. Use this ID when uploading the image in the media library.`
+      title: "Cloudinary path copied",
+      description: `Copied "${cloudinaryPath}" to clipboard. Use this path when uploading the image in Cloudinary.`
     })
   }
-
-  // Use either the media asset URL or the direct image URL from the member
-  const imageUrl = memberImageUrl || member.image_url || '/images/placeholder-team.jpg'
 
   return (
     <motion.div
@@ -53,12 +48,19 @@ function TeamMemberCard({ member, isPhysician = false }: {
       className="group relative"
     >
       <div className="relative aspect-[3/4] overflow-hidden">
-        <Image
-          src={imageUrl}
+        <CldImage
+          src={cloudinaryPath}
           alt={member.name}
-          fill
+          width={600}
+          height={800}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          fallbackSrc="/images/placeholder-team.jpg"
+          config={{
+            cloud: {
+              cloudName: 'dyrzyfg3w'
+            }
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent" />
         
@@ -83,7 +85,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
               onClick={copyAssetId}
             >
               <Copy className="w-4 h-4 mr-2" />
-              Copy ID
+              Copy Path
             </Button>
           </div>
         )}
@@ -96,7 +98,7 @@ function TeamMemberCard({ member, isPhysician = false }: {
         <p className="mt-1 text-sm text-zinc-300">{member.role}</p>
         {isDevelopment && (
           <div className="mt-2 text-xs text-zinc-400">
-            <p>Placeholder ID: {placeholderId}</p>
+            <p>Cloudinary path: {cloudinaryPath}</p>
           </div>
         )}
       </div>
