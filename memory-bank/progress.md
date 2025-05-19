@@ -113,7 +113,7 @@ Based on the PRD and our progress, the following components still need to be imp
 - **Completed Tasks**: 
   - Task 1 - Project Setup & Environment Configuration
   - Task 2 - Database Schema Implementation
-  - Task 3 - Cloudinary Media System Integration
+  - Task 3 - Cloudinary Media System Integration ([Archive](../docs/archive/cloudinary-media-system-reflection.md))
   - Task 5 - Authentication & User Management
   - Basic SEO component implementation
   - Article system front-end updates and filtering enhancements
@@ -169,6 +169,11 @@ Based on the PRD and our progress, the following components still need to be imp
      - Tag-based filtering
      - Search functionality
      - Active filters display with clear options
+   - ✅ Added Cloudinary water video background to articles hero section:
+     - Used CldVideoPlayer from next-cloudinary
+     - Set height to 25% of viewport (25vh)
+     - Added proper CSS styling for video display
+     - Improved mobile responsiveness with optimized layout
    - ⏳ Working on completing admin interface for article management
    - ⏳ Adding text-to-speech functionality for articles
 

@@ -13,8 +13,9 @@
 3. ✅ Update article detail page to use new Cloudinary components
 4. ✅ Implement SEO optimization for articles
 5. ✅ Enhance article filtering and categorization
-6. ⏳ Complete admin interface for article management
-7. ⏳ Add text-to-speech functionality for articles
+6. ✅ Add Cloudinary water video background to articles hero section with 25vh height
+7. ⏳ Complete admin interface for article management
+8. ⏳ Add text-to-speech functionality for articles
 
 ### Task 6: Gallery System Implementation
 **Status**: IN PROGRESS
@@ -63,9 +64,22 @@
 8. ✅ Execute migrations and verify data integrity
 
 ### Task 3: Cloudinary Media System Integration
-**Status**: COMPLETED
+**Status**: ARCHIVED
 **Dependencies**: Task 2 (Database Schema)
 **Description**: Implement the Cloudinary media system as specified in the PRD.
+
+## Status
+- [x] Initialization complete
+- [x] Planning complete
+- [x] Implementation complete
+- [x] Reflection complete
+- [x] Archiving complete
+
+## Reflection Highlights
+- **What Went Well**: Enhanced wrapper components, folder-based organization, robust error handling
+- **Challenges**: Property conflicts, circular dependencies, URL construction with version numbers
+- **Lessons Learned**: Enhanced wrapper components provide better DX, different image strategies work best in different contexts
+- **Next Steps**: Complete Gallery Integration, Performance Optimization
 
 **Subtasks**:
 1. ✅ Create CldImage component

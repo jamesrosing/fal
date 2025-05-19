@@ -22,10 +22,11 @@ We're implementing the Gallery System while also continuing work on the article 
    - ✅ Implemented SEO optimization for articles
    - ✅ Enhanced article filtering and categorization
    - ✅ Fixed duplicate category display in articles page filtering
+   - ✅ Added Cloudinary water video background to articles hero section with 25vh height
    - ⏳ Completing admin interface for article management
    - ⏳ Adding text-to-speech functionality for articles
 
-3. **Cloudinary Media System Integration** (COMPLETED)
+3. **Cloudinary Media System Integration** (ARCHIVED)
    - ✅ Implemented new API endpoints in `/app/api/cloudinary` for direct access to Cloudinary assets
    - ✅ Created asset endpoints that work with direct public IDs rather than placeholder IDs
    - ✅ Created responsive image and transformation endpoints for client-side usage
@@ -34,6 +35,8 @@ We're implementing the Gallery System while also continuing work on the article 
    - ✅ Created migration guide in `CLOUDINARY-MIGRATION.md` for developer reference
    - ✅ Established direct public ID usage pattern to avoid indirection
    - ✅ Created migration scripts to handle different aspects of the migration
+   - ✅ Task fully archived ([Archive Document](../docs/archive/cloudinary-media-system-reflection.md))
+   - ✅ All lessons and improvements documented in the archive for future reference
 
 ## Recent Decisions
 
