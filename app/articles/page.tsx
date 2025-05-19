@@ -1,13 +1,9 @@
 import { NavBar } from "@/components/nav-bar"
-import { PageHero } from "@/components/ui/page-hero"
 import { Metadata } from "next"
 import { ArticlesList } from "./articles-list"
 import { CldOgImage } from "next-cloudinary"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
-import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
-
-
+import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media"
+import { ArticlesHero } from "./hero"
 
 export const metadata: Metadata = {
   title: 'Articles & Resources | Allure MD',
@@ -26,31 +22,22 @@ export const metadata: Metadata = {
   }
 }
 
-export default async function ArticlesPage({ 
+export default function ArticlesPage({ 
   searchParams 
 }: { 
   searchParams: { [key: string]: string | string[] | undefined } 
 }) {
   return (
     <main className="flex min-h-screen flex-col bg-black text-white">
+      {/* Navigation */}
       <NavBar />
       
-      <PageHero
-        title="Articles & Resources"
-        subtitle="Stay informed and educated"
-        description="Discover the latest news, educational content, and resources about aesthetic procedures, dermatology treatments, and wellness."
-        image={{
-          path: "hero/hero-articles",
-          alt: "Articles and Resources"
-        }}
-      />
+      {/* Hero section */}
+      <ArticlesHero />
 
-      <section className="py-16 md:py-24 bg-zinc-900 text-white">
+      {/* Articles list section */}
+      <section className="py-12 md:py-16 bg-zinc-900 text-white">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Browse Articles</h2>
-            <p className="text-lg md:text-xl max-w-3xl mx-auto">Filter by category to find exactly what you're looking for</p>
-          </div>
           <ArticlesList searchParams={searchParams} />
         </div>
       </section>
