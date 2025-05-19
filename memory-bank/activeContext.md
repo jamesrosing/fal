@@ -1,8 +1,20 @@
-# Active Context: Production Readiness Implementation
+# Active Context: Production Readiness and System Improvements
 
 ## Current Focus
 
-We're implementing the production readiness plan to prepare the application for launch, while also continuing work on the Gallery System and article system management features. This follows our successful completion of the Cloudinary Media System Migration and the creation of a comprehensive production readiness plan.
+We're implementing the production readiness plan to prepare the application for launch, while also continuing work on the Gallery System and article system management features. We've recently completed and archived the Admin System and Media Improvements task.
+
+1. **Admin System and Media Improvements** (ARCHIVED)
+   - ✅ Fixed admin authentication flow in middleware.ts
+   - ✅ Added missing user_profiles table to database schema
+   - ✅ Fixed Medical Spa page routing ("/medical-spa" → "/services/medical-spa")
+   - ✅ Improved Medical Spa hero section height for mobile
+   - ✅ Updated team page to use direct Cloudinary paths
+   - ✅ Created standardized team member image paths
+   - ✅ Fixed admin team page component error
+   - ✅ Fixed type inconsistency in TeamMember interface
+   - ✅ Task fully archived ([Archive Document](../docs/archive/admin-system-media-improvements.md))
+   - ✅ All lessons and improvements documented in the archive for future reference
 
 1. **Production Readiness Implementation**
    - ✅ Created comprehensive production readiness plan (ARCHIVED)
@@ -13,7 +25,7 @@ We're implementing the production readiness plan to prepare the application for 
    - ⏳ Setting up monitoring and error tracking
    - ⏳ Preparing testing framework and quality assurance processes
 
-1. **Gallery System Implementation**
+2. **Gallery System Implementation**
    - ✅ Updated gallery components to use new Cloudinary components
    - ✅ Fixed gallery hero image display using direct Cloudinary URLs
    - ✅ Implemented responsive design for gallery pages on mobile and desktop
@@ -24,7 +36,7 @@ We're implementing the production readiness plan to prepare the application for 
    - ⏳ Implementing filtering and sorting options
    - ⏳ Creating admin interface for gallery management
 
-2. **Article System Updates**
+3. **Article System Updates**
    - ✅ Updated article content component to use new Cloudinary components
    - ✅ Updated article list page to use new Cloudinary components 
    - ✅ Updated article detail page to use new Cloudinary components
@@ -35,30 +47,19 @@ We're implementing the production readiness plan to prepare the application for 
    - ⏳ Completing admin interface for article management
    - ⏳ Adding text-to-speech functionality for articles
 
-3. **Cloudinary Media System Integration** (ARCHIVED)
-   - ✅ Implemented new API endpoints in `/app/api/cloudinary` for direct access to Cloudinary assets
-   - ✅ Created asset endpoints that work with direct public IDs rather than placeholder IDs
-   - ✅ Created responsive image and transformation endpoints for client-side usage
-   - ✅ Removed legacy placeholder-based API endpoints that are no longer needed
-   - ✅ Using the established components in `@/components/media` directory (CldImage, CldVideo, etc.)
-   - ✅ Created migration guide in `CLOUDINARY-MIGRATION.md` for developer reference
-   - ✅ Established direct public ID usage pattern to avoid indirection
-   - ✅ Created migration scripts to handle different aspects of the migration
+4. **Cloudinary Media System Integration** (ARCHIVED)
    - ✅ Task fully archived ([Archive Document](../docs/archive/cloudinary-media-system-reflection.md))
    - ✅ All lessons and improvements documented in the archive for future reference
 
 ## Recent Decisions
 
-- **Database Schema Adaptation**: Updated Supabase queries to use created_at for sorting instead of display_order, which doesn't exist in the database schema.
+- **Database Schema Improvements**: Created the user_profiles table for proper admin authentication and implemented Row Level Security policies to ensure data protection.
+- **URL Path Standardization**: Established a pattern of using full path structure (e.g., "/services/medical-spa" instead of "/medical-spa") for consistency across the application.
+- **Cloudinary Media Path Convention**: Standardized Cloudinary path structure for team member images using lowercase, hyphenated member names in consistent folder paths.
+- **Component Reuse Priority**: Committed to prioritizing the reuse of existing components over creating new ones to maintain consistency and reduce duplication.
+- **Type Safety Enforcement**: Enhanced TypeScript type consistency in interfaces, particularly in the TeamMember interface where order was changed from string to number.
 - **Error Handling Enhancement**: Implemented comprehensive error handling with better logging and user-friendly fallbacks in the gallery system.
-- **Fallback Data Strategy**: Added mock/fallback gallery data for situations when the database returns empty results, providing a better user experience.
-- **Gallery Implementation Approach**: Using direct Cloudinary URLs for gallery images rather than the CldImage component to resolve rendering issues.
-- **Mobile-First Responsive Design**: Implemented 16:9 aspect ratio on mobile for gallery hero section while using percentage-based height on larger screens.
-- **Image Positioning Control**: Using inline style with objectPosition to fine-tune image focal points rather than relying on Cloudinary's gravity parameter.
-- **Completed Cloudinary Component Consolidation**: Removed transitional media components in favor of direct Cloudinary integration.
-- **Article System Enhancement**: Completed improvements to article filtering, categorization, and now focusing on admin interface development.
-- **Advanced Article Filtering**: Implemented more sophisticated article filtering options including tag filtering, search functionality, and subcategory filtering with clean URL parameter handling.
-- **Fixed Duplicate Categories**: Resolved issue with duplicate categories appearing in article filtering section by implementing deduplication with Maps and Sets.
+- **Mobile-First Responsive Design**: Implemented 35-40vh height for hero sections on mobile for better user experience.
 
 ## Implementation Flow
 
@@ -86,36 +87,6 @@ We're implementing the production readiness plan to prepare the application for 
    - Create analytics dashboard
    - Build marketing tools
 
-## Article System Structure
-
-1. **Frontend Components**
-   - `app/articles/page.tsx`: Main articles listing page
-   - `app/articles/[slug]/page.tsx`: Article detail page
-   - `app/articles/articles-list.tsx`: Enhanced article list component with filtering
-
-2. **Admin Interface**
-   - `app/admin/articles/page.tsx`: Article management dashboard
-   - `app/admin/articles/[id]/edit`: Article editor interface
-   - `app/admin/articles/categories`: Category management interface
-
-3. **API Endpoints**
-   - `/api/articles`: List and create articles
-   - `/api/articles/[id]`: Get, update, and delete specific articles
-   - `/api/articles/categories`: Manage article categories
-   - `/api/articles/featured`: Get featured articles
-
-## Gallery System Structure
-
-1. **Frontend Components**
-   - `app/gallery/page.tsx`: Main gallery listing page
-   - `app/gallery/[...slug]/page.tsx`: Dynamic routes for galleries, albums, and cases
-   - `app/gallery/[...slug]/layout.tsx`: Layout for gallery pages with error handling
-
-2. **Database Integration**
-   - Uses Supabase queries with enhanced error handling
-   - Adapts to available database schema (using created_at instead of display_order)
-   - Provides fallback data when database is unavailable
-
 ## Next Steps
 
 1. **Continue Gallery System Implementation**:
@@ -135,35 +106,47 @@ We're implementing the production readiness plan to prepare the application for 
    - Implement content management interfaces
    - Develop analytics dashboard
 
-## Cloudinary Best Practices
+4. **Apply Recent Lessons Learned**:
+   - Conduct URL consistency audit across the application
+   - Review TypeScript interfaces for type consistency
+   - Implement standardized media path approach in all sections
+   - Add automated database schema verification to CI/CD pipeline
+   - Create comprehensive component documentation
 
-1. **Use Standard Components**: Always use our standard components from `@/components/media`:
-   ```jsx
-   import { CldImage, CldVideo, MediaAdapter } from '@/components/media';
+## Best Practices (Updated)
+
+### Authentication and Database
+1. **Schema Validation**: Always verify database schema components early:
+   ```typescript
+   // Check if required tables exist before using them
+   const { data, error } = await supabase
+     .from('user_profiles')
+     .select('count(*)')
+     .limit(1)
+     
+   if (error) {
+     console.error('user_profiles table may not exist:', error)
+     // Implement fallback or show error message
+   }
    ```
 
-2. **Direct PublicId Usage**: Use the Cloudinary publicId directly in components:
-   ```jsx
-   <CldImage 
-     src="folder/image-name" 
-     width={800} 
-     height={600} 
-     alt="Description" 
-   />
+2. **Role-Based Access**: Use proper role checks in middleware:
+   ```typescript
+   // Correctly check for admin role
+   const isAdmin = data && ['admin', 'super_admin'].includes(data.role)
    ```
 
-3. **Folder-Based Components**: For content organized by folders, use the folder-based components:
-   ```jsx
-   <CloudinaryFolderImage
-     folder="articles"
-     imageName="article-image-name"
-     width={800}
-     height={600}
-     alt="Description"
-   />
+### Cloudinary Media
+1. **Standardized Paths**: Use consistent folder structure and naming:
+   ```typescript
+   // For team members
+   const cloudinaryPath = `team/headshots/${name.toLowerCase().replace(/\s+/g, '-')}`
+   
+   // For services
+   const cloudinaryPath = `services/${category}/${name.toLowerCase().replace(/\s+/g, '-')}`
    ```
 
-4. **Responsive Images**: Use the sizes attribute for responsive behavior:
+2. **Responsive Images**: Use the sizes attribute for responsive behavior:
    ```jsx
    <CldImage
      src="folder/image-name"
@@ -174,28 +157,49 @@ We're implementing the production readiness plan to prepare the application for 
    />
    ```
 
-5. **Video Configuration**: Use appropriate video settings based on context:
-   ```jsx
-   <CldVideo
-     src="folder/video-name"
-     width={800}
-     height={600}
-     autoPlay={true}
-     loop={true}
-     muted={true}
-     controls={false} // For background videos
-   />
+### TypeScript and Components
+1. **Consistent Type Definitions**: Ensure types match across definition and usage:
+   ```typescript
+   // Define types properly
+   interface TeamMember {
+     id: string;
+     name: string;
+     order: number; // Not string!
+   }
+   
+   // Use types consistently
+   const sortedMembers = members.sort((a, b) => a.order - b.order);
    ```
 
-6. **Type-Based Media Rendering**: For dynamic content, use MediaAdapter:
+2. **Component Reuse Strategy**: Always check for existing components before creating new ones:
    ```jsx
-   <MediaAdapter
-     mediaType={item.type} // "image" or "video"
-     src={item.publicId}
-     alt={item.alt}
-     width={800}
-     height={600}
-   />
+   // Use existing components with proper typing
+   import { CldUploadWidgetWrapper } from '@/components/media/CldUploadWidgetWrapper';
+   
+   // Instead of creating new ones
+   // import { TeamMemberImageUpload } from '@/components/team-member-image-upload';
+   ```
+
+### URL Structure
+1. **Consistent URL Patterns**: Use full path structure for consistency:
+   ```jsx
+   // Good
+   <Link href="/services/medical-spa">Medical Spa</Link>
+   
+   // Avoid partial paths
+   // <Link href="/medical-spa">Medical Spa</Link>
+   ```
+
+2. **URL Validation**: Create utilities to validate URL consistency:
+   ```typescript
+   const validateUrl = (url: string): boolean => {
+     // Check if URL follows our standard patterns
+     const servicePattern = /^\/services\/[a-z-]+$/;
+     const teamPattern = /^\/team(\/[a-z-]+)?$/;
+     // etc.
+     
+     return servicePattern.test(url) || teamPattern.test(url) || ...;
+   }
    ```
 
 ## Database Error Handling Best Practices

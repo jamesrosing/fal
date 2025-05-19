@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 
 /**
- * API route for creating a new media asset placeholder in Supabase
+ * API route for creating a new media asset in Supabase
  * POST /api/media/assets/create
  * 
  * Request body:
  * {
- *   placeholder_id: string;
- *   cloudinary_id?: string;
+ *   cloudinary_id: string;
+ *   type: 'image' | 'video';
+ *   title?: string;
+ *   alt_text?: string;
+ *   width?: number;
+ *   height?: number;
+ *   format?: string;
+ *   url?: string;
  *   metadata?: object;
  * }
  */
@@ -16,12 +22,22 @@ export async function POST(request: NextRequest) {
   try {
     // Get request body
     const body = await request.json();
-    const { placeholder_id, cloudinary_id = '', metadata = {} } = body;
+    const { 
+      cloudinary_id, 
+      type = 'image',
+      title = '',
+      alt_text = '',
+      width, 
+      height,
+      format,
+      url = '',
+      metadata = {} 
+    } = body;
     
-    // Validate placeholder_id
-    if (!placeholder_id) {
+    // Validate cloudinary_id
+    if (!cloudinary_id) {
       return NextResponse.json(
-        { error: 'Missing placeholder_id parameter' },
+        { error: 'Missing cloudinary_id parameter' },
         { status: 400 }
       );
     }
@@ -29,50 +45,57 @@ export async function POST(request: NextRequest) {
     // Connect to Supabase
     const supabase = createClient();
     
-    // Check if placeholder already exists
+    // Check if asset already exists
     const { data: existingData, error: checkError } = await supabase
       .from('media_assets')
-      .select('placeholder_id')
-      .eq('placeholder_id', placeholder_id)
+      .select('cloudinary_id')
+      .eq('cloudinary_id', cloudinary_id)
       .maybeSingle();
     
     if (checkError) {
-      console.error('Error checking for existing placeholder:', checkError);
+      console.error('Error checking for existing media asset:', checkError);
       return NextResponse.json(
-        { error: 'Failed to check for existing placeholder' },
+        { error: 'Failed to check for existing media asset' },
         { status: 500 }
       );
     }
     
     if (existingData) {
       return NextResponse.json(
-        { error: `Placeholder with ID "${placeholder_id}" already exists` },
+        { error: `Media asset with cloudinary_id "${cloudinary_id}" already exists` },
         { status: 409 }
       );
     }
     
-    // Insert new placeholder
+    // Insert new media asset
     const { data, error } = await supabase
       .from('media_assets')
       .insert({
-        placeholder_id,
         cloudinary_id,
-        metadata,
-        uploaded_at: new Date().toISOString(),
-        uploaded_by: 'system'
-      });
+        type,
+        title,
+        alt_text,
+        width,
+        height,
+        format,
+        url,
+        metadata
+      })
+      .select()
+      .single();
     
     if (error) {
-      console.error('Error creating new placeholder:', error);
+      console.error('Error creating new media asset:', error);
       return NextResponse.json(
-        { error: 'Failed to create new placeholder' },
+        { error: 'Failed to create new media asset' },
         { status: 500 }
       );
     }
     
     return NextResponse.json({ 
       success: true,
-      message: `Created new placeholder: ${placeholder_id}`
+      message: `Created new media asset: ${cloudinary_id}`,
+      mediaAsset: data
     });
   } catch (error) {
     console.error('Error in create media asset API route:', error);

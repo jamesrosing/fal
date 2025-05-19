@@ -97,7 +97,7 @@ export type TeamMember = {
   image_url: string;
   description: string;
   order: number;
-  is_provider: boolean;
+  is_provider: string;
   created_at: string;
   updated_at: string;
 };

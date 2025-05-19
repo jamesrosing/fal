@@ -41,8 +41,7 @@ const FolderIcon = () => (
 );
 
 const FileIcon = () => (
-  <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path 
+  <svg className="h-5 w-5 text-b-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">   <path 
       strokeLinecap="round" 
       strokeLinejoin="round" 
       strokeWidth={2} 
@@ -50,6 +49,9 @@ const FileIcon = () => (
     />
   </svg>
 );
+
+// Cloudinary script setup
+const CLOUDINARY_SCRIPT_URL = "https://media-library.cloudinary.com/global/all.js";
 
 // Define interfaces
 interface SectionMedia {
@@ -110,6 +112,32 @@ export default function MediaLibraryAdmin() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
+  // Handle script loading
+  const handleScriptLoad = () => {
+    setScriptLoaded(true);
+    console.log('Cloudinary Media Library script loaded successfully');
+  };
+
+  const handleScriptError = () => {
+    setError('Failed to load Cloudinary Media Library script');
+    console.error('Failed to load Cloudinary Media Library script');
+  };
+
+  // Add useEffect to load data on initial render
+  useEffect(() => {
+    // Load initial data
+    fetchSiteStructure();
+    fetchSectionMediaItems();
+    fetchMediaAssets();
+  }, []);
+
+  // Add effect to update data when selection changes
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchSectionMediaItems();
+    }
+  }, [selectedCategory, selectedSubcategory]);
+
   // Function to fetch the site structure
   async function fetchSiteStructure() {
     try {
@@ -157,31 +185,46 @@ export default function MediaLibraryAdmin() {
     try {
       // First check if media asset already exists
       const existingAssetResponse = await fetch(`/api/media/assets?cloudinary_id=${cloudinaryId}`);
+      if (!existingAssetResponse.ok) {
+        throw new Error(`HTTP error! status: ${existingAssetResponse.status}`);
+      }
+      
       const existingAssetData = await existingAssetResponse.json();
       
       let mediaAssetId;
       
       // If media asset doesn't exist, create it
       if (!existingAssetData.mediaAssets || existingAssetData.mediaAssets.length === 0) {
+        // Get asset type based on extension or path
+        const assetType = isVideoAsset(cloudinaryId) ? 'video' : 'image';
+        const assetTitle = cloudinaryId.split('/').pop() || cloudinaryId;
+        
         // Create new media asset
         const assetResponse = await fetch('/api/media/assets/create', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            cloudinary_id: cloudinaryId,
-            type: isVideoAsset(cloudinaryId) ? 'video' : 'image',
-            title: cloudinaryId.split('/').pop() || cloudinaryId,
-            alt_text: cloudinaryId.split('/').pop() || cloudinaryId,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cloudinary_id: cloudinaryId,
+            type: assetType,
+            title: assetTitle,
+            alt_text: assetTitle,
           }),
         });
         
         if (!assetResponse.ok) {
-          throw new Error(`HTTP error! status: ${assetResponse.status}`);
+          const errorData = await assetResponse.json();
+          console.error('Error creating media asset:', errorData);
+          throw new Error(`HTTP error! status: ${assetResponse.status} - ${errorData.error || 'Unknown error'}`);
         }
         
         const assetData = await assetResponse.json();
+        
+        if (!assetData.mediaAsset || !assetData.mediaAsset.id) {
+          throw new Error('Media asset creation did not return expected data');
+        }
+        
         mediaAssetId = assetData.mediaAsset.id;
       } else {
         mediaAssetId = existingAssetData.mediaAssets[0].id;
@@ -197,14 +240,19 @@ export default function MediaLibraryAdmin() {
           body: JSON.stringify({
             id: sectionMediaId,
             media_asset_id: mediaAssetId,
-          }),
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+        toast({
+          title: "Media Updated",
+          description: `Successfully updated media for ${pagePath}/${sectionName}`,
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
       } else {
-        // Create new section media entry
+        // Otherwise create a new section media entry
         const response = await fetch('/api/media/section-media', {
           method: 'POST',
           headers: {
@@ -220,25 +268,22 @@ export default function MediaLibraryAdmin() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        toast({
+          title: "Media Added",
+          description: `Successfully added media to ${pagePath}/${sectionName}`,
+        });
       }
       
-      // Show success toast
-      toast({
-        title: "Media updated",
-        description: "The media assignment has been updated successfully.",
-        duration: 3000,
-      });
-      
-      // Refresh the section media items list
+      // Refresh section media items
       fetchSectionMediaItems();
-      
-    } catch (err) {
-      setError(`Error updating media: ${err instanceof Error ? err.message : String(err)}`);
+    } catch (error: any) {
+      console.error('Error handling media selection:', error);
+      setError(`Error adding media: ${error.message}`);
       toast({
         title: "Error",
-        description: `Error updating media: ${err instanceof Error ? err.message : String(err)}`,
+        description: `Failed to add media: ${error.message}`,
         variant: "destructive",
-        duration: 5000,
       });
     }
   };
@@ -246,17 +291,41 @@ export default function MediaLibraryAdmin() {
   // Fetch section media items
   async function fetchSectionMediaItems() {
     try {
-      const response = await fetch('/api/media/section-media');
+      setError(null);
+      
+      // Determine query parameters based on selected category/subcategory
+      let url = '/api/media/section-media';
+      
+      if (selectedCategory) {
+        url += `?page_path=${selectedCategory}`;
+        
+        if (selectedSubcategory) {
+          url += `&section_name=${selectedSubcategory}`;
+        }
+      }
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.sectionMedia) {
         setSectionMediaItems(data.sectionMedia);
       } else {
-        setError('No section media items found');
+        setSectionMediaItems([]);
+        console.warn('No section media data returned from API');
       }
     } catch (error: any) {
       console.error('Error fetching section media items:', error);
-      setError(`Error fetching section media items: ${error.message}`);
+      setError(`Error updating media: ${error.message}`);
+      toast({
+        title: "Error",
+        description: `Failed to load media items: ${error.message}`,
+        variant: "destructive",
+      });
     }
   }
 
@@ -277,13 +346,6 @@ export default function MediaLibraryAdmin() {
     }
   }
 
-  // Add useEffect to fetch data on component mount
-  useEffect(() => {
-    fetchSectionMediaItems();
-    fetchMediaAssets();
-    fetchSiteStructure();
-  }, []);
-  
   // Handle Media Library selection
   const handleMediaLibrarySelection = async (data: any) => {
     if (!data || !data.assets || data.assets.length === 0) {
@@ -412,51 +474,72 @@ export default function MediaLibraryAdmin() {
   
   // Function to open Media Library for a specific section
   const openMediaLibraryForSection = (pagePath: string, sectionName: string, sectionMediaId: string = '') => {
-    if (typeof window === 'undefined' || !window.cloudinary) {
-      setError('Cloudinary script not loaded');
+    if (!scriptLoaded) {
+      toast({
+        title: 'Cloudinary widget not ready',
+        description: 'Please wait for the Cloudinary widget to load completely.',
+        variant: 'destructive',
+      });
       return;
     }
     
-    try {
-      // Get environment variables
-      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-      const apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
-      
-      if (!cloudName || !apiKey) {
-        setError('Missing Cloudinary credentials.');
-        return;
-      }
-      
-      // Configure and open the Media Library widget
-      const mediaLibrary = window.cloudinary.createMediaLibrary(
-        {
-          cloud_name: cloudName,
-          api_key: apiKey,
-          folder_mode: true,
+    // Create folder path for the media based on page path and section
+    const folderPath = `${pagePath.replace(/\//g, '-')}/${sectionName}`.replace(/^-/, '');
+    
+    // Set up Cloudinary widget configuration
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fal_media';
+    
+    const options = {
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dyrzyfg3w',
+      uploadPreset: uploadPreset,
+      folder: folderPath,
           multiple: false,
-          insert_caption: 'Select',
-          default_transformations: [
-            [{ quality: 'auto', fetch_format: 'auto' }]
-          ],
-        },
+      resourceType: 'auto',
+      clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'mov', 'webm'],
+      maxFileSize: 20000000, // 20MB
+      sources: ['local', 'url', 'camera', 'google_drive', 'dropbox', 'instagram', 'shutterstock'],
+      googleApiKey: process.env.NEXT_PUBLIC_CLOUDINARY_GOOGLE_API_KEY,
+      dropboxAppKey: process.env.NEXT_PUBLIC_CLOUDINARY_DROPBOX_APP_KEY,
+      searchByRights: true,
+      buttonClass: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded',
+      buttonCaption: 'Select Media',
+          styles: {
+            palette: {
+          window: '#000000',
+          sourceBg: '#222222',
+          windowBorder: '#555555',
+          tabIcon: '#FFFFFF',
+          inactiveTabIcon: '#999999',
+          menuIcons: '#CCCCCC',
+              link: '#0078FF',
+          action: '#339933',
+              inProgress: '#0078FF',
+          complete: '#339933',
+          error: '#CC0000',
+          textDark: '#000000',
+          textLight: '#FFFFFF'
+        }
+      }
+    };
+    
+    // Open the Cloudinary widget and handle asset selection
+    const widget = (window as any).cloudinary.createMediaLibrary(
+      options,
         {
           insertHandler: (data: any) => {
-            if (!data || !data.assets || data.assets.length === 0) {
-              return;
-            }
+          if (data.assets && data.assets.length > 0) {
+              const asset = data.assets[0];
+            // Extract the Cloudinary ID (public_id) from the asset
+            const cloudinaryId = asset.public_id;
             
-            const asset = data.assets[0];
-            handleMediaSelect(asset.public_id, sectionMediaId, pagePath, sectionName);
-          },
+            // Call handler to process the selected media
+            handleMediaSelect(cloudinaryId, sectionMediaId, pagePath, sectionName);
+          }
         }
-      );
-      
-      mediaLibrary.show();
-      
-    } catch (error: any) {
-      console.error('Error opening Cloudinary Media Library:', error);
-      setError(`Error opening Cloudinary Media Library: ${error.message}`);
-    }
+      }
+    );
+    
+    widget.show();
   };
 
   // Filter section media items for the currently selected category/subcategory
@@ -567,87 +650,31 @@ export default function MediaLibraryAdmin() {
 
   // Sidebar component to display the hierarchical tree
   const Sidebar = () => {
-    const filteredStructure = filterSiteStructure(siteStructure);
+    // Filter the site structure based on search term if needed
+    const filteredStructure = searchTerm 
+      ? filterSiteStructure(siteStructure)
+      : siteStructure;
     
     if (isLoadingSiteStructure) {
-      return (
-        <div className="w-1/3 pr-4">
-          <div className={directoryStyles.container}>
-            <div className={directoryStyles.header}>
-              <div className="flex items-center">
-                <FolderIcon />
-                <span>MEDIA EXPLORER</span>
-              </div>
-            </div>
-            <div className="p-4 text-center text-gray-400">
-              <p>Loading site structure...</p>
-            </div>
-          </div>
-        </div>
-      );
+      return <div className="py-4 text-gray-400">Loading site structure...</div>;
+    }
+    
+    if (Object.keys(filteredStructure).length === 0) {
+      return <div className="py-4 text-gray-400">No pages found. Try adjusting your search.</div>;
     }
 
     return (
-      <div className="w-1/3 pr-4 overflow-auto max-h-[calc(100vh-200px)]">
-        <div className={directoryStyles.container}>
-          <div className={directoryStyles.header}>
-            <div className="flex items-center">
-              <FolderIcon />
-              <span>MEDIA EXPLORER</span>
-            </div>
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="text-xs px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-md"
-            >
-              {showCreateForm ? 'Cancel' : 'New Section'}
-            </button>
-          </div>
-          
-          {showCreateForm && (
-            <div className="p-4 border-b border-zinc-700 bg-zinc-900">
-              <h3 className="font-medium mb-2 text-white">Create New Section</h3>
-              <div className="mb-2">
-                <label className="block text-sm text-gray-400 mb-1">Page Path</label>
-                <input
-                  type="text"
-                  value={newSectionMedia.page_path}
-                  onChange={(e) => setNewSectionMedia(prev => ({ ...prev, page_path: e.target.value }))}
-                  placeholder="e.g., services/dermatology"
-                  className="w-full p-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-sm text-gray-400 mb-1">Section Name</label>
-                <input
-                  type="text"
-                  value={newSectionMedia.section_name}
-                  onChange={(e) => setNewSectionMedia(prev => ({ ...prev, section_name: e.target.value }))}
-                  placeholder="e.g., hero, gallery"
-                  className="w-full p-2 bg-zinc-800 text-white border border-zinc-700 rounded-md"
-                />
-              </div>
-              <button
-                onClick={createNewSectionMedia}
-                className="w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-              >
-                Create & Upload Media
-              </button>
-            </div>
-          )}
-          
-          <div className={directoryStyles.content}>
-            {Object.values(filteredStructure).map(node => (
-              <CategoryNode 
-                key={node.path}
-                node={node}
-                onSelect={selectCategory}
-                onToggle={toggleCategory}
-                isExpanded={!!expandedCategories[node.path]}
-                level={0}
-              />
-            ))}
-          </div>
-        </div>
+      <div className={directoryStyles.content}>
+        {Object.entries(filteredStructure).map(([key, node]) => (
+          <CategoryNode 
+              key={key} 
+            node={node}
+              onSelect={selectCategory}
+              onToggle={toggleCategory}
+            isExpanded={expandedCategories[node.path] || false}
+            level={0}
+            />
+          ))}
       </div>
     );
   };
@@ -681,7 +708,7 @@ export default function MediaLibraryAdmin() {
           }}
         >
           <div className="flex items-center flex-grow cursor-pointer">
-            <FolderIcon />
+              <FolderIcon />
             <span className="ml-2">{node.name}</span>
           </div>
           {hasChildren && (
@@ -707,7 +734,7 @@ export default function MediaLibraryAdmin() {
                 <div className="flex items-center">
                   <FileIcon />
                   <span className="ml-2">{section}</span>
-                </div>
+          </div>
                 <button
                   className="ml-auto text-xs px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded-md"
                   onClick={(e) => {
@@ -717,7 +744,7 @@ export default function MediaLibraryAdmin() {
                 >
                   Upload
                 </button>
-              </div>
+        </div>
             ))}
             
             {/* Show child nodes recursively */}
@@ -739,124 +766,127 @@ export default function MediaLibraryAdmin() {
 
   // Main content component
   const MainContent = () => {
-    // Get filtered section media items for the selected category/subcategory
-    const filteredItems = getFilteredSectionMedia();
-    
-    // Sort by section name and display order
-    filteredItems.sort((a, b) => {
-      if (a.section_name !== b.section_name) {
-        return a.section_name.localeCompare(b.section_name);
-      }
-      return a.display_order - b.display_order;
-    });
-    
-    // If no category is selected, show a message
-    if (!selectedCategory) {
+    if (!selectedCategory || !selectedSubcategory) {
       return (
-        <div className="w-2/3 pl-4">
-          <div className={directoryStyles.container}>
-            <div className={directoryStyles.header}>
-              <span>Select a page from the sidebar to view and manage media</span>
-            </div>
-            <div className="p-8 text-center text-gray-400">
-              <p>No page selected. Click on a page in the Media Explorer to view its media.</p>
-              <button
-                className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                onClick={openMediaLibrary}
-              >
-                Browse All Media
-              </button>
-            </div>
-          </div>
+        <div className="p-6 text-center text-gray-400">
+          <p>Select a page and section from the Media Explorer to view or manage media.</p>
         </div>
       );
     }
+
+    const pagePath = selectedCategory;
+    const sectionName = selectedSubcategory;
     
-    // Create a title based on selected category and subcategory
-    let sectionTitle = selectedCategory;
-    if (selectedSubcategory) {
-      sectionTitle = `${selectedCategory} - ${selectedSubcategory}`;
-    }
+    // Filter section media items for the selected page and section
+    const sectionItems = sectionMediaItems.filter(
+      item => item.page_path === pagePath && item.section_name === sectionName
+    );
     
-    return (
-      <div className="w-2/3 pl-4">
-        <div className={directoryStyles.container}>
-          <div className={directoryStyles.header}>
-            <span>{sectionTitle}</span>
-            <button
-              className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded-md"
-              onClick={() => {
-                if (selectedSubcategory) {
-                  handleUploadToSection(selectedSubcategory, selectedCategory);
-                } else {
-                  openMediaLibraryForSection(selectedCategory, 'main');
-                }
-              }}
-            >
-              Add Media
-            </button>
+    // Create breadcrumb path
+    const breadcrumbs = getBreadcrumbItems();
+    
+      return (
+      <div className="p-4">
+        {/* Breadcrumb navigation */}
+        {breadcrumbs.length > 0 && (
+          <div className="mb-4 text-sm flex items-center text-gray-400">
+            {breadcrumbs.map((item, index) => (
+              <div key={index} className="flex items-center">
+                {index > 0 && <span className="mx-2">→</span>}
+                <span className={index === breadcrumbs.length - 1 ? "text-white" : ""}>{item}</span>
           </div>
-          
-          {filteredItems.length === 0 ? (
-            <div className="p-8 text-center text-gray-400">
-              <p>No media found for this section. Upload new media using the button above.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
-              {filteredItems.map(item => (
-                <div key={item.id} className="bg-zinc-900 rounded-md overflow-hidden border border-zinc-800">
-                  <div className="aspect-video relative overflow-hidden bg-zinc-950 flex items-center justify-center">
-                    {item.media_asset?.type === 'video' ? (
+            ))}
+          </div>
+        )}
+        
+        {/* Section header with path and upload button */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-medium text-white">
+            {pagePath} - {sectionName}
+          </h2>
+          <AddMediaButton pagePath={pagePath} sectionName={sectionName} />
+        </div>
+        
+        {/* Section media content */}
+        {sectionItems.length === 0 ? (
+          <div className="border border-zinc-800 rounded-md p-8 text-center bg-zinc-900 text-gray-400">
+            <p>No media found for this section. Upload new media using the button above.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {sectionItems.map((item) => (
+              <div key={item.id} className="border border-zinc-800 rounded-md overflow-hidden bg-zinc-900">
+                {/* Media display */}
+                <div className="aspect-video bg-zinc-950 flex items-center justify-center overflow-hidden">
+                  {item.media_asset ? (
+                    item.media_asset.type === 'video' ? (
                       <CldVideo
                         publicId={item.media_asset.cloudinary_id}
-                        width={300}
-                        height={169}
-                        autoPlay={false}
-                        controls
+                        width={640}
+                        height={360}
+                        className="max-w-full max-h-full object-contain"
                       />
                     ) : (
                       <CldImage
                         src={item.media_asset.cloudinary_id}
-                        width={300}
-                        height={169}
-                        alt={item.media_asset.alt_text || item.media_asset.cloudinary_id}
+                        width={640}
+                        height={360}
+                        className="max-w-full max-h-full object-contain"
+                        alt={item.media_asset.alt_text || 'Media asset'}
                       />
-                    )}
+                    )
+                  ) : (
+                    <div className="text-gray-500">Media not found</div>
+                  )}
                   </div>
-                  <div className="p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="text-white font-medium truncate max-w-[200px]">
-                          {item.section_name}
-                        </div>
-                        <div className="text-xs text-gray-400 truncate max-w-[200px]">
-                          {item.media_asset.cloudinary_id}
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Order: {item.display_order}
+                
+                {/* Media info and controls */}
+                <div className="p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      {item.media_asset && (
+                        <h3 className="font-medium text-white">
+                          {item.media_asset.title || item.media_asset.cloudinary_id.split('/').pop()}
+                        </h3>
+                      )}
+                      <div className="text-xs text-gray-400 mt-1">
+                        {item.media_asset && (
+                          <>
+                            {item.media_asset.type} • 
+                            {item.media_asset.width && item.media_asset.height && 
+                              ` ${item.media_asset.width}×${item.media_asset.height}`
+                            }
+                            {item.media_asset.format && ` • ${item.media_asset.format}`}
+                          </>
+                        )}
                       </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <button
-                        className="flex-1 text-xs px-2 py-1 bg-zinc-800 text-white rounded-md border border-zinc-700 hover:bg-zinc-700"
-                        onClick={() => openMediaLibraryForSection(item.page_path, item.section_name, item.id)}
-                      >
-                        Replace
-                      </button>
-                      <button
-                        className="flex-1 text-xs px-2 py-1 bg-red-900 text-white rounded-md border border-red-800 hover:bg-red-800"
-                        onClick={() => deleteSectionMedia(item.id, item.page_path)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    <div className="flex">
+                    <button
+                        className="px-2 py-1 text-xs bg-blue-900 text-white rounded-md hover:bg-blue-800 mr-1"
+                        onClick={() => openMediaLibraryForSection(pagePath, sectionName, item.id)}
+                    >
+                      Replace
+                    </button>
+                    <button
+                        className="px-2 py-1 text-xs bg-red-900 text-white rounded-md hover:bg-red-800"
+                        onClick={() => deleteSectionMedia(item.id, pagePath)}
+                    >
+                        Remove
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                  
+                  {item.media_asset && (
+                    <div className="text-xs font-mono text-gray-500 break-all mt-2">
+                      {item.media_asset.cloudinary_id}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -899,104 +929,104 @@ export default function MediaLibraryAdmin() {
     }
   };
 
-  // Get breadcrumb items for the selected path
-  const getBreadcrumbItems = () => {
-    if (!selectedCategory) return [];
+  // Function to get breadcrumb items
+  const getBreadcrumbItems = (): string[] => {
+    const breadcrumbs: string[] = ['Media'];
     
-    const parts = selectedCategory.split('/').filter(Boolean);
-    const breadcrumbs = [];
-    let currentPath = '';
-    
-    for (let i = 0; i < parts.length; i++) {
-      currentPath = currentPath ? `${currentPath}/${parts[i]}` : parts[i];
-      breadcrumbs.push({
-        name: parts[i],
-        path: currentPath
-      });
-    }
-    
-    if (selectedSubcategory) {
-      breadcrumbs.push({
-        name: selectedSubcategory,
-        path: `${currentPath}/${selectedSubcategory}`
-      });
+    if (selectedCategory) {
+      breadcrumbs.push(selectedCategory);
+      
+      if (selectedSubcategory) {
+        breadcrumbs.push(selectedSubcategory);
+      }
     }
     
     return breadcrumbs;
   };
 
+  // Button component for adding media to a section
+  const AddMediaButton = ({ pagePath, sectionName }: { pagePath: string, sectionName: string }) => {
   return (
-    <div className="container mx-auto px-4 py-8">
+          <button
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded text-sm flex items-center"
+        onClick={() => openMediaLibraryForSection(pagePath, sectionName)}
+          >
+        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        Add Media
+          </button>
+    );
+  };
+
+  // Component for uploading media to a section
+  const UploadButton = ({ pagePath, sectionName }: { pagePath: string, sectionName: string }) => {
+    return (
+          <button
+        className="bg-zinc-700 hover:bg-zinc-600 text-white text-xs px-2 py-1 rounded"
+        onClick={() => openMediaLibraryForSection(pagePath, sectionName)}
+          >
+        Upload
+          </button>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-white">
       <Script
-        src="https://media-library.cloudinary.com/global/all.js"
-        onLoad={() => setScriptLoaded(true)}
-        onError={() => setError('Failed to load Cloudinary script')}
+        src={CLOUDINARY_SCRIPT_URL}
+        onLoad={handleScriptLoad}
+        onError={handleScriptError}
+        strategy="beforeInteractive"
       />
       
-      <h1 className="text-3xl font-bold mb-6 text-white">Media Library</h1>
-      
-      {error && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-          {error}
-        </div>
-      )}
-      
-      <div className="mb-6">
-        <div className="flex space-x-4 mb-4">
-          <div className="flex-grow">
-            <input
-              type="text"
-              placeholder="Search for pages, sections, or media..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 bg-zinc-900 text-white border border-zinc-700 rounded-lg"
-            />
-          </div>
-          <button
-            onClick={openMediaLibrary}
-            disabled={!scriptLoaded}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+      {/* Main header with title and search */}
+      <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-4">
+        <h1 className="text-2xl font-bold mb-4">Media Library</h1>
+        
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-200 text-red-800 p-4 rounded-md mb-4">
+            <p>Error updating media: {error}</p>
+            </div>
+        )}
+        
+        {/* Search and upload */}
+        <div className="flex gap-3">
+              <input
+                type="text"
+            placeholder="Search for pages, sections, or media..."
+            className="flex-1 bg-zinc-800 border border-zinc-700 text-white px-4 py-2 rounded-md"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+              <button
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            onClick={() => openMediaLibraryForSection(
+              selectedCategory || 'home',
+              selectedSubcategory || 'main'
+            )}
           >
             Upload New Media
-          </button>
+              </button>
+            </div>
+          </div>
+      
+      {/* Main content with sidebar and details */}
+      <div className="flex">
+        {/* Sidebar with directory tree */}
+        <div className="w-1/3 border-r border-zinc-800 p-4 max-h-[calc(100vh-140px)] overflow-y-auto">
+          <h2 className="text-lg font-medium mb-4 flex items-center">
+            <FolderIcon />
+            <span className="ml-2">MEDIA EXPLORER</span>
+          </h2>
+          <Sidebar />
         </div>
         
-        {selectedCategory && (
-          <div className="flex items-center space-x-2 text-gray-400 mb-4">
-            <button
-              onClick={() => {
-                setSelectedCategory(null);
-                setSelectedSubcategory(null);
-              }}
-              className="text-white hover:text-blue-400"
-            >
-              Media
-            </button>
-            {getBreadcrumbItems().map((item, index) => (
-              <React.Fragment key={item.path}>
-                <span>/</span>
-                <button
-                  onClick={() => {
-                    if (index === getBreadcrumbItems().length - 1) return;
-                    
-                    setSelectedCategory(item.path);
-                    setSelectedSubcategory(null);
-                  }}
-                  className={`hover:text-blue-400 ${
-                    index === getBreadcrumbItems().length - 1 ? 'text-white' : 'text-gray-400'
-                  }`}
-                >
-                  {item.name}
-                </button>
-              </React.Fragment>
-            ))}
-          </div>
-        )}
+        {/* Main content area */}
+        <div className="w-2/3 max-h-[calc(100vh-140px)] overflow-y-auto">
+          <MainContent />
       </div>
-      
-      <div className="flex flex-wrap -mx-4">
-        <Sidebar />
-        <MainContent />
       </div>
     </div>
   );

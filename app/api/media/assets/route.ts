@@ -8,11 +8,22 @@ import { createClient } from '@/lib/supabase';
 export async function GET(request: NextRequest) {
   try {
     const supabase = createClient();
+    const { searchParams } = new URL(request.url);
+    const cloudinaryId = searchParams.get('cloudinary_id');
     
-    const { data, error } = await supabase
+    let query = supabase
       .from('media_assets')
-      .select('*')
-      .order('placeholder_id');
+      .select('*');
+    
+    // Add filter by cloudinary_id if provided
+    if (cloudinaryId) {
+      query = query.eq('cloudinary_id', cloudinaryId);
+    }
+    
+    // Order by created_at (newest first) instead of placeholder_id
+    query = query.order('created_at', { ascending: false });
+    
+    const { data, error } = await query;
     
     if (error) {
       console.error('Error fetching media assets:', error);
