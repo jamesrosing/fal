@@ -29,7 +29,7 @@ export default function ArticlesPage({
 }) {
   return (
     <main className="flex min-h-screen flex-col bg-black text-white">
-      {/* Navigation */}
+      {/* Navigation bar */}
       <NavBar />
       
       {/* Hero section */}
