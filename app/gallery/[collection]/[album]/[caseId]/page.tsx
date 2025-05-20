@@ -1,8 +1,9 @@
-import { getGalleries, getAlbumsByGallery, getCase, Image } from "@/lib/supabase";
+import { getGalleries, getAlbumsByGallery, getCasesByAlbum, getCase, Image as GalleryImage } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { NavBar } from "@/components/nav-bar";
 import { CaseViewer } from "@/components/case-viewer";
+import CldImage from '@/components/media/CldImage';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -11,6 +12,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { SidebarInset } from "@/components/ui/sidebar-inset";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { GallerySidebar } from "@/components/GallerySidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { ArrowLeft, Heart, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -45,8 +50,8 @@ export default async function CasePage({ params }: CasePageProps) {
   
   // Find the current gallery by slug (collection param)
   const currentGallery = galleries.find(
-    gallery => gallery.title === params.collection || 
-               gallery.title.toLowerCase().replace(/\s+/g, '-') === params.collection
+    gallery => gallery.title.toLowerCase() === params.collection.toLowerCase() || 
+               gallery.title.toLowerCase().replace(/\s+/g, '-') === params.collection.toLowerCase()
   );
   
   if (!currentGallery) {
@@ -62,8 +67,8 @@ export default async function CasePage({ params }: CasePageProps) {
   
   // Find the current album by slug
   const currentAlbum = albums.find(
-    album => album.title === params.album || 
-             album.title.toLowerCase().replace(/\s+/g, '-') === params.album
+    album => album.title.toLowerCase() === params.album.toLowerCase() || 
+             album.title.toLowerCase().replace(/\s+/g, '-') === params.album.toLowerCase()
   );
   
   if (!currentAlbum) {
@@ -121,22 +126,25 @@ export default async function CasePage({ params }: CasePageProps) {
           </div>
         </div>
         
-        {/* Case viewer */}
-        {currentCase.images && currentCase.images.length > 0 ? (
-          <CaseViewer 
-            images={currentCase.images.map((img: Image) => ({
-              id: img.id,
-              url: img.cloudinary_url
-            }))} 
-          />
-        ) : (
-          <div className="text-center py-12 px-4 bg-zinc-900/50 rounded-lg">
-            <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Images Available</h3>
-            <p className="text-zinc-400">
-              This case currently has no images. Please check back later.
-            </p>
-          </div>
-        )}
+        {/* Case images */}
+        <div className="mt-8">
+          {currentCase.images && currentCase.images.length > 0 ? (
+            <CaseViewer 
+              images={currentCase.images.map((img: GalleryImage) => ({
+                id: img.id,
+                url: img.cloudinary_url,
+                type: img.type === 'video' ? 'video' : 'image'
+              }))} 
+            />
+          ) : (
+            <div className="text-center py-12 px-4 bg-zinc-900/50 rounded-lg">
+              <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Images Available</h3>
+              <p className="text-zinc-400">
+                This case currently has no images. Please check back later.
+              </p>
+            </div>
+          )}
+        </div>
         
         {/* Display metadata if available */}
         {currentCase.metadata && Object.keys(currentCase.metadata).length > 0 && (

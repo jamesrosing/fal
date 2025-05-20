@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NavBar } from "@/components/nav-bar";
 import CldImage from '@/components/media/CldImage';
 import { GallerySidebar } from "@/components/GallerySidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -12,6 +13,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { SidebarInset } from "@/components/ui/sidebar-inset";
+import { AppSidebar } from "@/components/app-sidebar";
 
 interface CollectionPageProps {
   params: {
@@ -30,8 +33,8 @@ export default async function CollectionPage({ params, searchParams }: Collectio
   
   // Find the current gallery by slug (collection param)
   const currentGallery = galleries.find(
-    gallery => gallery.title === params.collection || 
-               gallery.title.toLowerCase().replace(/\s+/g, '-') === params.collection
+    gallery => gallery.title.toLowerCase() === params.collection.toLowerCase() || 
+               gallery.title.toLowerCase().replace(/\s+/g, '-') === params.collection.toLowerCase()
   );
   
   if (!currentGallery) {
@@ -40,6 +43,21 @@ export default async function CollectionPage({ params, searchParams }: Collectio
   
   // Fetch albums for this gallery
   const albums = await getAlbumsByGallery(params.collection);
+  
+  // Fetch all albums for each gallery for the sidebar
+  const sidebarCollections = await Promise.all(
+    galleries.map(async (gallery) => {
+      const galleryAlbums = await getAlbumsByGallery(gallery.id);
+      return {
+        id: gallery.title.toLowerCase().replace(/\s+/g, '-'),
+        title: gallery.title,
+        albums: galleryAlbums?.map(album => ({
+          id: album.title.toLowerCase().replace(/\s+/g, '-'),
+          title: album.title,
+        })) || []
+      };
+    })
+  );
   
   // Get filter values from search params
   const procedure = searchParams.procedure as string | undefined;
@@ -85,95 +103,105 @@ export default async function CollectionPage({ params, searchParams }: Collectio
   }));
 
   return (
-    <div className="min-h-screen">
-      <NavBar />
-      
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Home</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/gallery">Gallery</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{currentGallery.title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <div className="md:col-span-1">
-            <GallerySidebar 
-              title={currentGallery.title}
-              procedures={procedures}
-              sortOptions={[
-                { id: 'newest', label: 'Newest First' },
-                { id: 'oldest', label: 'Oldest First' },
-                { id: 'name', label: 'Name (A-Z)' }
-              ]}
-              baseUrl={`/gallery/${params.collection}`}
-              selectedProcedure={procedure}
-              selectedSort={sortBy}
-            />
-          </div>
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden">
+        <AppSidebar isAdminPage={false} />
+        <div className="flex-1 overflow-auto">
+          <NavBar />
           
-          {/* Main content */}
-          <div className="md:col-span-3">
-            <h1 className="text-3xl font-bold mb-2">{currentGallery.title}</h1>
-            {currentGallery.description && (
-              <p className="text-muted-foreground mb-6">
-                {currentGallery.description}
-              </p>
-            )}
+          <div className="container mx-auto px-4 py-8">
+            {/* Breadcrumb */}
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/gallery">Gallery</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{currentGallery.title}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             
-            {filteredAlbums.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAlbums.map((album) => (
-                  <Link
-                    key={album.id}
-                    href={`/gallery/${params.collection}/${album.title}`}
-                    className="group"
-                  >
-                    <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 transition-all group-hover:border-slate-300 dark:group-hover:border-slate-700">
-                      <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
-                        {/* Album thumbnail - placeholder for now */}
-                        <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-900">
-                          <span className="text-slate-400 dark:text-slate-600">
-                            {album.title}
-                          </span>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {/* Sidebar */}
+              <SidebarInset className="lg:w-64 xl:w-80">
+                <SidebarProvider>
+                  <GallerySidebar
+                    title={currentGallery.title}
+                    procedures={procedures}
+                    sortOptions={[
+                      { id: 'newest', label: 'Newest', count: albums?.length || 0 },
+                      { id: 'oldest', label: 'Oldest', count: albums?.length || 0 },
+                      { id: 'az', label: 'A-Z', count: albums?.length || 0 },
+                      { id: 'za', label: 'Z-A', count: albums?.length || 0 },
+                    ]}
+                    baseUrl={`/gallery/${params.collection}`}
+                    selectedProcedure={procedure}
+                    selectedSort={sortBy}
+                    collections={sidebarCollections}
+                    currentCollection={params.collection}
+                  />
+                </SidebarProvider>
+              </SidebarInset>
+              
+              {/* Main content */}
+              <div className="md:col-span-3">
+                <h1 className="text-3xl font-bold mb-2">{currentGallery.title}</h1>
+                {currentGallery.description && (
+                  <p className="text-muted-foreground mb-6">
+                    {currentGallery.description}
+                  </p>
+                )}
+                
+                {filteredAlbums.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredAlbums.map((album) => (
+                      <Link
+                        key={album.id}
+                        href={`/gallery/${params.collection}/${album.title.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="group"
+                      >
+                        <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800 transition-all group-hover:border-slate-300 dark:group-hover:border-slate-700">
+                          <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800">
+                            {/* Album thumbnail - placeholder for now */}
+                            <div className="w-full h-full flex items-center justify-center bg-slate-200 dark:bg-slate-900">
+                              <span className="text-slate-400 dark:text-slate-600">
+                                {album.title}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h3 className="font-medium group-hover:underline">{album.title}</h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {typeof album.case_count === 'object' && album.case_count !== null 
+                                ? String((album.case_count as any).count || 0) 
+                                : album.case_count || 0} cases
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-medium group-hover:underline">{album.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {typeof album.case_count === 'object' && album.case_count !== null 
-                            ? String((album.case_count as any).count || 0) 
-                            : album.case_count || 0} cases
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 border rounded-lg">
+                    <h3 className="text-xl font-medium mb-2">No albums found</h3>
+                    <p className="text-muted-foreground">
+                      {procedure 
+                        ? `No albums found matching "${procedure}". Try a different filter.` 
+                        : 'No albums have been added to this collection yet.'}
+                    </p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-12 border rounded-lg">
-                <h3 className="text-xl font-medium mb-2">No albums found</h3>
-                <p className="text-muted-foreground">
-                  {procedure 
-                    ? `No albums found matching "${procedure}". Try a different filter.` 
-                    : 'No albums have been added to this collection yet.'}
-                </p>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 } 

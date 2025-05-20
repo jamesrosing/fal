@@ -22,6 +22,7 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
 
 export interface FilterOption {
   id: string;
@@ -39,6 +40,16 @@ export interface GallerySidebarProps {
   tags?: FilterOption[];
   surgeons?: FilterOption[];
   onFilter?: (filters: Record<string, string[]>) => void;
+  collections?: {
+    id: string;
+    title: string;
+    albums?: {
+      id: string;
+      title: string;
+    }[];
+  }[];
+  currentCollection?: string;
+  currentAlbum?: string;
 }
 
 export function GallerySidebar({
@@ -50,7 +61,10 @@ export function GallerySidebar({
   selectedSort,
   tags = [],
   surgeons = [],
-  onFilter
+  onFilter,
+  collections = [],
+  currentCollection,
+  currentAlbum
 }: GallerySidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -195,7 +209,51 @@ export function GallerySidebar({
       </div>
       
       <div className="flex-1 overflow-auto">
-        <Accordion type="multiple" defaultValue={["sort", "procedures", "tags", "surgeons"]} className="w-full">
+        <Accordion type="multiple" defaultValue={["collections", "sort", "procedures", "tags", "surgeons"]} className="w-full">
+          {collections.length > 0 && (
+            <AccordionItem value="collections" className="border-b">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                Collections
+              </AccordionTrigger>
+              <AccordionContent className="px-4 py-2">
+                <div className="space-y-1">
+                  {collections.map((collection) => (
+                    <div key={collection.id} className="space-y-1">
+                      <Link 
+                        href={`/gallery/${collection.id}`}
+                        className={`block px-2 py-1.5 text-sm rounded-md ${
+                          currentCollection === collection.id 
+                            ? 'bg-accent text-accent-foreground font-medium' 
+                            : 'hover:bg-accent/50 hover:text-accent-foreground'
+                        }`}
+                      >
+                        {collection.title}
+                      </Link>
+                      
+                      {collection.albums && collection.albums.length > 0 && currentCollection === collection.id && (
+                        <div className="ml-4 space-y-1 mt-1 border-l-2 pl-2">
+                          {collection.albums.map((album) => (
+                            <Link
+                              key={album.id}
+                              href={`/gallery/${collection.id}/${album.id}`}
+                              className={`block px-2 py-1 text-sm rounded-md ${
+                                currentAlbum === album.id
+                                  ? 'bg-accent/70 text-accent-foreground font-medium'
+                                  : 'hover:bg-accent/30 hover:text-accent-foreground'
+                              }`}
+                            >
+                              {album.title}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+          
           <AccordionItem value="sort" className="border-b">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               Sort By

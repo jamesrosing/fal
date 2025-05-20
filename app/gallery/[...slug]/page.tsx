@@ -172,9 +172,10 @@ export default function GalleryPage() {
       
       return (
         <div className="max-w-7xl mx-auto">
-          <CaseViewer images={currentCase.images.map(img => ({
+          <CaseViewer images={currentCase.images.map((img: GalleryImage) => ({
             id: img.id,
-            url: img.cloudinary_url
+            url: img.cloudinary_url,
+            type: img.type === 'video' ? 'video' : 'image'
           }))} />
         </div>
       )

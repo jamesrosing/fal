@@ -230,7 +230,7 @@ export async function getGalleryByTitle(title: string) {
   }
 }
 
-export async function getAlbumsByGallery(gallerySlug: string): Promise<Album[] | null> {
+export async function getAlbumsByGallery(gallerySlugOrId: string): Promise<Album[] | null> {
   try {
     const supabase = createServerClient();
     
@@ -238,7 +238,24 @@ export async function getAlbumsByGallery(gallerySlug: string): Promise<Album[] |
       throw new Error('Failed to create Supabase client');
     }
     
-    // First get all galleries to find the right one
+    // First check if gallerySlugOrId is a UUID
+    if (gallerySlugOrId.includes('-') && gallerySlugOrId.length > 20) {
+      // If it looks like a UUID, use it directly as gallery_id
+      const { data, error } = await supabase
+        .from('albums')
+        .select(`
+          *,
+          case_count:cases(count),
+          image_count:cases(images(count))
+        `)
+        .eq('gallery_id', gallerySlugOrId)
+        .order('title', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    } 
+    
+    // If not a UUID, try to find the gallery by title with more flexible matching
     const { data: galleries, error: galleriesError } = await supabase
       .from('galleries')
       .select('id, title');
@@ -248,31 +265,40 @@ export async function getAlbumsByGallery(gallerySlug: string): Promise<Album[] |
       return null;
     }
     
-    // Find gallery by exact title match or URL-friendly version of title
-    const gallery = galleries.find(g => 
-      g.title === gallerySlug || 
-      g.title.toLowerCase().replace(/\s+/g, '-') === gallerySlug
+    // Normalize the input slug for comparison
+    const normalizedSlug = gallerySlugOrId.toLowerCase().trim();
+    const dashedSlug = normalizedSlug.replace(/\s+/g, '-');
+    
+    // Find gallery with flexible matching (exact title, lowercase title, or URL-friendly)
+    const foundGallery = galleries?.find(g => 
+      g.title.toLowerCase() === normalizedSlug || 
+      g.title.toLowerCase().replace(/\s+/g, '-') === normalizedSlug || 
+      g.title.toLowerCase().replace(/\s+/g, '-') === dashedSlug
     );
     
-    if (!gallery) {
-      console.error(`Gallery not found with title/slug: ${gallerySlug}`);
+    if (!foundGallery) {
+      console.error(`Gallery not found with title/slug: ${gallerySlugOrId}`);
       return null;
     }
     
     // Get albums using the found gallery ID
-    const { data, error } = await supabase
+    const { data: albumsData, error: albumsError } = await supabase
       .from('albums')
       .select(`
         *,
         case_count:cases(count),
         image_count:cases(images(count))
       `)
-      .eq('gallery_id', gallery.id)
+      .eq('gallery_id', foundGallery.id)
       .order('title', { ascending: true });
     
-    if (error) throw error;
+    if (albumsError) {
+      console.error('Error fetching albums:', albumsError);
+      return null;
+    }
     
-    return data;
+    return albumsData;
+    
   } catch (error) {
     console.error('Error fetching albums by gallery:', error);
     return null;
@@ -291,39 +317,109 @@ export async function getCasesByAlbum(albumId: string): Promise<Case[] | null> {
     let actualAlbumId = albumId;
     
     // Check if albumId is not a UUID
-    if (!albumId.includes('-')) {
-      const { data: album, error: albumError } = await supabase
+    if (!albumId.includes('-') || albumId.length < 20) {
+      // Try to find the album with more robust matching logic
+      const { data: albums, error: albumsError } = await supabase
         .from('albums')
-        .select('id')
-        .eq('title', albumId)
-        .single();
-      
-      if (albumError) {
-        console.error('Error fetching album:', albumError);
+        .select('id, title');
+        
+      if (albumsError) {
+        console.error('Error fetching albums:', albumsError);
         return null;
       }
       
-      if (!album) {
+      // Normalize the input slug for comparison
+      const normalizedInput = albumId.toLowerCase().replace(/-/g, ' ');
+      
+      // Find a matching album - try exact match first, then normalized
+      const matchingAlbum = albums?.find(
+        album => album.title.toLowerCase() === albumId.toLowerCase() || 
+                 album.title.toLowerCase() === normalizedInput || 
+                 album.title.toLowerCase().replace(/\s+/g, '-') === albumId.toLowerCase()
+      );
+      
+      if (!matchingAlbum) {
         return null;
       }
       
-      actualAlbumId = album.id;
+      actualAlbumId = matchingAlbum.id;
     }
     
-    const { data, error } = await supabase
+    // Fetch the cases
+    const { data: cases, error } = await supabase
       .from('cases')
-      .select(`
-        *,
-        images (*)
-      `)
+      .select('*')
       .eq('album_id', actualAlbumId)
-      .order('title', { ascending: true });
+      .order('title');
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching cases:', error);
+      return null;
+    }
     
-    return data;
+    if (!cases || cases.length === 0) {
+      return [];
+    }
+    
+    // For each case, fetch its images from case_images and media_assets
+    const casesWithImages = await Promise.all(cases.map(async (caseItem) => {
+      // Get case_images for this case
+      const { data: caseImages, error: caseImagesError } = await supabase
+        .from('case_images')
+        .select('media_id, sequence')
+        .eq('case_id', caseItem.id)
+        .order('sequence', { ascending: true });
+      
+      if (caseImagesError) {
+        console.error(`Error fetching case_images for case ${caseItem.id}:`, caseImagesError);
+        return { ...caseItem, images: [] };
+      }
+      
+      if (!caseImages || caseImages.length === 0) {
+        return { ...caseItem, images: [] };
+      }
+      
+      // Get media_assets for these case_images
+      const mediaIds = caseImages.map(ci => ci.media_id);
+      const { data: mediaAssets, error: mediaAssetsError } = await supabase
+        .from('media_assets')
+        .select('*')
+        .in('id', mediaIds);
+      
+      if (mediaAssetsError) {
+        console.error(`Error fetching media_assets for case ${caseItem.id}:`, mediaAssetsError);
+        return { ...caseItem, images: [] };
+      }
+      
+      // Map media assets to our expected image format
+      // Sort by the sequence from case_images
+      const images = caseImages.map(ci => {
+        const media = mediaAssets?.find(ma => ma.id === ci.media_id);
+        if (!media) return null;
+        
+        return {
+          id: media.id,
+          case_id: caseItem.id,
+          cloudinary_id: media.cloudinary_id || '',
+          cloudinary_url: media.url || '',
+          type: media.type || 'image',
+          sort_order: ci.sequence || 0,
+          is_before: media.tags?.includes('before') || false,
+          created_at: media.created_at || '',
+          updated_at: media.updated_at || ''
+        };
+      }).filter(Boolean) as Image[];
+      
+      return {
+        ...caseItem,
+        images: images || []
+      };
+    }));
+    
+    return casesWithImages as Case[];
+    
   } catch (error) {
-    console.error('Error fetching cases by album:', error);
+    console.error('Error in getCasesByAlbum:', error);
     return null;
   }
 }
@@ -336,20 +432,76 @@ export async function getCase(caseId: string): Promise<Case | null> {
       throw new Error('Failed to create Supabase client');
     }
     
-    const { data, error } = await supabase
+    // Fetch the case
+    const { data: caseData, error: caseError } = await supabase
       .from('cases')
-      .select(`
-        *,
-        images (*)
-      `)
+      .select('*')
       .eq('id', caseId)
       .single();
     
-    if (error) throw error;
+    if (caseError) {
+      console.error(`Error fetching case ${caseId}:`, caseError);
+      return null;
+    }
     
-    return data;
+    if (!caseData) {
+      return null;
+    }
+    
+    // Get case_images for this case
+    const { data: caseImages, error: caseImagesError } = await supabase
+      .from('case_images')
+      .select('media_id, sequence')
+      .eq('case_id', caseId)
+      .order('sequence', { ascending: true });
+    
+    if (caseImagesError) {
+      console.error(`Error fetching case_images for case ${caseId}:`, caseImagesError);
+      return { ...caseData, images: [] };
+    }
+    
+    if (!caseImages || caseImages.length === 0) {
+      return { ...caseData, images: [] };
+    }
+    
+    // Get media_assets for these case_images
+    const mediaIds = caseImages.map(ci => ci.media_id);
+    const { data: mediaAssets, error: mediaAssetsError } = await supabase
+      .from('media_assets')
+      .select('*')
+      .in('id', mediaIds);
+    
+    if (mediaAssetsError) {
+      console.error(`Error fetching media_assets for case ${caseId}:`, mediaAssetsError);
+      return { ...caseData, images: [] };
+    }
+    
+    // Map media assets to our expected image format
+    // Sort by the sequence from case_images
+    const images = caseImages.map(ci => {
+      const media = mediaAssets?.find(ma => ma.id === ci.media_id);
+      if (!media) return null;
+      
+      return {
+        id: media.id,
+        case_id: caseId,
+        cloudinary_id: media.cloudinary_id || '',
+        cloudinary_url: media.url || '',
+        type: media.type || 'image',
+        sort_order: ci.sequence || 0,
+        is_before: media.tags?.includes('before') || false,
+        created_at: media.created_at || '',
+        updated_at: media.updated_at || ''
+      };
+    }).filter(Boolean) as Image[];
+    
+    return {
+      ...caseData,
+      images: images || []
+    };
+    
   } catch (error) {
-    console.error('Error fetching case:', error);
+    console.error('Error in getCase:', error);
     return null;
   }
 }

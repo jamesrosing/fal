@@ -5,14 +5,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronRight } from "lucide-react"
 import {
-  SidebarGroup,
-  SidebarGroupLabel,
+  Sidebar,
+  SidebarContent,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  useSidebar
 } from "./ui/sidebar"
 import CldImage from '@/components/media/CldImage';
 import CldVideo from '@/components/media/CldVideo';
@@ -26,14 +23,14 @@ interface NavItem {
 
 export function NavMain({ items }: { items: NavItem[] }) {
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>GALLERY</SidebarGroupLabel>
+    <div>
+      <h2 className="text-sm font-semibold px-2 py-2">GALLERY</h2>
       <SidebarMenu>
         {items.map((item) => (
           <NavMenuItem key={item.title} item={item} />
         ))}
       </SidebarMenu>
-    </SidebarGroup>
+    </div>
   )
 }
 
@@ -50,13 +47,13 @@ function NavMenuItem({ item }: { item: NavItem }) {
             <span>{item.title}</span>
             <ChevronRight className="ml-auto h-4 w-4" />
           </SidebarMenuButton>
-          <SidebarMenuSub>
+          <div className="pl-4">
             <ul>
               {item.items.map((subItem) => (
                 <NavMenuItem key={subItem.title} item={subItem} />
               ))}
             </ul>
-          </SidebarMenuSub>
+          </div>
         </>
       ) : (
         <SidebarMenuButton asChild data-active={isActive}>

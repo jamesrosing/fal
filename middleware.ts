@@ -118,9 +118,18 @@ export async function middleware(request: NextRequest) {
         .single();
       
       console.log('User profile for admin check:', profile);
+      console.log('Session details:', {
+        user_id: session.user.id,
+        email: session.user.email
+      });
       
-      if (!profile || profile.role !== 'admin') {
-        console.log('User is not an admin, redirecting to homepage');
+      if (!profile) {
+        console.log('No user profile found, redirecting to homepage');
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      
+      if (profile.role !== 'admin') {
+        console.log(`User role is ${profile.role}, not admin. Redirecting to homepage`);
         return NextResponse.redirect(new URL('/', request.url));
       }
     } catch (error) {
