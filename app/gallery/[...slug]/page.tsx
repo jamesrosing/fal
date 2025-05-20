@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import {
@@ -22,19 +23,72 @@ import { Share2, Heart } from "lucide-react"
 import CldImage from '@/components/media/CldImage'
 import CldVideo from '@/components/media/CldVideo'
 
-
-interface PageProps {
-  galleries: Gallery[];
-  albums?: Album[];
-  cases?: (Case & { images: GalleryImage[] })[];
-  currentCase?: Case & { images: GalleryImage[] };
-  currentAlbum?: Album;
-}
-
-export default function GalleryPage({ galleries = [], albums = [], cases = [], currentCase, currentAlbum }: PageProps) {
+export default function GalleryPage() {
   const params = useParams()
   const router = useRouter()
   const slug = params.slug as string[] || []
+  
+  // State for data
+  const [galleries, setGalleries] = useState<Gallery[]>([])
+  const [albums, setAlbums] = useState<Album[]>([])
+  const [cases, setCases] = useState<(Case & { images: GalleryImage[] })[]>([])
+  const [currentCase, setCurrentCase] = useState<Case & { images: GalleryImage[] } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch data based on slug path
+  useEffect(() => {
+    const fetchGalleryData = async () => {
+      setLoading(true)
+      try {
+        // Always fetch galleries
+        const galleriesResponse = await fetch('/api/gallery/collections')
+        const galleriesData = await galleriesResponse.json()
+        setGalleries(galleriesData.collections || [])
+        
+        // If no slug, just show galleries
+        if (!slug || slug.length === 0) {
+          setLoading(false)
+          return
+        }
+        
+        // If 1 slug param, fetch albums for that gallery
+        if (slug.length === 1) {
+          const albumsResponse = await fetch(`/api/gallery/albums?collection=${slug[0]}`)
+          const albumsData = await albumsResponse.json()
+          setAlbums(albumsData.albums || [])
+          setLoading(false)
+          return
+        }
+        
+        // If 2 slug params, fetch cases for that album
+        if (slug.length === 2) {
+          const casesResponse = await fetch(`/api/gallery/cases?collection=${slug[0]}&album=${slug[1]}`)
+          const casesData = await casesResponse.json()
+          setCases(casesData.cases || [])
+          setAlbums([]) // Clear albums
+          setLoading(false)
+          return
+        }
+        
+        // If 3 slug params, fetch the specific case
+        if (slug.length === 3) {
+          const caseResponse = await fetch(`/api/gallery/cases/${slug[2]}`)
+          const caseData = await caseResponse.json()
+          setCurrentCase(caseData.case || null)
+          setCases([]) // Clear cases
+          setAlbums([]) // Clear albums
+          setLoading(false)
+          return
+        }
+        
+      } catch (error) {
+        console.error('Error fetching gallery data:', error)
+        setLoading(false)
+      }
+    }
+    
+    fetchGalleryData()
+  }, [slug])
 
   const renderBreadcrumbs = () => {
     // For case view, only show the case number and a back button

@@ -43,11 +43,17 @@ export default function ReviewsPage() {
       {/* Hero Section */}
       <section className="relative h-[70vh]">
         <div className="absolute inset-0">
-          <CldImage publicId="hero/reviews-hero.jpg" alt="Patient Reviews"   priority fill / config={{
-          cloud: {
-            cloudName: 'dyrzyfg3w'
-          }
-        }}>
+          <CldImage 
+            src="hero/reviews-hero.jpg" 
+            alt="Patient Reviews" 
+            priority 
+            fill 
+            config={{
+              cloud: {
+                cloudName: 'dyrzyfg3w'
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-black/50" />
         </div>
         

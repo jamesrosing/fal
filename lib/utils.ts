@@ -9,6 +9,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function formatDate(date: string | Date): string {
+  if (!date) return '';
+  
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  // Check if date is valid
+  if (isNaN(d.getTime())) return '';
+  
+  return d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
 export async function resizeImage(file: File, maxSize: number = 2048): Promise<Blob> {
   if (typeof window === 'undefined') {
     throw new Error('resizeImage can only be used in the browser')

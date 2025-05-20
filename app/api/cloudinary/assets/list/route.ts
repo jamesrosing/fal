@@ -7,56 +7,80 @@ import { createClient } from '@/lib/supabase';
  */
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get('type');
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const offset = (page - 1) * limit;
-    const folder = searchParams.get('folder');
-    
     const supabase = createClient();
     
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const folder = searchParams.get('folder') || '';
+    const type = searchParams.get('type') || '';
+    const sort = searchParams.get('sort') || 'newest';
+    const search = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    
+    // Start building query
     let query = supabase
       .from('media_assets')
-      .select('*', { count: 'exact' });
+      .select('*');
     
-    // Apply filters if provided
-    if (type) {
+    // Apply folder filter if provided
+    if (folder) {
+      query = query.eq('folder', folder);
+    }
+    
+    // Apply type filter if provided
+    if (type && type !== 'all') {
       query = query.eq('type', type);
     }
     
-    if (folder) {
-      query = query.ilike('public_id', `${folder}/%`);
+    // Apply search filter if provided
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,alt_text.ilike.%${search}%,cloudinary_id.ilike.%${search}%`);
     }
     
-    // Add pagination
-    query = query
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+    // Apply sorting
+    switch (sort) {
+      case 'oldest':
+        query = query.order('created_at', { ascending: true });
+        break;
+      case 'name_asc':
+        query = query.order('title', { ascending: true });
+        break;
+      case 'name_desc':
+        query = query.order('title', { ascending: false });
+        break;
+      case 'newest':
+      default:
+        query = query.order('created_at', { ascending: false });
+        break;
+    }
     
+    // Apply pagination
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    query = query.range(from, to);
+    
+    // Execute the query
     const { data, error, count } = await query;
     
     if (error) {
-      console.error('Error fetching media assets:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch media assets' },
-        { status: 500 }
-      );
+      throw error;
     }
     
-    return NextResponse.json({ 
-      mediaAssets: data,
+    return NextResponse.json({
+      assets: data || [],
       pagination: {
-        total: count || 0,
         page,
         limit,
-        pages: count ? Math.ceil(count / limit) : 0
+        total: count || 0,
+        totalPages: count ? Math.ceil(count / limit) : 0
       }
     });
+    
   } catch (error) {
-    console.error('Error in media assets API route:', error);
+    console.error('Error fetching assets:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch assets' },
       { status: 500 }
     );
   }

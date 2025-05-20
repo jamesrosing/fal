@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase';
 import { getMediaType } from '@/lib/cloudinary';
+import { cookies } from 'next/headers';
 
 /**
  * API route for registering a new Cloudinary asset in the database
@@ -16,111 +17,142 @@ import { getMediaType } from '@/lib/cloudinary';
  *   metadata?: object;  // Optional metadata
  * }
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    // Get request body
-    const body = await request.json();
-    const { 
-      public_id,
-      title = '',
-      alt_text = '',
+    const supabase = createServerClient();
+    
+    // Extract session cookie manually from headers
+    const cookieHeader = request.headers.get('cookie') || '';
+    const sessionMatch = cookieHeader.match(/sb-[^=]+=([^;]+)/);
+    const session = sessionMatch ? sessionMatch[1] : null;
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+    
+    // Verify the user is authenticated using session 
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !sessionData.session || !sessionData.session.user) {
+      return NextResponse.json(
+        { error: 'You must be logged in to register assets' },
+        { status: 401 }
+      );
+    }
+    
+    const user = sessionData.session.user;
+    
+    // Get user role
+    const { data: userProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    
+    if (profileError || !userProfile || userProfile.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'You must be an admin to register assets' },
+        { status: 403 }
+      );
+    }
+    
+    // Get the request body
+    const {
+      cloudinary_id,
+      type,
+      format,
       width,
       height,
-      metadata = {}
-    } = body;
+      url,
+      size,
+      title,
+      alt_text,
+      tags,
+      folder
+    } = await request.json();
     
-    // Validate public_id
-    if (!public_id) {
+    // Validate required fields
+    if (!cloudinary_id || !url || !type) {
       return NextResponse.json(
-        { error: 'Missing public_id parameter' },
+        { error: 'cloudinary_id, url, and type are required' },
         { status: 400 }
       );
     }
     
-    // Connect to Supabase
-    const supabase = createClient();
-    
-    // Check if asset already exists
-    const { data: existingData, error: checkError } = await supabase
+    // Check if this asset already exists in the database
+    const { data: existingAsset } = await supabase
       .from('media_assets')
       .select('id')
-      .eq('public_id', public_id)
-      .maybeSingle();
+      .eq('cloudinary_id', cloudinary_id)
+      .single();
     
-    if (checkError) {
-      console.error('Error checking for existing asset:', checkError);
-      return NextResponse.json(
-        { error: 'Failed to check for existing asset' },
-        { status: 500 }
-      );
-    }
-    
-    const type = getMediaType(public_id);
-    
-    if (existingData) {
-      // Update existing asset
-      const { error: updateError } = await supabase
+    if (existingAsset) {
+      // Update the existing asset
+      const { data, error } = await supabase
         .from('media_assets')
         .update({
-          title: title || null,
-          alt_text: alt_text || null,
-          width: width || null,
-          height: height || null,
-          metadata: metadata || {},
           type,
+          format,
+          width,
+          height,
+          url,
+          size,
+          title: title || cloudinary_id.split('/').pop(),
+          alt_text: alt_text || cloudinary_id.split('/').pop(),
+          tags,
+          folder,
           updated_at: new Date().toISOString()
         })
-        .eq('id', existingData.id);
-      
-      if (updateError) {
-        console.error('Error updating asset:', updateError);
-        return NextResponse.json(
-          { error: 'Failed to update asset' },
-          { status: 500 }
-        );
-      }
-      
-      return NextResponse.json({ 
-        success: true,
-        message: `Updated asset: ${public_id}`,
-        id: existingData.id
-      });
-    } else {
-      // Insert new asset
-      const { data: insertData, error: insertError } = await supabase
-        .from('media_assets')
-        .insert({
-          public_id,
-          title: title || null,
-          alt_text: alt_text || null,
-          width: width || null,
-          height: height || null,
-          metadata: metadata || {},
-          type,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .select('id')
+        .eq('id', existingAsset.id)
+        .select()
         .single();
       
-      if (insertError) {
-        console.error('Error creating new asset:', insertError);
-        return NextResponse.json(
-          { error: 'Failed to create new asset' },
-          { status: 500 }
-        );
+      if (error) {
+        throw error;
       }
       
       return NextResponse.json({ 
-        success: true,
-        message: `Created new asset: ${public_id}`,
-        id: insertData.id
+        message: 'Asset updated successfully', 
+        asset: data 
       });
     }
+    
+    // Insert a new asset
+    const { data, error } = await supabase
+      .from('media_assets')
+      .insert({
+        cloudinary_id,
+        type,
+        format,
+        width,
+        height,
+        url,
+        size,
+        title: title || cloudinary_id.split('/').pop(),
+        alt_text: alt_text || cloudinary_id.split('/').pop(),
+        tags,
+        folder,
+        created_by: user.id
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      throw error;
+    }
+    
+    return NextResponse.json({ 
+      message: 'Asset registered successfully', 
+      asset: data 
+    });
+    
   } catch (error) {
-    console.error('Error in register asset API route:', error);
+    console.error('Error registering asset:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to register asset' },
       { status: 500 }
     );
   }

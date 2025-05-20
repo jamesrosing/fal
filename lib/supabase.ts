@@ -55,39 +55,58 @@ export async function isUserAdmin() {
 }
 
 // Types for our database tables
-export interface Gallery {
+export type Gallery = {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   created_at: string;
-}
+  updated_at?: string;
+  image_count?: number;
+  album_count?: number;
+  case_count?: number;
+};
 
-export interface Album {
+export type Album = {
   id: string;
+  title: string;
+  description?: string;
   gallery_id: string;
-  title: string;
-  description: string;
   created_at: string;
-}
+  updated_at?: string;
+  tags?: string[];
+  procedure?: string;
+  image_count?: number;
+  case_count?: number;
+};
 
-export interface Case {
+export type Case = {
   id: string;
-  album_id: string;
   title: string;
-  description: string;
-  metadata: Record<string, any>;
+  description?: string;
+  procedure?: string;
+  album_id: string;
   created_at: string;
-}
+  updated_at?: string;
+  slug?: string;
+  patient_age?: number;
+  patient_gender?: string;
+  before_date?: string;
+  after_date?: string;
+  images?: Image[];
+  metadata?: Record<string, any>;
+};
 
-export interface Image {
+export type Image = {
   id: string;
   case_id: string;
+  cloudinary_id: string;
   cloudinary_url: string;
-  caption: string;
-  tags: string[];
+  type: string;
+  sort_order: number;
+  is_before: boolean;
   created_at: string;
-  display_order: number;
-}
+  updated_at: string;
+};
 
 export type TeamMember = {
   id: string;
@@ -158,7 +177,7 @@ function handleSupabaseError(error: any, operation: string): void {
 }
 
 // Helper functions for database operations
-export async function getGalleries() {
+export async function getGalleries(): Promise<Gallery[] | null> {
   try {
     const supabase = createServerClient();
     
@@ -168,18 +187,20 @@ export async function getGalleries() {
     
     const { data, error } = await supabase
       .from('galleries')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select(`
+        *,
+        album_count:albums(count),
+        case_count:albums(cases(count)),
+        image_count:albums(cases(images(count)))
+      `)
+      .order('title', { ascending: true });
     
-    if (error) {
-      handleSupabaseError(error, 'getGalleries');
-      return [];
-    }
+    if (error) throw error;
     
-    return data || [];
+    return data;
   } catch (error) {
-    handleSupabaseError(error, 'getGalleries');
-    return [];
+    console.error('Error fetching galleries:', error);
+    return null;
   }
 }
 
@@ -209,7 +230,7 @@ export async function getGalleryByTitle(title: string) {
   }
 }
 
-export async function getAlbumsByGallery(galleryIdOrTitle: string) {
+export async function getAlbumsByGallery(gallerySlug: string): Promise<Album[] | null> {
   try {
     const supabase = createServerClient();
     
@@ -217,101 +238,118 @@ export async function getAlbumsByGallery(galleryIdOrTitle: string) {
       throw new Error('Failed to create Supabase client');
     }
     
-    // First try to get albums by gallery ID
-    let { data, error } = await supabase
-      .from('albums')
-      .select('*')
-      .eq('gallery_id', galleryIdOrTitle)
-      .order('created_at', { ascending: false });
+    // First get all galleries to find the right one
+    const { data: galleries, error: galleriesError } = await supabase
+      .from('galleries')
+      .select('id, title');
     
-    if (error) {
-      handleSupabaseError(error, `getAlbumsByGallery(ID): ${galleryIdOrTitle}`);
-      return [];
-    }
-    
-    // If no albums found, try to get the gallery by title
-    if (data && data.length === 0) {
-      try {
-        const gallery = await getGalleryByTitle(galleryIdOrTitle);
-        
-        if (!gallery) {
-          console.error(`Gallery not found: ${galleryIdOrTitle}`);
-          return [];
-        }
-        
-        const result = await supabase
-          .from('albums')
-          .select('*')
-          .eq('gallery_id', gallery.id)
-          .order('created_at', { ascending: false });
-        
-        if (result.error) {
-          handleSupabaseError(result.error, `getAlbumsByGallery(title): ${galleryIdOrTitle}`);
-          return [];
-        }
-        
-        data = result.data;
-      } catch (err) {
-        handleSupabaseError(err, `getAlbumsByGallery(title-fallback): ${galleryIdOrTitle}`);
-        return [];
-      }
-    }
-    
-    return data || [];
-  } catch (error) {
-    handleSupabaseError(error, `getAlbumsByGallery: ${galleryIdOrTitle}`);
-    return [];
-  }
-}
-
-export async function getCasesByAlbum(albumId: string) {
-  try {
-    const supabase = createServerClient();
-    
-    if (!supabase) {
-      throw new Error('Failed to create Supabase client');
-    }
-    
-    const { data, error } = await supabase
-      .from('cases')
-      .select('*, images(*)')
-      .eq('album_id', albumId)
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      handleSupabaseError(error, `getCasesByAlbum: ${albumId}`);
-      return [];
-    }
-    
-    return data || [];
-  } catch (error) {
-    handleSupabaseError(error, `getCasesByAlbum: ${albumId}`);
-    return [];
-  }
-}
-
-export async function getCase(caseId: string) {
-  try {
-    const supabase = createServerClient();
-    
-    if (!supabase) {
-      throw new Error('Failed to create Supabase client');
-    }
-    
-    const { data, error } = await supabase
-      .from('cases')
-      .select('*, images(*)')
-      .eq('id', caseId)
-      .single();
-    
-    if (error) {
-      handleSupabaseError(error, `getCase: ${caseId}`);
+    if (galleriesError) {
+      console.error('Error fetching galleries:', galleriesError);
       return null;
     }
     
+    // Find gallery by exact title match or URL-friendly version of title
+    const gallery = galleries.find(g => 
+      g.title === gallerySlug || 
+      g.title.toLowerCase().replace(/\s+/g, '-') === gallerySlug
+    );
+    
+    if (!gallery) {
+      console.error(`Gallery not found with title/slug: ${gallerySlug}`);
+      return null;
+    }
+    
+    // Get albums using the found gallery ID
+    const { data, error } = await supabase
+      .from('albums')
+      .select(`
+        *,
+        case_count:cases(count),
+        image_count:cases(images(count))
+      `)
+      .eq('gallery_id', gallery.id)
+      .order('title', { ascending: true });
+    
+    if (error) throw error;
+    
     return data;
   } catch (error) {
-    handleSupabaseError(error, `getCase: ${caseId}`);
+    console.error('Error fetching albums by gallery:', error);
+    return null;
+  }
+}
+
+export async function getCasesByAlbum(albumId: string): Promise<Case[] | null> {
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    // Handle if albumId is actually a slug (title instead of UUID)
+    let actualAlbumId = albumId;
+    
+    // Check if albumId is not a UUID
+    if (!albumId.includes('-')) {
+      const { data: album, error: albumError } = await supabase
+        .from('albums')
+        .select('id')
+        .eq('title', albumId)
+        .single();
+      
+      if (albumError) {
+        console.error('Error fetching album:', albumError);
+        return null;
+      }
+      
+      if (!album) {
+        return null;
+      }
+      
+      actualAlbumId = album.id;
+    }
+    
+    const { data, error } = await supabase
+      .from('cases')
+      .select(`
+        *,
+        images (*)
+      `)
+      .eq('album_id', actualAlbumId)
+      .order('title', { ascending: true });
+    
+    if (error) throw error;
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching cases by album:', error);
+    return null;
+  }
+}
+
+export async function getCase(caseId: string): Promise<Case | null> {
+  try {
+    const supabase = createServerClient();
+    
+    if (!supabase) {
+      throw new Error('Failed to create Supabase client');
+    }
+    
+    const { data, error } = await supabase
+      .from('cases')
+      .select(`
+        *,
+        images (*)
+      `)
+      .eq('id', caseId)
+      .single();
+    
+    if (error) throw error;
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching case:', error);
     return null;
   }
 }
@@ -326,4 +364,40 @@ function compareByDate(a: any, b: any) {
 
 function compareByRelevance(a: any, b: any) {
   // comparison function code
+}
+
+// Get a specific gallery by slug
+export async function getGallery(slug: string): Promise<Gallery | null> {
+  const supabase = createServerClient();
+  
+  const { data, error } = await supabase
+    .from('galleries')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  
+  if (error) {
+    console.error('Error fetching gallery:', error);
+    return null;
+  }
+  
+  return data as Gallery;
+}
+
+// Get a specific album by slug
+export async function getAlbum(slug: string): Promise<Album | null> {
+  const supabase = createServerClient();
+  
+  const { data, error } = await supabase
+    .from('albums')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  
+  if (error) {
+    console.error('Error fetching album:', error);
+    return null;
+  }
+  
+  return data as Album;
 } 

@@ -1,201 +1,185 @@
-"use client"
-
-import { motion } from 'framer-motion';
-import { useParams } from 'next/navigation';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AdminLayout from '@/components/layouts/AdminLayout';
+import { getGallery, getAlbum, getCasesByAlbum } from '@/lib/supabase';
+import { 
+  PlusCircleIcon, 
+  ImageIcon, 
+  Edit2Icon, 
+  Trash2Icon,
+  ArrowLeftIcon,
+  Eye,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, ImageIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { getCasesByAlbum, getAlbumsByGallery } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { formatDate } from '@/lib/utils';
 
-
-interface Album {
-  title: string;
+interface AdminGalleryAlbumPageProps {
+  params: {
+    collection: string;
+    album: string;
+  };
 }
 
-interface DatabaseAlbum {
-  id: string;
-  title: string;
+export async function generateMetadata({ params }: AdminGalleryAlbumPageProps): Promise<Metadata> {
+  const album = await getAlbum(params.album);
+  return {
+    title: album ? `${album.title} | Gallery Cases` : 'Gallery Album',
+    description: 'Manage cases in this gallery album',
+  };
 }
 
-interface Case {
-  id: string;
-  title: string;
-  description: string;
-  images: Array<{
-    id: string;
-    cloudinary_url: string;
-  }>;
-}
-
-interface Collection {
-  title: string;
-  description: string;
-  albums: Record<string, Album>;
-}
-
-// Use the same collections structure
-const collections: Record<string, Collection> = {
-  "plastic-surgery": {
-    title: "Plastic Surgery",
-    description: "Before and after photos of plastic surgery procedures",
-    albums: {
-      "face": { title: "Face" },
-      "eyelids": { title: "Eyelids" },
-      "ears": { title: "Ears" },
-      "nose": { title: "Nose" },
-      "neck": { title: "Neck" },
-      "breast-augmentation": { title: "Breast Augmentation" },
-      "breast-lift": { title: "Breast Lift" },
-      "breast-reduction": { title: "Breast Reduction" },
-      "breast-revision": { title: "Breast Revision" },
-      "breast-nipple-areolar-complex": { title: "Breast Nipple Areolar Complex" },
-      "abdominoplasty": { title: "Abdominoplasty" },
-      "mini-abdominoplasty": { title: "Mini Abdominoplasty" },
-      "liposuction": { title: "Liposuction" },
-      "arm-lift": { title: "Arm Lift" },
-      "thigh-lift": { title: "Thigh Lift" }
-    }
-  },
-  "emsculpt": {
-    title: "Emsculpt",
-    description: "Before and after photos of EMSculpt treatments",
-    albums: {
-      "abdomen": { title: "Abdomen" },
-      "buttocks": { title: "Buttocks" },
-      "arms": { title: "Arms" },
-      "calves": { title: "Calves" }
-    }
-  },
-  "sylfirmx": {
-    title: "Sylfirm X",
-    description: "Before and after photos of Sylfirm X treatments",
-    albums: {
-      "face": { title: "Face" }
-    }
-  },
-  "facials": {
-    title: "Facials",
-    description: "Before and after photos of facial treatments",
-    albums: {
-      "hydrafacial": { title: "HydraFacial" }
-    }
+export default async function AdminGalleryAlbumPage({ params }: AdminGalleryAlbumPageProps) {
+  const gallery = await getGallery(params.collection);
+  const album = await getAlbum(params.album);
+  
+  if (!gallery || !album) {
+    notFound();
   }
-};
-
-export default function AlbumPage() {
-  const params = useParams();
-  const collectionId = params.collection as string;
-  const albumId = params.album as string;
-  const collection = collections[collectionId];
-  const album = collection?.albums[albumId];
-  const [cases, setCases] = useState<Case[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchCases() {
-      try {
-        // First get the album ID from the database
-        const albums = await getAlbumsByGallery(collectionId);
-        const dbAlbum = albums?.find(a => 
-          a.title.toLowerCase().replace(/\s+/g, '-') === albumId
-        ) as DatabaseAlbum | undefined;
-        
-        if (dbAlbum) {
-          // Then fetch cases for this album
-          const albumCases = await getCasesByAlbum(dbAlbum.id);
-          setCases(albumCases || []);
-        }
-      } catch (error) {
-        console.error('Error fetching cases:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (collection && album) {
-      fetchCases();
-    }
-  }, [collectionId, albumId, collection, album]);
-
-  if (!collection || !album) {
-    return <div>Album not found</div>;
-  }
-
+  
+  const cases = await getCasesByAlbum(album.id);
+  
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <Link 
-          href={`/admin/gallery/${collectionId}`} 
-          className="inline-flex items-center text-zinc-200 hover:text-white mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to {collection.title}
-        </Link>
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">{album.title}</h1>
-            <p className="text-zinc-500">
-              {cases.length} Cases • {cases.reduce((total, c) => total + c.images.length, 0)} Photos
-            </p>
+    <AdminLayout>
+      <div className="container mx-auto py-6 space-y-6">
+        <div className="flex flex-col space-y-2">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/admin/gallery">Gallery</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href={`/admin/gallery/${params.collection}`}>{gallery.title}</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink>{album.title}</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold tracking-tight">{album.title} Cases</h1>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/gallery/${params.collection}`}>
+                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                  Back to Albums
+                </Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href={`/admin/gallery/${params.collection}/${params.album}/new`}>
+                  <PlusCircleIcon className="mr-2 h-4 w-4" />
+                  New Case
+                </Link>
+              </Button>
+            </div>
           </div>
-          <Link href={`/admin/gallery/${collectionId}/${albumId}/new`}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              New Case
-            </Button>
-          </Link>
+          
+          <p className="text-muted-foreground">
+            {album.description || `Manage cases in the ${album.title} album.`}
+          </p>
         </div>
-      </div>
-
-      {/* Cases Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <div className="col-span-full text-center py-12">
-            <p className="text-zinc-500">Loading cases...</p>
-          </div>
-        ) : cases.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <p className="text-zinc-500">No cases yet. Create your first case.</p>
-          </div>
-        ) : (
-          cases.map((case_) => (
-            <motion.div
-              key={case_.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <Link href={`/admin/gallery/${collectionId}/${albumId}/${case_.id}`}>
-                <Card className="hover:bg-zinc-900 transition-colors cursor-pointer overflow-hidden">
-                  {case_.images[0] && (
-                    <div className="relative aspect-[4/3] w-full">
-                      <Image
-                        src={case_.images[0].cloudinary_url}
-                        alt={case_.title}
-                        fill
-                        className="object-cover"
-                      />
+        
+        {cases && cases.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cases.map((caseItem) => (
+              <Card key={caseItem.id} className="overflow-hidden">
+                <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                  {caseItem.images && caseItem.images.length > 0 ? (
+                    <CldImage
+                      src={caseItem.images[0].cloudinary_url.replace(/^.*\/upload\//, '')}
+                      fill
+                      className="object-cover"
+                      alt={caseItem.title}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="h-10 w-10 text-muted-foreground" />
                     </div>
                   )}
-                  <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                    <CardTitle className="flex-1">{case_.title}</CardTitle>
-                    <ImageIcon className="w-5 h-5 text-zinc-500" />
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-zinc-500 line-clamp-2">{case_.description}</p>
-                  </CardContent>
-                </Card>
+                </div>
+                <CardHeader className="pb-2">
+                  <CardTitle>{caseItem.title}</CardTitle>
+                  <CardDescription>
+                    {formatDate(caseItem.created_at)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pb-0">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {caseItem.procedure && (
+                      <Badge variant="secondary">{caseItem.procedure}</Badge>
+                    )}
+                    {caseItem.patient_gender && (
+                      <Badge variant="outline">{caseItem.patient_gender}</Badge>
+                    )}
+                    {caseItem.patient_age && (
+                      <Badge variant="outline">Age: {caseItem.patient_age}</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {caseItem.description || 'No description provided.'}
+                  </p>
+                </CardContent>
+                <CardFooter className="flex justify-between pt-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/gallery/${params.collection}/${params.album}/${caseItem.id}`} target="_blank">
+                      <Eye className="mr-2 h-4 w-4" />
+                      View Live
+                    </Link>
+                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon" asChild>
+                      <Link href={`/admin/gallery/${params.collection}/${params.album}/${caseItem.id}/edit`}>
+                        <Edit2Icon className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button variant="destructive" size="icon">
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 border rounded-lg text-center px-4">
+            <ImageIcon className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-medium mb-2">No Cases Yet</h3>
+            <p className="text-muted-foreground mb-6">
+              This album doesn't have any cases yet. Create your first case to get started.
+            </p>
+            <Button asChild>
+              <Link href={`/admin/gallery/${params.collection}/${params.album}/new`}>
+                <PlusCircleIcon className="mr-2 h-4 w-4" />
+                Create First Case
               </Link>
-            </motion.div>
-          ))
+            </Button>
+          </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   );
 } 
