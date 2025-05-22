@@ -4,8 +4,7 @@ import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { NavBar } from "@/components/nav-bar"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -118,7 +117,7 @@ export default function GalleryPage() {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <Link href="/gallery" className="hover:text-white">
+            <Link href="/gallery" className="hover:text-primary">
               Gallery
             </Link>
           </BreadcrumbItem>
@@ -131,7 +130,7 @@ export default function GalleryPage() {
                 ) : (
                   <Link 
                     href={`/gallery/${slug.slice(0, i + 1).join('/')}`}
-                    className="hover:text-white capitalize"
+                    className="hover:text-primary capitalize"
                   >
                     {segment.replace(/-/g, ' ')}
                   </Link>
@@ -150,7 +149,7 @@ export default function GalleryPage() {
       return (
         <div className="text-center py-12 px-4">
           <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Galleries Available</h3>
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
             No gallery collections are currently available. Please check back later.
           </p>
         </div>
@@ -163,7 +162,7 @@ export default function GalleryPage() {
         return (
           <div className="text-center py-12 px-4">
             <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Images Available</h3>
-            <p className="text-zinc-400">
+            <p className="text-muted-foreground">
               This case currently has no images. Please check back later.
             </p>
           </div>
@@ -194,7 +193,7 @@ export default function GalleryPage() {
           {cases.length === 0 ? (
             <div className="text-center py-12 px-4">
               <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Cases Yet</h3>
-              <p className="text-zinc-400">
+              <p className="text-muted-foreground">
                 This album is currently empty. Check back soon for new cases.
               </p>
             </div>
@@ -206,7 +205,7 @@ export default function GalleryPage() {
                   href={`/gallery/${slug[0]}/${slug[1]}/${case_.id}`}
                   className="group block"
                 >
-                  <div className="bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors">
+                  <div className="bg-card border rounded-lg overflow-hidden hover:border-primary/50 transition-colors">
                     {case_.images && case_.images[0] ? (
                       <div className="relative w-full h-48">
                         <CldImage
@@ -215,19 +214,19 @@ export default function GalleryPage() {
                           fill
                           className="object-cover"
                         />
-                        <div className="absolute bottom-2 right-2 w-5 h-5 flex items-center justify-center bg-black/40 rounded-full text-xs text-zinc-400 opacity-70">
+                        <div className="absolute bottom-2 right-2 w-5 h-5 flex items-center justify-center bg-black/40 rounded-full text-xs text-white opacity-70">
                           {parseInt(case_.title.replace(/[^0-9]/g, '')) || '?'}
                         </div>
                       </div>
                     ) : (
-                      <div className="w-full h-48 bg-zinc-800 flex items-center justify-center">
-                        <span className="text-zinc-500">No Image</span>
+                      <div className="w-full h-48 bg-muted flex items-center justify-center">
+                        <span className="text-muted-foreground">No Image</span>
                       </div>
                     )}
                     <div className="p-4">
                       <h3 className="font-cerebri text-sm uppercase tracking-wide font-light">{case_.title}</h3>
                       {case_.description && (
-                        <p className="text-zinc-400 text-sm mt-1">{case_.description}</p>
+                        <p className="text-muted-foreground text-sm mt-1">{case_.description}</p>
                       )}
                     </div>
                   </div>
@@ -251,7 +250,7 @@ export default function GalleryPage() {
                 key={`album-${album.id}`} 
                 className="block"
               >
-                <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+                <div className="bg-card text-card-foreground p-4 rounded-lg border hover:border-primary/50 transition-colors">
                   <div className="relative w-full h-40">
                     <CldImage
                       src={`placeholders/album-${album.id}`}
@@ -278,7 +277,7 @@ export default function GalleryPage() {
       return (
         <div className="text-center py-12 px-4">
           <h3 className="font-cerebri font-light uppercase tracking-wide text-xl mb-2">No Albums Yet</h3>
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
             This gallery collection is currently empty. Check back soon for new albums.
           </p>
         </div>
@@ -296,7 +295,7 @@ export default function GalleryPage() {
               key={`collection-${gallery.id}`} 
               className="block"
             >
-              <div className="bg-card text-card-foreground p-4 rounded-lg shadow hover:shadow-md transition-shadow">
+              <div className="bg-card text-card-foreground p-4 rounded-lg border hover:border-primary/50 transition-colors">
                 <div className="relative w-full h-40">
                   <CldImage
                     src={`placeholders/gallery-${gallery.id}`}
@@ -319,18 +318,13 @@ export default function GalleryPage() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex h-screen overflow-hidden w-full">
-        <AppSidebar isAdminPage={false} />
-        <SidebarInset className="flex-1 overflow-auto w-full">
-          <div className="p-6 max-w-full">
-            {renderBreadcrumbs()}
-            <div className="mt-6">{renderContent()}</div>
-          </div>
-        </SidebarInset>
+    <div className="min-h-screen bg-background">
+      <NavBar />
+      
+      <div className="container mx-auto px-4 py-8 pt-24">
+        {renderBreadcrumbs()}
+        <div className="mt-6">{renderContent()}</div>
       </div>
-    </SidebarProvider>
+    </div>
   )
 }
-
-

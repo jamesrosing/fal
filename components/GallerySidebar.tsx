@@ -21,7 +21,15 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { 
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Search, SlidersHorizontal, X, Filter } from "lucide-react";
 import Link from "next/link";
 
 export interface FilterOption {
@@ -81,6 +89,7 @@ export function GallerySidebar({
   const [selectedSurgeons, setSelectedSurgeons] = useState<string[]>(currentSurgeons);
   const [sortOption, setSortOption] = useState<string>(currentSort);
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("q") || "");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   
   // Function to update URL with current filters
   const applyFilters = () => {
@@ -179,7 +188,7 @@ export function GallerySidebar({
     }
   };
   
-  return (
+  const SidebarContent = () => (
     <div className="w-full h-full flex flex-col border rounded-lg">
       <div className="p-4 border-b flex items-center justify-between">
         <h2 className="text-lg font-medium flex items-center">
@@ -226,6 +235,7 @@ export function GallerySidebar({
                             ? 'bg-accent text-accent-foreground font-medium' 
                             : 'hover:bg-accent/50 hover:text-accent-foreground'
                         }`}
+                        onClick={() => setIsSheetOpen(false)}
                       >
                         {collection.title}
                       </Link>
@@ -241,6 +251,7 @@ export function GallerySidebar({
                                   ? 'bg-accent/70 text-accent-foreground font-medium'
                                   : 'hover:bg-accent/30 hover:text-accent-foreground'
                               }`}
+                              onClick={() => setIsSheetOpen(false)}
                             >
                               {album.title}
                             </Link>
@@ -368,7 +379,10 @@ export function GallerySidebar({
       
       <div className="p-4 border-t">
         <Button 
-          onClick={applyFilters} 
+          onClick={() => {
+            applyFilters();
+            setIsSheetOpen(false);
+          }} 
           className="w-full"
         >
           Apply Filters
@@ -376,4 +390,41 @@ export function GallerySidebar({
       </div>
     </div>
   );
-} 
+
+  return (
+    <>
+      {/* Mobile Filter Button */}
+      <div className="md:hidden mb-4">
+        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="w-full">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+              {isFiltersActive && (
+                <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                  Active
+                </span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-full sm:w-80">
+            <SheetHeader>
+              <SheetTitle>Gallery Filters</SheetTitle>
+              <SheetDescription>
+                Filter and sort gallery content to find what you're looking for.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="mt-6 h-full">
+              <SidebarContent />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block">
+        <SidebarContent />
+      </div>
+    </>
+  );
+}

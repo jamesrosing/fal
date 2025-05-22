@@ -419,14 +419,13 @@ export function NavBar() {
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "md:hidden p-1 text-white rounded-lg bg-white/10 hover:bg-white/20 transition-colors z-50",
-                    isScrolled ? "hover:text-white" : "hover:text-white"
+                    "md:hidden relative h-10 w-10 rounded-md text-white hover:bg-white/20 transition-colors z-50"
                   )}
                 >
-                  <div className="w-10 h-10 flex flex-col justify-center items-center gap-1.5">
-                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
-                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
-                    <span className="w-7 h-0.75 bg-white rounded-full block"></span>
+                  <div className="relative w-6 h-6 flex flex-col justify-center items-center">
+                    <span className="w-6 h-0.5 bg-white rounded-full block transition-all duration-200"></span>
+                    <span className="w-6 h-0.5 bg-white rounded-full block mt-1.5 transition-all duration-200"></span>
+                    <span className="w-6 h-0.5 bg-white rounded-full block mt-1.5 transition-all duration-200"></span>
                   </div>
                   <span className="sr-only">Toggle menu</span>
                 </Button>
