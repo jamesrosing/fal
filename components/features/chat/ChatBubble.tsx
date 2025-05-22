@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar } from '@/components/shared/ui/avatar';
 import { motion } from 'framer-motion';
 
 interface ChatBubbleProps {

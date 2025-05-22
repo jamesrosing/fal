@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { getCloudinaryUrl } from '@/lib/cloudinary';
 import styles from './SiteMediaManager.module.css';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 /**

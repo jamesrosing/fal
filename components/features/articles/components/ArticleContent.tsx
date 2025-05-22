@@ -2,7 +2,7 @@
 
 import type { Article, ArticleContent } from '@/lib/types'
 import { format } from 'date-fns'
-import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
+import CloudinaryFolderImage from '@/components/shared/media/CloudinaryFolderImage'
 import { extractImageNameFromPath } from '@/lib/cloudinary/folder-utils'
 
 const isValidDate = (dateString: string): boolean => {

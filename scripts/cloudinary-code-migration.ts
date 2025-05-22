@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
@@ -123,13 +123,13 @@ function replaceImports(content: string): string {
   // Replace UnifiedImage/OptimizedImage imports with CldImage
   newContent = newContent.replace(
     /import\s+(?:{[^}]*}|\w+)\s+from\s+['"](?:@\/components\/media|\.\/|\.\.\/\S+)\/(?:UnifiedImage|OptimizedImage|ServerImage)['"]/g,
-    `import CldImage from '@/components/media/CldImage'`
+    `import CldImage from '@/components/shared/media/CldImage'`
   );
   
   // Replace UnifiedVideo/OptimizedVideo imports with CldVideo
   newContent = newContent.replace(
     /import\s+(?:{[^}]*}|\w+)\s+from\s+['"](?:@\/components\/media|\.\/|\.\.\/\S+)\/(?:UnifiedVideo|OptimizedVideo)['"]/g,
-    `import CldVideo from '@/components/media/CldVideo'`
+    `import CldVideo from '@/components/shared/media/CldVideo'`
   );
   
   return newContent;

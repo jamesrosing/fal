@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/shared/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
+import { Button } from '@/components/shared/ui/button';
 import { CheckCircle, AlertCircle, RefreshCw, Server, Settings, Info } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Alert, AlertTitle, AlertDescription } from '@/components/shared/ui/alert';
+import { Badge } from '@/components/shared/ui/badge';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export default function ZenotiAdminPage() {

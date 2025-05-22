@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert';
 import { CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export default function ZenotiSetupPage() {

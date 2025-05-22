@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { useIsMobile } from "@/hooks/use-mobile"
 import Image from "next/image"
 

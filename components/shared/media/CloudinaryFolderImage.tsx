@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import CldImage from './CldImage';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 // Constants for Cloudinary folder structure
 const CLOUDINARY_FOLDER = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || 'alluremd';

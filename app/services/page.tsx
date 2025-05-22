@@ -1,8 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
 import { getCloudinaryUrl } from "@/lib/cloudinary"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 // Simple metadata for now

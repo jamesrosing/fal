@@ -5,8 +5,8 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 const Select = SelectPrimitive.Root

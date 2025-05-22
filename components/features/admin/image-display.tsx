@@ -3,9 +3,9 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Download, Maximize2, Minimize2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Button } from '@/components/shared/ui/button'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface ImageDisplayProps {

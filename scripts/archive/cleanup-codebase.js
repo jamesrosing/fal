@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 
 /**
  * Comprehensive Codebase Cleanup Script
@@ -319,7 +319,7 @@ export default ${exportName};
     const homePath = path.join(APP_DIR, 'page.tsx');
     const content = `"use client";
 
-import { NavBar } from "@/components/nav-bar";
+import { NavBar } from '@/components/shared/layout/nav-bar";
 
 export default function Home() {
   return (

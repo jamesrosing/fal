@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import ImageUploader from "@/components/image-uploader"
-import ImageDisplay from "@/components/image-display"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import ImageUploader from '@/components/features/admin/image-uploader'
+import ImageDisplay from '@/components/features/admin/image-display'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export default function UploadPage() {

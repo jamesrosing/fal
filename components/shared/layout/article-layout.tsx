@@ -2,16 +2,16 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import { Article, ArticleContent, ARTICLE_CATEGORIES } from "@/lib/types"
 import Link from "next/link"
 import { articles, getRelatedArticles } from "@/lib/articles"
-import { Section } from "@/components/ui/section"
+import { Section } from '@/components/shared/ui/section'
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import Head from "next/head"
 import { Footer } from "./footer"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 
 
@@ -61,7 +61,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
     data: {
       headline: article.title,
       description: article.excerpt,
-      image: imageUrl || '/placeholder-image.jpg',
+      image: imageUrl || '/placeholder.jpg',
       datePublished: article.publishedAt || article.date,
       dateModified: article.updatedAt || article.date,
       author: article.author ? {
@@ -162,7 +162,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
         {/* Hero Image */}
         <div className="relative aspect-[16/9] w-full">
           <Image
-            src={imageUrl || '/placeholder-image.jpg'}
+            src={imageUrl || '/placeholder.jpg'}
             alt={article.title}
             fill
             className="object-cover"
@@ -219,7 +219,7 @@ export function ArticleLayout({ article }: ArticleLayoutProps) {
                 (relatedArticle.image.includes('https://res.cloudinary.com') 
                   ? relatedArticle.image 
                   : mediaUrl(`articles/${relatedArticle.image}`)) 
-                : '/placeholder-image.jpg';
+                : '/placeholder.jpg';
                 
               return (
                 <Link 

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardContent } from "@/components/ui/card"
-import { AspectRatio } from "../../components/ui/aspect-ratio"
+import { Card, CardContent } from '@/components/shared/ui/card'
+import { AspectRatio } from '@/components/shared/ui/aspect-ratio'
 import { cn } from "@/lib/utils"
 import type { Article } from '@/lib/types'
 import { Bookmark, Share2 } from 'lucide-react'
@@ -20,7 +20,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
       crop: 'fill',
       gravity: 'auto'
     }) : 
-    '/placeholder-image.jpg';
+    '/placeholder.jpg';
 
   return (
     <Card className="h-full overflow-hidden border-none shadow-none">

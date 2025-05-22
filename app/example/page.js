@@ -1,8 +1,8 @@
-import { SimpleHero } from '@/components/Hero/Hero';
-import { MediaContentSection } from '@/components/layouts/TwoColumnLayout';
+import { SimpleHero } from '@/components/shared/layout/hero/Hero';
+import { MediaContentSection } from '@/components/shared/layout/TwoColumnLayout';
 import { CldImage } from '../components/media/CldImage';
 import { CldVideo } from '../components/media/CldVideo';
-import { MediaRenderer } from '@/components/media/MediaRenderer';
+import { MediaRenderer } from '@/components/shared/media/MediaRenderer';
 
 export const metadata = {
   title: 'Media Components Example',
@@ -201,7 +201,7 @@ export default function MediaExamplePage() {
           <h3 className="text-xl font-bold mb-4 text-black">Example Layout Usage</h3>
           <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto text-black">
 {`// In your page component
-import { MediaContentSection } from '@/components/layouts/TwoColumnLayout';
+import { MediaContentSection } from '@/components/shared/layout/TwoColumnLayout';
 
 export default function ServicePage() {
   return (

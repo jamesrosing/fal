@@ -1,4 +1,4 @@
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import { Metadata } from "next"
 import { ArticlesList } from "./articles-list"
 import { CldOgImage } from "next-cloudinary"

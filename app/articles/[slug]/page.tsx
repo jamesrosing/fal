@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation"
 import { Metadata } from "next"
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { createClient } from '@supabase/supabase-js'
 import { Article } from "@/lib/types"
-import ArticleContent from "@/components/articles/ArticleContent"
-import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage'
+import ArticleContent from '@/components/features/articles/components/ArticleContent'
+import CloudinaryFolderImage from '@/components/shared/media/CloudinaryFolderImage'
 import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils'
 
 type Props = {

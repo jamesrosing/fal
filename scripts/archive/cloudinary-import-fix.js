@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -44,11 +44,11 @@ async function findFiles(dir, fileType = '.tsx') {
 const patterns = [
   {
     match: /import\s*{\s*CldImage\s*}\s*from\s*['"]\.\.\/components\/media\/CldImage['"]/g,
-    replace: `import CldImage from '@/components/media/CldImage'`
+    replace: `import CldImage from '@/components/shared/media/CldImage'`
   },
   {
     match: /import\s*{\s*CldVideo\s*}\s*from\s*['"]\.\.\/components\/media\/CldVideo['"]/g,
-    replace: `import CldVideo from '@/components/media/CldVideo'`
+    replace: `import CldVideo from '@/components/shared/media/CldVideo'`
   }
 ];
 

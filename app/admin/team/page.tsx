@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { CldUploadWidgetWrapper } from "@/components/media/CldUploadWidget"
+import { AppSidebar } from '@/components/features/admin/app-sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/shared/ui/sidebar'
+import { Button } from '@/components/shared/ui/button'
+import { Input } from '@/components/shared/ui/input'
+import { Label } from '@/components/shared/ui/label'
+import { Separator } from '@/components/shared/ui/separator'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/shared/ui/breadcrumb'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/shared/ui/card'
+import { CldUploadWidgetWrapper } from '@/components/shared/media/CldUploadWidget'
 import { TeamMember } from "@/lib/supabase"
 import { Plus, Edit, Trash } from "lucide-react"
 import {
@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/shared/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -31,10 +31,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
-import CldImage from '@/components/media/CldImage'
-import CldVideo from '@/components/media/CldVideo'
+} from '@/components/shared/ui/dialog'
+import { Switch } from '@/components/shared/ui/switch'
+import CldImage from '@/components/shared/media/CldImage'
+import CldVideo from '@/components/shared/media/CldVideo'
 
 
 export default function TeamPage() {

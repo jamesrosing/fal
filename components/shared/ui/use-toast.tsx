@@ -1,7 +1,7 @@
 import * as React from "react"
-import { type ToastActionElement, type ToastProps } from "@/components/ui/toast"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { type ToastActionElement, type ToastProps } from '@/components/shared/ui/toast'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 const TOAST_LIMIT = 1

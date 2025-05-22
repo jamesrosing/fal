@@ -2,7 +2,7 @@
 
 import { CldImage as NextCloudinaryImage } from 'next-cloudinary';
 import { useState, useCallback, useMemo } from 'react';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 interface CldEnhancedImageProps {
   src: string;

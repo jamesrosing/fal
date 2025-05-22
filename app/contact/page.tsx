@@ -2,15 +2,15 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { Phone, MapPin, Clock, MessageCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import Head from "next/head"
 import axios from 'axios'
-import CldImage from '@/components/media/CldImage'
+import CldImage from '@/components/shared/media/CldImage'
 
 /// <reference path="../../types/maps.d.ts" />
 

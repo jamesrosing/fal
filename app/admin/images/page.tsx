@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { AppSidebar } from '@/components/features/admin/app-sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/shared/ui/sidebar'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card'
+import { Button } from '@/components/shared/ui/button'
 import { ImageAssetUpload } from "@/components/image-asset-upload"
 import { ImageArea, deleteFromCloudinary } from "@/lib/cloudinary"
 import { IMAGE_ASSETS, type ImageAsset, getImageUrl } from "@/lib/image-config"
@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/shared/ui/dialog'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,21 +28,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/shared/ui/alert-dialog'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
-import { Toaster } from "@/components/ui/toaster"
+} from '@/components/shared/ui/select'
+import { Input } from '@/components/shared/ui/input'
+import { Label } from '@/components/shared/ui/label'
+import { toast } from '@/components/shared/ui/use-toast'
+import { Toaster } from '@/components/shared/ui/toaster'
 import { updateImageConfig, deleteImageAsset } from "@/app/actions/image-config"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export default function ImagesPage() {

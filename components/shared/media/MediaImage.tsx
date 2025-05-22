@@ -1,6 +1,6 @@
 import { CldImage } from 'next-cloudinary';
 import { useState } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 interface MediaImageProps {
 publicId: string;

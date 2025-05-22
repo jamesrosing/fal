@@ -1,9 +1,9 @@
 import { getGalleries, getAlbumsByGallery } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { NavBar } from "@/components/nav-bar";
-import CldImage from '@/components/media/CldImage';
-import { GallerySidebar } from "@/components/GallerySidebar";
+import { NavBar } from '@/components/shared/layout/nav-bar';
+import CldImage from '@/components/shared/media/CldImage';
+import { GallerySidebar } from '@/components/features/gallery/GallerySidebar';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +11,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/shared/ui/breadcrumb';
 
 interface CollectionPageProps {
   params: {

@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface VideoLoaderProps {

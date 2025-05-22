@@ -2,17 +2,17 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { useEffect, useState } from "react"
 import { TeamMember } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/shared/ui/button'
 import { Copy, Upload } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from '@/components/shared/ui/use-toast'
 import { getCloudinaryUrl } from "@/lib/cloudinary"
 import { useMediaAsset } from "@/hooks/useMedia"
-import CldImage from '@/components/media/CldImage'
-import CldVideo from '@/components/media/CldVideo'
+import CldImage from '@/components/shared/media/CldImage'
+import CldVideo from '@/components/shared/media/CldVideo'
 
 
 function TeamMemberCard({ member, isPhysician = false }: { 

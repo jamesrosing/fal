@@ -4,7 +4,7 @@ import * as React from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,15 +12,15 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { CaseViewer } from "@/components/case-viewer"
-import { Button } from "@/components/ui/button"
+} from '@/components/shared/ui/breadcrumb'
+import { CaseViewer } from '@/components/features/gallery/case-viewer'
+import { Button } from '@/components/shared/ui/button'
 import { ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import { Gallery, Album, Case, Image as GalleryImage } from "@/lib/supabase"
 import { Share2, Heart } from "lucide-react"
-import CldImage from '@/components/media/CldImage'
-import CldVideo from '@/components/media/CldVideo'
+import CldImage from '@/components/shared/media/CldImage'
+import CldVideo from '@/components/shared/media/CldVideo'
 
 export default function GalleryPage() {
   const params = useParams()

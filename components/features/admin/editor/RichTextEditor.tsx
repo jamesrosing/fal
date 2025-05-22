@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import {
   Bold,
   Italic,
@@ -17,8 +17,8 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { uploadToCloudinary } from '@/lib/cloudinary';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface RichTextEditorProps {

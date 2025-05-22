@@ -3,13 +3,13 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Upload, Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from '@/components/shared/ui/button'
+import { Input } from '@/components/shared/ui/input'
+import { Label } from '@/components/shared/ui/label'
 import { type ImageArea, getImageProps, IMAGE_SIZES, IMAGE_PLACEMENTS } from "@/lib/image-utils"
 import { resizeImage } from "@/lib/utils"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface ImageUploadFieldProps {

@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import { Star } from "lucide-react"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 const reviews = [

@@ -1,9 +1,9 @@
 import { getGalleries, getAlbumsByGallery, getCasesByAlbum, getCase, Image as GalleryImage } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { NavBar } from "@/components/nav-bar";
-import { CaseViewer } from "@/components/case-viewer";
-import CldImage from '@/components/media/CldImage';
+import { NavBar } from '@/components/shared/layout/nav-bar';
+import { CaseViewer } from '@/components/features/gallery/case-viewer';
+import CldImage from '@/components/shared/media/CldImage';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -11,13 +11,13 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { SidebarInset } from "@/components/ui/sidebar-inset";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { GallerySidebar } from "@/components/GallerySidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+} from '@/components/shared/ui/breadcrumb';
+import { SidebarInset } from '@/components/shared/ui/sidebar-inset';
+import { SidebarProvider } from '@/components/shared/ui/sidebar';
+import { GallerySidebar } from '@/components/features/gallery/GallerySidebar';
+import { AppSidebar } from '@/components/features/admin/app-sidebar';
 import { ArrowLeft, Heart, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/shared/ui/button';
 
 interface CasePageProps {
   params: {

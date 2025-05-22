@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { ArrowLeft, Trash2, Plus, Save, Loader2, MoveVertical } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getCase } from '@/lib/supabase';
-import { CaseViewer } from '@/components/case-viewer';
+import { CaseViewer } from '@/components/features/gallery/case-viewer';
 import { deleteFromCloudinary, uploadToCloudinary } from '@/lib/cloudinary';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
+import { Button } from '@/components/shared/ui/button';
+import { toast } from '@/components/shared/ui/use-toast';
 import { 
   Dialog, 
   DialogContent, 
@@ -17,9 +17,9 @@ import {
   DialogTitle, 
   DialogTrigger,
   DialogFooter 
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+} from '@/components/shared/ui/dialog';
+import { Label } from '@/components/shared/ui/label';
+import { Input } from '@/components/shared/ui/input';
 import {
   DndContext,
   closestCenter,
@@ -37,8 +37,8 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface Case {

@@ -1,9 +1,9 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { LearnMoreButton } from "../ui/learn-more-button"
+import { LearnMoreButton } from "../../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from "@/components/media/CldImage"
+import CldImage from '@/components/shared/media/CldImage'
 import Image from "next/image"
 
 export function PlasticSurgerySection() {

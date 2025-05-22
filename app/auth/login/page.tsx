@@ -3,18 +3,18 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from "@/components/ui/breadcrumb"
+import { AppSidebar } from '@/components/features/admin/app-sidebar'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/shared/ui/sidebar'
+import { Button } from '@/components/shared/ui/button'
+import { Input } from '@/components/shared/ui/input'
+import { Label } from '@/components/shared/ui/label'
+import { Separator } from '@/components/shared/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/shared/ui/card'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/shared/ui/breadcrumb'
 import { createBrowserClient } from '@supabase/ssr'
 import { toast } from "sonner"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")

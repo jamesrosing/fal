@@ -3,7 +3,7 @@
 import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
 import { useState, useCallback, useMemo } from 'react';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 interface CldEnhancedVideoProps {
   publicId: string;

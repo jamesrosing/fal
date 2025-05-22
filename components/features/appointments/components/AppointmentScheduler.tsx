@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Calendar } from '@/components/ui/calendar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Calendar } from '@/components/shared/ui/calendar';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
 import { ZenotiService, ZenotiProvider, ZenotiSlot } from '@/lib/zenoti';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/shared/ui/use-toast';
 import { Loader2, AlertCircle, Calendar as CalendarIcon, Clock, User, CheckCircle } from 'lucide-react';
 import { z } from 'zod';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { RadioGroup, RadioGroupItem } from '@/components/shared/ui/radio-group'
+import { ScrollArea } from '@/components/shared/ui/scroll-area'
 import { motion, AnimatePresence } from 'framer-motion';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 const formSchema = z.object({

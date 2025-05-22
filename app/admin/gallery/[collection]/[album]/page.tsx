@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import AdminLayout from '@/components/layouts/AdminLayout';
+import AdminLayout from '@/components/shared/layout/AdminLayout';
 import { getGallery, getAlbum, getCasesByAlbum } from '@/lib/supabase';
 import { 
   PlusCircleIcon, 
@@ -11,8 +11,8 @@ import {
   ArrowLeftIcon,
   Eye,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 import {
   Card,
   CardContent,
@@ -20,15 +20,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/shared/ui/card';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import CldImage from '@/components/media/CldImage';
+} from '@/components/shared/ui/breadcrumb';
+import CldImage from '@/components/shared/media/CldImage';
 import { formatDate } from '@/lib/utils';
 
 interface AdminGalleryAlbumPageProps {

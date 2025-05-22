@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import CloudinaryExample from '@/components/example/CloudinaryExample';
 import CloudinaryBrowser from '@/components/example/CloudinaryBrowser';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
 
 export default function CloudinaryExamplesPage() {
   return (

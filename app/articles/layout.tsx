@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import type { ReactNode } from "react"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export const metadata: Metadata = {

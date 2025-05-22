@@ -1,8 +1,8 @@
 import { getGalleries, getAlbumsByGallery, getCasesByAlbum, Image as GalleryImage } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { NavBar } from "@/components/nav-bar";
-import CldImage from '@/components/media/CldImage';
+import { NavBar } from '@/components/shared/layout/nav-bar';
+import CldImage from '@/components/shared/media/CldImage';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -10,8 +10,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { GallerySidebar } from "@/components/GallerySidebar";
+} from '@/components/shared/ui/breadcrumb';
+import { GallerySidebar } from '@/components/features/gallery/GallerySidebar';
 
 interface AlbumPageProps {
   params: {

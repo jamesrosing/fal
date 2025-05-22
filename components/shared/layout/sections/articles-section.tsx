@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import CldImage from '@/components/media/CldImage'
-import { LearnMoreButton } from "../ui/learn-more-button"
-import { Skeleton } from "@/components/ui/skeleton"
+import CldImage from '@/components/shared/media/CldImage'
+import { LearnMoreButton } from "@/components/shared/ui/learn-more-button"
+import { Skeleton } from "@/components/shared/ui/skeleton"
 import { Article } from "@/lib/types"
-import { ArticleCard } from "../articles/ArticleCard"
+import { ArticleCard } from "@/components/features/articles/components/ArticleCard"
 
 export default function ArticlesSection() {
   const [loading, setLoading] = useState(true)

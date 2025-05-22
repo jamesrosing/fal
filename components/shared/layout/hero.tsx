@@ -2,12 +2,12 @@
 
 import React from 'react'
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/shared/ui/button'
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldVideo from '@/components/media/CldVideo'
-import CldImage from '@/components/media/CldImage'
-import { Skeleton } from "@/components/ui/skeleton"
+import CldVideo from '@/components/shared/media/CldVideo'
+import CldImage from '@/components/shared/media/CldImage'
+import { Skeleton } from '@/components/shared/ui/skeleton'
 
 export function Hero() {
   const isMobile = useIsMobile();

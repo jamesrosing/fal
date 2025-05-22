@@ -2,15 +2,15 @@
 
 import { useState } from "react"
 import { ImageAssetUpload } from "@/components/image-asset-upload"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card'
+import { AppSidebar } from '@/components/features/admin/app-sidebar'
+import { SidebarProvider, SidebarInset } from '@/components/shared/ui/sidebar'
+import { Button } from '@/components/shared/ui/button'
 import { Trash } from "lucide-react"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/image-config"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface UploadedImage {

@@ -3,12 +3,12 @@
 import * as React from "react"
 import Link from "next/link"
 import { Menu, Minus, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
+import { Button } from '@/components/shared/ui/button'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/shared/ui/dialog'
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface SubItem {

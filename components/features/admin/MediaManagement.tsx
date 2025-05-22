@@ -3,16 +3,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { CloudinaryVideo } from '@/components/CloudinaryVideo';
-import { CloudinaryUploader } from '@/components/CloudinaryUploader';
+import { CloudinaryUploader } from '@/components/features/admin/CloudinaryUploader';
 import { 
   CloudinaryAsset, 
   ImageArea,
   deleteFromCloudinary,
 } from '@/lib/cloudinary';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import { 
   Card, 
   CardContent, 
@@ -20,7 +20,7 @@ import {
   CardHeader, 
   CardTitle,
   CardDescription
-} from '@/components/ui/card';
+} from '@/components/shared/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/shared/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,20 +37,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/shared/ui/dropdown-menu';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs';
+} from '@/components/shared/ui/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 import { 
   Search, 
   Filter, 
@@ -76,20 +76,20 @@ import {
   AlertCircle,
   Camera
 } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from '@/components/shared/ui/use-toast';
+import { Badge } from '@/components/shared/ui/badge';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
+import { Separator } from '@/components/shared/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/shared/ui/tooltip';
 import {
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from '@/components/shared/ui/accordion';
 
 interface MediaQueryParams {
   area?: ImageArea | 'all';

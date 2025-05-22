@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { NavBar } from '@/components/nav-bar'
+import { Button } from '@/components/shared/ui/button'
+import { NavBar } from '@/components/shared/layout/nav-bar'
 
 export default function TeamErrorPage({
   error,

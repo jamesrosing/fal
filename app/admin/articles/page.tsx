@@ -1,9 +1,9 @@
 'use client';
 
 import { ArticleManager } from '@/components/ArticleManager';
-import { Toaster } from '@/components/ui/toaster';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Toaster } from '@/components/shared/ui/toaster';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 /**

@@ -3,21 +3,21 @@
 import { useState, useEffect } from 'react';
 import { motion, Reorder } from 'framer-motion';
 import { GripVertical, Plus, Search, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
 import { ArticleCategory } from '@/lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/shared/ui/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+} from '@/components/shared/ui/dialog';
+import { Label } from '@/components/shared/ui/label';
+import { Textarea } from '@/components/shared/ui/textarea';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export default function CategoriesPage() {

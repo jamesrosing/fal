@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 import Head from 'next/head'
 
@@ -191,40 +191,34 @@ export default function PlasticSurgery() {
             />
             {/* Gradient overlay for mobile */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
-            
-            {/* Title overlay at bottom of image */}
-            <div className="absolute inset-0 flex items-end">
-              <div className="px-4 py-6 w-full">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="text-white"
-                >
-                  <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                    Plastic Surgery
-                  </h1>
-                  <h2 className="mb-4 text-[clamp(2rem,5vw,3rem)] leading-none tracking-tight font-serif">
-                    Artistry in aesthetic transformation
-                  </h2>
-                </motion.div>
-              </div>
-            </div>
           </div>
           
           {/* Text content below image */}
           <div className="px-4 py-6 bg-black flex-grow">
-            <div className="space-y-6 text-base font-cerebri font-light text-white">
-              <p>
-                At Allure MD, our board-certified plastic surgeons combine surgical expertise with an artistic vision to enhance your natural beauty. 
-                Led by Dr. James Rosing, we specialize in facial aesthetic surgery, breast procedures, and body contouring with personalized care and exceptional results.
-              </p>
-              <div className="space-y-4">
-                <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-white"
+            >
+              <h1 className="mb-2 text-xs font-cerebri font-normal uppercase tracking-wide">
+                Plastic Surgery
+              </h1>
+              <h2 className="mb-4 text-[clamp(2rem,5vw,3rem)] leading-none tracking-tight font-serif">
+                Artistry in aesthetic transformation
+              </h2>
+              <div className="space-y-6 text-base font-cerebri font-light">
+                <p>
+                  At Allure MD, our board-certified plastic surgeons combine surgical expertise with an artistic vision to enhance your natural beauty. 
+                  Led by Dr. James Rosing, we specialize in facial aesthetic surgery, breast procedures, and body contouring with personalized care and exceptional results.
+                </p>
+                <div className="space-y-4">
+                  <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
+                  <br />
+                  <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -257,7 +251,7 @@ export default function PlasticSurgery() {
               </div>
               <div className="w-full md:w-2/3">
                 <h2 className="mb-6 text-3xl font-serif">About Dr. James Rosing, Board Certified Plastic Surgeon</h2>
-                <div className="space-y-4 text-lg font-cerebri font-light">
+                <div className="space-y-4 text-base font-cerebri font-light">
                   <p>
                     Dr. James Rosing, MD, FACS is a board certified plastic and reconstructive surgeon specializing in facial aesthetic plastic surgery. His expertise includes facelift, necklift, eyelid lift, browlift, earlobe enhancement, and ear pinning procedures that deliver natural-looking results with minimal downtime.
                   </p>
@@ -296,8 +290,6 @@ export default function PlasticSurgery() {
                         src={category.imageId}
                         alt={category.category}
                         fill
-                        width={800}
-                        height={600}
                         className="object-cover"
                         sizes="100vw"
                         config={{
@@ -310,7 +302,7 @@ export default function PlasticSurgery() {
                     
                     {/* Text content with proper padding */}
                     <div className="px-4 py-8 bg-black">
-                      <h3 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
+                      <h3 className="mb-2 text-xs font-cerebri font-normal uppercase tracking-wide text-white">
                         {category.category}
                       </h3>
                       <p className="mb-6 text-[clamp(1.5rem,3vw,2rem)] leading-tight tracking-tight font-serif text-white">
@@ -340,8 +332,6 @@ export default function PlasticSurgery() {
                           src={category.imageId}
                           alt={category.category}
                           fill
-                          width={800}
-                          height={600}
                           className="object-cover w-full h-full"
                           sizes="50vw"
                           config={{
@@ -399,7 +389,7 @@ export default function PlasticSurgery() {
                     <li key={index} className="flex items-start space-x-4">
                       <span className="w-8 h-[1px] bg-white mt-3"></span>
                       <div>
-                        <p className="text-lg font-cerebri font-normal">{award.name}</p>
+                        <p className="text-base font-cerebri font-normal">{award.name}</p>
                         <p className="text-sm font-cerebri font-light text-gray-400">
                           {award.issuer} {award.year && `(${award.year})`}
                         </p>
@@ -416,7 +406,7 @@ export default function PlasticSurgery() {
                     <li key={index} className="flex items-start space-x-4">
                       <span className="w-8 h-[1px] bg-white mt-3"></span>
                       <div>
-                        <p className="text-lg font-cerebri font-normal">{edu.institution}</p>
+                        <p className="text-base font-cerebri font-normal">{edu.institution}</p>
                         <p className="text-sm font-cerebri font-light text-gray-400">
                           {edu.degree || edu.program} ({edu.year})
                         </p>
@@ -428,15 +418,15 @@ export default function PlasticSurgery() {
             </div>
             
             <div className="text-center grid grid-cols-1 md:grid-cols-3 gap-8">
-              <p className="text-lg font-cerebri">
+              <p className="text-base font-cerebri">
                 <span className="text-4xl font-serif">15+</span><br />
                 years of specialized experience
               </p>
-              <p className="text-lg font-cerebri">
+              <p className="text-base font-cerebri">
                 <span className="text-4xl font-serif">1000+</span><br />
                 facial aesthetic procedures
               </p>
-              <p className="text-lg font-cerebri">
+              <p className="text-base font-cerebri">
                 <span className="text-4xl font-serif">2500+</span><br />
                 breast and body procedures
               </p>
@@ -537,15 +527,15 @@ export default function PlasticSurgery() {
             <div className="grid md:grid-cols-2 gap-8 text-center md:text-left">
               <div>
                 <h3 className="mb-6 text-xl font-cerebri uppercase tracking-wide">Office Location</h3>
-                <p className="text-lg font-cerebri font-light">{contact.address}</p>
-                <p className="text-lg font-cerebri font-light">{contact.city}</p>
+                <p className="text-base font-cerebri font-light">{contact.address}</p>
+                <p className="text-base font-cerebri font-light">{contact.city}</p>
               </div>
               
               <div>
                 <h3 className="mb-6 text-xl font-cerebri uppercase tracking-wide">Contact Information</h3>
-                <p className="text-lg font-cerebri font-light">Email: {contact.email}</p>
-                <p className="text-lg font-cerebri font-light">Phone: {contact.phone}</p>
-                <p className="text-lg font-cerebri font-light">Fax: {contact.fax}</p>
+                <p className="text-base font-cerebri font-light">Email: {contact.email}</p>
+                <p className="text-base font-cerebri font-light">Phone: {contact.phone}</p>
+                <p className="text-base font-cerebri font-light">Fax: {contact.fax}</p>
               </div>
             </div>
             

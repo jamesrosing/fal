@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CldImageWrapper } from '@/components/media/CldImageWrapper';
-import { CldVideoWrapper } from '@/components/media/CldVideoWrapper';
-import { Button } from '@/components/ui/button';
+import { CldImageWrapper } from '@/components/shared/media/CldImageWrapper';
+import { CldVideoWrapper } from '@/components/shared/media/CldVideoWrapper';
+import { Button } from '@/components/shared/ui/button';
 import { Folder, Image, Video, RefreshCw } from 'lucide-react';
 
 type MediaAsset = {

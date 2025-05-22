@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode } from "react"
-import { NavBar } from "@/components/nav-bar"
+import { NavBar } from '@/components/shared/layout/nav-bar'
 import { motion } from "framer-motion"
 
 interface MainLayoutProps {

@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Button } from '@/components/shared/ui/button'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 export function AdminNavBar() {

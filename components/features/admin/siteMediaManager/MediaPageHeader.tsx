@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 
 export function MediaPageHeader() {
   const [searchTerm, setSearchTerm] = useState('');

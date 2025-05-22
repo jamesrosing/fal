@@ -16,10 +16,10 @@ import {
   LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Toaster } from '@/components/ui/toaster';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Button } from '@/components/shared/ui/button';
+import { Toaster } from '@/components/shared/ui/toaster';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 const menuItems = [

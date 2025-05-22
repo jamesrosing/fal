@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { ChevronRight, FolderOpen, Image as ImageIcon } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 // Keep the existing collections structure

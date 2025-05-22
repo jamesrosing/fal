@@ -1,24 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { MarketingFeatures } from '@/components/MarketingFeatures';
-import { ChatInterface } from '@/components/ChatInterface';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MarketingFeatures } from '@/components/features/marketing/MarketingFeatures';
+import { ChatInterface } from '@/components/features/chat/ChatInterface';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
+import { Button } from '@/components/shared/ui/button';
+import { Calendar } from '@/components/shared/ui/calendar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/shared/ui/dialog';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/shared/ui/popover';
+import { Badge } from '@/components/shared/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/shared/ui/avatar';
 import { CalendarIcon, Clock, DollarSign, ShoppingCart, MessageSquare, TagIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { toast } from '@/components/ui/use-toast';
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { toast } from '@/components/shared/ui/use-toast';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 // Mock data for the example

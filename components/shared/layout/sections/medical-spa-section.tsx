@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { LearnMoreButton } from "../ui/learn-more-button"
+import { LearnMoreButton } from "../../ui/learn-more-button"
 import { useState } from "react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"

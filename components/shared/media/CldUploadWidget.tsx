@@ -1,7 +1,7 @@
 'use client';
 
 import { CldUploadWidget } from 'next-cloudinary';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { Image } from 'lucide-react';
 import { useState } from 'react';
 

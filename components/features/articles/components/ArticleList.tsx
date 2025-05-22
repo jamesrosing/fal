@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { ArticleCard } from './ArticleCard'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/shared/ui/button'
 import { Article } from '@/lib/types'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/shared/ui/skeleton'
 
 export default function ArticleList({ initialArticles }: { initialArticles: Article[] }) {
   const [articles, setArticles] = useState<Article[]>(initialArticles)

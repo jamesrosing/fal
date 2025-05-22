@@ -2,8 +2,8 @@
 
 import * as React from "react"
 import { useState, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { NavAdmin } from "@/components/nav-admin"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card'
+import { NavAdmin } from '@/components/features/admin/nav-admin'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,10 +11,10 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
+} from '@/components/shared/ui/breadcrumb'
+import { Separator } from '@/components/shared/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/shared/ui/sidebar'
+import { Button } from '@/components/shared/ui/button'
 import { Plus, ChevronLeft, Trash2, Upload } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -31,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from '@/components/shared/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -40,14 +40,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '@/components/shared/ui/dialog'
+import { Input } from '@/components/shared/ui/input'
+import { Label } from '@/components/shared/ui/label'
 import type { FileRejection, DropEvent } from 'react-dropzone'
-import { toast } from "@/components/ui/use-toast"
-import { Toaster } from "@/components/ui/toaster"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { toast } from '@/components/shared/ui/use-toast'
+import { Toaster } from '@/components/shared/ui/toaster'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 interface CloudinaryImage {

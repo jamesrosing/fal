@@ -3,14 +3,14 @@
 import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from '@/components/shared/ui/button'
+import { ScrollArea } from '@/components/shared/ui/scroll-area'
 import { ChevronRight, Image, Settings, Users, FolderOpen, Album, ImageIcon, MoreHorizontal } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useSidebar } from "@/components/ui/sidebar"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import { Separator } from '@/components/shared/ui/separator'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/shared/ui/dropdown-menu'
+import { useSidebar } from '@/components/shared/ui/sidebar'
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 // Define the collections structure

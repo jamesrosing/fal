@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { Image } from 'lucide-react';
 import Script from 'next/script';
 

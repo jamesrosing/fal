@@ -4,7 +4,7 @@ import * as React from "react"
 import { usePathname } from "next/navigation"
 import { MoreHorizontal, Plus, Folder, type LucideIcon } from "lucide-react"
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/shared/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -12,7 +12,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/shared/ui/sidebar'
 
 export function NavManage({
   items,

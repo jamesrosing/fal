@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
-import AdminLayout from '@/components/layouts/AdminLayout';
-import { MediaBrowser } from '@/components/siteMediaManager/MediaBrowser';
-import { MediaUploadWidget } from '@/components/siteMediaManager/MediaUploadWidget';
-import { MediaOrganizationTools } from '@/components/siteMediaManager/MediaOrganizationTools';
-import { MediaPageHeader } from '@/components/siteMediaManager/MediaPageHeader';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AdminLayout from '@/components/shared/layout/AdminLayout';
+import { MediaBrowser } from '@/components/features/admin/SiteMediaManager/MediaBrowser';
+import { MediaUploadWidget } from '@/components/features/admin/SiteMediaManager/MediaUploadWidget';
+import { MediaOrganizationTools } from '@/components/features/admin/SiteMediaManager/MediaOrganizationTools';
+import { MediaPageHeader } from '@/components/features/admin/SiteMediaManager/MediaPageHeader';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
 
 export const metadata: Metadata = {
   title: 'Media Management | Allure MD Admin',

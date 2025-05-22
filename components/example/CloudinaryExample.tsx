@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { CldImageWrapper } from '@/components/media/CldImageWrapper';
-import { CldVideoWrapper } from '@/components/media/CldVideoWrapper';
-import { CldUploadWidgetWrapper } from '@/components/media/CldUploadWidget';
-import CldMediaLibrary from '@/components/media/CldMediaLibrary';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CldImageWrapper } from '@/components/shared/media/CldImageWrapper';
+import { CldVideoWrapper } from '@/components/shared/media/CldVideoWrapper';
+import { CldUploadWidgetWrapper } from '@/components/shared/media/CldUploadWidget';
+import CldMediaLibrary from '@/components/shared/media/CldMediaLibrary';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
 export default function CloudinaryExample() {

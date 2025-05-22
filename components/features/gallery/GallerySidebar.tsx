@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import { 
   Select, 
   SelectContent, 
@@ -14,13 +14,13 @@ import {
   SelectLabel, 
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select";
+} from '@/components/shared/ui/select';
 import { 
   Accordion, 
   AccordionContent, 
   AccordionItem, 
   AccordionTrigger 
-} from "@/components/ui/accordion";
+} from '@/components/shared/ui/accordion';
 import { 
   Sheet,
   SheetContent,
@@ -28,7 +28,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/shared/ui/sheet';
 import { Search, SlidersHorizontal, X, Filter } from "lucide-react";
 import Link from "next/link";
 

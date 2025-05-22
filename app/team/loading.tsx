@@ -1,5 +1,5 @@
-import { NavBar } from "@/components/nav-bar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { Skeleton } from '@/components/shared/ui/skeleton'
 
 export default function TeamLoading() {
   return (

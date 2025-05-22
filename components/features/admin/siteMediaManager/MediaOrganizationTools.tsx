@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
 import { FolderPlusIcon, FolderIcon, TagIcon, ArrowRightIcon, Trash2Icon } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/components/shared/ui/use-toast';
 
 export function MediaOrganizationTools() {
   // State for folder creation

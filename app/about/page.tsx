@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { useMediaAsset, MediaHookResult } from '@/hooks/useMedia'
 import { useIsMobile } from "@/hooks/use-mobile"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 
 
 // Define types for better type safety

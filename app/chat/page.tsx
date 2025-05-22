@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase';
 import { ChatContainer, ChatMessage } from '@/components/chat';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { ArrowLeftIcon } from 'lucide-react';
 
 export default function ChatPage() {

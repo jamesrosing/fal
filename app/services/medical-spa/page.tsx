@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { NavBar } from "@/components/nav-bar"
-import { LearnMoreButton } from "@/components/ui/learn-more-button"
+import { NavBar } from '@/components/shared/layout/nav-bar'
+import { LearnMoreButton } from '@/components/shared/ui/learn-more-button'
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import CldImage from '@/components/media/CldImage';
-import CldVideo from '@/components/media/CldVideo';
+import CldImage from '@/components/shared/media/CldImage';
+import CldVideo from '@/components/shared/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
 import Head from 'next/head'
 

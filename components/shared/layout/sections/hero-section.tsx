@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { LearnMoreButton } from "../ui/learn-more-button"
+import { LearnMoreButton } from "../../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 // Define video sources with multiple formats for better browser support
 const videoSources = {
   mobile: {
-    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm",
-    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4"
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm.webm",
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4.mp4"
   },
   desktop: {
-    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm", 
-    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4"
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm.webm", 
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4.mp4"
   }
 };
 
@@ -25,16 +25,23 @@ export function HeroSection() {
   const [videoError, setVideoError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
-  const handleVideoError = () => {
-    console.log("Video failed to load, showing fallback");
+  const currentSources = isMobile ? videoSources.mobile : videoSources.desktop;
+
+  const handleVideoError = (e: any) => {
+    console.error("Video failed to load:", e);
+    console.error("Current sources:", currentSources);
     setVideoError(true);
   };
 
   const handleVideoLoad = () => {
+    console.log("Video loaded successfully");
     setIsVideoLoaded(true);
   };
 
-  const currentSources = isMobile ? videoSources.mobile : videoSources.desktop;
+  // Log video sources on mount
+  useEffect(() => {
+    console.log("Hero video sources:", currentSources);
+  }, [currentSources]);
   
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">

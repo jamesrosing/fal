@@ -3,7 +3,7 @@
 import type { Article, ArticleContent } from '@/lib/types';
 import { format } from 'date-fns';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/shared/ui/badge';
 
 
 interface ArticlePreviewProps {

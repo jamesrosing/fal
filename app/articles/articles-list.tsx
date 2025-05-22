@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Article, ArticleCategory, ARTICLE_CATEGORIES } from '@/lib/types';
-import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
 import { useRouter } from 'next/navigation';
-import CloudinaryFolderImage from '@/components/media/CloudinaryFolderImage';
+import CloudinaryFolderImage from '@/components/shared/media/CloudinaryFolderImage';
 import { extractImageNameFromPath, isCloudinaryUrl } from '@/lib/cloudinary/folder-utils';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/shared/ui/input';
+import { Badge } from '@/components/shared/ui/badge';
 import { Search, X } from 'lucide-react';
 
 // Define the main category slugs we want to show in the menubar

@@ -2,22 +2,22 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { CloudinaryUploader } from '@/components/CloudinaryUploader';
+import { CloudinaryUploader } from '@/components/features/admin/CloudinaryUploader';
 import { CloudinaryAsset, ImageArea } from '@/lib/cloudinary';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Badge } from '@/components/shared/ui/badge';
+import { Label } from '@/components/shared/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
+import { useToast } from '@/components/shared/ui/use-toast';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from '@/components/shared/ui/accordion';
 import {
   ChevronRight,
   FileImage,
