@@ -5,20 +5,23 @@ import { motion } from "framer-motion"
 import { LearnMoreButton } from "../../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
 
-// Define video sources with multiple formats for better browser support
+// Define Cloudinary video sources with multiple formats for better browser support
 const videoSources = {
   mobile: {
-    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm.webm",
-    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4.mp4"
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/emsculpt/videos/hero/hero-480p-webm",
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/emsculpt/videos/hero/hero-480p-mp4"
   },
   desktop: {
-    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm.webm", 
-    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4.mp4"
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/emsculpt/videos/hero/hero-720p-webm", 
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/emsculpt/videos/hero/hero-720p-mp4"
   }
 };
 
+// Main homepage video (alternative option)
+const homeHeroVideo = "/videos/backgrounds/home-hero.mp4";
+
 // Fallback image if video fails to load
-const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1/hero/hero-fallback.jpg";
+const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/home/hero-fallback";
 
 export function HeroSection() {
   const isMobile = useIsMobile();
@@ -29,12 +32,10 @@ export function HeroSection() {
 
   const handleVideoError = (e: any) => {
     console.error("Video failed to load:", e);
-    console.error("Current sources:", currentSources);
     setVideoError(true);
   };
 
   const handleVideoLoad = () => {
-    console.log("Video loaded successfully");
     setIsVideoLoaded(true);
   };
 
@@ -64,10 +65,6 @@ export function HeroSection() {
               playsInline
               onError={handleVideoError}
               onLoadedData={handleVideoLoad}
-              style={{
-                objectPosition: 'center',
-                zIndex: 1
-              }}
             >
               {/* WebM source for better compression and quality */}
               <source src={currentSources.webm} type="video/webm" />
@@ -83,8 +80,7 @@ export function HeroSection() {
           <div 
             className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url(${fallbackImage})`,
-              zIndex: 1
+              backgroundImage: `url(${fallbackImage})`
             }}
           />
         )}
