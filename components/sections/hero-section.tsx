@@ -1,121 +1,78 @@
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
-import { CldVideoPlayer } from 'next-cloudinary'
-import 'next-cloudinary/dist/cld-video-player.css'
 import { useIsMobile } from "@/hooks/use-mobile"
 
 export function HeroSection() {
   const isMobile = useIsMobile();
+  const [videoError, setVideoError] = useState(false);
   
-  // Define video public IDs
-  const mobileVideoId = "emsculpt/videos/hero/hero-480p-mp4";
-  const desktopVideoId = "emsculpt/videos/hero/hero-720p-mp4";
+  // Define video sources with multiple formats for better browser support
+  const videoSources = {
+    mobile: {
+      webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm",
+      mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4"
+    },
+    desktop: {
+      webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm", 
+      mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4"
+    }
+  };
+
+  // Fallback image if video fails to load
+  const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1/hero/hero-fallback.jpg";
+
+  const handleVideoError = () => {
+    console.log("Video failed to load, showing fallback");
+    setVideoError(true);
+  };
+
+  const currentSources = isMobile ? videoSources.mobile : videoSources.desktop;
   
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
-      {/* Full-screen video container - Using conditional rendering based on device */}
+      {/* Full-screen video/image background */}
       <div className="absolute inset-0 w-full h-full">
-        {isMobile ? (
-          // Mobile Video Player
-          <div className="absolute inset-0">
-            <CldVideoPlayer
-              id="hero-video-mobile"
-              src={mobileVideoId}
-              width="480"
-              height="854"
-              autoplay={true}
-              muted={true}
-              loop={true}
-              controls={false}
-            />
-          </div>
+        {!videoError ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            onError={handleVideoError}
+            style={{
+              objectPosition: 'center',
+              zIndex: 1
+            }}
+          >
+            {/* WebM source for better compression and quality */}
+            <source src={currentSources.webm} type="video/webm" />
+            {/* MP4 fallback for broader browser support */}
+            <source src={currentSources.mp4} type="video/mp4" />
+            
+            {/* If video fails completely, this text will show */}
+            Your browser does not support the video tag.
+          </video>
         ) : (
-          // Desktop Video Player
-          <div className="absolute inset-0">
-            <CldVideoPlayer
-              id="hero-video-desktop"
-              src={desktopVideoId}
-              width="1920" 
-              height="1080"
-              autoplay={true}
-              muted={true}
-              loop={true}
-              controls={false}
-            />
-          </div>
+          /* Fallback image if video fails to load */
+          <div 
+            className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${fallbackImage})`,
+              zIndex: 1
+            }}
+          />
         )}
         
-        {/* Global styling for the video player to ensure it fills the screen */}
-        <style jsx global>{`
-          /* Make video player container fill available space */
-          .cld-video-player {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            max-width: none !important;
-            max-height: none !important;
-            overflow: hidden !important;
-          }
-          
-          /* Make the actual video element cover the container */
-          .cld-video-player video {
-            object-fit: cover !important;
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-          }
-          
-          /* Ensure video.js elements don't break the layout */
-          .cld-video-player .vjs-tech {
-            object-fit: cover !important;
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-          }
-          
-          /* Hide control bar completely */
-          .cld-video-player .vjs-control-bar {
-            display: none !important;
-          }
-          
-          /* Ensure video wrapper takes full size */
-          .cld-video-player-wrapper,
-          .cld-video-player .vjs-tech,
-          .cld-video-player .vjs-poster {
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            object-fit: cover !important;
-            background-size: cover !important;
-          }
-          
-          /* Fix mobile specific issues */
-          @media (max-width: 768px) {
-            .cld-video-player,
-            .cld-video-player video,
-            .cld-video-player .vjs-tech {
-              object-position: center !important;
-            }
-          }
-        `}</style>
-        
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/30" />
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 z-10" />
       </div>
       
       {/* Content Container */}
-      <div className="relative h-screen flex items-center">
+      <div className="relative h-screen flex items-end pb-16 md:pb-20 z-20">
         <div className="container mx-auto px-4 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

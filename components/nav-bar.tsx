@@ -418,9 +418,7 @@ export function NavBar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={cn(
-                    "md:hidden relative h-10 w-10 rounded-md text-white hover:bg-white/20 transition-colors z-50"
-                  )}
+                  className="md:hidden relative h-10 w-10 rounded-md text-white hover:bg-white/20 transition-colors z-50"
                 >
                   <div className="relative w-6 h-6 flex flex-col justify-center items-center gap-1.5">
                     <span className="w-6 h-0.5 bg-white rounded-full block transition-all duration-200"></span>
