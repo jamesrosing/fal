@@ -10,6 +10,7 @@ import { Suspense } from "react"
 import CldImage from '@/components/media/CldImage';
 import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+import Head from 'next/head'
 
 
 
@@ -72,6 +73,12 @@ const treatments = [
 export default function Dermatology() {
   return (
     <main className="min-h-screen bg-black">
+      <Head>
+        <title>Dermatology Services Newport Beach | Skin Care Specialists | Allure MD</title>
+        <meta name="description" content="Comprehensive dermatology care at Allure MD in Newport Beach. Expert treatment for acne, eczema, psoriasis, rosacea, and preventative skin screenings." />
+        <meta name="keywords" content="dermatology, skin care, acne treatment, eczema, psoriasis, rosacea, skin screening, Newport Beach, skin specialists" />
+      </Head>
+      
       <Suspense fallback={null}>
         <ScrollHandler />
       </Suspense>
@@ -79,44 +86,96 @@ export default function Dermatology() {
       
       {/* Hero Section */}
       <section className="relative h-screen">
-        <div className="absolute inset-0">
+        {/* Desktop Hero with full-screen image and text overlay */}
+        <div className="hidden lg:block absolute inset-0">
           <CldImage 
             src="services/dermatology/dermatology-hero" 
             alt="Dermatology at Allure MD" 
             priority 
             fill 
+            className="object-cover"
             config={{
               cloud: {
-                cloudName: 'dyrzyfg3w', // Use your Cloudinary cloud name
+                cloudName: 'dyrzyfg3w'
               }
             }}
           />
-          <div className="absolute inset-0 bg-black/50" />
+          {/* Gradient overlay for desktop */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+          
+          <div className="relative h-full flex items-end">
+            <div className="container mx-auto px-8 pb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="max-w-2xl text-white"
+              >
+                <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                  DERMATOLOGY
+                </h1>
+                <h2 className="mb-6 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+                  Excellence in skin care
+                </h2>
+                <div className="space-y-4 text-lg font-cerebri font-light">
+                  <p>
+                    At Allure MD, our dermatology team provides comprehensive care for all your skin health needs. From medical treatments to cosmetic enhancements, we offer personalized solutions for every patient.
+                  </p>
+                  <div className="flex flex-wrap gap-4 mt-6">
+                    <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
+                    <LearnMoreButton href="/gallery/dermatology">View Before & After Gallery</LearnMoreButton>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
         
-        <div className="relative h-full flex items-center">
-          <div className="container mx-auto px-4">
+        {/* Mobile Hero */}
+        <div className="lg:hidden">
+          {/* Media container with full width */}
+          <div className="relative w-full aspect-[16/9]">
+            <CldImage 
+              src="services/dermatology/dermatology-hero" 
+              alt="Dermatology at Allure MD" 
+              priority 
+              fill 
+              className="object-cover"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
+            {/* Gradient overlay for mobile */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+            
+            {/* Text positioned at the bottom of the image */}
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
+                DERMATOLOGY
+              </h1>
+            </div>
+          </div>
+          
+          {/* Text content continuation for mobile */}
+          <div className="px-4 py-6 bg-black">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="max-w-3xl text-white"
+              className="text-white"
             >
-              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                Dermatology
-              </h1>
-              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+              <h2 className="mb-6 text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-tight font-serif">
                 Excellence in skin care
               </h2>
-              <div className="space-y-6 text-lg font-cerebri font-light">
+              <div className="space-y-4 text-base font-cerebri font-light">
                 <p>
-                  At Allure MD, our dermatology team provides comprehensive care for all your skin health needs.
-                  From medical treatments to cosmetic enhancements, we offer personalized solutions for every patient.
+                  At Allure MD, our dermatology team provides comprehensive care for all your skin health needs. From medical treatments to cosmetic enhancements, we offer personalized solutions for every patient.
                 </p>
-                <div>
-                  <LearnMoreButton href="/consultation">Schedule a Consultation</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/about#susan-pearose">Susan Pearose, Certified Dermatology Specialist</LearnMoreButton>
+                <div className="flex flex-col space-y-4 mt-6">
+                  <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
+                  <LearnMoreButton href="/gallery/dermatology">View Before & After Gallery</LearnMoreButton>
                 </div>
               </div>
             </motion.div>

@@ -10,6 +10,7 @@ import { Suspense } from "react"
 import CldImage from '@/components/media/CldImage';
 import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+import Head from 'next/head'
 
 function ScrollHandler() {
   const searchParams = useSearchParams()
@@ -74,6 +75,14 @@ const education = [
   { institution: "Manhattan Eye, Ear & Throat Hospital", program: "Aesthetic Fellowship", year: "2012" }
 ]
 
+const contact = {
+  address: "1441 Avocado Avenue, Suite 708",
+  city: "Newport Beach, California 92660",
+  email: "drrosing@allure-md",
+  phone: "949.706.7874",
+  fax: "949.706.7817"
+}
+
 const reviews = [
   {
     platform: "Google",
@@ -101,6 +110,15 @@ const reviews = [
 export default function PlasticSurgery() {
   return (
     <main className="min-h-screen bg-black">
+      <Head>
+        <title>Plastic Surgery Newport Beach | Dr. James Rosing, MD, FACS | Allure MD</title>
+        <meta name="description" content="Board certified plastic surgeon Dr. James Rosing specializes in facial plastic surgery, breast procedures & body contouring in Newport Beach. Natural results with minimal downtime." />
+        <meta name="keywords" content="plastic surgeon Newport Beach, facial plastic surgery, facelift, necklift, eyelid lift, browlift, breast augmentation, breast reduction, breast lift, nipple inversion, body contouring, liposuction, abdominoplasty, tummy tuck, Dr. James Rosing MD FACS" />
+        <meta property="og:title" content="Plastic Surgery Newport Beach | Dr. James Rosing, MD, FACS | Allure MD" />
+        <meta property="og:description" content="Board certified plastic surgeon Dr. James Rosing specializes in facial plastic surgery, breast procedures & body contouring in Newport Beach." />
+        <meta property="og:url" content="https://allure-md.com/services/plastic-surgery" />
+        <meta property="og:type" content="website" />
+      </Head>
       <Suspense fallback={null}>
         <ScrollHandler />
       </Suspense>
@@ -108,7 +126,8 @@ export default function PlasticSurgery() {
       
       {/* Hero Section */}
       <section className="relative h-screen">
-        <div className="absolute inset-0">
+        {/* Desktop Hero with full-screen image and text overlay */}
+        <div className="hidden lg:block absolute inset-0">
           <CldImage 
             src="services/plastic-surgery/plastic-surgery-hero" 
             alt="Plastic Surgery at Allure MD" 
@@ -121,77 +140,11 @@ export default function PlasticSurgery() {
               }
             }}
           />
-          <div className="absolute inset-0 bg-black/50" />
-        </div>
-        
-        {/* Mobile Hero with Image on top + Text below */}
-        <div className="lg:hidden">
-          {/* Media container with full width */}
-          <div className="relative w-full aspect-[16/9]">
-            <CldImage 
-              src="services/plastic-surgery/plastic-surgery-hero" 
-              alt="Plastic Surgery at Allure MD" 
-              priority 
-              fill 
-              className="object-cover"
-              config={{
-                cloud: {
-                  cloudName: 'dyrzyfg3w'
-                }
-              }}
-            />
-            <div className="absolute inset-0 bg-black/50" />
-          </div>
+          {/* Gradient overlay for desktop */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
           
-          {/* Text content below image */}
-          <div className="px-4 py-10 bg-black">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-white"
-            >
-              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-                Plastic Surgery
-              </h1>
-              <h2 className="mb-6 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
-                Artistry in aesthetic transformation
-              </h2>
-              <div className="space-y-6 text-base font-cerebri font-light">
-                <p>
-                  At Allure MD, our board-certified plastic surgeons combine surgical expertise with an artistic vision to enhance your natural beauty. 
-                  Dr. James Rosing and our team deliver personalized care and exceptional results.
-                </p>
-                <div className="space-y-4">
-                  <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
-                  <br />
-                  <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-        
-        {/* Desktop Hero with Text over Image */}
-        <div className="hidden lg:block relative h-screen">
-          <div className="absolute inset-0">
-            <CldImage 
-              src="services/plastic-surgery/plastic-surgery-hero" 
-              alt="Plastic Surgery at Allure MD" 
-              priority 
-              fill 
-              className="object-cover"
-              config={{
-                cloud: {
-                  cloudName: 'dyrzyfg3w'
-                }
-              }}
-            />
-            <div className="absolute inset-0 bg-black/50" />
-          </div>
-          
-          <div className="relative h-full flex items-center">
-            <div className="container mx-auto px-4 lg:px-8">
+          <div className="relative h-full flex items-end">
+            <div className="container mx-auto px-8 py-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -207,7 +160,7 @@ export default function PlasticSurgery() {
                 <div className="space-y-6 text-base font-cerebri font-light">
                   <p>
                     At Allure MD, our board-certified plastic surgeons combine surgical expertise with an artistic vision to enhance your natural beauty.
-                    Dr. James Rosing and our team deliver personalized care and exceptional results.
+                    Led by Dr. James Rosing, we specialize in facial aesthetic surgery, breast procedures, and body contouring with personalized care and exceptional results.
                   </p>
                   <div className="space-y-4">
                     <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
@@ -216,6 +169,61 @@ export default function PlasticSurgery() {
                   </div>
                 </div>
               </motion.div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Mobile Hero */}
+        <div className="lg:hidden h-full flex flex-col">
+          {/* Image container with aspect ratio */}
+          <div className="relative w-full aspect-[16/9] mt-16">
+            <CldImage 
+              src="services/plastic-surgery/plastic-surgery-hero" 
+              alt="Plastic Surgery at Allure MD" 
+              priority 
+              fill 
+              className="object-cover"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
+            {/* Gradient overlay for mobile */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+            
+            {/* Title overlay at bottom of image */}
+            <div className="absolute inset-0 flex items-end">
+              <div className="px-4 py-6 w-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="text-white"
+                >
+                  <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                    Plastic Surgery
+                  </h1>
+                  <h2 className="mb-4 text-[clamp(2rem,5vw,3rem)] leading-none tracking-tight font-serif">
+                    Artistry in aesthetic transformation
+                  </h2>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Text content below image */}
+          <div className="px-4 py-6 bg-black flex-grow">
+            <div className="space-y-6 text-base font-cerebri font-light text-white">
+              <p>
+                At Allure MD, our board-certified plastic surgeons combine surgical expertise with an artistic vision to enhance your natural beauty. 
+                Led by Dr. James Rosing, we specialize in facial aesthetic surgery, breast procedures, and body contouring with personalized care and exceptional results.
+              </p>
+              <div className="space-y-4">
+                <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
+                <br />
+                <LearnMoreButton href="/gallery">View Before & After Gallery</LearnMoreButton>
+              </div>
             </div>
           </div>
         </div>
@@ -248,16 +256,16 @@ export default function PlasticSurgery() {
                 </div>
               </div>
               <div className="w-full md:w-2/3">
-                <h2 className="mb-6 text-3xl font-serif">About Dr. Rosing</h2>
+                <h2 className="mb-6 text-3xl font-serif">About Dr. James Rosing, Board Certified Plastic Surgeon</h2>
                 <div className="space-y-4 text-lg font-cerebri font-light">
                   <p>
-                    Dr. James Rosing is a double board-certified plastic surgeon specializing in facial plastic surgery. After earning his medical degree from Yale University, he completed his residency at UCLA Medical Center and an aesthetic fellowship at the prestigious Manhattan Eye, Ear & Throat Hospital.
+                    Dr. James Rosing, MD, FACS is a board certified plastic and reconstructive surgeon specializing in facial aesthetic plastic surgery. His expertise includes facelift, necklift, eyelid lift, browlift, earlobe enhancement, and ear pinning procedures that deliver natural-looking results with minimal downtime.
                   </p>
                   <p>
-                    With over 15 years of experience, Dr. Rosing has developed innovative techniques for facial rejuvenation that deliver natural-looking results with minimal downtime. His dedication to facial aesthetics has made him a sought-after surgeon for patients worldwide seeking facelifts and eyelid procedures.
+                    Dr. Rosing is also well known for excellence in plastic surgery of the breast, including augmentation, revision breast implant surgery, breast reduction and lift surgery, and nipple inversion correction. His body contouring expertise features etching liposuction for male and female fit abdominal shaping and abdominoplasty designed to correct diastasis after multiple childbirths.
                   </p>
                   <p>
-                    Dr. Rosing takes pride in understanding each patient's unique facial anatomy and aesthetic goals. His personalized approach ensures results that enhance natural beauty rather than creating an artificial appearance.
+                    Beyond his clinical expertise, Dr. Rosing has contributed to the field through research on autologous fat grafting for breast augmentation and innovative nipple reconstruction techniques. As an accomplished athlete with Ironman and marathon completions, he brings the same dedication and precision to his surgical practice that has made him a sought-after surgeon for patients worldwide.
                   </p>
                 </div>
               </div>
@@ -425,12 +433,12 @@ export default function PlasticSurgery() {
                 years of specialized experience
               </p>
               <p className="text-lg font-cerebri">
-                <span className="text-4xl font-serif">5000+</span><br />
-                successful procedures performed
+                <span className="text-4xl font-serif">1000+</span><br />
+                facial aesthetic procedures
               </p>
               <p className="text-lg font-cerebri">
-                <span className="text-4xl font-serif">25+</span><br />
-                countries represented in patient base
+                <span className="text-4xl font-serif">2500+</span><br />
+                breast and body procedures
               </p>
             </div>
           </motion.div>
@@ -509,6 +517,40 @@ export default function PlasticSurgery() {
                 <br />
                 <LearnMoreButton href="/financing">Learn About Financing</LearnMoreButton>
               </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Information */}
+      <section className="py-16 lg:py-24 bg-gray-950">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-white"
+          >
+            <h2 className="text-center mb-12 text-3xl font-serif">Contact Dr. Rosing</h2>
+            
+            <div className="grid md:grid-cols-2 gap-8 text-center md:text-left">
+              <div>
+                <h3 className="mb-6 text-xl font-cerebri uppercase tracking-wide">Office Location</h3>
+                <p className="text-lg font-cerebri font-light">{contact.address}</p>
+                <p className="text-lg font-cerebri font-light">{contact.city}</p>
+              </div>
+              
+              <div>
+                <h3 className="mb-6 text-xl font-cerebri uppercase tracking-wide">Contact Information</h3>
+                <p className="text-lg font-cerebri font-light">Email: {contact.email}</p>
+                <p className="text-lg font-cerebri font-light">Phone: {contact.phone}</p>
+                <p className="text-lg font-cerebri font-light">Fax: {contact.fax}</p>
+              </div>
+            </div>
+            
+            <div className="mt-12 text-center">
+              <LearnMoreButton href="/appointment">Schedule a Consultation</LearnMoreButton>
             </div>
           </motion.div>
         </div>

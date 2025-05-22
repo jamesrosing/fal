@@ -10,6 +10,7 @@ import { Suspense } from "react"
 import CldImage from '@/components/media/CldImage';
 import CldVideo from '@/components/media/CldVideo';
 import { mediaId, mediaUrl, getMediaUrl } from "@/lib/media";
+import Head from 'next/head'
 
 
 
@@ -86,57 +87,115 @@ const treatments = [
 export default function MedicalSpa() {
   return (
     <main className="min-h-screen bg-black">
+      <Head>
+        <title>Medical Spa Newport Beach | Luxury Aesthetic Treatments | Allure MD</title>
+        <meta name="description" content="Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD's Medical Spa in Newport Beach." />
+        <meta name="keywords" content="medical spa, Newport Beach, cosmetic injections, Botox, fillers, laser treatments, RF microneedling, EMSCULPT, esthetician services, luxury spa" />
+      </Head>
+      
       <Suspense fallback={null}>
         <ScrollHandler />
       </Suspense>
       <NavBar />
       
       {/* Hero Section */}
-      <section className="relative pt-20">
-        {/* Container with reduced height (40vh) */}
-        <div className="relative w-full h-[40vh] md:h-[40vh] lg:h-[40vh]">
+      <section className="relative h-screen">
+        {/* Desktop Hero with full-screen image and text overlay */}
+        <div className="hidden lg:block absolute inset-0">
           <CldImage 
             src="services/medical-spa/medical-spa-hero" 
             alt="Medical Spa at Allure MD" 
             priority 
             fill 
             className="object-cover"
-            sizes="100vw"
             config={{
               cloud: {
                 cloudName: 'dyrzyfg3w'
               }
             }}
           />
-          <div className="absolute inset-0 bg-black/50" />
+          {/* Gradient overlay for desktop */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+          
+          <div className="relative h-full flex items-end">
+            <div className="container mx-auto px-8 pb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="max-w-2xl text-white"
+              >
+                <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                  MEDICAL SPA
+                </h1>
+                <h2 className="mb-6 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+                  Luxury meets advanced aesthetics
+                </h2>
+                <div className="space-y-4 text-lg font-cerebri font-light">
+                  <p>
+                    Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD's Medical Spa.
+                    Our expert team delivers personalized care using the latest technologies and techniques.
+                  </p>
+                  <div className="flex flex-wrap gap-4 mt-6">
+                    <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
+                    <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
         </div>
         
-        {/* Content positioned below hero image on mobile, overlaying on desktop */}
-        <div className="relative lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl text-white"
-          >
-            <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
-              Medical Spa
-            </h1>
-            <h2 className="mb-6 text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-tight font-serif">
-              Luxury meets advanced aesthetics
-            </h2>
-            <div className="space-y-4 text-base lg:text-lg font-cerebri font-light">
-              <p>
-                Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD&apos;s Medical Spa.
-                Our expert team delivers personalized care using the latest technologies and techniques.
-              </p>
-              <div className="space-y-4 pt-2">
-                <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
-                <br />
-                <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
-              </div>
+        {/* Mobile Hero */}
+        <div className="lg:hidden">
+          {/* Media container with full width */}
+          <div className="relative w-full aspect-[16/9]">
+            <CldImage 
+              src="services/medical-spa/medical-spa-hero" 
+              alt="Medical Spa at Allure MD" 
+              priority 
+              fill 
+              className="object-cover"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
+            {/* Gradient overlay for mobile */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+            
+            {/* Text positioned at the bottom of the image */}
+            <div className="absolute bottom-0 left-0 right-0 p-6">
+              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide text-white">
+                MEDICAL SPA
+              </h1>
             </div>
-          </motion.div>
+          </div>
+          
+          {/* Text content continuation for mobile */}
+          <div className="px-4 py-6 bg-black">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-white"
+            >
+              <h2 className="mb-6 text-[clamp(2.5rem,5vw,3.5rem)] leading-none tracking-tight font-serif">
+                Luxury meets advanced aesthetics
+              </h2>
+              <div className="space-y-4 text-base font-cerebri font-light">
+                <p>
+                  Experience the perfect blend of relaxation and cutting-edge aesthetic treatments at Allure MD's Medical Spa.
+                  Our expert team delivers personalized care using the latest technologies and techniques.
+                </p>
+                <div className="flex flex-col space-y-4 mt-6">
+                  <LearnMoreButton href="/appointment">Schedule an Appointment</LearnMoreButton>
+                  <LearnMoreButton href="/gallery/medical-spa">View Before & After Gallery</LearnMoreButton>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 

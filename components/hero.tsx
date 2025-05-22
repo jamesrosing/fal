@@ -149,8 +149,8 @@ export function PageHero({
   }, [image.path, publicId, error]);
   
   return (
-    <section className="relative pt-20">
-      <div className="relative aspect-[16/9] w-full">
+    <section className="relative h-screen">
+      <div className="absolute inset-0">
         {isLoading ? (
           <Skeleton 
             className="absolute inset-0 w-full h-full object-cover" 
@@ -176,25 +176,128 @@ export function PageHero({
             <span className="text-gray-400">Image not available</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        {/* Gradient overlay: clearer on left, more opaque on right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/50 to-black/70" />
       </div>
       
-      <div className="lg:absolute lg:bottom-0 lg:left-0 lg:right-0 p-6 bg-black lg:bg-transparent">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-3xl text-white"
-        >
-          {subtitle && (
-            <p className="text-lg md:text-xl font-serif mb-2 text-gray-300">{subtitle}</p>
+      {/* Mobile Hero with Image on top + Text below */}
+      <div className="lg:hidden">
+        {/* Media container with full width */}
+        <div className="relative w-full aspect-[16/9]">
+          {isLoading ? (
+            <Skeleton 
+              className="absolute inset-0 w-full h-full object-cover" 
+            />
+          ) : publicId ? (
+            <CldImage 
+              src={publicId}
+              alt={image.alt}
+              width={1920}
+              height={1080} 
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+              sizes="100vw"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
+          ) : (
+            // Fallback image when no publicId is available
+            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400">Image not available</span>
+            </div>
           )}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-4">{title}</h1>
-          {description && (
-            <p className="text-lg text-gray-200 mb-6">{description}</p>
+          {/* Gradient overlay: clearer on left, more opaque on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-black/50 to-black/70" />
+        </div>
+        
+        {/* Text content below image */}
+        <div className="px-4 py-10 bg-black">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-white"
+          >
+            {subtitle && (
+              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                {subtitle}
+              </h1>
+            )}
+            <h2 className="mb-6 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+              {title}
+            </h2>
+            {description && (
+              <div className="space-y-6 text-base font-cerebri font-light">
+                <p>{description}</p>
+                <div className="space-y-4">
+                  {children}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Desktop Hero with Text over Image */}
+      <div className="hidden lg:block relative h-screen">
+        <div className="absolute inset-0">
+          {isLoading ? (
+            <Skeleton 
+              className="absolute inset-0 w-full h-full object-cover" 
+            />
+          ) : publicId ? (
+            <CldImage 
+              src={publicId}
+              alt={image.alt}
+              width={1920}
+              height={1080} 
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+              sizes="100vw"
+              config={{
+                cloud: {
+                  cloudName: 'dyrzyfg3w'
+                }
+              }}
+            />
+          ) : (
+            // Fallback image when no publicId is available
+            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400">Image not found</span>
+            </div>
           )}
-          {children}
-        </motion.div>
+          {/* Gradient overlay from left to right - clearer on left, more opaque on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-black/70" />
+        </div>
+        
+        <div className="relative h-full flex items-end">
+          <div className="container mx-auto px-8 py-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-3xl text-white"
+            >
+              <h1 className="mb-2 text-md font-cerebri font-normal uppercase tracking-wide">
+                {subtitle}
+              </h1>
+              <h2 className="mb-8 text-[clamp(2.5rem,5vw,4rem)] leading-none tracking-tight font-serif">
+                {title}
+              </h2>
+              <div className="space-y-6 text-base font-cerebri font-light">
+                <p>
+                  {description}
+                </p>
+                <div className="space-y-4">
+                  {children}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
