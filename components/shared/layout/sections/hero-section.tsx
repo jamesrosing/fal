@@ -5,28 +5,33 @@ import { motion } from "framer-motion"
 import { LearnMoreButton } from "../ui/learn-more-button"
 import { useIsMobile } from "@/hooks/use-mobile"
 
+// Define video sources with multiple formats for better browser support
+const videoSources = {
+  mobile: {
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm",
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4"
+  },
+  desktop: {
+    webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm", 
+    mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4"
+  }
+};
+
+// Fallback image if video fails to load
+const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1/hero/hero-fallback.jpg";
+
 export function HeroSection() {
   const isMobile = useIsMobile();
   const [videoError, setVideoError] = useState(false);
-  
-  // Define video sources with multiple formats for better browser support
-  const videoSources = {
-    mobile: {
-      webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-webm",
-      mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-480p-mp4"
-    },
-    desktop: {
-      webm: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-webm", 
-      mp4: "https://res.cloudinary.com/dyrzyfg3w/video/upload/v1/emsculpt/videos/hero/hero-720p-mp4"
-    }
-  };
-
-  // Fallback image if video fails to load
-  const fallbackImage = "https://res.cloudinary.com/dyrzyfg3w/image/upload/v1/hero/hero-fallback.jpg";
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   const handleVideoError = () => {
     console.log("Video failed to load, showing fallback");
     setVideoError(true);
+  };
+
+  const handleVideoLoad = () => {
+    setIsVideoLoaded(true);
   };
 
   const currentSources = isMobile ? videoSources.mobile : videoSources.desktop;
@@ -36,26 +41,36 @@ export function HeroSection() {
       {/* Full-screen video/image background */}
       <div className="absolute inset-0 w-full h-full">
         {!videoError ? (
-          <video
-            className="absolute inset-0 w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            onError={handleVideoError}
-            style={{
-              objectPosition: 'center',
-              zIndex: 1
-            }}
-          >
-            {/* WebM source for better compression and quality */}
-            <source src={currentSources.webm} type="video/webm" />
-            {/* MP4 fallback for broader browser support */}
-            <source src={currentSources.mp4} type="video/mp4" />
+          <>
+            {/* Show skeleton while video is loading */}
+            {!isVideoLoaded && (
+              <div className="absolute inset-0 w-full h-full bg-gray-900 animate-pulse" />
+            )}
             
-            {/* If video fails completely, this text will show */}
-            Your browser does not support the video tag.
-          </video>
+            <video
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                isVideoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
+              autoPlay
+              muted
+              loop
+              playsInline
+              onError={handleVideoError}
+              onLoadedData={handleVideoLoad}
+              style={{
+                objectPosition: 'center',
+                zIndex: 1
+              }}
+            >
+              {/* WebM source for better compression and quality */}
+              <source src={currentSources.webm} type="video/webm" />
+              {/* MP4 fallback for broader browser support */}
+              <source src={currentSources.mp4} type="video/mp4" />
+              
+              {/* If video fails completely, this text will show */}
+              Your browser does not support the video tag.
+            </video>
+          </>
         ) : (
           /* Fallback image if video fails to load */
           <div 
@@ -98,4 +113,4 @@ export function HeroSection() {
       </div>
     </section>
   )
-} 
+}

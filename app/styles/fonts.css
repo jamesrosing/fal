@@ -1,23 +1,45 @@
-/* Adobe Typekit font classes will be available after the stylesheet loads */
-.tk-font-primary {
-  font-family: "font-family-name", sans-serif;
-}
+/* Font System - Unified Typography Configuration */
 
-.tk-font-secondary {
-  font-family: "font-family-name", serif;
-}
-
-/* Garamond Premier Pro styles */
-
-
+/* Primary Font: Garamond Premier Pro (Adobe Typekit) */
+/* This font is loaded via Adobe Typekit in layout.tsx */
 .tk-garamond-subhead {
   font-family: "garamond-premier-pro-subhead", serif;
 }
 
+/* Secondary Font: Cerebri Sans (Local) */
+@font-face {
+  font-family: 'Cerebri Sans';
+  src: url('/fonts/CerebriSansLight.woff2') format('woff2'),
+       url('/fonts/CerebriSansLight.woff') format('woff'),
+       url('/fonts/CerebriSansLight.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
+  font-family: 'Cerebri Sans';
+  src: url('/fonts/CerebriSansBook.woff2') format('woff2'),
+       url('/fonts/CerebriSansBook.woff') format('woff'),
+       url('/fonts/CerebriSansBook.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
-/* Font weight system */
+@font-face {
+  font-family: 'Cerebri Sans';
+  src: url('/fonts/CerebriSansMedium.woff2') format('woff2'),
+       url('/fonts/CerebriSansMedium.woff') format('woff'),
+       url('/fonts/CerebriSansMedium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Font Weight System */
 :root {
+  --font-light: 300;
   --font-regular: 400;
   --font-medium: 500;
   --font-bold: 700;
@@ -26,7 +48,7 @@
 /* Typography System */
 .hero-text {
   font-family: "garamond-premier-pro-subhead", serif;
-  font-weight: 500;
+  font-weight: var(--font-medium);
   font-style: normal;
   font-size: clamp(3rem, 6vw, 5rem);
   line-height: 1;
@@ -36,6 +58,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.hero-tagline {
+  font-family: "Cerebri Sans", sans-serif;
+  font-weight: var(--font-light);
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Display & Heading Styles */
 .display-heading {
   font-family: "garamond-premier-pro-subhead", serif;
   font-weight: var(--font-regular);
@@ -58,7 +89,7 @@
   font-size: 0.875rem;
 }
 
-/* Size utilities */
+/* Responsive Typography Scale */
 .text-display {
   font-family: "garamond-premier-pro-subhead", serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
@@ -84,57 +115,13 @@
 }
 
 .text-body {
+  font-family: "Cerebri Sans", sans-serif;
   font-size: 1rem;
   line-height: 1.5;
 }
 
 .text-small {
+  font-family: "Cerebri Sans", sans-serif;
   font-size: 0.875rem;
   line-height: 1.4;
 }
-
-/* Add this to your Typography System section */
-.hero-tagline {
-  font-family: "Cerebri Sans", sans-serif;
-  font-weight: 300;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Add Cerebri Sans font faces */
-@font-face {
-  font-family: 'Cerebri Sans';
-  src: url('/fonts/CerebriSansBook.woff2') format('woff2'),
-       url('/fonts/CerebriSansBook.woff') format('woff'),
-       url('/fonts/CerebriSansBook.ttf') format('truetype'),
-       url('/fonts/CerebriSansBook.eot') format('embedded-opentype'),
-       url('/fonts/CerebriSansBook.svg') format('svg');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cerebri Sans';
-  src: url('/fonts/CerebriSansLight.woff2') format('woff2'),
-       url('/fonts/CerebriSansLight.woff') format('woff'),
-       url('/fonts/CerebriSansLight.ttf') format('truetype'),
-       url('/fonts/CerebriSansLight.eot') format('embedded-opentype'),
-       url('/fonts/CerebriSansLight.svg') format('svg');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cerebri Sans';
-  src: url('/fonts/CerebriSansMedium.woff2') format('woff2'),
-       url('/fonts/CerebriSansMedium.woff') format('woff'),
-       url('/fonts/CerebriSansMedium.ttf') format('truetype'),
-       url('/fonts/CerebriSansMedium.eot') format('embedded-opentype'),
-       url('/fonts/CerebriSansMedium.svg') format('svg');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-} 

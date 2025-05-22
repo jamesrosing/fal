@@ -1,12 +1,13 @@
 import { ThemeProvider } from "next-themes"
 import "./globals.css"
 import type { Metadata } from "next"
-import { Footer } from "@/components/footer"
-import { ChatBubble } from '@/components/ui/chat-bubble'
+import { Footer } from "@/components/shared/layout/footer"
+import { ChatBubble } from '@/components/shared/ui/chat-bubble'
 import { ToasterProvider } from "@/providers/toaster-provider"
 import Script from "next/script"
 import { Analytics } from '@vercel/analytics/react'
 import { generatePracticeSchema, generateDoctorSchema } from "@/lib/schema"
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://allure-md.com'),
@@ -84,11 +85,12 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <ToasterProvider />
-          {children}
-          <Footer />
-          <ChatBubble />
-          <Analytics />
+          <ErrorBoundary>
+            <ToasterProvider />
+            {children}
+            <Footer />
+            <ChatBubble />
+            <Analytics />
           
           {/* Google Tag Manager - using the existing setup */}
           <Script
@@ -104,6 +106,7 @@ export default function RootLayout({
               `,
             }}
           />
+          </ErrorBoundary>
         </ThemeProvider>
       </body>
     </html>
