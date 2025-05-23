@@ -10,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   useSidebar
-} from "./ui/sidebar"
+} from "@/components/shared/ui/sidebar"
 import CldImage from '@/components/shared/media/CldImage';
 import CldVideo from '@/components/shared/media/CldVideo';
 

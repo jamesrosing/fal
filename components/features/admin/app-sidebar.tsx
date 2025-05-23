@@ -4,8 +4,8 @@ import * as React from "react"
 import { Album, ImageIcon, LayoutGrid, Settings, Upload, Star, Pin, LogIn, Building2, Calendar, LayoutDashboard } from "lucide-react"
 import Link from "next/link"
 
-import { NavMain } from "./nav-main"
-import { NavUser } from "./nav-user"
+import { NavMain } from "@/components/shared/layout/nav-main"
+import { NavUser } from "@/components/shared/layout/nav-user"
 import { TeamSwitcher } from "./team-switcher"
 import { NavAdmin } from "./nav-admin"
 import { 
@@ -14,13 +14,12 @@ import {
   SidebarHeader, 
   SidebarFooter,
   SidebarCollapsible
-} from "./ui/sidebar"
-import { Button } from "./ui/button"
-import { ThemeToggle } from "./theme-toggle"
-import { ScrollArea } from "./ui/scroll-area"
+} from "@/components/shared/ui/sidebar"
+import { Button } from "@/components/shared/ui/button"
+import { ThemeToggle } from "@/components/shared/ui/theme-toggle"
+import { ScrollArea } from "@/components/shared/ui/scroll-area"
 import CldImage from '@/components/shared/media/CldImage';
 import CldVideo from '@/components/shared/media/CldVideo';
-
 
 const data = {
   teams: [
@@ -133,7 +132,7 @@ export function AppSidebar({ isAdminPage = true, ...props }: AppSidebarProps) {
         ) : (
           <div className="p-2 space-y-2">
             <Button asChild variant="outline" className="w-full">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <LogIn className="mr-2 h-4 w-4" />
                 Login / Create Account
               </Link>

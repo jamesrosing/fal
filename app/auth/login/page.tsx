@@ -48,18 +48,17 @@ export default function LoginPage() {
       toast.success("Logged in successfully")
       
       // Get the redirect path from query parameters
-      const redirectPath = searchParams.get('redirect') || '/'
+      // Default to /admin if no redirect is specified
+      const redirectPath = searchParams.get('redirect') || '/admin'
       console.log("Redirecting to:", redirectPath)
       
       // Ensure we have the latest session before redirecting
       await supabase.auth.getSession()
       
-      // Add a small delay to ensure session is properly set
-      setTimeout(() => {
-        // Redirect to the original destination or dashboard
-        router.push(redirectPath)
-        router.refresh()
-      }, 500)
+      // Use window.location for more reliable redirect
+      // This ensures the middleware runs again with the new auth state
+      window.location.href = redirectPath
+      
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in")
       console.error("Login error:", error)

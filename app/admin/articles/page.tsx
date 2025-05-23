@@ -1,6 +1,6 @@
 'use client';
 
-import { ArticleManager } from '@/components/ArticleManager';
+import { ArticleManager } from '@/components/features/articles/components/articleManager';
 import { Toaster } from '@/components/shared/ui/toaster';
 import CldImage from '@/components/shared/media/CldImage';
 import CldVideo from '@/components/shared/media/CldVideo';

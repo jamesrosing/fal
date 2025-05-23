@@ -90,19 +90,20 @@ export async function middleware(request: NextRequest) {
     }
   );
   
-  // Get the user's session
+  // Get the user's session - use getUser instead of getSession for better accuracy
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
   
   // Check if path requires authentication (admin routes)
   if (PROTECTED_ADMIN_ROUTES.some(route => pathname.startsWith(route))) {
     // Log to help debug redirects
-    console.log('Admin route detected:', pathname);
+    console.log('[Middleware] Admin route detected:', pathname);
+    console.log('[Middleware] User:', user?.email);
     
-    // If no session, redirect to login
-    if (!session) {
-      console.log('No session, redirecting to login');
+    // If no user, redirect to login
+    if (!user) {
+      console.log('[Middleware] No user found, redirecting to login');
       const url = request.nextUrl.clone();
       url.pathname = '/auth/login';
       url.searchParams.set('redirect', pathname);
@@ -111,38 +112,56 @@ export async function middleware(request: NextRequest) {
     
     // Check if user has admin role for admin routes
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('role')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
       
-      console.log('User profile for admin check:', profile);
-      console.log('Session details:', {
-        user_id: session.user.id,
-        email: session.user.email
-      });
+      console.log('[Middleware] Profile query result:', { profile, error });
+      
+      if (error) {
+        console.error('[Middleware] Error fetching user profile:', error);
+        // If profile doesn't exist, redirect to login to re-authenticate
+        const url = request.nextUrl.clone();
+        url.pathname = '/auth/login';
+        url.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(url);
+      }
       
       if (!profile) {
-        console.log('No user profile found, redirecting to homepage');
-        return NextResponse.redirect(new URL('/', request.url));
+        console.log('[Middleware] No user profile found, redirecting to login');
+        const url = request.nextUrl.clone();
+        url.pathname = '/auth/login';
+        url.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(url);
       }
       
-      if (profile.role !== 'admin') {
-        console.log(`User role is ${profile.role}, not admin. Redirecting to homepage`);
-        return NextResponse.redirect(new URL('/', request.url));
+      if (profile.role !== 'admin' && profile.role !== 'super_admin') {
+        console.log(`[Middleware] User role is ${profile.role}, not admin. Redirecting to homepage`);
+        // For non-admin users, redirect to homepage with a message
+        const url = request.nextUrl.clone();
+        url.pathname = '/';
+        url.searchParams.set('message', 'unauthorized');
+        return NextResponse.redirect(url);
       }
+      
+      // User is authenticated and has admin role - allow access
+      console.log('[Middleware] Admin access granted');
     } catch (error) {
-      console.error('Error checking admin role:', error);
-      // Redirect to homepage on error
-      return NextResponse.redirect(new URL('/', request.url));
+      console.error('[Middleware] Unexpected error checking admin role:', error);
+      // On unexpected error, redirect to login
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/login';
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
     }
   }
   
   // Check if route requires normal user authentication
   if (PROTECTED_USER_ROUTES.some(route => pathname.startsWith(route))) {
-    // If no session, redirect to login
-    if (!session) {
+    // If no user, redirect to login
+    if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = '/auth/login';
       url.searchParams.set('redirect', pathname);

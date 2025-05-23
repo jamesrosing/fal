@@ -803,6 +803,7 @@ export {
   useSidebar,
   SidebarProvider,
   Sidebar,
+  SidebarTrigger,
   SidebarHeader,
   SidebarFooter,
   SidebarCollapsible,

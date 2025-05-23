@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Edge runtime
-export const runtime = 'edge';
+// Remove edge runtime - Cloudinary SDK requires Node.js runtime
+// export const runtime = 'edge';
 
 interface FolderStructure {
   name: string;
